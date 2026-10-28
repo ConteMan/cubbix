@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -66,6 +67,7 @@ func (a *application) save() {
 	} else {
 		a.settingsError = ""
 	}
+	a.resizeWindow()
 }
 
 func (a *application) changeLanguage() {
@@ -91,11 +93,31 @@ func (a *application) changeLogin() {
 			}
 			a.config.OpenAtLogin = !a.config.OpenAtLogin
 			a.settingsError = "LoginError"
+			a.resizeWindow()
 			log.Print(err)
 			return
 		}
 	}
 	a.save()
+}
+
+func settingsHeight(t tokenValues, page int, hasError bool) int {
+	content := 2*t.SizeRowHeight + t.StrokeHairline
+	if page == 1 {
+		content = t.FontSizeSmall*t.LineHeightBody + t.Space8 + 3*t.SizeRowHeight + 2*t.StrokeHairline
+	}
+	if hasError {
+		content += t.Space8 + t.SizeIcon
+	}
+	height := max(t.SizeWindowMinHeight, content+2*t.Space24)
+	return int(math.Ceil(float64(height/t.Space4)) * float64(t.Space4))
+}
+
+func (a *application) resizeWindow() {
+	if a.window != nil {
+		t := tokens(false, "zh-CN")
+		a.window.SetSize(int(t.SizeWindowWidth), settingsHeight(t, a.page, a.settingsError != ""))
+	}
 }
 
 func (a *application) menu() *mygo.Menu {
@@ -148,7 +170,7 @@ func (a *application) ready() {
 	if os.Getenv("CUBBIX_QA") != "" {
 		if os.Getenv("CUBBIX_QA_PAGE") == "about" {
 			a.page = 1
-			a.window.SetSize(int(t.SizeWindowWidth), int(t.SizeWindowHeightAbout))
+			a.resizeWindow()
 		}
 		log.Printf("status item window: %+v", a.tray.Bounds())
 		a.window.ShowInactive()
@@ -230,13 +252,7 @@ func (a *application) view(c *ui.Context) {
 					}
 					button.Background(background).OnClick(func() {
 						a.page = index
-						if a.window != nil {
-							if index == 0 {
-								a.window.SetSize(int(t.SizeWindowWidth), int(t.SizeWindowHeight))
-							} else {
-								a.window.SetSize(int(t.SizeWindowWidth), int(t.SizeWindowHeightAbout))
-							}
-						}
+						a.resizeWindow()
 					}).Children(func() {
 						ui.Row(c).Fill().AlignItems(ui.Center).PaddingX(t.Space8).Gap(t.Space8).Children(func() {
 							ui.Icon(c, icon(item.glyph)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
@@ -248,7 +264,7 @@ func (a *application) view(c *ui.Context) {
 		})
 		ui.Column(c).Grow(1).FillHeight().Padding(t.Space24).Gap(t.Space8).DragWindow().Children(func() {
 			if a.page == 1 {
-				ui.Text(c, text("UpdateGroup")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
+				ui.Text(c, text("UpdateGroup")).Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
 			}
 			ui.Column(c).FillWidth().PaddingX(t.Space16).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
 				if a.page == 0 {

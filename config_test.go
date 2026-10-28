@@ -6,6 +6,26 @@ import (
 	"testing"
 )
 
+func TestNewConfigEnablesAutomaticUpdates(t *testing.T) {
+	config, err := loadConfig(filepath.Join(t.TempDir(), "config.toml"))
+	if err != nil || !config.AutomaticUpdates {
+		t.Fatalf("new config = %#v, %v; automatic updates should be enabled", config, err)
+	}
+}
+
+func TestSavedAutomaticUpdatesOffIsPreserved(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.toml")
+	config := defaultConfig()
+	config.AutomaticUpdates = false
+	if err := saveConfig(path, config); err != nil {
+		t.Fatal(err)
+	}
+	loaded, err := loadConfig(path)
+	if err != nil || loaded.AutomaticUpdates {
+		t.Fatalf("saved config = %#v, %v; automatic updates should remain off", loaded, err)
+	}
+}
+
 func TestConfigRoundTrip(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "cubbix", "config.toml")
 	initial, err := loadConfig(path)

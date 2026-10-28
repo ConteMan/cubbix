@@ -19,7 +19,7 @@ type Config struct {
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN"}
+	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true}
 }
 
 func loadConfig(path string) (Config, error) {

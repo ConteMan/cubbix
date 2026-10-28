@@ -79,11 +79,24 @@ func TestLanguageAndPreferencesPersist(t *testing.T) {
 	if err := tester.Click("关于"); err != nil {
 		t.Fatal(err)
 	}
-	tester.SetSize(720, 316)
+	tester.SetSize(720, settingsHeight(tokens(false, "zh-CN"), 1, false))
 	tester.ClickAt(672, 170)
 	loaded, err := loadConfig(path)
-	if err != nil || loaded.Language != "en" || !loaded.AutomaticUpdates {
+	if err != nil || loaded.Language != "en" || loaded.AutomaticUpdates {
 		t.Fatalf("config=%+v err=%v", loaded, err)
+	}
+}
+
+func TestSettingsHeight(t *testing.T) {
+	tokens := tokens(false, "zh-CN")
+	if got := settingsHeight(tokens, 0, false); got != 176 {
+		t.Fatalf("general height = %d", got)
+	}
+	if got := settingsHeight(tokens, 1, false); got != 220 {
+		t.Fatalf("about height = %d", got)
+	}
+	if got := settingsHeight(tokens, 1, true); got != 244 {
+		t.Fatalf("about with error height = %d", got)
 	}
 }
 
