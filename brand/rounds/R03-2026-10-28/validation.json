@@ -1,0 +1,124 @@
+{
+  "variants": {
+    "a1-head": {
+      "head_g2": {
+        "joins": 19,
+        "max_tangent_degrees": 1.9090959104164224e-06,
+        "max_curvature_jump": 1.1912470634922734e-08
+      },
+      "head_convex_min_radius": 1.0000000037734582,
+      "head_concave_min_radius": 3.9999999456330038,
+      "templates": [
+        {
+          "scale": 1,
+          "ink_components": 1,
+          "enclosed_apertures": 3
+        },
+        {
+          "scale": 2,
+          "ink_components": 1,
+          "enclosed_apertures": 3
+        }
+      ]
+    },
+    "a2-layer": {
+      "visible_cap_g2": [
+        {
+          "tangent_degrees": 0.0,
+          "curvature_jump": 2.363749387196412e-10
+        },
+        {
+          "tangent_degrees": 1.2074182697257333e-06,
+          "curvature_jump": 9.521073859874996e-11
+        }
+      ],
+      "left-paw_g2": {
+        "joins": 12,
+        "max_tangent_degrees": 3.078324659199975e-06,
+        "max_curvature_jump": 1.7958636362724878e-08
+      },
+      "right-paw_g2": {
+        "joins": 12,
+        "max_tangent_degrees": 3.306651113363206e-06,
+        "max_curvature_jump": 1.7958636681913998e-08
+      },
+      "rendered_clearance_units": [
+        {
+          "part": "left-paw",
+          "head_gap": 5.790617410950235,
+          "box_gap": 4.056245184896988
+        },
+        {
+          "part": "right-paw",
+          "head_gap": 5.581778390441527,
+          "box_gap": 4.056245184896988
+        }
+      ],
+      "templates": [
+        {
+          "scale": 1,
+          "ink_components": 5,
+          "enclosed_apertures": 2
+        },
+        {
+          "scale": 2,
+          "ink_components": 5,
+          "enclosed_apertures": 2
+        }
+      ]
+    },
+    "a3-combined": {
+      "head_g2": {
+        "joins": 19,
+        "max_tangent_degrees": 1.9090959104164224e-06,
+        "max_curvature_jump": 1.1912470634922734e-08
+      },
+      "head_convex_min_radius": 1.0000000037734582,
+      "head_concave_min_radius": 3.9999999456330038,
+      "visible_cap_g2": [
+        {
+          "tangent_degrees": 0.0,
+          "curvature_jump": 4.560228548944334e-09
+        },
+        {
+          "tangent_degrees": 0.0,
+          "curvature_jump": 4.560229360794921e-09
+        }
+      ],
+      "left-paw_g2": {
+        "joins": 12,
+        "max_tangent_degrees": 3.078324659199975e-06,
+        "max_curvature_jump": 1.7958636362724878e-08
+      },
+      "right-paw_g2": {
+        "joins": 12,
+        "max_tangent_degrees": 3.306651113363206e-06,
+        "max_curvature_jump": 1.7958636681913998e-08
+      },
+      "rendered_clearance_units": [
+        {
+          "part": "left-paw",
+          "head_gap": 4.162706451336678,
+          "box_gap": 4.056245184896988
+        },
+        {
+          "part": "right-paw",
+          "head_gap": 4.162706451336678,
+          "box_gap": 4.056245184896988
+        }
+      ],
+      "templates": [
+        {
+          "scale": 1,
+          "ink_components": 5,
+          "enclosed_apertures": 2
+        },
+        {
+          "scale": 2,
+          "ink_components": 5,
+          "enclosed_apertures": 2
+        }
+      ]
+    }
+  }
+}

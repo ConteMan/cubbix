@@ -1,0 +1,436 @@
+{
+  "files": [
+    {
+      "file": "a1-head/previews/color-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "color"
+    },
+    {
+      "file": "a1-head/previews/color-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "color"
+    },
+    {
+      "file": "a1-head/previews/color-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "color"
+    },
+    {
+      "file": "a1-head/previews/color-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "color"
+    },
+    {
+      "file": "a1-head/previews/mono-light-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/mono-light-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/mono-light-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/mono-light-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/template-light-transparent-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a1-head/previews/template-light-context-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-context"
+    },
+    {
+      "file": "a1-head/previews/template-light-transparent-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a1-head/previews/template-light-context-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-context"
+    },
+    {
+      "file": "a1-head/previews/mono-dark-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/mono-dark-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/mono-dark-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/mono-dark-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "mono"
+    },
+    {
+      "file": "a1-head/previews/template-dark-transparent-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a1-head/previews/template-dark-context-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-context"
+    },
+    {
+      "file": "a1-head/previews/template-dark-transparent-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a1-head/previews/template-dark-context-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-context"
+    },
+    {
+      "file": "a2-layer/previews/color-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "color"
+    },
+    {
+      "file": "a2-layer/previews/color-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "color"
+    },
+    {
+      "file": "a2-layer/previews/color-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "color"
+    },
+    {
+      "file": "a2-layer/previews/color-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "color"
+    },
+    {
+      "file": "a2-layer/previews/mono-light-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/mono-light-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/mono-light-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/mono-light-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/template-light-transparent-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a2-layer/previews/template-light-context-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-context"
+    },
+    {
+      "file": "a2-layer/previews/template-light-transparent-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a2-layer/previews/template-light-context-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-context"
+    },
+    {
+      "file": "a2-layer/previews/mono-dark-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/mono-dark-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/mono-dark-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/mono-dark-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "mono"
+    },
+    {
+      "file": "a2-layer/previews/template-dark-transparent-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a2-layer/previews/template-dark-context-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-context"
+    },
+    {
+      "file": "a2-layer/previews/template-dark-transparent-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a2-layer/previews/template-dark-context-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-context"
+    },
+    {
+      "file": "a3-combined/previews/color-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "color"
+    },
+    {
+      "file": "a3-combined/previews/color-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "color"
+    },
+    {
+      "file": "a3-combined/previews/color-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "color"
+    },
+    {
+      "file": "a3-combined/previews/color-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "color"
+    },
+    {
+      "file": "a3-combined/previews/mono-light-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/mono-light-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/mono-light-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/mono-light-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/template-light-transparent-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a3-combined/previews/template-light-context-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-context"
+    },
+    {
+      "file": "a3-combined/previews/template-light-transparent-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a3-combined/previews/template-light-context-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-context"
+    },
+    {
+      "file": "a3-combined/previews/mono-dark-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/mono-dark-128.png",
+      "width": 128,
+      "height": 128,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/mono-dark-32.png",
+      "width": 32,
+      "height": 32,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/mono-dark-16.png",
+      "width": 16,
+      "height": 16,
+      "kind": "mono"
+    },
+    {
+      "file": "a3-combined/previews/template-dark-transparent-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a3-combined/previews/template-dark-context-1x.png",
+      "width": 16,
+      "height": 16,
+      "kind": "template-context"
+    },
+    {
+      "file": "a3-combined/previews/template-dark-transparent-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-transparent"
+    },
+    {
+      "file": "a3-combined/previews/template-dark-context-2x.png",
+      "width": 32,
+      "height": 32,
+      "kind": "template-context"
+    },
+    {
+      "file": "comparison/r02-left-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "comparison/r02-right-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "a1-head/details/left-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "a1-head/details/right-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "a2-layer/details/left-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "a2-layer/details/right-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "a3-combined/details/left-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "a3-combined/details/right-junction-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "junction-detail"
+    },
+    {
+      "file": "comparison/overlay-a1.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "overlay"
+    },
+    {
+      "file": "comparison/overlay-a2.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "overlay"
+    },
+    {
+      "file": "comparison/overlay-a3.png",
+      "width": 1024,
+      "height": 1024,
+      "kind": "overlay"
+    },
+    {
+      "file": "comparison/overlay-board.png",
+      "width": 2304,
+      "height": 960,
+      "kind": "overlay-board"
+    }
+  ]
+}
