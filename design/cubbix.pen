@@ -1,0 +1,4746 @@
+{
+  "version": "2.21",
+  "children": [
+    {
+      "type": "frame",
+      "id": "AJEuu",
+      "x": 0,
+      "y": 0,
+      "name": "01 Foundations",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN"
+      },
+      "clip": true,
+      "width": 1840,
+      "height": 480,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space32",
+      "children": [
+        {
+          "type": "text",
+          "id": "r5PYC",
+          "name": "Foundation title",
+          "fill": "$ColorText",
+          "content": "Cubbix · 设计基础 R01",
+          "lineHeight": "$LineHeightTitle",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeDisplay",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "QAIGz",
+          "name": "Token families",
+          "width": "fill_container",
+          "gap": "$Space40",
+          "children": [
+            {
+              "type": "frame",
+              "id": "UOv4Q",
+              "name": "Typography",
+              "width": 280,
+              "layout": "vertical",
+              "gap": "$Space12",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "yixTW",
+                  "name": "Type label",
+                  "fill": "$ColorTextSecondary",
+                  "content": "字号 · 字重 · 行高",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "QVUlh",
+                  "name": "Cubbix / 28",
+                  "fill": "$ColorText",
+                  "content": "Cubbix / 28",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeDisplay",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "X2oRz",
+                  "name": "页面标题 / 20",
+                  "fill": "$ColorText",
+                  "content": "页面标题 / 20",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeTitle",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "DMjuz",
+                  "name": "设置行 / 13",
+                  "fill": "$ColorText",
+                  "content": "设置行 / 13",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "VOfwr",
+                  "name": "辅助文字 / 12",
+                  "fill": "$ColorText",
+                  "content": "辅助文字 / 12",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "cPpEH",
+                  "name": "分组标题 / 11",
+                  "fill": "$ColorText",
+                  "content": "分组标题 / 11",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "cTqgt",
+                  "name": "Type weights",
+                  "fill": "$ColorTextSecondary",
+                  "content": "400 · 500 · 600  /  1.5 · 1.3",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "S11ErA",
+              "name": "Shape and spacing",
+              "width": 260,
+              "layout": "vertical",
+              "gap": "$Space16",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "YlVCE",
+                  "name": "Shape label",
+                  "fill": "$ColorTextSecondary",
+                  "content": "圆角 · 三档",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "IU5Lg",
+                  "name": "窗口 12",
+                  "width": 220,
+                  "height": 44,
+                  "fill": "$ColorCard",
+                  "cornerRadius": "$RadiusWindow",
+                  "stroke": "$ColorSeparator",
+                  "strokeWidth": "$StrokeHairline",
+                  "layout": "vertical",
+                  "gap": "$Space0",
+                  "padding": "$Space12",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "g9F4j",
+                      "name": "窗口 12 token",
+                      "fill": "$ColorText",
+                      "content": "窗口 12",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "f5AqX",
+                  "name": "卡片 / 条目 8",
+                  "width": 220,
+                  "height": 44,
+                  "fill": "$ColorCard",
+                  "cornerRadius": "$RadiusCard",
+                  "stroke": "$ColorSeparator",
+                  "strokeWidth": "$StrokeHairline",
+                  "layout": "vertical",
+                  "gap": "$Space0",
+                  "padding": "$Space12",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Wfa02",
+                      "name": "卡片 / 条目 8 token",
+                      "fill": "$ColorText",
+                      "content": "卡片 / 条目 8",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "TD4Hy",
+                  "name": "控件 6",
+                  "width": 220,
+                  "height": 44,
+                  "fill": "$ColorCard",
+                  "cornerRadius": "$RadiusControl",
+                  "stroke": "$ColorSeparator",
+                  "strokeWidth": "$StrokeHairline",
+                  "layout": "vertical",
+                  "gap": "$Space0",
+                  "padding": "$Space12",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "JpIzc",
+                      "name": "控件 6 token",
+                      "fill": "$ColorText",
+                      "content": "控件 6",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "poJwm",
+                  "name": "Spacing scale",
+                  "fill": "$ColorTextSecondary",
+                  "content": "间距 0 · 2 · 4 · 6 · 8 · 10 · 12\n16 · 20 · 24 · 32 · 40",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "B2Nnr",
+              "name": "Semantic themes",
+              "width": "fill_container",
+              "gap": "$Space24",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "w0c0jW",
+                  "name": "Palette light",
+                  "theme": {
+                    "mode": "light"
+                  },
+                  "width": "fill_container",
+                  "fill": "$ColorCard",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space16",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Tp2xH",
+                      "name": "Mode light",
+                      "fill": "$ColorText",
+                      "content": "浅色 · light",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightSemibold"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "WbKUf",
+                      "name": "ColorWindow",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "k9Jyog",
+                          "name": "ColorWindow swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorWindow",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "V5MCs9",
+                          "name": "ColorWindow label",
+                          "fill": "$ColorText",
+                          "content": "ColorWindow",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "l8oHC",
+                      "name": "ColorCard",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "H2gd9",
+                          "name": "ColorCard swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorCard",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "hg4a3",
+                          "name": "ColorCard label",
+                          "fill": "$ColorText",
+                          "content": "ColorCard",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "l2XBcn",
+                      "name": "ColorText",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "EyjeY",
+                          "name": "ColorText swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorText",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "LyOl5",
+                          "name": "ColorText label",
+                          "fill": "$ColorText",
+                          "content": "ColorText",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "cFa9X",
+                      "name": "ColorTextSecondary",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "XV0AW",
+                          "name": "ColorTextSecondary swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorTextSecondary",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "h9n16c",
+                          "name": "ColorTextSecondary label",
+                          "fill": "$ColorText",
+                          "content": "ColorTextSecondary",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "U0aytG",
+                      "name": "ColorSeparator",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "EzdSi",
+                          "name": "ColorSeparator swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorSeparator",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Bwrnm",
+                          "name": "ColorSeparator label",
+                          "fill": "$ColorText",
+                          "content": "ColorSeparator",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SYYbU",
+                      "name": "ColorAccent",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "P2nAjM",
+                          "name": "ColorAccent swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorAccent",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "utSoc",
+                          "name": "ColorAccent label",
+                          "fill": "$ColorText",
+                          "content": "ColorAccent",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "sehva",
+                      "name": "ColorSuccess",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "l3tvP",
+                          "name": "ColorSuccess swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorSuccess",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "OpCZl",
+                          "name": "ColorSuccess label",
+                          "fill": "$ColorText",
+                          "content": "ColorSuccess",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "f7YlK",
+                      "name": "ColorDanger",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "bPmKd",
+                          "name": "ColorDanger swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorDanger",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "A5TLLh",
+                          "name": "ColorDanger label",
+                          "fill": "$ColorText",
+                          "content": "ColorDanger",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "rnlZy",
+                  "name": "Palette dark",
+                  "theme": {
+                    "mode": "dark"
+                  },
+                  "width": "fill_container",
+                  "fill": "$ColorCard",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space16",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Fwzi1",
+                      "name": "Mode dark",
+                      "fill": "$ColorText",
+                      "content": "深色 · dark",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightSemibold"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "pvOMz",
+                      "name": "ColorWindow",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "n7moG",
+                          "name": "ColorWindow swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorWindow",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "vfjrl",
+                          "name": "ColorWindow label",
+                          "fill": "$ColorText",
+                          "content": "ColorWindow",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZzoSo",
+                      "name": "ColorCard",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "ITZi4",
+                          "name": "ColorCard swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorCard",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "XmpaO",
+                          "name": "ColorCard label",
+                          "fill": "$ColorText",
+                          "content": "ColorCard",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EbgeX",
+                      "name": "ColorText",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Ip3tQ",
+                          "name": "ColorText swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorText",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "HSwWr",
+                          "name": "ColorText label",
+                          "fill": "$ColorText",
+                          "content": "ColorText",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "UNl8S",
+                      "name": "ColorTextSecondary",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "S3Rcb0",
+                          "name": "ColorTextSecondary swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorTextSecondary",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "PVadr",
+                          "name": "ColorTextSecondary label",
+                          "fill": "$ColorText",
+                          "content": "ColorTextSecondary",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "pGWuV",
+                      "name": "ColorSeparator",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "m4wGph",
+                          "name": "ColorSeparator swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorSeparator",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "U5Jpn3",
+                          "name": "ColorSeparator label",
+                          "fill": "$ColorText",
+                          "content": "ColorSeparator",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "w4vi6",
+                      "name": "ColorAccent",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "dOxMT",
+                          "name": "ColorAccent swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorAccent",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ki4Y6",
+                          "name": "ColorAccent label",
+                          "fill": "$ColorText",
+                          "content": "ColorAccent",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "QND09",
+                      "name": "ColorSuccess",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Fq5af",
+                          "name": "ColorSuccess swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorSuccess",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "iRl9W",
+                          "name": "ColorSuccess label",
+                          "fill": "$ColorText",
+                          "content": "ColorSuccess",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "eijWy",
+                      "name": "ColorDanger",
+                      "width": "fill_container",
+                      "gap": "$Space8",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Y6DGI9",
+                          "name": "ColorDanger swatch",
+                          "width": 28,
+                          "height": 18,
+                          "fill": "$ColorDanger",
+                          "cornerRadius": "$RadiusControl",
+                          "stroke": "$ColorSeparator",
+                          "strokeWidth": "$StrokeHairline",
+                          "layout": "vertical",
+                          "gap": "$Space0"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Kaqkc",
+                          "name": "ColorDanger label",
+                          "fill": "$ColorText",
+                          "content": "ColorDanger",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamily",
+                          "fontSize": "$FontSizeSmall",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "FO7EW",
+      "x": 0,
+      "y": 560,
+      "name": "02 Components and states",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN"
+      },
+      "clip": true,
+      "width": 1840,
+      "height": 1000,
+      "fill": "$ColorWindow",
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "aWnBr",
+          "x": 32,
+          "y": 24,
+          "name": "Component title",
+          "fill": "$ColorText",
+          "content": "组件 · 实例 · 状态",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeDisplay",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "Ectkj",
+          "x": 32,
+          "y": 90,
+          "name": "Icon/blocks",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "teRUf",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide blocks",
+              "geometry": "M15 3h5q1 0 1 1v5q0 1-1 1h-5q-1 0-1-1v-5q0-1 1-1z m-5 18v-13a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1h-13",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "O4KJZC",
+          "x": 66,
+          "y": 90,
+          "name": "Icon/settings-2",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "Tw4ru",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide settings-2",
+              "geometry": "M20 7h-9m3 10h-9m9 0a3 3 0 1 0 6 0 3 3 0 1 0-6 0m-10-10a3 3 0 1 0 6 0 3 3 0 1 0-6 0",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "uTgqT",
+          "x": 100,
+          "y": 90,
+          "name": "Icon/info",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "Lq3F3",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide info",
+              "geometry": "M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0m10 4v-4m0-4h0.01",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YeT0w",
+          "x": 134,
+          "y": 90,
+          "name": "Icon/refresh-cw",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "neIrc",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide refresh-cw",
+              "geometry": "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74l2.26 2.26m0-5v5h-5m5 4a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74l-2.26-2.26m5 0h-5v5",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "MTEP9",
+          "x": 168,
+          "y": 90,
+          "name": "Icon/chevron-right",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "F9086",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide chevron-right",
+              "geometry": "M9 18l6-6-6-6",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "lPkvC",
+          "x": 202,
+          "y": 90,
+          "name": "Icon/sun",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "Vxwbv",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide sun",
+              "geometry": "M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0m4-10v2m0 16v2m-7.07-17.07l1.41 1.41m11.32 11.32l1.41 1.41m-17.07-7.07h2m16 0h2m-15.66 5.66l-1.41 1.41m14.14-14.14l-1.41 1.41",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Hvppf",
+          "x": 236,
+          "y": 90,
+          "name": "Icon/braces",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "VfDAN",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide braces",
+              "geometry": "M8 3h-1a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1 0.9 2 2 2h1m8 0h1a2 2 0 0 0 2-2v-5c0-1.1 0.9-2 2-2a2 2 0 0 1-2-2v-5a2 2 0 0 0-2-2h-1",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "s4LWGi",
+          "x": 270,
+          "y": 90,
+          "name": "Icon/power",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "vtnLZ",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide power",
+              "geometry": "M12 2v10m6.4-5.4a9 9 0 1 1-12.77 0.04",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "xgZOR",
+          "x": 304,
+          "y": 90,
+          "name": "Icon/check",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "NJGRv",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide check",
+              "geometry": "M20 6l-11 11-5-5",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "sWO1O",
+          "x": 338,
+          "y": 90,
+          "name": "Icon/triangle-alert",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "QdblK",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide triangle-alert",
+              "geometry": "M21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14a2 2 0 0 0 1.75 3h16a2 2 0 0 0 1.73-3m-9.73-9v4m0 4h0.01",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VFLqP",
+          "x": 372,
+          "y": 90,
+          "name": "Icon/loader-circle",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "t2hUsI",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide loader-circle",
+              "geometry": "M21 12a9 9 0 1 1-6.219-8.56",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "QBOEx",
+          "x": 406,
+          "y": 90,
+          "name": "Icon/x",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "YMz1w",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide x",
+              "geometry": "M18 6l-12 12m0-12l12 12",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Jy4Q0",
+          "x": 440,
+          "y": 90,
+          "name": "Icon/download",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "TomFj",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide download",
+              "geometry": "M21 15v4a2 2 0 0 1-2 2h-14a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5l0-12",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RrJvC",
+          "x": 474,
+          "y": 90,
+          "name": "Icon/external-link",
+          "reusable": true,
+          "width": 16,
+          "height": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "jZPXH",
+              "x": 0,
+              "y": 0,
+              "name": "Lucide external-link",
+              "geometry": "M15 3h6v6m-11 5l11-11m-3 10v6a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-11a2 2 0 0 1 2-2h6",
+              "viewBox": [
+                0,
+                0,
+                24,
+                24
+              ],
+              "fill": "$ColorTransparent",
+              "width": 16,
+              "height": 16,
+              "stroke": "$ColorTextSecondary",
+              "strokeWidth": "$StrokeIcon",
+              "strokeLinejoin": "round",
+              "strokeLinecap": "round"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "KfHWu",
+          "x": 32,
+          "y": 170,
+          "name": "Switch",
+          "reusable": true,
+          "metadata": {
+            "type": "interaction",
+            "role": "switch",
+            "state": "on"
+          },
+          "width": 34,
+          "height": 20,
+          "fill": "$ColorAccent",
+          "cornerRadius": "$RadiusControl",
+          "gap": "$Space0",
+          "padding": "$Space2",
+          "justifyContent": "end",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "pQHRp",
+              "name": "Thumb",
+              "width": 14,
+              "height": 14,
+              "fill": "$ColorThumb",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "gap": "$Space0"
+            }
+          ]
+        },
+        {
+          "id": "gFjHZ",
+          "type": "ref",
+          "ref": "KfHWu",
+          "name": "Switch off",
+          "x": 90,
+          "y": 170,
+          "fill": "$ColorControlHover",
+          "justifyContent": "start"
+        },
+        {
+          "id": "ao8fg",
+          "type": "ref",
+          "ref": "KfHWu",
+          "name": "Switch disabled",
+          "x": 148,
+          "y": 170,
+          "opacity": 1,
+          "fill": "$ColorControl",
+          "descendants": {
+            "pQHRp": {
+              "fill": "$ColorTextDisabled"
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "PfG9x",
+          "x": 32,
+          "y": 138,
+          "name": "Switch label",
+          "fill": "$ColorTextSecondary",
+          "content": "开关 · 开 / 关 / 不可用",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "Hs9NC",
+          "x": 260,
+          "y": 164,
+          "name": "Segmented control",
+          "reusable": true,
+          "metadata": {
+            "type": "interaction",
+            "role": "radiogroup"
+          },
+          "width": 220,
+          "height": 28,
+          "fill": "$ColorControl",
+          "cornerRadius": "$RadiusControl",
+          "gap": "$Space2",
+          "padding": "$Space2",
+          "children": [
+            {
+              "type": "frame",
+              "id": "X2e2V",
+              "name": "Chinese segment",
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": "$ColorCard",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "gap": "$Space0",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pYbgH",
+                  "name": "Chinese label",
+                  "fill": "$ColorText",
+                  "content": "简体中文",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightMedium"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ZR7tO",
+              "name": "English segment",
+              "width": "fill_container",
+              "height": "fill_container",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "gap": "$Space0",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ExLjG",
+                  "name": "English label",
+                  "fill": "$ColorText",
+                  "content": "English",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightMedium"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "u3fOIs",
+          "x": 260,
+          "y": 138,
+          "name": "Segmented label",
+          "fill": "$ColorTextSecondary",
+          "content": "分段选择 · 单选",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "n2ixa",
+          "x": 550,
+          "y": 160,
+          "name": "Icon button",
+          "reusable": true,
+          "metadata": {
+            "type": "interaction",
+            "role": "button",
+            "tooltip": "$CopyCheckUpdates",
+            "focus": "visible on keyboard only"
+          },
+          "width": 28,
+          "height": 28,
+          "fill": "$ColorTransparent",
+          "cornerRadius": "$RadiusControl",
+          "layout": "vertical",
+          "gap": "$Space0",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "ZuTth",
+              "type": "ref",
+              "ref": "YeT0w",
+              "name": "Button icon"
+            }
+          ]
+        },
+        {
+          "id": "eDQuS",
+          "type": "ref",
+          "ref": "n2ixa",
+          "name": "Icon button hover",
+          "x": 594,
+          "y": 160,
+          "fill": "$ColorControlHover"
+        },
+        {
+          "id": "I6FzY",
+          "type": "ref",
+          "ref": "n2ixa",
+          "name": "Icon button focus visible",
+          "x": 638,
+          "y": 160,
+          "stroke": "$ColorAccent",
+          "strokeWidth": "$StrokeIcon"
+        },
+        {
+          "type": "frame",
+          "id": "sFUcN",
+          "x": 550,
+          "y": 198,
+          "name": "Tooltip",
+          "reusable": true,
+          "fill": "$ColorTooltip",
+          "cornerRadius": "$RadiusControl",
+          "layout": "vertical",
+          "gap": "$Space0",
+          "padding": [
+            "$Space6",
+            "$Space8"
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "w4rXY",
+              "name": "Tooltip label",
+              "fill": "$ColorTooltipText",
+              "content": "检查更新",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "unNyD",
+          "x": 550,
+          "y": 128,
+          "name": "Icon button label",
+          "fill": "$ColorTextSecondary",
+          "content": "图标按钮 · 常态 / 悬停 / 键盘焦点",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "GaYMc",
+          "x": 790,
+          "y": 160,
+          "name": "Text button",
+          "reusable": true,
+          "metadata": {
+            "type": "interaction",
+            "role": "button"
+          },
+          "height": 28,
+          "fill": "$ColorAccent",
+          "cornerRadius": "$RadiusControl",
+          "layout": "vertical",
+          "gap": "$Space0",
+          "padding": [
+            "$Space4",
+            "$Space12"
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "qEQlb",
+              "name": "Button label",
+              "fill": "$ColorOnAccent",
+              "content": "重新打开",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightMedium"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "o4jfmh",
+          "x": 790,
+          "y": 128,
+          "name": "Text button label",
+          "fill": "$ColorTextSecondary",
+          "content": "有名称的操作",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "PodLz",
+          "x": 32,
+          "y": 300,
+          "name": "Settings row",
+          "reusable": true,
+          "width": 528,
+          "height": 48,
+          "gap": "$Space16",
+          "padding": [
+            "$Space8",
+            "$Space16"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "PiLZ5",
+              "name": "Row text",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space2",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "iJGB1",
+                  "name": "Row title",
+                  "fill": "$ColorText",
+                  "content": "开机启动",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "ecyDi",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Row supporting text",
+                  "enabled": false,
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": 420,
+                  "content": "登录后在菜单栏中运行",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "id": "WyToO",
+              "type": "ref",
+              "ref": "KfHWu",
+              "name": "Row control"
+            }
+          ]
+        },
+        {
+          "id": "YOqKX",
+          "type": "ref",
+          "ref": "PodLz",
+          "name": "Settings row with supporting text",
+          "x": 32,
+          "y": 360,
+          "height": 64,
+          "descendants": {
+            "ecyDi": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "ZZAqN",
+          "x": 32,
+          "y": 266,
+          "name": "Settings row label",
+          "fill": "$ColorTextSecondary",
+          "content": "设置行 · 说明可选，仅在有必要时展示",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "fezUM",
+          "x": 32,
+          "y": 450,
+          "name": "Inset divider",
+          "reusable": true,
+          "width": 528,
+          "height": 1,
+          "layout": "vertical",
+          "gap": "$Space0",
+          "padding": [
+            "$Space0",
+            "$Space16"
+          ],
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "F9csL",
+              "name": "Separator",
+              "fill": "$ColorSeparator",
+              "width": "fill_container",
+              "height": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "X6uV6",
+          "x": 32,
+          "y": 512,
+          "name": "Settings card",
+          "reusable": true,
+          "clip": true,
+          "width": 528,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space0",
+          "children": [
+            {
+              "type": "frame",
+              "id": "NeV96",
+              "name": "Card content",
+              "slot": [],
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space0",
+              "children": [
+                {
+                  "id": "kqrak",
+                  "type": "ref",
+                  "ref": "PodLz",
+                  "name": "Card first row"
+                },
+                {
+                  "id": "meT69",
+                  "type": "ref",
+                  "ref": "fezUM",
+                  "name": "Card divider"
+                },
+                {
+                  "id": "ZWWO1",
+                  "type": "ref",
+                  "ref": "PodLz",
+                  "name": "Card second row"
+                },
+                {
+                  "id": "YxJOl",
+                  "type": "ref",
+                  "ref": "fezUM",
+                  "name": "Card second divider",
+                  "width": 528,
+                  "enabled": false
+                },
+                {
+                  "id": "YvjK5",
+                  "type": "ref",
+                  "ref": "PodLz",
+                  "name": "Card third row",
+                  "width": 528,
+                  "enabled": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "BvfFS",
+          "x": 32,
+          "y": 480,
+          "name": "Card label",
+          "fill": "$ColorTextSecondary",
+          "content": "分组卡片 · 细分隔线 · 紧凑行",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "zlRGT",
+          "x": 640,
+          "y": 300,
+          "name": "Navigation item",
+          "reusable": true,
+          "width": 144,
+          "height": 32,
+          "cornerRadius": "$RadiusCard",
+          "gap": "$Space8",
+          "padding": "$Space8",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "HsBCN",
+              "type": "ref",
+              "ref": "O4KJZC",
+              "name": "Navigation icon"
+            },
+            {
+              "type": "text",
+              "id": "namsg",
+              "name": "Navigation label",
+              "fill": "$ColorText",
+              "content": "通用",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightMedium"
+            }
+          ]
+        },
+        {
+          "id": "dupx6",
+          "type": "ref",
+          "ref": "zlRGT",
+          "name": "Navigation selected",
+          "x": 640,
+          "y": 340,
+          "fill": "$ColorAccentSoft",
+          "descendants": {
+            "namsg": {
+              "fill": "$ColorAccent"
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "fSJVH",
+          "x": 640,
+          "y": 266,
+          "name": "Navigation label",
+          "fill": "$ColorTextSecondary",
+          "content": "导航 · 常态 / 选中",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "XlhBz",
+          "x": 900,
+          "y": 300,
+          "name": "Status icon",
+          "reusable": true,
+          "metadata": {
+            "type": "interaction",
+            "tooltip": "$CopyTooltipChecking",
+            "motion": "rotate when active; static when reduced motion"
+          },
+          "width": 28,
+          "height": 28,
+          "layout": "vertical",
+          "gap": "$Space0",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "Jr6mc",
+              "type": "ref",
+              "ref": "VFLqP",
+              "name": "Status glyph"
+            }
+          ]
+        },
+        {
+          "id": "P66Ka",
+          "type": "ref",
+          "ref": "XlhBz",
+          "name": "Status success",
+          "x": 950,
+          "y": 300,
+          "children": [
+            {
+              "id": "W6Puhj",
+              "type": "ref",
+              "ref": "xgZOR",
+              "name": "Success check",
+              "descendants": {
+                "NJGRv": {
+                  "stroke": "$ColorSuccess"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "EkAAi",
+          "type": "ref",
+          "ref": "XlhBz",
+          "name": "Status error",
+          "x": 1000,
+          "y": 300,
+          "children": [
+            {
+              "id": "HEOpZ",
+              "type": "ref",
+              "ref": "sWO1O",
+              "name": "Failure alert",
+              "descendants": {
+                "QdblK": {
+                  "stroke": "$ColorDanger"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "f0NYf",
+          "type": "ref",
+          "ref": "sFUcN",
+          "name": "Error reason tooltip",
+          "x": 900,
+          "y": 344,
+          "descendants": {
+            "w4rXY": {
+              "content": "无法检查更新，请重试"
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "Ew05X",
+          "x": 900,
+          "y": 266,
+          "name": "Status label",
+          "fill": "$ColorTextSecondary",
+          "content": "反馈 · 进行中 / 短暂成功 / 失败",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "SvwYl",
+          "x": 900,
+          "y": 442,
+          "name": "Menu item",
+          "reusable": true,
+          "width": 260,
+          "height": 32,
+          "cornerRadius": "$RadiusControl",
+          "gap": "$Space8",
+          "padding": [
+            "$Space6",
+            "$Space8"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "j4QfwA",
+              "type": "ref",
+              "ref": "lPkvC",
+              "name": "Menu icon"
+            },
+            {
+              "type": "text",
+              "id": "VEfOk",
+              "name": "Menu label",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "常亮",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "dfaXM",
+              "name": "Menu shortcut",
+              "fill": "$ColorTextSecondary",
+              "content": "⌃⌥⌘K",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "zh2Qo",
+          "x": 900,
+          "y": 520,
+          "name": "Menu bar dropdown",
+          "reusable": true,
+          "width": 276,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space2",
+          "padding": "$Space8",
+          "children": [
+            {
+              "id": "xHgDv",
+              "type": "ref",
+              "ref": "SvwYl",
+              "name": "Menu sun",
+              "width": "fill_container",
+              "descendants": {
+                "j4QfwA": {
+                  "id": "vCJ7v",
+                  "type": "ref",
+                  "ref": "lPkvC",
+                  "name": "Menu icon sun"
+                },
+                "VEfOk": {
+                  "content": "常亮"
+                },
+                "dfaXM": {
+                  "content": "⌃⌥⌘K"
+                }
+              }
+            },
+            {
+              "id": "XF13K",
+              "type": "ref",
+              "ref": "SvwYl",
+              "name": "Menu braces",
+              "width": "fill_container",
+              "descendants": {
+                "j4QfwA": {
+                  "id": "FhQ49",
+                  "type": "ref",
+                  "ref": "Hvppf",
+                  "name": "Menu icon braces"
+                },
+                "VEfOk": {
+                  "content": "JSON"
+                },
+                "dfaXM": {
+                  "content": ""
+                }
+              }
+            },
+            {
+              "id": "Y4rWE",
+              "type": "ref",
+              "ref": "fezUM",
+              "name": "Menu section divider",
+              "width": 260
+            },
+            {
+              "id": "pICa5",
+              "type": "ref",
+              "ref": "SvwYl",
+              "name": "Menu settings-2",
+              "width": "fill_container",
+              "descendants": {
+                "j4QfwA": {
+                  "id": "yhLaL",
+                  "type": "ref",
+                  "ref": "O4KJZC",
+                  "name": "Menu icon settings-2"
+                },
+                "VEfOk": {
+                  "content": "设置…"
+                },
+                "dfaXM": {
+                  "content": "⌘,"
+                }
+              }
+            },
+            {
+              "id": "uipfi",
+              "type": "ref",
+              "ref": "SvwYl",
+              "name": "Menu power",
+              "width": "fill_container",
+              "descendants": {
+                "j4QfwA": {
+                  "id": "l1kn1",
+                  "type": "ref",
+                  "ref": "s4LWGi",
+                  "name": "Menu icon power"
+                },
+                "VEfOk": {
+                  "content": "退出 Cubbix"
+                },
+                "dfaXM": {
+                  "content": "⌘Q"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "U5DQc",
+          "x": 900,
+          "y": 490,
+          "name": "Menu label",
+          "fill": "$ColorTextSecondary",
+          "content": "菜单栏下拉菜单 · Lucide 0.468.0",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "BVbwx",
+          "x": 32,
+          "y": 700,
+          "name": "Download ready notice",
+          "reusable": true,
+          "metadata": {
+            "type": "interaction",
+            "visibility": "download-ready only"
+          },
+          "width": 528,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "gap": "$Space12",
+          "padding": "$Space16",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "B7hIQ",
+              "type": "ref",
+              "ref": "Jy4Q0",
+              "name": "Download icon"
+            },
+            {
+              "type": "frame",
+              "id": "dyc1k",
+              "name": "Download text",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space2",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "uW0wa",
+                  "name": "Download title",
+                  "fill": "$ColorText",
+                  "content": "更新已就绪",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "v3iwe",
+                  "name": "Download hint",
+                  "fill": "$ColorTextSecondary",
+                  "content": "重新打开后生效",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "id": "CLm8u",
+              "type": "ref",
+              "ref": "GaYMc",
+              "name": "Reopen action"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "YDYKh",
+          "x": 32,
+          "y": 668,
+          "name": "Notice label",
+          "fill": "$ColorTextSecondary",
+          "content": "下载完成后才出现的提示",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "text",
+          "id": "p7ZUw",
+          "x": 1250,
+          "y": 160,
+          "name": "Behavior rules",
+          "fill": "$ColorTextSecondary",
+          "textGrowth": "fixed-width",
+          "width": 500,
+          "content": "状态规则\n焦点框只在键盘操作时显示。\n进行中用 loader；成功短暂停留后收起。\n失败原因放 tooltip；正常状态不显示标签。\n图标按钮悬停和键盘聚焦时均可查看 tooltip。",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "text",
+          "id": "Gqq2i",
+          "x": 1250,
+          "y": 420,
+          "name": "Implementation note",
+          "fill": "$ColorTextSecondary",
+          "textGrowth": "fixed-width",
+          "width": 500,
+          "content": "组件均为 reusable；样张使用 ref。\n文案由语言资源写入对应实例。\n颜色由 mode 主题变量切换。\nSVG 源文件与 ISC 许可证随稿保存。",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "vUQhl",
+          "x": 640,
+          "y": 520,
+          "name": "Version control",
+          "reusable": true,
+          "height": 28,
+          "gap": "$Space8",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "O1OO9W",
+              "name": "Version value",
+              "fill": "$ColorTextSecondary",
+              "content": "0.1.0",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "id": "M6RP4h",
+              "type": "ref",
+              "ref": "n2ixa",
+              "name": "Check updates"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "y6tUf",
+      "x": 1920,
+      "y": 560,
+      "name": "Settings window",
+      "reusable": true,
+      "metadata": {
+        "type": "window",
+        "systemTitlebar": false,
+        "draggable": "empty background",
+        "contentMaxWidthToken": "SizeContentMaxWidth"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "gap": "$Space0",
+      "children": [
+        {
+          "type": "frame",
+          "id": "b3WHS",
+          "name": "Sidebar",
+          "width": 168,
+          "height": "fill_container",
+          "fill": "$ColorSidebar",
+          "layout": "vertical",
+          "gap": "$Space24",
+          "padding": [
+            "$Space32",
+            "$Space12"
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "BLKzA",
+              "name": "Brand",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "PJCPf",
+                  "type": "ref",
+                  "ref": "Ectkj",
+                  "name": "Cubbix mark"
+                },
+                {
+                  "type": "text",
+                  "id": "QS56E",
+                  "name": "Cubbix name",
+                  "fill": "$ColorText",
+                  "content": "Cubbix",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ygEre",
+              "name": "Navigation",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space4",
+              "children": [
+                {
+                  "id": "ezKZw",
+                  "type": "ref",
+                  "ref": "zlRGT",
+                  "name": "General navigation",
+                  "width": "fill_container",
+                  "fill": "$ColorAccentSoft",
+                  "descendants": {
+                    "namsg": {
+                      "fill": "$ColorAccent"
+                    }
+                  }
+                },
+                {
+                  "id": "vENnM",
+                  "type": "ref",
+                  "ref": "zlRGT",
+                  "name": "About navigation",
+                  "width": "fill_container",
+                  "descendants": {
+                    "HsBCN/Tw4ru": {
+                      "geometry": "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0 M12 16v-4 M12 8h.01"
+                    },
+                    "namsg": {
+                      "content": "关于"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "THtqg",
+          "name": "Main",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space24",
+          "padding": "$Space32",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "t2g8tl",
+              "name": "Page header",
+              "width": 528,
+              "gap": "$Space0",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "T2VbQ",
+                  "name": "Page title",
+                  "fill": "$ColorText",
+                  "content": "通用",
+                  "lineHeight": "$LineHeightTitle",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeTitle",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "id": "e6rVej",
+                  "type": "ref",
+                  "ref": "n2ixa",
+                  "name": "Close settings",
+                  "children": [
+                    {
+                      "id": "eomxN",
+                      "type": "ref",
+                      "ref": "QBOEx",
+                      "name": "Close icon"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "i1QUPx",
+              "name": "Page content",
+              "slot": [],
+              "width": 528,
+              "layout": "vertical",
+              "gap": "$Space24",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Eeol5",
+                  "name": "Shell placeholder",
+                  "fill": "$ColorText",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "rIbMb",
+      "x": 0,
+      "y": 1640,
+      "name": "general-zh-CN-light",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "general",
+        "language": "zh-CN",
+        "mode": "light",
+        "state": "normal"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "uxYpF",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorAccentSoft"
+            },
+            "ezKZw/namsg": {
+              "content": "通用",
+              "fill": "$ColorAccent"
+            },
+            "vENnM": {
+              "fill": "$ColorTransparent"
+            },
+            "vENnM/namsg": {
+              "content": "关于",
+              "fill": "$ColorText"
+            },
+            "T2VbQ": {
+              "content": "通用"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "zagPX",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "uXaJ0",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "byoIk",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "偏好设置",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "W5if29",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "语言"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "JMY4N",
+                      "type": "ref",
+                      "ref": "Hs9NC",
+                      "name": "Language selector",
+                      "descendants": {
+                        "X2e2V": {
+                          "fill": "$ColorCard"
+                        },
+                        "pYbgH": {
+                          "content": "简体中文"
+                        },
+                        "ZR7tO": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "ExLjG": {
+                          "content": "English"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "开机启动"
+                    },
+                    "YxJOl": {
+                      "enabled": false
+                    },
+                    "YvjK5": {
+                      "enabled": false
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "自动更新"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ztBBK",
+      "x": 920,
+      "y": 1640,
+      "name": "general-en-light",
+      "theme": {
+        "mode": "light",
+        "language": "en"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "general",
+        "language": "en",
+        "mode": "light",
+        "state": "normal"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "io3Be",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorAccentSoft"
+            },
+            "ezKZw/namsg": {
+              "content": "General",
+              "fill": "$ColorAccent"
+            },
+            "vENnM": {
+              "fill": "$ColorTransparent"
+            },
+            "vENnM/namsg": {
+              "content": "About",
+              "fill": "$ColorText"
+            },
+            "T2VbQ": {
+              "content": "General"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "tAkH2",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "yRzFc",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "C6ei8",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "Preferences",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "H7BpP",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "Language"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "p1g8Lk",
+                      "type": "ref",
+                      "ref": "Hs9NC",
+                      "name": "Language selector",
+                      "descendants": {
+                        "X2e2V": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "pYbgH": {
+                          "content": "简体中文"
+                        },
+                        "ZR7tO": {
+                          "fill": "$ColorCard"
+                        },
+                        "ExLjG": {
+                          "content": "English"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "Open at login"
+                    },
+                    "YxJOl": {
+                      "enabled": false
+                    },
+                    "YvjK5": {
+                      "enabled": false
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "Automatic updates"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "d3UD1",
+      "x": 0,
+      "y": 2300,
+      "name": "about-zh-CN-light",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "about",
+        "language": "zh-CN",
+        "mode": "light",
+        "state": "download-ready"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "bhjlD",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "通用",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "关于",
+              "fill": "$ColorAccent"
+            },
+            "T2VbQ": {
+              "content": "关于"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "H6aOMT",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "hEvTH",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "oPpEY",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "更新",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "oB3Od",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "版本"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "lvCU7",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "更新内容"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "kqCe5",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "自动更新"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "lKAcc",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "更新已就绪"
+                },
+                "v3iwe": {
+                  "content": "重新打开后生效"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "重新打开"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "nknJR",
+      "x": 920,
+      "y": 2300,
+      "name": "about-en-light",
+      "theme": {
+        "mode": "light",
+        "language": "en"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "about",
+        "language": "en",
+        "mode": "light",
+        "state": "download-ready"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "ZKnZQ",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "General",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "About",
+              "fill": "$ColorAccent"
+            },
+            "T2VbQ": {
+              "content": "About"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "CtMNC",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "oVu3a",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "j6tDh",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "Updates",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "e3j70",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "Version"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "F7vF32",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "What’s new"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "x78Ke",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "Automatic updates"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "T1Phk",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "Update ready"
+                },
+                "v3iwe": {
+                  "content": "Reopen to apply"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "Reopen"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Pz9Qv",
+      "x": 0,
+      "y": 2960,
+      "name": "general-zh-CN-dark",
+      "theme": {
+        "mode": "dark",
+        "language": "zh-CN"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "general",
+        "language": "zh-CN",
+        "mode": "dark",
+        "state": "normal"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "z48oF",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorAccentSoft"
+            },
+            "ezKZw/namsg": {
+              "content": "通用",
+              "fill": "$ColorAccent"
+            },
+            "vENnM": {
+              "fill": "$ColorTransparent"
+            },
+            "vENnM/namsg": {
+              "content": "关于",
+              "fill": "$ColorText"
+            },
+            "T2VbQ": {
+              "content": "通用"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "V1TumQ",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "U4Me3",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "dWIu1",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "偏好设置",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "HAMM8",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "语言"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "vOdbV",
+                      "type": "ref",
+                      "ref": "Hs9NC",
+                      "name": "Language selector",
+                      "descendants": {
+                        "X2e2V": {
+                          "fill": "$ColorCard"
+                        },
+                        "pYbgH": {
+                          "content": "简体中文"
+                        },
+                        "ZR7tO": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "ExLjG": {
+                          "content": "English"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "开机启动"
+                    },
+                    "YxJOl": {
+                      "enabled": false
+                    },
+                    "YvjK5": {
+                      "enabled": false
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "自动更新"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "G04tZ",
+      "x": 920,
+      "y": 2960,
+      "name": "general-en-dark",
+      "theme": {
+        "mode": "dark",
+        "language": "en"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "general",
+        "language": "en",
+        "mode": "dark",
+        "state": "normal"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "BTlWL",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorAccentSoft"
+            },
+            "ezKZw/namsg": {
+              "content": "General",
+              "fill": "$ColorAccent"
+            },
+            "vENnM": {
+              "fill": "$ColorTransparent"
+            },
+            "vENnM/namsg": {
+              "content": "About",
+              "fill": "$ColorText"
+            },
+            "T2VbQ": {
+              "content": "General"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "WgNKr",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "X9RXj",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "qWiSo",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "Preferences",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "XoTnm",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "Language"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "avnvh",
+                      "type": "ref",
+                      "ref": "Hs9NC",
+                      "name": "Language selector",
+                      "descendants": {
+                        "X2e2V": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "pYbgH": {
+                          "content": "简体中文"
+                        },
+                        "ZR7tO": {
+                          "fill": "$ColorCard"
+                        },
+                        "ExLjG": {
+                          "content": "English"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "Open at login"
+                    },
+                    "YxJOl": {
+                      "enabled": false
+                    },
+                    "YvjK5": {
+                      "enabled": false
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "Automatic updates"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "wUVXs",
+      "x": 0,
+      "y": 3620,
+      "name": "about-zh-CN-dark",
+      "theme": {
+        "mode": "dark",
+        "language": "zh-CN"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "about",
+        "language": "zh-CN",
+        "mode": "dark",
+        "state": "download-ready"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "KEN1P",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "通用",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "关于",
+              "fill": "$ColorAccent"
+            },
+            "T2VbQ": {
+              "content": "关于"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "lWqTB",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "RCQAD",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "EIJB3",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "更新",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "Zvi8N",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "版本"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "W4llKo",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "更新内容"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "cvggI",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "自动更新"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "vDKWi",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "更新已就绪"
+                },
+                "v3iwe": {
+                  "content": "重新打开后生效"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "重新打开"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "H1kV1",
+      "x": 920,
+      "y": 3620,
+      "name": "about-en-dark",
+      "theme": {
+        "mode": "dark",
+        "language": "en"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "about",
+        "language": "en",
+        "mode": "dark",
+        "state": "download-ready"
+      },
+      "clip": true,
+      "width": 840,
+      "height": 580,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "v8fqh",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 840,
+          "height": 580,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "General",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "About",
+              "fill": "$ColorAccent"
+            },
+            "T2VbQ": {
+              "content": "About"
+            },
+            "i1QUPx": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "UDbCh",
+          "x": 240,
+          "y": 84,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "wPA1M",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "oYphT",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "Updates",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "qdj0V",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "Version"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "eeYkk",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "What’s new"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "V5Ebv",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "Automatic updates"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "D0Snf",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "Update ready"
+                },
+                "v3iwe": {
+                  "content": "Reopen to apply"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "Reopen"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "themes": {
+    "mode": [
+      "light",
+      "dark"
+    ],
+    "language": [
+      "zh-CN",
+      "en"
+    ]
+  },
+  "variables": {
+    "ColorWindow": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F5F5F7",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#202022",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSidebar": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#EBEBEE",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#29292C",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorCard": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#2C2C2F",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorControl": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F0F0F3",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#3B3B3F",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorControlHover": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E6E6EB",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#49494E",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorText": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#202124",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#F5F5F7",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorTextSecondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#63636B",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#B5B5BD",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorTextDisabled": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#85858F",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#92929B",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSeparator": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#DEDEE3",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#47474D",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorAccent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#0068D9",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#5AA8FF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorAccentSoft": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#DAE9FC",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#263E59",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorOnAccent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#102640",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorThumb": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSuccess": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#18733D",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#6ED59A",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorDanger": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#BC3030",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#FF8D8D",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorTooltip": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#25252A",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#F0F0F4",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorTooltipText": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#202124",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorTransparent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#00000000",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#00000000",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "FontSizeCaption": {
+      "type": "number",
+      "value": 11
+    },
+    "FontSizeSmall": {
+      "type": "number",
+      "value": 12
+    },
+    "FontSizeBody": {
+      "type": "number",
+      "value": 13
+    },
+    "FontSizeTitle": {
+      "type": "number",
+      "value": 20
+    },
+    "FontSizeDisplay": {
+      "type": "number",
+      "value": 28
+    },
+    "LineHeightBody": {
+      "type": "number",
+      "value": 1.5
+    },
+    "LineHeightTitle": {
+      "type": "number",
+      "value": 1.3
+    },
+    "RadiusWindow": {
+      "type": "number",
+      "value": 12
+    },
+    "RadiusCard": {
+      "type": "number",
+      "value": 8
+    },
+    "RadiusControl": {
+      "type": "number",
+      "value": 6
+    },
+    "Space0": {
+      "type": "number",
+      "value": 0
+    },
+    "Space2": {
+      "type": "number",
+      "value": 2
+    },
+    "Space4": {
+      "type": "number",
+      "value": 4
+    },
+    "Space6": {
+      "type": "number",
+      "value": 6
+    },
+    "Space8": {
+      "type": "number",
+      "value": 8
+    },
+    "Space10": {
+      "type": "number",
+      "value": 10
+    },
+    "Space12": {
+      "type": "number",
+      "value": 12
+    },
+    "Space16": {
+      "type": "number",
+      "value": 16
+    },
+    "Space20": {
+      "type": "number",
+      "value": 20
+    },
+    "Space24": {
+      "type": "number",
+      "value": 24
+    },
+    "Space32": {
+      "type": "number",
+      "value": 32
+    },
+    "Space40": {
+      "type": "number",
+      "value": 40
+    },
+    "StrokeHairline": {
+      "type": "number",
+      "value": 1
+    },
+    "StrokeIcon": {
+      "type": "number",
+      "value": 2
+    },
+    "SizeIcon": {
+      "type": "number",
+      "value": 16
+    },
+    "SizeIconLarge": {
+      "type": "number",
+      "value": 24
+    },
+    "SizeIconButton": {
+      "type": "number",
+      "value": 28
+    },
+    "SizeSwitchWidth": {
+      "type": "number",
+      "value": 34
+    },
+    "SizeSwitchHeight": {
+      "type": "number",
+      "value": 20
+    },
+    "SizeSwitchThumb": {
+      "type": "number",
+      "value": 14
+    },
+    "SizeSidebarWidth": {
+      "type": "number",
+      "value": 168
+    },
+    "SizeWindowWidth": {
+      "type": "number",
+      "value": 840
+    },
+    "SizeWindowHeight": {
+      "type": "number",
+      "value": 580
+    },
+    "SizeContentMaxWidth": {
+      "type": "number",
+      "value": 528
+    },
+    "SizeRowHeight": {
+      "type": "number",
+      "value": 48
+    },
+    "SizeNavHeight": {
+      "type": "number",
+      "value": 32
+    },
+    "SizeSegmentHeight": {
+      "type": "number",
+      "value": 28
+    },
+    "SizeMenuWidth": {
+      "type": "number",
+      "value": 260
+    },
+    "SizeMenuRowHeight": {
+      "type": "number",
+      "value": 32
+    },
+    "SizeButtonHeight": {
+      "type": "number",
+      "value": 28
+    },
+    "SizeBrandMark": {
+      "type": "number",
+      "value": 36
+    },
+    "OpacityDisabled": {
+      "type": "number",
+      "value": 0.45
+    },
+    "FontWeightRegular": {
+      "type": "string",
+      "value": "400"
+    },
+    "FontWeightMedium": {
+      "type": "string",
+      "value": "500"
+    },
+    "FontWeightSemibold": {
+      "type": "string",
+      "value": "600"
+    },
+    "FontFamily": {
+      "type": "string",
+      "value": [
+        {
+          "value": "Noto Sans SC",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Inter",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyGeneral": {
+      "type": "string",
+      "value": [
+        {
+          "value": "通用",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "General",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyAbout": {
+      "type": "string",
+      "value": [
+        {
+          "value": "关于",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "About",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopySettings": {
+      "type": "string",
+      "value": [
+        {
+          "value": "设置",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Settings",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyPreferencesGroup": {
+      "type": "string",
+      "value": [
+        {
+          "value": "偏好设置",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Preferences",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyStartupGroup": {
+      "type": "string",
+      "value": [
+        {
+          "value": "启动",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Startup",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyLanguage": {
+      "type": "string",
+      "value": [
+        {
+          "value": "语言",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Language",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyLaunchAtLogin": {
+      "type": "string",
+      "value": [
+        {
+          "value": "开机启动",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Open at login",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyLaunchHint": {
+      "type": "string",
+      "value": [
+        {
+          "value": "登录后在菜单栏中运行",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Run in the menu bar after login",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyVersion": {
+      "type": "string",
+      "value": [
+        {
+          "value": "版本",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Version",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyVersionValue": {
+      "type": "string",
+      "value": [
+        {
+          "value": "0.1.0",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "0.1.0",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyCheckUpdates": {
+      "type": "string",
+      "value": [
+        {
+          "value": "检查更新",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Check for updates",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyWhatsNew": {
+      "type": "string",
+      "value": [
+        {
+          "value": "更新内容",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "What’s new",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyAutomaticUpdates": {
+      "type": "string",
+      "value": [
+        {
+          "value": "自动更新",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Automatic updates",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyUpdateGroup": {
+      "type": "string",
+      "value": [
+        {
+          "value": "更新",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Updates",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyDownloadReady": {
+      "type": "string",
+      "value": [
+        {
+          "value": "更新已就绪",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Update ready",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyDownloadHint": {
+      "type": "string",
+      "value": [
+        {
+          "value": "重新打开后生效",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Reopen to apply",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyReopen": {
+      "type": "string",
+      "value": [
+        {
+          "value": "重新打开",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Reopen",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyCloseSettings": {
+      "type": "string",
+      "value": [
+        {
+          "value": "关闭设置 (⌘W)",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Close settings (⌘W)",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyStartAwake": {
+      "type": "string",
+      "value": [
+        {
+          "value": "开始常亮 (⌃⌥⌘K)",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Start keep awake (⌃⌥⌘K)",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyAwake": {
+      "type": "string",
+      "value": [
+        {
+          "value": "常亮",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Keep awake",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyJSON": {
+      "type": "string",
+      "value": [
+        {
+          "value": "JSON",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "JSON",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyMenuSettings": {
+      "type": "string",
+      "value": [
+        {
+          "value": "设置…",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Settings…",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyQuit": {
+      "type": "string",
+      "value": [
+        {
+          "value": "退出 Cubbix",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Quit Cubbix",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyShortAwake": {
+      "type": "string",
+      "value": [
+        {
+          "value": "⌃⌥⌘K",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "⌃⌥⌘K",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyShortSettings": {
+      "type": "string",
+      "value": [
+        {
+          "value": "⌘,",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "⌘,",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyShortQuit": {
+      "type": "string",
+      "value": [
+        {
+          "value": "⌘Q",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "⌘Q",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyTooltipError": {
+      "type": "string",
+      "value": [
+        {
+          "value": "无法检查更新，请重试",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Unable to check for updates. Try again.",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyTooltipChecking": {
+      "type": "string",
+      "value": [
+        {
+          "value": "正在检查更新",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Checking for updates",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyTooltipSuccess": {
+      "type": "string",
+      "value": [
+        {
+          "value": "已是最新版本",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "You’re up to date",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyChinese": {
+      "type": "string",
+      "value": [
+        {
+          "value": "简体中文",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "简体中文",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyEnglish": {
+      "type": "string",
+      "value": [
+        {
+          "value": "English",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "English",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyEmpty": {
+      "type": "string",
+      "value": [
+        {
+          "value": "",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopySystem": {
+      "type": "string",
+      "value": [
+        {
+          "value": "跟随系统",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Use system setting",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyGeneralDescription": {
+      "type": "string",
+      "value": [
+        {
+          "value": "选择界面语言",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Choose the interface language",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyButtonGeneric": {
+      "type": "string",
+      "value": [
+        {
+          "value": "重新打开",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Reopen",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "FontFamilyCJK": {
+      "type": "string",
+      "value": "Noto Sans SC"
+    }
+  },
+  "fileToken": "d54ef04c-78c9-405f-bd8d-0848edd09a7a"
+}

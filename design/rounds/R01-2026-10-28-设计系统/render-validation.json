@@ -1,0 +1,71 @@
+{
+  "cliVersion": "0.3.13",
+  "scale": 2,
+  "sourceSha256": "84d69a6f19ecc838ba85dbaf81646c51d188d82ece188013c9b174d9e74d640e",
+  "nativeLayout": {
+    "nodes": 464,
+    "problems": []
+  },
+  "exports": [
+    {
+      "nodeId": "AJEuu",
+      "name": "01 Foundations",
+      "file": "foundations.png",
+      "sha256": "dceb12e3ac55a07ef7c98619003f9160e3c27982171847d5ed388c2664a971b7"
+    },
+    {
+      "nodeId": "FO7EW",
+      "name": "02 Components and states",
+      "file": "components.png",
+      "sha256": "a83d9cf810dc340c55301868f3d2d9c18fdd1f25eed28db04cfe3498fef2f89a"
+    },
+    {
+      "nodeId": "rIbMb",
+      "name": "general-zh-CN-light",
+      "file": "general-zh-CN-light.png",
+      "sha256": "8d90a4167384d748ee5fbd626cb8df83a1eafde27b9a99c93fd1a5251c6f9dbc"
+    },
+    {
+      "nodeId": "ztBBK",
+      "name": "general-en-light",
+      "file": "general-en-light.png",
+      "sha256": "352fac63ffd37be364f714e06efca5d8d86924e974973615bf0ef68665ad2e4c"
+    },
+    {
+      "nodeId": "d3UD1",
+      "name": "about-zh-CN-light",
+      "file": "about-zh-CN-light.png",
+      "sha256": "47b6f54d7b5359cd11bf64669e5d4d4f8bbbabf13c1a6cf0df4185f7423cf995"
+    },
+    {
+      "nodeId": "nknJR",
+      "name": "about-en-light",
+      "file": "about-en-light.png",
+      "sha256": "46ba53e65356701c8a420f550b2e405a43dfb085c7f539161062b9817335e95e"
+    },
+    {
+      "nodeId": "Pz9Qv",
+      "name": "general-zh-CN-dark",
+      "file": "general-zh-CN-dark.png",
+      "sha256": "6cfe32360a879f17f17a07560a1f158a2129b8a4bd97f3e2e058c44615d76ce0"
+    },
+    {
+      "nodeId": "G04tZ",
+      "name": "general-en-dark",
+      "file": "general-en-dark.png",
+      "sha256": "c77de4b35fcb436ba67338181495aaeaa0f124443611e271c53102d309eb4777"
+    },
+    {
+      "nodeId": "wUVXs",
+      "name": "about-zh-CN-dark",
+      "file": "about-zh-CN-dark.png",
+      "sha256": "d24c45c9f8c628a02bccc076f54b3ef0dedd11b90efd9ab761b4ad86b625a5da"
+    },
+    {
+      "nodeId": "H1kV1",
+      "name": "about-en-dark",
+      "file": "about-en-dark.png",
+      "sha256": "664ebec21249b5b49c7d185caf45742bd4c9306f42fa2d2e52cfdd6c3e1afc26"
+    }
+  ]
+}
