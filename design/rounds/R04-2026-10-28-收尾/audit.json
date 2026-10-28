@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "scope": "All authored canvas children and descendants; variable definitions excluded; geometry x/y/width/height excluded from spacing.",
+  "styleTokens": 74,
+  "styleTokensByType": {
+    "color": 23,
+    "number": 46,
+    "string": 5
+  },
+  "documentVariables": 114,
+  "copyResourceKeys": 40,
+  "reusableComponents": [
+    {
+      "id": "Ectkj",
+      "name": "Icon/blocks"
+    },
+    {
+      "id": "O4KJZC",
+      "name": "Icon/settings-2"
+    },
+    {
+      "id": "uTgqT",
+      "name": "Icon/info"
+    },
+    {
+      "id": "YeT0w",
+      "name": "Icon/refresh-cw"
+    },
+    {
+      "id": "MTEP9",
+      "name": "Icon/chevron-right"
+    },
+    {
+      "id": "lPkvC",
+      "name": "Icon/sun"
+    },
+    {
+      "id": "Hvppf",
+      "name": "Icon/braces"
+    },
+    {
+      "id": "s4LWGi",
+      "name": "Icon/power"
+    },
+    {
+      "id": "xgZOR",
+      "name": "Icon/check"
+    },
+    {
+      "id": "sWO1O",
+      "name": "Icon/triangle-alert"
+    },
+    {
+      "id": "VFLqP",
+      "name": "Icon/loader-circle"
+    },
+    {
+      "id": "QBOEx",
+      "name": "Icon/x"
+    },
+    {
+      "id": "Jy4Q0",
+      "name": "Icon/download"
+    },
+    {
+      "id": "RrJvC",
+      "name": "Icon/external-link"
+    },
+    {
+      "id": "KfHWu",
+      "name": "Switch"
+    },
+    {
+      "id": "Hs9NC",
+      "name": "Segmented control"
+    },
+    {
+      "id": "n2ixa",
+      "name": "Icon button"
+    },
+    {
+      "id": "sFUcN",
+      "name": "Tooltip"
+    },
+    {
+      "id": "GaYMc",
+      "name": "Text button"
+    },
+    {
+      "id": "PodLz",
+      "name": "Settings row"
+    },
+    {
+      "id": "fezUM",
+      "name": "Inset divider"
+    },
+    {
+      "id": "X6uV6",
+      "name": "Settings card"
+    },
+    {
+      "id": "zlRGT",
+      "name": "Navigation item"
+    },
+    {
+      "id": "XlhBz",
+      "name": "Status icon"
+    },
+    {
+      "id": "SvwYl",
+      "name": "Menu item"
+    },
+    {
+      "id": "zh2Qo",
+      "name": "Menu bar dropdown"
+    },
+    {
+      "id": "BVbwx",
+      "name": "Download ready notice"
+    },
+    {
+      "id": "vUQhl",
+      "name": "Version control"
+    },
+    {
+      "id": "ewQJq",
+      "name": "Restart confirmation"
+    },
+    {
+      "id": "r2xEJ",
+      "name": "Logo/Mark"
+    },
+    {
+      "id": "ivtHk",
+      "name": "Brand lockup"
+    },
+    {
+      "id": "qSiSW",
+      "name": "Brand icon only"
+    },
+    {
+      "id": "y6tUf",
+      "name": "Settings window"
+    }
+  ],
+  "componentCount": 33,
+  "authoredRefCount": 110,
+  "samples": 12,
+  "literalCounts": {
+    "colors": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    },
+    "cornerRadius": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    },
+    "fontSize": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    },
+    "spacing": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    }
+  },
+  "literalDetails": {
+    "colors": [],
+    "cornerRadius": [],
+    "fontSize": [],
+    "spacing": []
+  },
+  "missingVariables": [],
+  "danglingRefs": [],
+  "tokenDrift": [],
+  "r04Checks": {
+    "noRepeatedPageHeaderOrCloseButton": true,
+    "fixedWidthAndContentHeight": true,
+    "modeOnlySamples": true,
+    "languageOptionsInOrder": true,
+    "defaultLanguageIsChinese": true,
+    "brandLockupInstalled": true,
+    "noBrandPlaceholder": true,
+    "bothBrandVariants": true,
+    "navigationHasNoStroke": true,
+    "navigationStatesShareShape": true,
+    "navigationStatesUseDistinctColors": true,
+    "accentAliasesCentralized": true,
+    "noComparisonBoard": true,
+    "neutralSuccess": true,
+    "selectedTextUsesOnAccent": true,
+    "primaryButtonTextUsesOnAccent": true,
+    "accentUsesModeOnly": true
+  },
+  "unfinishedPlaceholders": [],
+  "completeSampleMatrix": true,
+  "completePromptMatrix": true,
+  "passed": true
+}

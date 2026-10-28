@@ -1,0 +1,82 @@
+{
+  "nativeExpandedNodes": 1282,
+  "navigationItems": 34,
+  "hoverAndSelectedSameGeometry": true,
+  "navigationWithoutStroke": true,
+  "hoverAndSelectedDifferentFill": true,
+  "samples": [
+    {
+      "sample": "general-zh-CN-light",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "general-en-light",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "about-zh-CN-light",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "about-en-light",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "general-zh-CN-dark",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "general-en-dark",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "about-zh-CN-dark",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "about-en-dark",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "restart-confirmation-zh-CN-light",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "restart-confirmation-en-light",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "restart-confirmation-zh-CN-dark",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    },
+    {
+      "sample": "restart-confirmation-en-dark",
+      "navigationItems": 2,
+      "logoMarks": 1,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

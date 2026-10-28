@@ -1,0 +1,62 @@
+{
+  "source": "brand/dist/mark.svg",
+  "sourceSha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+  "method": "Compare source path data, inverse-transform viewBoxes, ellipse bounds, evenodd holes, provenance and native themed fills.",
+  "markSize": 20,
+  "parts": [
+    {
+      "sourceId": "source-VBc6i",
+      "nodeId": "NpwyL",
+      "geometryMatches": true,
+      "sourceHashMatches": true,
+      "sourceIdMatches": true,
+      "themeFill": true
+    },
+    {
+      "sourceId": "source-o6Smr",
+      "nodeId": "iiaeT",
+      "geometryMatches": true,
+      "sourceHashMatches": true,
+      "sourceIdMatches": true,
+      "themeFill": true
+    },
+    {
+      "sourceId": "source-GqfJ3",
+      "nodeId": "v12IUx",
+      "geometryMatches": true,
+      "sourceHashMatches": true,
+      "sourceIdMatches": true,
+      "themeFill": true
+    },
+    {
+      "sourceId": "source-nFnwB",
+      "nodeId": "wIJE2",
+      "geometryMatches": true,
+      "sourceHashMatches": true,
+      "sourceIdMatches": true,
+      "themeFill": true
+    },
+    {
+      "sourceId": "source-A38atD",
+      "nodeId": "e9GZB3",
+      "geometryMatches": true,
+      "sourceHashMatches": true,
+      "sourceIdMatches": true,
+      "themeFill": true
+    },
+    {
+      "sourceId": "source-PM6Vu",
+      "nodeId": "DX5L7",
+      "geometryMatches": true,
+      "sourceHashMatches": true,
+      "sourceIdMatches": true,
+      "themeFill": true
+    }
+  ],
+  "nativeMarkInstances": 19,
+  "nativeForegroundColors": [
+    "#202020",
+    "#F5F5F5"
+  ],
+  "passed": true
+}

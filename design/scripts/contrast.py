@@ -36,7 +36,7 @@ def audit():
         ('selected navigation', 'ColorAccent', 'ColorAccentSoft'),
         ('tooltip', 'ColorTooltipText', 'ColorTooltip'),
     ]
-    for surface in ('ColorWindow', 'ColorCard', 'ColorSidebar', 'ColorControl', 'ColorAccentSoft'):
+    for surface in ('ColorWindow', 'ColorCard', 'ColorSidebar', 'ColorControl', 'ColorAccentSoft', 'ColorNavHover'):
         for foreground in ('ColorText', 'ColorTextSecondary'):
             text_pairs.append((foreground + ' on ' + surface, foreground, surface))
     graphic_pairs = [
@@ -44,7 +44,8 @@ def audit():
         ('off switch thumb', 'ColorText', 'ColorControlHover'),
         ('off switch outline', 'ColorTextSecondary', 'ColorControlHover'),
         ('selected segment boundary', 'ColorAccent', 'ColorControl'),
-        ('selected navigation outline', 'ColorTextSecondary', 'ColorAccentSoft'),
+        ('navigation hover icon', 'ColorText', 'ColorNavHover'),
+        ('selected navigation icon', 'ColorAccent', 'ColorAccentSoft'),
     ]
     for surface in ('ColorWindow', 'ColorCard', 'ColorControlHover'):
         for foreground in ('ColorAccent', 'ColorTextSecondary', 'ColorDanger', 'ColorSuccess'):

@@ -24,7 +24,7 @@
           "id": "r5PYC",
           "name": "Foundation title",
           "fill": "$ColorText",
-          "content": "Cubbix · 设计基础 R03 黑白灰",
+          "content": "Cubbix 设计系统 · R04",
           "lineHeight": "$LineHeightTitle",
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeDisplay",
@@ -1885,6 +1885,8 @@
           "width": 144,
           "height": 32,
           "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorTransparent",
+          "strokeWidth": "$Space0",
           "gap": "$Space8",
           "padding": "$Space8",
           "alignItems": "center",
@@ -1914,10 +1916,10 @@
           "ref": "zlRGT",
           "name": "Navigation selected",
           "x": 640,
-          "y": 340,
+          "y": 380,
           "fill": "$ColorAccentSoft",
-          "stroke": "$ColorTextSecondary",
-          "strokeWidth": "$StrokeHairline",
+          "stroke": "$ColorTransparent",
+          "strokeWidth": "$Space0",
           "descendants": {
             "namsg": {
               "fill": "$ColorAccent"
@@ -1931,7 +1933,7 @@
           "y": 266,
           "name": "Navigation label",
           "fill": "$ColorTextSecondary",
-          "content": "导航 · 常态 / 选中",
+          "content": "导航 · 常态 / 悬停 / 选中",
           "lineHeight": "$LineHeightBody",
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeSmall",
@@ -2343,47 +2345,13 @@
           ]
         },
         {
-          "type": "frame",
-          "id": "qxNp2",
-          "x": 1250,
-          "y": 540,
-          "name": "Brand placeholder · 待替换为 Logo",
-          "reusable": true,
-          "metadata": {
-            "type": "brand-placeholder",
-            "status": "待替换为 Logo",
-            "temporary": true
-          },
-          "width": 120,
-          "height": 28,
-          "gap": "$Space0",
-          "padding": [
-            "$Space0",
-            "$Space8"
-          ],
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "text",
-              "id": "uPtza",
-              "name": "Brand name",
-              "fill": "$ColorText",
-              "content": "Cubbix",
-              "lineHeight": "$LineHeightBody",
-              "fontFamily": "$FontFamily",
-              "fontSize": "$FontSizeBody",
-              "fontWeight": "$FontWeightSemibold"
-            }
-          ]
-        },
-        {
           "type": "text",
           "id": "A1aVb",
           "x": 1250,
           "y": 508,
-          "name": "Brand placeholder note",
+          "name": "Brand variants note",
           "fill": "$ColorTextSecondary",
-          "content": "品牌占位 · 待替换为 Logo",
+          "content": "品牌 · 猫标 + Cubbix（推荐） / 仅猫标",
           "lineHeight": "$LineHeightBody",
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeSmall",
@@ -2509,6 +2477,216 @@
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeSmall",
           "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "r2xEJ",
+          "x": 1500,
+          "y": 540,
+          "name": "Logo/Mark",
+          "reusable": true,
+          "metadata": {
+            "type": "brand-mark",
+            "source": "../brand/dist/mark.svg",
+            "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b"
+          },
+          "width": 20,
+          "height": 20,
+          "layout": "none",
+          "children": [
+            {
+              "type": "path",
+              "id": "NpwyL",
+              "x": 0.9954067699208515,
+              "y": 0,
+              "name": "source-VBc6i",
+              "metadata": {
+                "type": "brand-source-part",
+                "source": "../brand/dist/mark.svg",
+                "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+                "sourceId": "source-VBc6i"
+              },
+              "geometry": "M28 36l0-8.074c0-11.926 0-11.926 9.541-4.771l11.461 8.596c2.998 2.249 2.998 2.249 6.746 2.249l16.504 0c3.748 0 3.748 0 6.746-2.249l11.461-8.596c9.541-7.155 9.541-7.155 9.541 4.771l0 8.074c0 8 0 8.357 0 14.178 0 5.822-0.333 7.064 0 10.731 0.333 3.666 3.333 5.758 0.333 10.091-3 4.333-7.666 7.667-13 9.333-5.333 1.667-11.333 1.667-23.333 1.667-12 0-18 0-23.333-1.667-5.334-1.666-10-5-13-9.333-3-4.333 0-6.425 0.333-10.091 0.333-3.667 0-7.001 0-10.731 0-3.729 0-6.178 0-14.178l0 0z m32 20c0 6.627-5.373 12-12 12-6.627 0-12-5.373-12-12 0-6.627 5.373-12 12-12 6.627 0 12 5.373 12 12z m32 0c0 6.627-5.373 12-12 12-6.627 0-12-5.373-12-12 0-6.627 5.373-12 12-12 6.627 0 12 5.373 12 12z",
+              "fillRule": "evenodd",
+              "viewBox": [
+                19.99925352750301,
+                18.272093554335168,
+                88.01816301735236,
+                102.30774058135454
+              ],
+              "fill": "$ColorText",
+              "width": 18.009186460158297,
+              "height": 20
+            },
+            {
+              "type": "ellipse",
+              "id": "iiaeT",
+              "x": 4.98607876961502,
+              "y": 6.800084924088519,
+              "name": "source-o6Smr",
+              "metadata": {
+                "type": "brand-source-part",
+                "source": "../brand/dist/mark.svg",
+                "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+                "sourceId": "source-o6Smr"
+              },
+              "fill": "$ColorText",
+              "width": 1.8418486152434623,
+              "height": 1.8418486152434623
+            },
+            {
+              "type": "ellipse",
+              "id": "v12IUx",
+              "x": 4.781428923476858,
+              "y": 10.611688308411795,
+              "name": "source-GqfJ3",
+              "metadata": {
+                "type": "brand-source-part",
+                "source": "../brand/dist/mark.svg",
+                "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+                "sourceId": "source-GqfJ3"
+              },
+              "fill": "$ColorText",
+              "width": 4.092996922763249,
+              "height": 4.092996922763249
+            },
+            {
+              "type": "ellipse",
+              "id": "wIJE2",
+              "x": 11.330223999898056,
+              "y": 10.611688308411795,
+              "name": "source-nFnwB",
+              "metadata": {
+                "type": "brand-source-part",
+                "source": "../brand/dist/mark.svg",
+                "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+                "sourceId": "source-nFnwB"
+              },
+              "fill": "$ColorText",
+              "width": 4.092996922763249,
+              "height": 4.092996922763249
+            },
+            {
+              "type": "ellipse",
+              "id": "e9GZB3",
+              "x": 11.53487384603622,
+              "y": 6.800084924088519,
+              "name": "source-A38atD",
+              "metadata": {
+                "type": "brand-source-part",
+                "source": "../brand/dist/mark.svg",
+                "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+                "sourceId": "source-A38atD"
+              },
+              "fill": "$ColorText",
+              "width": 1.8418486152434623,
+              "height": 1.8418486152434623
+            },
+            {
+              "type": "path",
+              "id": "DX5L7",
+              "x": 0.9954067699208515,
+              "y": 0,
+              "name": "source-PM6Vu",
+              "metadata": {
+                "type": "brand-source-part",
+                "source": "../brand/dist/mark.svg",
+                "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+                "sourceId": "source-PM6Vu"
+              },
+              "geometry": "M20 80c0-5.33333 2.66667-8 8-8l72 0c5.33333 0 8 2.66667 8 8l0 28c0 5.33333-2.66667 8-8 8l-72 0c-5.33333 0-8-2.66667-8-8l0-28z m8 4c0-2.66667 1.33333-4 4-4l64 0c2.66667 0 4 1.33333 4 4l0 20c0 2.66667-1.33333 4-4 4l-64 0c-2.66667 0-4-1.33333-4-4l0-20z",
+              "fillRule": "evenodd",
+              "viewBox": [
+                20,
+                18.27209852629125,
+                88,
+                97.72790147370876
+              ],
+              "fill": "$ColorText",
+              "width": 18.009186460158297,
+              "height": 20
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ivtHk",
+          "x": 1250,
+          "y": 540,
+          "name": "Brand lockup",
+          "reusable": true,
+          "metadata": {
+            "type": "brand-lockup",
+            "recommendation": "preferred"
+          },
+          "width": 120,
+          "height": 28,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space6"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "X0KmsM",
+              "type": "ref",
+              "ref": "r2xEJ",
+              "name": "Brand mark",
+              "width": 20,
+              "height": 20
+            },
+            {
+              "type": "text",
+              "id": "uPtza",
+              "name": "Brand name",
+              "fill": "$ColorText",
+              "content": "Cubbix",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightSemibold"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qSiSW",
+          "x": 1250,
+          "y": 580,
+          "name": "Brand icon only",
+          "reusable": true,
+          "metadata": {
+            "type": "brand-icon-only",
+            "use": "compact sidebar"
+          },
+          "width": 120,
+          "height": 28,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space6"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "Vx9Kv",
+              "type": "ref",
+              "ref": "r2xEJ",
+              "name": "Brand mark",
+              "width": 20,
+              "height": 20
+            }
+          ]
+        },
+        {
+          "id": "iWiRx",
+          "type": "ref",
+          "ref": "zlRGT",
+          "name": "Navigation hover",
+          "x": 640,
+          "y": 340,
+          "fill": "$ColorNavHover"
         }
       ]
     },
@@ -2549,10 +2727,10 @@
           ],
           "children": [
             {
-              "id": "QsPFu",
+              "id": "CMWHS",
               "type": "ref",
-              "ref": "qxNp2",
-              "name": "Brand placeholder · 待替换为 Logo",
+              "ref": "ivtHk",
+              "name": "Brand lockup",
               "width": "fill_container"
             },
             {
@@ -2670,15 +2848,17 @@
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "通用",
               "fill": "$ColorAccent"
             },
             "vENnM": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "关于",
@@ -2795,15 +2975,17 @@
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "General",
               "fill": "$ColorAccent"
             },
             "vENnM": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "About",
@@ -2919,7 +3101,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "通用",
@@ -2927,8 +3111,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "关于",
@@ -3065,7 +3249,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "General",
@@ -3073,8 +3259,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "About",
@@ -3212,15 +3398,17 @@
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "通用",
               "fill": "$ColorAccent"
             },
             "vENnM": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "关于",
@@ -3337,15 +3525,17 @@
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "General",
               "fill": "$ColorAccent"
             },
             "vENnM": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "About",
@@ -3461,7 +3651,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "通用",
@@ -3469,8 +3661,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "关于",
@@ -3607,7 +3799,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "General",
@@ -3615,8 +3809,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "About",
@@ -3753,7 +3947,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "通用",
@@ -3761,8 +3957,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "关于",
@@ -3945,7 +4141,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "General",
@@ -3953,8 +4151,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "About",
@@ -4137,7 +4335,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "通用",
@@ -4145,8 +4345,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "关于",
@@ -4329,7 +4529,9 @@
           "height": 316,
           "descendants": {
             "ezKZw": {
-              "fill": "$ColorTransparent"
+              "fill": "$ColorTransparent",
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "ezKZw/namsg": {
               "content": "General",
@@ -4337,8 +4539,8 @@
             },
             "vENnM": {
               "fill": "$ColorAccentSoft",
-              "stroke": "$ColorTextSecondary",
-              "strokeWidth": "$StrokeHairline"
+              "stroke": "$ColorTransparent",
+              "strokeWidth": "$Space0"
             },
             "vENnM/namsg": {
               "content": "About",
@@ -4481,6 +4683,660 @@
                   "content": "Return to documents"
                 }
               }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "nfzJX",
+      "x": 0,
+      "y": 3100,
+      "name": "brand-comparison",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN"
+      },
+      "metadata": {
+        "type": "brand-comparison",
+        "recommendation": "mark-and-name"
+      },
+      "width": 1512,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "frame",
+          "id": "P61RX",
+          "name": "Comparison heading",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "children": [
+            {
+              "type": "text",
+              "id": "xiQJJ",
+              "name": "Comparison title",
+              "fill": "$ColorText",
+              "content": "侧栏品牌 · 两种排法",
+              "lineHeight": "$LineHeightTitle",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeDisplay",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "Q1XOI",
+              "name": "Recommendation",
+              "fill": "$ColorText",
+              "content": "推荐猫标 + Cubbix：侧栏空间充足，名称帮助识别；仅猫标可用于紧凑侧栏。",
+              "lineHeight": "$LineHeightTitle",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "yae9E",
+          "name": "light brand variants",
+          "width": "fill_container",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "urYou",
+              "name": "lockup light",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "h1Nyp",
+                  "name": "Variant caption",
+                  "fill": "$ColorText",
+                  "content": "猫标 + Cubbix · 推荐 / 浅色",
+                  "lineHeight": "$LineHeightTitle",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "gwWHw",
+                  "name": "lockup-light",
+                  "theme": {
+                    "mode": "light",
+                    "language": "zh-CN"
+                  },
+                  "metadata": {
+                    "type": "brand-variant",
+                    "variant": "lockup",
+                    "mode": "light"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "gmCWl",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "BBvzD",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "w42ZHL",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "fwh3K",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "C97BM",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorAccent"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文",
+                                      "fill": "$ColorOnAccent"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English",
+                                      "fill": "$ColorText"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "q19AJ4",
+              "name": "icon-only light",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "SgLm0",
+                  "name": "Variant caption",
+                  "fill": "$ColorText",
+                  "content": "仅猫标 · 紧凑备选 / 浅色",
+                  "lineHeight": "$LineHeightTitle",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "sBX9v",
+                  "name": "icon-only-light",
+                  "theme": {
+                    "mode": "light",
+                    "language": "zh-CN"
+                  },
+                  "metadata": {
+                    "type": "brand-variant",
+                    "variant": "icon-only",
+                    "mode": "light"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "mVvzK",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "CMWHS/uPtza": {
+                          "enabled": false
+                        },
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dtQFk",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "jsBkf",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "BqdxV",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "UaeQY",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorAccent"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文",
+                                      "fill": "$ColorOnAccent"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English",
+                                      "fill": "$ColorText"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "l99T9I",
+          "name": "dark brand variants",
+          "width": "fill_container",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "r2dro",
+              "name": "lockup dark",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zfEJh",
+                  "name": "Variant caption",
+                  "fill": "$ColorText",
+                  "content": "猫标 + Cubbix · 推荐 / 深色",
+                  "lineHeight": "$LineHeightTitle",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "rz2jE",
+                  "name": "lockup-dark",
+                  "theme": {
+                    "mode": "dark",
+                    "language": "zh-CN"
+                  },
+                  "metadata": {
+                    "type": "brand-variant",
+                    "variant": "lockup",
+                    "mode": "dark"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "F8BnRl",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ryYXJ",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "EJ04K",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "Vp83b",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "eYcU7",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorAccent"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文",
+                                      "fill": "$ColorOnAccent"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English",
+                                      "fill": "$ColorText"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "opnXk",
+              "name": "icon-only dark",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "BOKq5",
+                  "name": "Variant caption",
+                  "fill": "$ColorText",
+                  "content": "仅猫标 · 紧凑备选 / 深色",
+                  "lineHeight": "$LineHeightTitle",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "INs1P",
+                  "name": "icon-only-dark",
+                  "theme": {
+                    "mode": "dark",
+                    "language": "zh-CN"
+                  },
+                  "metadata": {
+                    "type": "brand-variant",
+                    "variant": "icon-only",
+                    "mode": "dark"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "lLwb7",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "CMWHS/uPtza": {
+                          "enabled": false
+                        },
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent",
+                          "stroke": "$ColorTransparent",
+                          "strokeWidth": "$Space0"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "TCfIS",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "QlJII",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "Xdg0C",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "bDtCR",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorAccent"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文",
+                                      "fill": "$ColorOnAccent"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English",
+                                      "fill": "$ColorText"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -4684,13 +5540,13 @@
       "type": "color",
       "value": [
         {
-          "value": "#E5E5E5",
+          "value": "#E0E0E0",
           "theme": {
             "mode": "light"
           }
         },
         {
-          "value": "#3A3A3A",
+          "value": "#414141",
           "theme": {
             "mode": "dark"
           }
@@ -4969,7 +5825,7 @@
     },
     "SizeBrandMark": {
       "type": "number",
-      "value": 36
+      "value": 20
     },
     "OpacityDisabled": {
       "type": "number",
@@ -5717,6 +6573,23 @@
           "value": "Return to documents",
           "theme": {
             "language": "en"
+          }
+        }
+      ]
+    },
+    "ColorNavHover": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F3F3F3",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#333333",
+          "theme": {
+            "mode": "dark"
           }
         }
       ]

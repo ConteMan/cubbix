@@ -1,6 +1,6 @@
 # 组件索引
 
-R03 保留 31 个 reusable：14 个 Lucide 图标、17 个界面组件。95 个源稿 ref 包含 descendants 内的嵌套引用。R02 的四个对比面板随当前对比板移除。
+R04 共 33 个 reusable：14 个 Lucide 图标、1 个品牌猫标和 18 个界面组件。110 个源稿 ref 包含 descendants 内的嵌套引用。12 张场景样张之外，品牌对比板含浅深主题各两种排法。
 
 | 组件 | 节点 ID |
 | --- | --- |
@@ -32,14 +32,17 @@ R03 保留 31 个 reusable：14 个 Lucide 图标、17 个界面组件。95 个�
 | Menu bar dropdown | `zh2Qo` |
 | Download ready notice | `BVbwx` |
 | Version control | `vUQhl` |
-| Brand placeholder · 待替换为 Logo | `qxNp2` |
 | Restart confirmation | `ewQJq` |
+| Logo/Mark | `r2xEJ` |
+| Brand lockup | `ivtHk` |
+| Brand icon only | `qSiSW` |
 | Settings window | `y6tUf` |
 
-## 黑白灰状态
+## 品牌与状态
 
-- 主要按钮和选中分段使用近黑／近白填充，文字使用 ColorOnAccent；未选中分段恢复普通文字色。
-- 打开状态开关使用反差拇指；关闭状态以中性拇指与描边保持可辨，停用状态仍保持中性。
-- 导航选中态为灰底和细中性描边；键盘焦点是独立的较粗框，仅在键盘操作时出现。
-- 失败／阻断 alert 使用语义红；成功 check 使用中性色。
-- 品牌文字占位和未保存 JSON 提示保留，尺寸、内容、语言与恢复规则沿用 R02。
+- Logo/Mark 精确导入 main 的 `brand/dist/mark.svg`，保留两个 evenodd 路径与四个椭圆；全部填充引用 ColorText。
+- Brand lockup 为猫标 + Cubbix，推荐用于当前侧栏；Brand icon only 为紧凑备选。标记框 20 × 20，与 16 × 16 导航图标居中对齐。
+- Navigation item 的常态／悬停／选中共用同一形状；悬停用 ColorNavHover，选中用 ColorAccentSoft，均无描边，仅颜色不同。
+- 主要按钮和选中分段使用近黑／近白填充，文字使用 ColorOnAccent；打开状态开关使用反差拇指。
+- 关闭状态开关使用中性拇指与描边；键盘焦点只在键盘操作时显示。
+- 失败／阻断 alert 使用语义红；成功 check 使用中性色。未保存 JSON 提示和恢复规则沿用 R02。

@@ -1,12 +1,14 @@
 # Token 与 Go 标识符映射
 
-R03 共 73 个样式 Token。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+R04 共 74 个样式 Token。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
 AccentFill、AccentSoft、AccentOnFill 集中在 groups.accent，仅按 mode 定义浅深主题。ColorAccent、ColorAccentSoft、ColorOnAccent 是对应别名；不再提供蓝色或橘色界面变体。
 
 ColorSuccess 引用 ColorText，成功 check 采用中性色。ColorDanger 是唯一允许彩色的语义 Token；其他颜色均为中性 RGB。ColorThumb 在浅色为白、深色为近黑，以对比打开状态的强调填充。
+
+ColorNavHover 是导航悬停背景，ColorAccentSoft 是选中背景；两态共用无描边的内缩圆角形状。SizeBrandMark 为 20，源猫标按比例居中放入该标记框。
 
 ## 全量映射
 
@@ -17,6 +19,7 @@ ColorSuccess 引用 ColorText，成功 check 采用中性色。ColorDanger 是�
 | `ColorCard` | color | `mode=light: #FFFFFF / mode=dark: #2C2C2C` |
 | `ColorControl` | color | `mode=light: #F0F0F0 / mode=dark: #3B3B3B` |
 | `ColorControlHover` | color | `mode=light: #E6E6E6 / mode=dark: #494949` |
+| `ColorNavHover` | color | `mode=light: #F3F3F3 / mode=dark: #333333` |
 | `ColorText` | color | `mode=light: #202020 / mode=dark: #F5F5F5` |
 | `ColorTextSecondary` | color | `mode=light: #636363 / mode=dark: #B5B5B5` |
 | `ColorTextDisabled` | color | `mode=light: #858585 / mode=dark: #929292` |
@@ -70,7 +73,7 @@ ColorSuccess 引用 ColorText，成功 check 采用中性色。ColorDanger 是�
 | `SizeMenuWidth` | number | `260` |
 | `SizeMenuRowHeight` | number | `32` |
 | `SizeButtonHeight` | number | `28` |
-| `SizeBrandMark` | number | `36` |
+| `SizeBrandMark` | number | `20` |
 | `OpacityDisabled` | number | `0.45` |
 | `FontWeightRegular` | string | `400` |
 | `FontWeightMedium` | string | `500` |
@@ -78,7 +81,7 @@ ColorSuccess 引用 ColorText，成功 check 采用中性色。ColorDanger 是�
 | `FontFamily` | string | `language=zh-CN: Noto Sans SC / language=en: Inter` |
 | `FontFamilyCJK` | string | `Noto Sans SC` |
 | `AccentFill` | color | `mode=light: #202020 / mode=dark: #F5F5F5` |
-| `AccentSoft` | color | `mode=light: #E5E5E5 / mode=dark: #3A3A3A` |
+| `AccentSoft` | color | `mode=light: #E0E0E0 / mode=dark: #414141` |
 | `AccentOnFill` | color | `mode=light: #FFFFFF / mode=dark: #202020` |
 | `ColorOverlay` | color | `mode=light: #00000033 / mode=dark: #00000066` |
 | `SizeWindowMinHeight` | number | `176` |

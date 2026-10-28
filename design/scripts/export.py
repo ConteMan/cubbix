@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-ROUND = ROOT / 'rounds' / 'R03-2026-10-28-黑白灰'
+ROUND = ROOT / 'rounds' / 'R04-2026-10-28-收尾'
 CLI_VERSION = '0.3.13'
 
 
@@ -23,8 +23,12 @@ def main():
     boards = [node for node in document['children'] if not node.get('reusable')]
     samples = [node['id'] for node in boards]
     ids = [node['id'] for node in boards]
-    code = ('qa={nodes:0,problems:[]};for(const root of ' + json.dumps(samples)
-            + ')Get(root,(n,c)=>{qa.nodes++;if(c.problems&&n.enabled!==false)'
+    code = ('qa={nodes:0,problems:[],navigation:[],brands:[]};for(const root of ' + json.dumps(samples)
+            + ')Get(root,(n,c)=>{qa.nodes++;'
+              'if(["Navigation hover","Navigation selected","General navigation","About navigation"].includes(n.name))'
+              'qa.navigation.push({id:n.id,name:n.name,bounds:c.bounds,width:n.width,height:n.height,cornerRadius:n.cornerRadius,padding:n.padding,gap:n.gap,fill:n.fill,stroke:n.stroke,strokeWidth:n.strokeWidth});'
+              'if(n.metadata&&n.metadata.type==="brand-mark")qa.brands.push({id:n.id,width:n.width,height:n.height,parts:Get(n.id,{resolveInstances:true,resolveVariables:true,depth:1}).children.map(p=>({sourceId:p.metadata.sourceId,fill:p.fill}))});'
+              'if(c.problems&&n.enabled!==false)'
               'qa.problems.push({id:n.id,name:n.name,problem:c.problems,bounds:c.bounds})},'
               '{resolveInstances:true});Print(qa);Export('
             + json.dumps(ids) + ',"png",' + json.dumps(str(ROUND)) + ',{scale:2});')

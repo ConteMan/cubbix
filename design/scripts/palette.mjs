@@ -18,7 +18,7 @@ for (const filename of (await readdir(directory)).filter(name => name.endsWith('
   }
   results.push({ file: filename, width: info.width, height: info.height, semanticRedPixels: semanticRed, unexpectedColorPixels: invalid });
 }
-const output = { scope: 'Native PNG pixels; only neutral RGB or semantic red allowed, with a two-level raster rounding tolerance.', images: results, passed: results.length === 14 && results.every(item => item.unexpectedColorPixels === 0) };
+const output = { scope: 'Native PNG pixels; only neutral RGB or semantic red allowed, with a two-level raster rounding tolerance.', images: results, passed: results.length === 15 && results.every(item => item.unexpectedColorPixels === 0) };
 await writeFile(join(directory, 'pixel-validation.json'), JSON.stringify(output, null, 2) + '\n');
 console.log(JSON.stringify({ images: results.length, passed: output.passed }));
 if (!output.passed) process.exitCode = 1;
