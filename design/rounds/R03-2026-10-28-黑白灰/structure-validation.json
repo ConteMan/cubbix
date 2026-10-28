@@ -1,0 +1,7 @@
+{
+  "baselineCommit": "ddffa374e505a3aee648028ed2b5ba93e71efba1",
+  "scope": "Sample names, node types, component references, content and layout; generated ids, theme and color styling excluded.",
+  "samples": 12,
+  "changedSamples": [],
+  "passed": true
+}
