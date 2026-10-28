@@ -38,5 +38,10 @@
   "UnsavedTitle": "有未保存的 JSON 文档",
   "UnsavedBody": "请先保存文档以保留更改，再重启更新。",
   "Cancel": "取消",
-  "ReturnToDocuments": "返回文档"
+  "ReturnToDocuments": "返回文档",
+  "UpdateSourceMissing": "尚未配置更新源",
+  "CheckAction": "检查更新",
+  "UpdateNotesUnavailable": "尚未配置更新内容",
+  "LoginError": "无法更改开机启动设置",
+  "ConfigError": "无法保存设置"
 }
