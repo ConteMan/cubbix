@@ -1,0 +1,95 @@
+{
+  "cliVersion": "0.3.13",
+  "scale": 2,
+  "sourceSha256": "1b3ec8b3ff36a387be8fc1e94e30be556b4492455943366829032a39a7d97f9c",
+  "nativeLayout": {
+    "nodes": 938,
+    "problems": []
+  },
+  "exports": [
+    {
+      "nodeId": "AJEuu",
+      "name": "01 Foundations",
+      "file": "foundations.png",
+      "sha256": "06299d615da07bdf06bc507da535c9e0eb04a7a77a6c22f5b4b0f3d5b683d41f"
+    },
+    {
+      "nodeId": "FO7EW",
+      "name": "02 Components and states",
+      "file": "components.png",
+      "sha256": "f2f760c944e5404ef5ca260b0f8d94b3028582cbb47cbff3204246ff76cf87a0"
+    },
+    {
+      "nodeId": "rIbMb",
+      "name": "general-zh-CN-light",
+      "file": "general-zh-CN-light.png",
+      "sha256": "9419e05292f12c69a1f646cc917801f786c8a786c195bfc3006b6c367a00df7e"
+    },
+    {
+      "nodeId": "ztBBK",
+      "name": "general-en-light",
+      "file": "general-en-light.png",
+      "sha256": "161b5e80b3e2eaf5cd93866d58d6b5f65843b5c89473611907989e5c88fdbf26"
+    },
+    {
+      "nodeId": "d3UD1",
+      "name": "about-zh-CN-light",
+      "file": "about-zh-CN-light.png",
+      "sha256": "409b8534299e54acab2426d15df58e8908f576853d264930485d649f6a515900"
+    },
+    {
+      "nodeId": "nknJR",
+      "name": "about-en-light",
+      "file": "about-en-light.png",
+      "sha256": "3ea4d14830ba1c0de15fd8ece07fa076495f302af7115f02661d79013dc4f6b9"
+    },
+    {
+      "nodeId": "Pz9Qv",
+      "name": "general-zh-CN-dark",
+      "file": "general-zh-CN-dark.png",
+      "sha256": "8e00569f230cacf2458f94278974b77aa046f0c55b7cde422f5934c360de02d8"
+    },
+    {
+      "nodeId": "G04tZ",
+      "name": "general-en-dark",
+      "file": "general-en-dark.png",
+      "sha256": "68fa36f3285d37fd33bb6e0c8f85a3e506f641aa35d6ccaf28d9231cab9ad4a1"
+    },
+    {
+      "nodeId": "wUVXs",
+      "name": "about-zh-CN-dark",
+      "file": "about-zh-CN-dark.png",
+      "sha256": "6c32b91f50ae7ed4839ac53f6f888e27821d2e040c1c1a580e0bf09330cb3055"
+    },
+    {
+      "nodeId": "H1kV1",
+      "name": "about-en-dark",
+      "file": "about-en-dark.png",
+      "sha256": "936b34d4b049624e22b98d50ce346eacd348f4f8d176d21e856233b19bca2345"
+    },
+    {
+      "nodeId": "f9UC6",
+      "name": "restart-confirmation-zh-CN-light",
+      "file": "restart-confirmation-zh-CN-light.png",
+      "sha256": "27cfd2cfa24ffa36db30543fa31661f2c437c4946d8957778f74c2a92bdc92e1"
+    },
+    {
+      "nodeId": "EdVPb",
+      "name": "restart-confirmation-en-light",
+      "file": "restart-confirmation-en-light.png",
+      "sha256": "613565eb8a920f2927d73557f5439d5f1a9e584d7ae415cead2f72a7f671183b"
+    },
+    {
+      "nodeId": "IxA8h",
+      "name": "restart-confirmation-zh-CN-dark",
+      "file": "restart-confirmation-zh-CN-dark.png",
+      "sha256": "d83b6bc7f17525db1d2109ea25eb6ce9b40086be0280e579479157062e40a460"
+    },
+    {
+      "nodeId": "M0z6f1",
+      "name": "restart-confirmation-en-dark",
+      "file": "restart-confirmation-en-dark.png",
+      "sha256": "e2719245ca200a54e41825701babecc11f2749ddfcdad71fc8e138e4a34ea114"
+    }
+  ]
+}

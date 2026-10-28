@@ -1,42 +1,38 @@
-# Cubbix 设计系统 R02
+# Cubbix 设计系统 R03 · 黑白灰
 
-本轮按 Issue #7 的维护者评审收敛设置窗口，并补齐语言与更新流程。设计源为 [`cubbix.pen`](cubbix.pen)，当前预览与规则见 [R02 评审目录](rounds/R02-2026-10-28-设计系统/README.md)。设计稿待本轮评审，尚未进入界面实现。
+维护者决定界面采用黑白灰，橘色仅属于应用图标。设计源为 [`cubbix.pen`](cubbix.pen)，本轮 PNG、规则与验证见 [R03 目录](rounds/R03-2026-10-28-黑白灰/README.md)。当前画布已删除 R02 的橘色对比板；[R01](rounds/R01-2026-10-28-设计系统/README.md) 与 [R02](rounds/R02-2026-10-28-设计系统/README.md) 目录保留为历史归档。
 
-- [Token 与 Go 标识符映射](token-index.md)：73 个样式 Token，强调色集中在 `accent` 组。
-- [组件索引](component-index.md)：31 个 reusable，含品牌文字占位和未保存文档提示。
+- [Token 映射](token-index.md)：73 个样式 Token，`accent` 组只按浅深主题解析黑白灰。
+- [组件索引](component-index.md)：31 个 reusable、95 个源稿 ref。
 - [语言资源](locales/)：中文和英文各 40 个资源键。
-- [图标与 ISC 许可证](assets/lucide-0.468.0/)：Lucide 固定 0.468.0；品牌位置不使用图标。
-- [R01 归档](rounds/R01-2026-10-28-设计系统/README.md)：目录保持原样，[R01 源稿](https://github.com/ConteMan/cubbix/blob/580fe96a99f969cbd37d2b207f151d86963d1cd9/design/cubbix.pen) 可按提交查看。
+- [Lucide 0.468.0 图标与 ISC 许可证](assets/lucide-0.468.0/)：品牌仍使用文字占位，下一轮再接入定稿 Logo。
 
-## 尺寸与关闭规则
+## 配色规则
 
-窗口固定宽 720，侧栏宽 144。右侧内容最大宽 528、居中，上下及两侧留白 24。高度取内容自然高度加上下留白与最小高度 176 中的较大值，再向上取整到 4 的倍数；当前通用页为 720 × 176，关于页为 720 × 316。未保存文档提示居中覆盖于关于页，不扩张设置窗口。
+浅色强调填充为近黑 #202020、填充上文字为白色；深色强调填充为近白 #F5F5F5、填充上文字为 #202020。主要按钮、打开的开关和选中分段使用这组变量。导航选中态采用浅灰／深灰底与中性描边；背景、文字、控件、分隔线和 tooltip 都使用中性灰阶。
 
-内容区不重复导航标题，也不保留「偏好设置」这类显而易见的分组标题；「更新」保留。无系统标题栏、无右上角 ×，通过 ⌘W 或 Esc 关闭设置，背景空白处可拖动窗口。
+失败或阻断状态的 alert 保留红色，原因仍放 tooltip。成功 check 选择中性色：图形与短暂停留已表达成功，不再额外引入绿色；红色因此能集中表达需要处理的状态。除语义红之外，当前画布没有彩色。
 
-## 已确认的产品规则
+选中导航和关闭状态开关的细描边用于识别状态，保持 R02 的尺寸与布局。键盘焦点仍使用独立的较粗焦点框，只在键盘操作时显示。
 
-语言顺序为「跟随系统／简体中文／English」，默认值为「简体中文」；英文样张展示用户切换到 English 后的状态。其他开关的开启状态仅为示例，不代表产品默认策略。
+## R02 结构与产品规则
 
-更新重启后，正在进行的常亮会话按剩余时间恢复；跟随进程的会话在原进程仍运行时继续跟随。有未保存的 JSON 文档时，点击「重启更新」先提示。本轮提示方案提供「取消」与「返回文档」：保留当前更改，返回保存后再发起更新。恢复规则由维护者确认，提示按钮方案由本轮设计提出。
+窗口固定宽 720、侧栏宽 144、右侧内容最大宽 528 且居中，主内容留白 24。高度取 `max(176, 内容自然高度 + 2 × 24)`，再向上取整到 4 的倍数；通用 720 × 176、关于 720 × 316，提示框宽 440。
 
-## 强调色与品牌占位
+不重复通用／关于标题，不显示右上角 ×；保留「更新」分组，使用 ⌘W／Esc 关闭，空白处可拖动。语言为「跟随系统／简体中文／English」，默认简体中文；英文样张展示切换后的状态。
 
-默认样张保持蓝色，品牌暂用 Cubbix 文字，组件标注「待替换为 Logo」。`tokens.json` 的 `groups.accent` 集中管理 `AccentFill`、`AccentSoft`、`AccentOnFill`，原 `ColorAccent` 等变量只作别名。Logo 主色定稿后，只改该组 `blue` 默认槽的值，画布节点无需调整。
+重启更新后，常亮会话按剩余时间恢复；原进程仍运行时继续跟随。有未保存 JSON 文档时先提示，当前方案提供取消／返回文档，保留更改后再发起更新。版本号与其他开关状态仅为示例。Logo 已定稿，本轮按工作单继续使用标注「待替换为 Logo」的文字组件。
 
-`accent=orange` 仅用于对比板，呼应维护者提出的橘色系「猫从箱子里探头」方向；不替换默认样张，也不作为已定稿 Logo 色值。
-
-## 验证与重新导出
-
-在仓库根目录执行，输出默认进入 R02，避免覆盖 R01：
+## 验证与导出
 
 ```sh
-python3 design/scripts/audit.py --out design/rounds/R02-2026-10-28-设计系统/audit.json
+python3 design/scripts/audit.py --out design/rounds/R03-2026-10-28-黑白灰/audit.json
+python3 design/scripts/contrast.py --out design/rounds/R03-2026-10-28-黑白灰/contrast-validation.json
 python3 design/scripts/export.py
 ```
 
-导出脚本用已登录的 pen.dev headless CLI 0.3.13，以 `interactive --in … --out …` 复开源稿，检查全部评审画板并导出 2× PNG；不连接桌面端。支持 `--cli-file` 使用已有 CLI 入口。原生检查、设计源与图片 SHA-256 存在 `render-validation.json`。
+导出使用已登录的 pen.dev headless CLI 0.3.13，保存后以 `interactive --in … --out …` 复开，输出 14 张 2× PNG。导出脚本支持 `--cli-file` 复用已有 CLI；`palette.mjs` 可通过同一 CLI 的 Sharp 依赖离线检查 PNG 像素，参数为 CLI 入口与 PNG 目录。
 
-颜色、圆角、字号、字重、行高、padding 与 gap 保留变量。CLI 0.3.13 不保留 `width/height` 变量绑定，几何尺寸按 Token 解析为数值；文本变量会按字面显示，实例文案由语言资源填入。40 个 `Copy…` 变量保留映射，`language` 主题选择字体。更改资源或 Token 后，应同步源稿并重新审计、导出。
+对比度按 [W3C 文字对比度](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) 的 sRGB 公式计算，活动文字统一以 4.5:1 为阈值；必要图形按 [非文字对比度](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) 的 3:1 检查。停用控件和装饰分隔线不纳入这些配色对。结果仅覆盖静态色值，不代替运行时可访问性验收。
 
-图标按钮均配 tooltip，焦点框仅在键盘操作时出现；进行中用 loader，成功短暂停留 check，失败用 alert，原因放 tooltip。静态稿表达这些状态，不代表运行时行为已实现。仓库尚未提供 `scripts/selftest.sh`，本轮未运行应用自测。
+颜色、圆角、字号、字重、行高、padding 与 gap 保留变量。CLI 不保留 width/height 变量绑定，几何尺寸由 Token 解析为数值；实例文案来自语言资源，Copy 变量保留映射。本轮未上传截图附件、未做浏览器检查或应用自测；仓库尚无 `scripts/selftest.sh`。

@@ -1,0 +1,104 @@
+{
+  "scope": "Native PNG pixels; only neutral RGB or semantic red allowed, with a two-level raster rounding tolerance.",
+  "images": [
+    {
+      "file": "about-en-dark.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "about-en-light.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "about-zh-CN-dark.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "about-zh-CN-light.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "components.png",
+      "width": 3680,
+      "height": 2000,
+      "semanticRedPixels": 888,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "foundations.png",
+      "width": 3680,
+      "height": 960,
+      "semanticRedPixels": 3528,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "general-en-dark.png",
+      "width": 1440,
+      "height": 352,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "general-en-light.png",
+      "width": 1440,
+      "height": 352,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "general-zh-CN-dark.png",
+      "width": 1440,
+      "height": 352,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "general-zh-CN-light.png",
+      "width": 1440,
+      "height": 352,
+      "semanticRedPixels": 0,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "restart-confirmation-en-dark.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 436,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "restart-confirmation-en-light.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 436,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "restart-confirmation-zh-CN-dark.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 436,
+      "unexpectedColorPixels": 0
+    },
+    {
+      "file": "restart-confirmation-zh-CN-light.png",
+      "width": 1440,
+      "height": 632,
+      "semanticRedPixels": 436,
+      "unexpectedColorPixels": 0
+    }
+  ],
+  "passed": true
+}

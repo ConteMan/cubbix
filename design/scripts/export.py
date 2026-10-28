@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-ROUND = ROOT / 'rounds' / 'R02-2026-10-28-设计系统'
+ROUND = ROOT / 'rounds' / 'R03-2026-10-28-黑白灰'
 CLI_VERSION = '0.3.13'
 
 

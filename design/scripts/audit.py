@@ -68,15 +68,19 @@ def audit():
     segmented = by_name['Segmented control']
     brand = by_name['Brand placeholder · 待替换为 Logo']
     default_boards = [node for node in document['children'] if node.get('metadata', {}).get('type') == 'sample']
-    r02_checks = {
+    r03_checks = {
         'noRepeatedPageHeaderOrCloseButton': not any(node['name'] in ('Page header', 'Page title', 'Close settings') for node in authored_nodes),
         'fixedWidthAndContentHeight': all(node['width'] == 720 and node['height'] == (176 if node['metadata']['page'] == 'general' else 316) for node in default_boards),
-        'defaultSamplesRemainBlue': all(node['theme'].get('accent') == 'blue' for node in default_boards),
+        'modeOnlySamples': all('accent' not in node['theme'] for node in default_boards),
         'languageOptionsInOrder': [node['name'] for node in segmented['children']] == ['System segment', 'Chinese segment', 'English segment'],
-        'defaultLanguageIsChinese': segmented['children'][1].get('fill') == '$ColorCard',
+        'defaultLanguageIsChinese': segmented['children'][1].get('fill') == '$ColorAccent',
         'brandPlaceholderMarked': brand['metadata'].get('status') == '待替换为 Logo',
         'accentAliasesCentralized': all(tokens[key]['value'] == '$' + target for key, target in {'ColorAccent': 'AccentFill', 'ColorAccentSoft': 'AccentSoft', 'ColorOnAccent': 'AccentOnFill'}.items()),
-        'orangeComparisonExists': any(node.get('name') == 'accent-comparison' for node in document['children']),
+        'noComparisonBoard': not any(node.get('name') == 'accent-comparison' for node in document['children']),
+        'neutralSuccess': tokens['ColorSuccess']['value'] == '$ColorText',
+        'selectedTextUsesOnAccent': segmented['children'][1]['children'][0].get('fill') == '$ColorOnAccent',
+        'primaryButtonTextUsesOnAccent': by_name['Text button']['children'][0].get('fill') == '$ColorOnAccent',
+        'accentUsesModeOnly': all(set(entry.get('theme', {})) == {'mode'} for key in ('AccentFill', 'AccentSoft', 'AccentOnFill') for entry in tokens[key]['value']),
     }
     result = {
         'schemaVersion': 1,
@@ -94,12 +98,12 @@ def audit():
         'missingVariables': missing,
         'danglingRefs': dangling_refs,
         'tokenDrift': token_drift,
-        'r02Checks': r02_checks,
+        'r03Checks': r03_checks,
         'unfinishedPlaceholders': placeholders,
         'completeSampleMatrix': matrix == expected and len(core_samples) == 8,
         'completePromptMatrix': prompts == {(l, m) for l in ('zh-CN', 'en') for m in ('light', 'dark')} and len(prompt_samples) == 4,
     }
-    result['passed'] = not any(literals.values()) and not any((missing, dangling_refs, token_drift, placeholders)) and result['completeSampleMatrix'] and result['completePromptMatrix'] and all(r02_checks.values())
+    result['passed'] = not any(literals.values()) and not any((missing, dangling_refs, token_drift, placeholders)) and result['completeSampleMatrix'] and result['completePromptMatrix'] and all(r03_checks.values())
     return result
 
 
