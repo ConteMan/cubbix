@@ -24,7 +24,7 @@ macOS 菜单栏常驻的个人工具箱。每个功能是一个「格子」，�
 
 ## 设计规则
 
-- 设计源是 `design/cubbix.pen`，用 pen.dev 编辑；每轮评审在 `design/rounds/` 下新建目录，放导出的预览图和 `README.md`（目标、评审意见、定下的规则）。交互原型用 HTML，放在 `design/prototypes/`。
+- 界面设计源是 `design/cubbix.pen`：维护者用 pen.dev 桌面端编辑，Agent 用 pen.dev headless CLI（`interactive --in/--out`）编辑，导出和复开检查均用 CLI。品牌源 `brand/cubbix-logo.pen` 只由维护者在桌面端编辑，CLI 只读取和导出，不改写。每轮评审在 `design/rounds/` 下新建目录，放导出的预览图和 `README.md`（目标、评审意见、定下的规则）。交互原型用 HTML，放在 `design/prototypes/`。
 - 画布上的颜色、字号、圆角、间距一律引用变量，不写死数值。
 - 低信息密度：以图标引导为主，不写说明文字；正常状态不打标签，只在异常时提示。
 - 图标统一用 Lucide，固定版本，用到的 SVG 连同许可证放进仓库；纯图标按钮配 tooltip，写法如「开始常亮 (⌃⌥⌘K)」。
