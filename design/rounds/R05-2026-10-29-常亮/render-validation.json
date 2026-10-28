@@ -1,0 +1,95 @@
+{
+  "cliVersion": "0.3.13",
+  "scale": 1,
+  "sourceSha256": "284845a3e655d4cbc33b434708b5b3c785943a0c3d6fe967ebd0d15a9f6b4454",
+  "nativeLayout": {
+    "nodes": 1868,
+    "problems": [],
+    "settings": [
+      {
+        "id": "nQlOc/lBjgP",
+        "width": 720,
+        "height": 232
+      },
+      {
+        "id": "Uk6K4/XtuOm",
+        "width": 720,
+        "height": 232
+      },
+      {
+        "id": "XyXhL/lBjgP",
+        "width": 720,
+        "height": 232
+      },
+      {
+        "id": "w3doQ/XtuOm",
+        "width": 720,
+        "height": 232
+      },
+      {
+        "id": "aKbUP/lBjgP",
+        "width": 720,
+        "height": 232
+      },
+      {
+        "id": "mwHqL/XtuOm",
+        "width": 720,
+        "height": 232
+      },
+      {
+        "id": "qmTNn/lBjgP",
+        "width": 720,
+        "height": 232
+      },
+      {
+        "id": "Y7o6Y/XtuOm",
+        "width": 720,
+        "height": 232
+      }
+    ],
+    "sections": [
+      "Section / Menus",
+      "Section / Windows",
+      "Section / Pages",
+      "Section / Notifications",
+      "Section / Icons",
+      "Section / Menus",
+      "Section / Windows",
+      "Section / Pages",
+      "Section / Notifications",
+      "Section / Icons",
+      "Section / Menus",
+      "Section / Windows",
+      "Section / Pages",
+      "Section / Notifications",
+      "Section / Icons",
+      "Section / Menus",
+      "Section / Windows",
+      "Section / Pages",
+      "Section / Notifications",
+      "Section / Icons"
+    ]
+  },
+  "exports": [
+    {
+      "nodeId": "nFPPv",
+      "file": "zh-CN-light.png",
+      "sha256": "1f43ba9945938b1818b358bd00a6fad361a44fee416fb9cd09dc6a78863c7f47"
+    },
+    {
+      "nodeId": "vGd6A",
+      "file": "zh-CN-dark.png",
+      "sha256": "94ad2c949675a1fe888689f3aff3425f332337e7db676238201fd0d5b305023e"
+    },
+    {
+      "nodeId": "Tdb02",
+      "file": "en-light.png",
+      "sha256": "3e2c8cd6b999446ccd7fc66b913713a57f69f9c7ce33078171d785eea71f3854"
+    },
+    {
+      "nodeId": "PSKKt",
+      "file": "en-dark.png",
+      "sha256": "541416289f706158835d8d5857a53056b4c5c68d684d01d40bca63390a398bf8"
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "scope": "All authored canvas children and descendants; variable definitions excluded; geometry x/y/width/height excluded from spacing.",
-  "styleTokens": 74,
+  "styleTokens": 82,
   "styleTokensByType": {
-    "color": 23,
-    "number": 46,
+    "color": 24,
+    "number": 53,
     "string": 5
   },
-  "documentVariables": 157,
-  "copyResourceKeys": 88,
+  "documentVariables": 181,
+  "copyResourceKeys": 104,
   "reusableComponents": [
     {
       "id": "Ectkj",
@@ -143,44 +143,80 @@
       "name": "Settings window"
     },
     {
-      "id": "uxJfm",
+      "id": "O8Imme",
+      "name": "R05 Icon/terminal"
+    },
+    {
+      "id": "H8TPWq",
+      "name": "R05 Icon/keyboard"
+    },
+    {
+      "id": "GgZ43",
+      "name": "R05 Icon/search"
+    },
+    {
+      "id": "xz4Am",
+      "name": "R05 Native menu item"
+    },
+    {
+      "id": "RLMny",
       "name": "R05 Native menu / off"
     },
     {
-      "id": "aoORB",
+      "id": "re5DI",
       "name": "R05 Native menu / active"
     },
     {
-      "id": "hHsCT",
+      "id": "vXGvH",
       "name": "R05 Native submenu / mode"
     },
     {
-      "id": "c76CW",
+      "id": "IuqUj",
       "name": "R05 Native submenu / duration"
     },
     {
-      "id": "XY52K",
+      "id": "DUqvf",
+      "name": "R05 Native status variants"
+    },
+    {
+      "id": "X88ii6",
+      "name": "R05 Keyboard field"
+    },
+    {
+      "id": "Dh9pW",
+      "name": "R05 Shortcut recorder"
+    },
+    {
+      "id": "sE9lv",
+      "name": "R05 Conflict tooltip"
+    },
+    {
+      "id": "d2Shh",
       "name": "R05 Dialog / duration"
     },
     {
-      "id": "ORQUx",
+      "id": "bxxcd",
       "name": "R05 Dialog / time"
     },
     {
-      "id": "AApos",
+      "id": "n2m80",
       "name": "R05 Dialog / process"
     },
     {
-      "id": "t7Eog",
+      "id": "zKcs0",
       "name": "R05 Settings / tiles"
     },
     {
-      "id": "tHJu2",
+      "id": "QgsRX",
       "name": "R05 Settings / shortcuts"
+    },
+    {
+      "id": "wHXVo",
+      "name": "R05 System notification"
     }
   ],
-  "componentCount": 42,
-  "authoredRefCount": 159,
+  "componentCount": 51,
+  "authoredRefCount": 229,
   "samples": 12,
   "literalCounts": {
     "colors": {

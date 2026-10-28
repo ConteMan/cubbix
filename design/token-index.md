@@ -1,6 +1,6 @@
 # Token 与 Go 标识符映射
 
-R04 共 74 个样式 Token。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+当前 R05B 共 82 个样式 Token，R04 的 74 项保留。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
@@ -94,3 +94,18 @@ ColorNavHover 是导航悬停背景，ColorAccentSoft 是选中背景；两态�
 R02 尺寸保持：窗口宽 720，侧栏 144，内容最大宽 528；通用高 176、关于高 316，按内容与上下留白取高后按 Space4 向上取整。提示框宽 440，三段语言选择宽 318。
 
 CLI 0.3.13 不保留 width/height 变量绑定，Size Token 解析为几何数值；颜色、圆角、字号、字重、行高与 padding/gap 保留引用。40 个语言资源键与 Copy 变量作映射，显示文案填入实例，language 主题切换字体。
+
+## R05B 新增
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `ColorMenuSurface` | color | `light: #FFFFFFEB / dark: #2C2C2CEB` |
+| `SizeR05MenuWidth` | number | `352` |
+| `SizeR05BoardWidth` | number | `1520` |
+| `SizeR05SettingsHeight` | number | `232` |
+| `SizeR05RecorderWidth` | number | `188` |
+| `SizeR05FieldWidth` | number | `164` |
+| `SizeMenubar18` | number | `18` |
+| `SizeMenubar16` | number | `16` |
+
+菜单与系统通知的半透明表面共用 ColorMenuSurface；设置窗口高 232 来自四项导航的自然高度（上下 24、品牌 20、分组间距 24、四行 32、三处间隔 4）。菜单栏图标的 18pt 与 16pt 是逻辑尺寸，1×／2× 位图分别解析对应像素密度。新增 Token 已通过 scripts/tokens.py 同步到 tokens.go。
