@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "source": {
+    "file": "brand/cubbix-logo.pen",
+    "sha256": "e3b22dd28aac216405aed27b4dadf12a8ce83276199934af4284383ee200517c",
+    "artboard_id": "n0a0W",
+    "node_count": 6,
+    "geometry_sha256": "2d7ff25d277894d911ee810259b533f133f63d8fe9c0548d6b1b9b44161fcfa5",
+    "pupil_node_ids": [
+      "o6Smr",
+      "A38atD"
+    ]
+  },
+  "generator": {
+    "file": "brand/scripts/export.py",
+    "sha256": "1bd3d0588fbf1f111f685c19c34caa2dd147b1f196a3faf06a94e0587c68b9fa",
+    "versions": {
+      "pen_cli": "0.3.12",
+      "resvg": "2.6.2",
+      "pillow": "13.0.0",
+      "svgpathtools": "1.7.2"
+    }
+  },
+  "spec": {
+    "ink": "#202522",
+    "background": "#FF9A3D",
+    "source_mark_bounds": [
+      159.99999999999994,
+      146.17678821033033,
+      864.0,
+      928.0
+    ],
+    "app": {
+      "canvas": 1024,
+      "body": 824,
+      "transparent_padding": 100,
+      "superellipse_n": 5,
+      "mark_height": 560,
+      "mark_center": [
+        512,
+        500
+      ]
+    },
+    "menu": {
+      "canvas_pt": 18,
+      "mark_height_pt": 16,
+      "center_pt": [
+        9,
+        9
+      ],
+      "pupils": false
+    }
+  },
+  "files": [
+    {
+      "file": "app-icon-1024.png",
+      "sha256": "56a3036a17b933b226aa2f597e8bba0a558d2bfadd51b997ee557c7f0f8ad8a2",
+      "bytes": 21655,
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "app-icon-128.png",
+      "sha256": "d2120fe55ccc55cafddd53b0159ed042f4c1567dcfda00281fe30f71a2a736a9",
+      "bytes": 7046,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "file": "app-icon-16.png",
+      "sha256": "251112d01c307c1af74b199e151ab6b288c4ff8631c5d8d3150476d3d7a1459b",
+      "bytes": 623,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "app-icon-256.png",
+      "sha256": "682c3862788c9b2ddf316fff52ef3b31868e491d86956c6da8f203a41ddabd1f",
+      "bytes": 14434,
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "app-icon-32.png",
+      "sha256": "8c2a2ef13357807ff90a91453a4857e251b16581be52bf2a03d2dde79fad5d7a",
+      "bytes": 1524,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "file": "app-icon-512.png",
+      "sha256": "96095b9d58d6f19c06af4c2964fe2bef38bc949fdfef4c58fdceb1710bcf2785",
+      "bytes": 29418,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "app-icon-64.png",
+      "sha256": "7afb18161039c346b4058a7501d2b2bb2906fea1a7f786460a11e73be46d3c0b",
+      "bytes": 3189,
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "mark-inverse.svg",
+      "sha256": "94b5aa2cdef9fe174e5be2a61c2d74b9d48e57f4b5f0ec5482375ba9aefd4ea8",
+      "bytes": 1670
+    },
+    {
+      "file": "mark.svg",
+      "sha256": "2bbbb2ab07c5d25e737ed5a73de6012f2c627d26e5153c8069cebd062bfeac4b",
+      "bytes": 1670
+    },
+    {
+      "file": "menubar-preview-dark.png",
+      "sha256": "78ff98bc0fa2fae3e3d3f066aaeb60dd2744b4b9ada571b7bd991c3523606e8a",
+      "bytes": 420,
+      "width": 18,
+      "height": 18
+    },
+    {
+      "file": "menubar-preview-dark@2x.png",
+      "sha256": "fcab04247e3551258abf122c4e9919e533e399becf78652e1993e8f133610d45",
+      "bytes": 744,
+      "width": 36,
+      "height": 36
+    },
+    {
+      "file": "menubar-preview-light.png",
+      "sha256": "09db54908c9f8da942e138ec420715b6cec8a71b62b69c8165598f5e5f9bb128",
+      "bytes": 415,
+      "width": 18,
+      "height": 18
+    },
+    {
+      "file": "menubar-preview-light@2x.png",
+      "sha256": "b0502a01169cd1773cb35e3a2252e91d48f8ff6666ee63be492dbc9585002f0e",
+      "bytes": 779,
+      "width": 36,
+      "height": 36
+    },
+    {
+      "file": "menubar-template.png",
+      "sha256": "cdff6963fc93a7ce74519c9537943c6f7ed3cc7ebd5a524eac84179f43bc03d5",
+      "bytes": 272,
+      "width": 18,
+      "height": 18
+    },
+    {
+      "file": "menubar-template@2x.png",
+      "sha256": "f7043ab1630e632f68422d607671188615c2df28ab255f2cc4af400bea7fe855",
+      "bytes": 498,
+      "width": 36,
+      "height": 36
+    }
+  ]
+}
