@@ -5341,6 +5341,4228 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "uxJfm",
+      "x": 2400,
+      "y": 3990,
+      "name": "R05 Native menu / off",
+      "reusable": true,
+      "width": 300,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusCard",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "vertical",
+      "gap": "$Space0",
+      "padding": [
+        "$Space8",
+        "$Space0"
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "n7DaR",
+          "name": "$R05Off",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "e5voul",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "hRUWA",
+              "name": "Label",
+              "fill": "$ColorTextDisabled",
+              "content": "未开启",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "O38U8",
+          "name": "$R05Start",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "bNS5J",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "b2Z6t",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "开启常亮",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "u0lpex",
+          "name": "Separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical",
+          "gap": "$Space0"
+        },
+        {
+          "type": "frame",
+          "id": "PXrX2",
+          "name": "$R05Mode",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "E2u89w",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "e1Kj0E",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "模式",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "E8B5cJ",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "▸",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "v8Xby8",
+          "name": "$R05Duration",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Kl3iK",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "s38dUH",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "时长",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "t8lDx",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "▸",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "oYqFi",
+          "name": "$R05Follow",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "zkGKk",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "ZrdS3",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "跟随进程…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Wft85",
+          "name": "Separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical",
+          "gap": "$Space0"
+        },
+        {
+          "type": "frame",
+          "id": "q8goF",
+          "name": "$R05Settings",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "lUz6i",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "mXkOp",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "设置…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "haWyw",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "⌘,",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "KIAqn",
+          "name": "$R05Quit",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Q86Bd",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "UCpy1",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "退出 Cubbix",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "OFm8i",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "⌘Q",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "aoORB",
+      "x": 2400,
+      "y": 3980,
+      "name": "R05 Native menu / active",
+      "reusable": true,
+      "width": 300,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusCard",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "vertical",
+      "gap": "$Space0",
+      "padding": [
+        "$Space8",
+        "$Space0"
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "f9HB3",
+          "name": "$R05On",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "tsCjC",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "LI4Yd",
+              "name": "Label",
+              "fill": "$ColorTextDisabled",
+              "content": "屏幕常亮 · 剩余 1:24",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "LUHS0",
+          "name": "$R05Mode",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "R7xuR7",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "l2nq6S",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "模式",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "QY9ri",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "▸",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qCFkD",
+          "name": "$R05Duration",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "qFoWV",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "Hc10W",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "时长",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "I63CA",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "▸",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "O3t57",
+          "name": "$R05Follow",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "EPD2I",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "NrZRG",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "跟随进程…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vMQ3E",
+          "name": "$R05Stop",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "OT9tX",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "IAlUJ",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "停止",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NMhc7",
+          "name": "Separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical",
+          "gap": "$Space0"
+        },
+        {
+          "type": "frame",
+          "id": "Z3HK7",
+          "name": "$R05Settings",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "RDKXl",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "WvdY1",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "设置…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "K0YPu",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "⌘,",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "sXV2f",
+          "name": "$R05Quit",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "xnjDU",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "GRMS0",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "退出 Cubbix",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "ebEG4",
+              "name": "Trailing",
+              "fill": "$ColorTextSecondary",
+              "content": "⌘Q",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "hHsCT",
+      "x": 2400,
+      "y": 3920,
+      "name": "R05 Native submenu / mode",
+      "reusable": true,
+      "width": 300,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusCard",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "vertical",
+      "gap": "$Space0",
+      "padding": [
+        "$Space8",
+        "$Space0"
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "uNRoL",
+          "name": "$R05Screen",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "bcsCF",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": "✓",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "QUcva",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "保持屏幕常亮",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "IulpW",
+          "name": "$R05Tasks",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "FKABo",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "yA4aG",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "仅保持任务",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "c76CW",
+      "x": 2400,
+      "y": 3980,
+      "name": "R05 Native submenu / duration",
+      "reusable": true,
+      "width": 300,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusCard",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "vertical",
+      "gap": "$Space0",
+      "padding": [
+        "$Space8",
+        "$Space0"
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "Qjt8v",
+          "name": "$R05Half",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "o42FZC",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "xvlxj",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "30 分钟",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "zg64O",
+          "name": "$R05Hour",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "jLMlV",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": "✓",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "q9P3yc",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "1 小时",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wGehB",
+          "name": "$R05Two",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "R0fJcb",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "kzVvA",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "2 小时",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ziN75",
+          "name": "$R05Four",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "j9sQ3r",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "c6FSXF",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "4 小时",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "v7xWC7",
+          "name": "Separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical",
+          "gap": "$Space0"
+        },
+        {
+          "type": "frame",
+          "id": "y3swJ",
+          "name": "$R05Custom",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "L6LYxa",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "Is7KK",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "自定义…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Z02rYs",
+          "name": "$R05Until",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Gq1pk",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "coJ6x",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "直到某时刻…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "grx35",
+          "name": "$R05Unlimited",
+          "width": "fill_container",
+          "height": 30,
+          "gap": "$Space8",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "lGIC8",
+              "name": "Mark",
+              "fill": "$ColorTextSecondary",
+              "content": " ",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "oVbOL",
+              "name": "Label",
+              "fill": "$ColorText",
+              "content": "不限时",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "XY52K",
+      "x": 2800,
+      "y": 3900,
+      "name": "R05 Dialog / duration",
+      "reusable": true,
+      "metadata": {
+        "type": "window",
+        "systemTitlebar": false,
+        "escape": "close",
+        "enter": "confirm"
+      },
+      "width": 380,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "vertical",
+      "gap": "$Space20",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "PTrix",
+          "name": "Dialog title",
+          "fill": "$ColorText",
+          "content": "自定义时长",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamilyCJK",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "tjCpH",
+          "name": "Duration fields",
+          "gap": "$Space12",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "FZVol",
+              "name": "Input",
+              "width": 65,
+              "height": 36,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space12"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "S2sL3S",
+                  "name": "Value",
+                  "fill": "$ColorText",
+                  "content": "1",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "qD39J",
+              "name": "Hours",
+              "fill": "$ColorText",
+              "content": "小时",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "frame",
+              "id": "HImLM",
+              "name": "Input",
+              "width": 65,
+              "height": 36,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space12"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "jYqlx",
+                  "name": "Value",
+                  "fill": "$ColorText",
+                  "content": "30",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "RWtZp",
+              "name": "Minutes",
+              "fill": "$ColorText",
+              "content": "分钟",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gIh1A",
+          "name": "Actions",
+          "width": "fill_container",
+          "gap": "$Space8",
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "frame",
+              "id": "bUMxt",
+              "name": "$R05Cancel",
+              "height": 32,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space16"
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "G7wkZ7",
+                  "name": "Button label",
+                  "fill": "$ColorText",
+                  "content": "取消",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "u5GLO",
+              "name": "$R05Confirm",
+              "height": 32,
+              "fill": "$ColorAccent",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space16"
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Z34pK",
+                  "name": "Button label",
+                  "fill": "$ColorOnAccent",
+                  "content": "确定",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ORQUx",
+      "x": 2800,
+      "y": 4250,
+      "name": "R05 Dialog / time",
+      "reusable": true,
+      "metadata": {
+        "type": "window",
+        "systemTitlebar": false,
+        "escape": "close",
+        "enter": "confirm"
+      },
+      "width": 380,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "vertical",
+      "gap": "$Space20",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "pd1R5",
+          "name": "Dialog title",
+          "fill": "$ColorText",
+          "content": "直到某时刻",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamilyCJK",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "t1OkFd",
+          "name": "Input",
+          "width": 180,
+          "height": 36,
+          "fill": "$ColorControl",
+          "cornerRadius": "$RadiusControl",
+          "gap": "$Space0",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "oHiJr",
+              "name": "Value",
+              "fill": "$ColorText",
+              "content": "02 : 30",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "f19nq",
+          "name": "Actions",
+          "width": "fill_container",
+          "gap": "$Space8",
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "frame",
+              "id": "MlRg6",
+              "name": "$R05Cancel",
+              "height": 32,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space16"
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "lJGst",
+                  "name": "Button label",
+                  "fill": "$ColorText",
+                  "content": "取消",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "KqvB6",
+              "name": "$R05Confirm",
+              "height": 32,
+              "fill": "$ColorAccent",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space16"
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "vU6Zf",
+                  "name": "Button label",
+                  "fill": "$ColorOnAccent",
+                  "content": "确定",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "AApos",
+      "x": 2800,
+      "y": 4600,
+      "name": "R05 Dialog / process",
+      "reusable": true,
+      "metadata": {
+        "type": "window",
+        "systemTitlebar": false,
+        "escape": "close",
+        "enter": "confirm"
+      },
+      "width": 380,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "vertical",
+      "gap": "$Space20",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "GbVnm",
+          "name": "Dialog title",
+          "fill": "$ColorText",
+          "content": "跟随进程",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamilyCJK",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "V4X0Vv",
+          "name": "Input",
+          "width": 330,
+          "height": 36,
+          "fill": "$ColorControl",
+          "cornerRadius": "$RadiusControl",
+          "gap": "$Space0",
+          "padding": [
+            "$Space0",
+            "$Space12"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "segTv",
+              "name": "Value",
+              "fill": "$ColorText",
+              "content": "搜索进程",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "tk59D",
+          "name": "Process list",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space4",
+          "children": [
+            {
+              "type": "frame",
+              "id": "fnRWE",
+              "name": "codex",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorAccentSoft",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space12",
+              "padding": [
+                "$Space0",
+                "$Space12"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "XEpAL",
+                  "name": "Process icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "⌘",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "NL4SZ",
+                  "name": "Process name",
+                  "fill": "$ColorText",
+                  "content": "codex",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fJv3o",
+              "name": "claude",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space12",
+              "padding": [
+                "$Space0",
+                "$Space12"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ZEwdx",
+                  "name": "Process icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "✦",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "yUdgv",
+                  "name": "Process name",
+                  "fill": "$ColorText",
+                  "content": "claude",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ICFri",
+              "name": "Terminal",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space12",
+              "padding": [
+                "$Space0",
+                "$Space12"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "w02iH",
+                  "name": "Process icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "●",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "K411l",
+                  "name": "Process name",
+                  "fill": "$ColorText",
+                  "content": "Terminal",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "kQEwx",
+              "name": "Safari",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space12",
+              "padding": [
+                "$Space0",
+                "$Space12"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "V7ykTu",
+                  "name": "Process icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "●",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "CFAeN",
+                  "name": "Process name",
+                  "fill": "$ColorText",
+                  "content": "Safari",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "StVcy",
+          "name": "Actions",
+          "width": "fill_container",
+          "gap": "$Space8",
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "frame",
+              "id": "B1tNs",
+              "name": "$R05Cancel",
+              "height": 32,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space16"
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "o0Wrcj",
+                  "name": "Button label",
+                  "fill": "$ColorText",
+                  "content": "取消",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "D3Zhk",
+              "name": "$R05Confirm",
+              "height": 32,
+              "fill": "$ColorAccent",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space0",
+              "padding": [
+                "$Space0",
+                "$Space16"
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "H4IC9",
+                  "name": "Button label",
+                  "fill": "$ColorOnAccent",
+                  "content": "确定",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "t7Eog",
+      "x": 3300,
+      "y": 3900,
+      "name": "R05 Settings / tiles",
+      "reusable": true,
+      "metadata": {
+        "type": "window",
+        "systemTitlebar": false,
+        "draggable": "empty background"
+      },
+      "width": 720,
+      "height": 270,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "gap": "$Space0",
+      "children": [
+        {
+          "type": "frame",
+          "id": "il0Jr",
+          "name": "Sidebar",
+          "width": 144,
+          "height": "fill_container",
+          "fill": "$ColorSidebar",
+          "layout": "vertical",
+          "gap": "$Space12",
+          "padding": [
+            "$Space24",
+            "$Space12"
+          ],
+          "children": [
+            {
+              "id": "MuXfw",
+              "type": "ref",
+              "ref": "ivtHk",
+              "name": "Brand",
+              "width": "fill_container"
+            },
+            {
+              "type": "frame",
+              "id": "l2LZV",
+              "name": "$R05General",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "whAeE",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "☷",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "J417S",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "通用",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "N9rWod",
+              "name": "$R05Tiles",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorAccentSoft",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "fhjb3",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "▦",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "fUNMm",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "格子",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GvNgU",
+              "name": "$R05Shortcuts",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "K8ULsP",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "⌘",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "I9GGC",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "快捷键",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "YwX3t",
+              "name": "$R05About",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "EXRi0",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "ⓘ",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "EySMQ",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "关于",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "TksFT",
+          "name": "Main",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space0",
+          "padding": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "cXly5",
+              "name": "Settings card",
+              "width": "fill_container",
+              "fill": "$ColorCard",
+              "cornerRadius": "$RadiusCard",
+              "stroke": "$ColorSeparator",
+              "strokeWidth": "$StrokeHairline",
+              "layout": "vertical",
+              "gap": "$Space12",
+              "padding": "$Space16",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "x6rssv",
+                  "name": "$R05Awake",
+                  "width": "fill_container",
+                  "height": 40,
+                  "gap": "$Space8",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "azZYU",
+                      "name": "Label",
+                      "fill": "$ColorText",
+                      "content": "常亮",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCJK",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "id": "C4RJY",
+                      "type": "ref",
+                      "ref": "KfHWu",
+                      "name": "Switch",
+                      "opacity": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "L0y8o",
+                  "name": "JSON",
+                  "width": "fill_container",
+                  "height": 40,
+                  "gap": "$Space8",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AjNp7",
+                      "name": "Label",
+                      "fill": "$ColorTextDisabled",
+                      "content": "JSON",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCJK",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "id": "DeFLN",
+                      "type": "ref",
+                      "ref": "KfHWu",
+                      "name": "Switch",
+                      "opacity": 0.35,
+                      "fill": "$ColorControl",
+                      "justifyContent": "start"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "tHJu2",
+      "x": 3300,
+      "y": 4280,
+      "name": "R05 Settings / shortcuts",
+      "reusable": true,
+      "metadata": {
+        "type": "window",
+        "systemTitlebar": false,
+        "draggable": "empty background"
+      },
+      "width": 720,
+      "height": 270,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "gap": "$Space0",
+      "children": [
+        {
+          "type": "frame",
+          "id": "vKWac",
+          "name": "Sidebar",
+          "width": 144,
+          "height": "fill_container",
+          "fill": "$ColorSidebar",
+          "layout": "vertical",
+          "gap": "$Space12",
+          "padding": [
+            "$Space24",
+            "$Space12"
+          ],
+          "children": [
+            {
+              "id": "j0hz2",
+              "type": "ref",
+              "ref": "ivtHk",
+              "name": "Brand",
+              "width": "fill_container"
+            },
+            {
+              "type": "frame",
+              "id": "BrTQO",
+              "name": "$R05General",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "qO5ix",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "☷",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "e7AkF",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "通用",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cU77G",
+              "name": "$R05Tiles",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "cUMN1",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "▦",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "Qdm49",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "格子",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sXI13",
+              "name": "$R05Shortcuts",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorAccentSoft",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "K3jHD",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "⌘",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "duJPc",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "快捷键",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "LAj0B",
+              "name": "$R05About",
+              "width": "fill_container",
+              "height": 32,
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusCard",
+              "gap": "$Space8",
+              "padding": [
+                "$Space0",
+                "$Space8"
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "La1Wv",
+                  "name": "Navigation icon",
+                  "fill": "$ColorTextSecondary",
+                  "content": "ⓘ",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "kB99y",
+                  "name": "Navigation label",
+                  "fill": "$ColorText",
+                  "content": "关于",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Rs3f8",
+          "name": "Main",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space0",
+          "padding": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "pbAVF",
+              "name": "Settings card",
+              "width": "fill_container",
+              "fill": "$ColorCard",
+              "cornerRadius": "$RadiusCard",
+              "stroke": "$ColorSeparator",
+              "strokeWidth": "$StrokeHairline",
+              "layout": "vertical",
+              "gap": "$Space12",
+              "padding": "$Space16",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Jua3l",
+                  "name": "Shortcut row",
+                  "width": "fill_container",
+                  "height": 40,
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "U8NI5D",
+                      "name": "Label",
+                      "fill": "$ColorText",
+                      "content": "常亮开关",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCJK",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wdGe1",
+                      "name": "Input",
+                      "width": 140,
+                      "height": 36,
+                      "fill": "$ColorControl",
+                      "cornerRadius": "$RadiusControl",
+                      "gap": "$Space0",
+                      "padding": [
+                        "$Space0",
+                        "$Space12"
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "RkS1m",
+                          "name": "Value",
+                          "fill": "$ColorText",
+                          "content": "⌃⌥⌘K",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamilyCJK",
+                          "fontSize": "$FontSizeBody",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kovg7",
+                  "name": "Conflict example",
+                  "width": "fill_container",
+                  "height": 40,
+                  "gap": "$Space8",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "RH48O",
+                      "name": "Input",
+                      "width": 140,
+                      "height": 36,
+                      "fill": "$ColorControl",
+                      "cornerRadius": "$RadiusControl",
+                      "gap": "$Space0",
+                      "padding": [
+                        "$Space0",
+                        "$Space12"
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Lyeyu",
+                          "name": "Value",
+                          "fill": "$ColorText",
+                          "content": "⌘,",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamilyCJK",
+                          "fontSize": "$FontSizeBody",
+                          "fontWeight": "$FontWeightRegular"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ZhpOr",
+                      "type": "ref",
+                      "ref": "sWO1O",
+                      "name": "Conflict alert"
+                    },
+                    {
+                      "type": "text",
+                      "id": "sB9Fc",
+                      "name": "Conflict tooltip",
+                      "fill": "$ColorTextSecondary",
+                      "content": "与已知快捷键冲突",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCJK",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "VSYWi",
+      "x": 0,
+      "y": 4500,
+      "name": "R05 zh-CN light",
+      "theme": {
+        "language": "zh-CN",
+        "mode": "light"
+      },
+      "width": 1600,
+      "height": 1600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space32",
+      "children": [
+        {
+          "type": "frame",
+          "id": "xfFbf",
+          "name": "Native menus",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "jTWaD",
+              "type": "ref",
+              "ref": "uxJfm",
+              "name": "Menu",
+              "descendants": {
+                "hRUWA": {
+                  "content": "未开启"
+                },
+                "b2Z6t": {
+                  "content": "开启常亮"
+                },
+                "e1Kj0E": {
+                  "content": "模式"
+                },
+                "s38dUH": {
+                  "content": "时长"
+                },
+                "ZrdS3": {
+                  "content": "跟随进程…"
+                },
+                "mXkOp": {
+                  "content": "设置…"
+                },
+                "UCpy1": {
+                  "content": "退出 Cubbix"
+                }
+              }
+            },
+            {
+              "id": "ECIRh",
+              "type": "ref",
+              "ref": "aoORB",
+              "name": "Menu",
+              "descendants": {
+                "LI4Yd": {
+                  "content": "屏幕常亮 · 剩余 1:24"
+                },
+                "l2nq6S": {
+                  "content": "模式"
+                },
+                "Hc10W": {
+                  "content": "时长"
+                },
+                "NrZRG": {
+                  "content": "跟随进程…"
+                },
+                "IAlUJ": {
+                  "content": "停止"
+                },
+                "WvdY1": {
+                  "content": "设置…"
+                },
+                "GRMS0": {
+                  "content": "退出 Cubbix"
+                }
+              }
+            },
+            {
+              "id": "jFW0K",
+              "type": "ref",
+              "ref": "hHsCT",
+              "name": "Menu",
+              "descendants": {
+                "QUcva": {
+                  "content": "保持屏幕常亮"
+                },
+                "yA4aG": {
+                  "content": "仅保持任务"
+                }
+              }
+            },
+            {
+              "id": "E8ynDz",
+              "type": "ref",
+              "ref": "c76CW",
+              "name": "Menu",
+              "descendants": {
+                "xvlxj": {
+                  "content": "30 分钟"
+                },
+                "q9P3yc": {
+                  "content": "1 小时"
+                },
+                "kzVvA": {
+                  "content": "2 小时"
+                },
+                "c6FSXF": {
+                  "content": "4 小时"
+                },
+                "Is7KK": {
+                  "content": "自定义…"
+                },
+                "coJ6x": {
+                  "content": "直到某时刻…"
+                },
+                "oVbOL": {
+                  "content": "不限时"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "WMTmS",
+          "name": "Dialogs",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "PcXRM",
+              "type": "ref",
+              "ref": "XY52K",
+              "name": "Dialog",
+              "descendants": {
+                "PTrix": {
+                  "content": "自定义时长"
+                },
+                "qD39J": {
+                  "content": "小时"
+                },
+                "RWtZp": {
+                  "content": "分钟"
+                },
+                "G7wkZ7": {
+                  "content": "取消"
+                },
+                "Z34pK": {
+                  "content": "确定"
+                }
+              }
+            },
+            {
+              "id": "YH5WL",
+              "type": "ref",
+              "ref": "ORQUx",
+              "name": "Dialog",
+              "descendants": {
+                "pd1R5": {
+                  "content": "直到某时刻"
+                },
+                "lJGst": {
+                  "content": "取消"
+                },
+                "vU6Zf": {
+                  "content": "确定"
+                }
+              }
+            },
+            {
+              "id": "QSNU9",
+              "type": "ref",
+              "ref": "AApos",
+              "name": "Dialog",
+              "descendants": {
+                "GbVnm": {
+                  "content": "跟随进程"
+                },
+                "segTv": {
+                  "content": "搜索进程"
+                },
+                "o0Wrcj": {
+                  "content": "取消"
+                },
+                "H4IC9": {
+                  "content": "确定"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "JYwEb",
+          "name": "Settings pages",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "b3xziu",
+              "type": "ref",
+              "ref": "t7Eog",
+              "name": "Settings",
+              "descendants": {
+                "J417S": {
+                  "content": "通用"
+                },
+                "fUNMm": {
+                  "content": "格子"
+                },
+                "I9GGC": {
+                  "content": "快捷键"
+                },
+                "EySMQ": {
+                  "content": "关于"
+                },
+                "azZYU": {
+                  "content": "常亮"
+                }
+              }
+            },
+            {
+              "id": "lJA2Q",
+              "type": "ref",
+              "ref": "tHJu2",
+              "name": "Settings",
+              "descendants": {
+                "e7AkF": {
+                  "content": "通用"
+                },
+                "Qdm49": {
+                  "content": "格子"
+                },
+                "duJPc": {
+                  "content": "快捷键"
+                },
+                "kB99y": {
+                  "content": "关于"
+                },
+                "U8NI5D": {
+                  "content": "常亮开关"
+                },
+                "sB9Fc": {
+                  "content": "与已知快捷键冲突"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "FuTlp",
+          "name": "Additional status variants",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "text",
+              "id": "euDbk",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "仅保持任务 · 剩余 1:24",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "bDhAT",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "屏幕常亮 · 直到 02:30",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "m6Iv8n",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "仅保持任务 · 跟随 codex",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "dbNvd",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "屏幕常亮 · 不限时",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "V79vO4",
+          "name": "System notification copy",
+          "layout": "vertical",
+          "gap": "$Space4",
+          "children": [
+            {
+              "type": "text",
+              "id": "Go3qf",
+              "name": "Notification title",
+              "fill": "$ColorText",
+              "content": "已切换到电池供电",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightSemibold"
+            },
+            {
+              "type": "text",
+              "id": "llMN9",
+              "name": "Notification body",
+              "fill": "$ColorText",
+              "content": "常亮仍在运行。",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "p8uuD",
+          "name": "Menu bar icon proposals",
+          "gap": "$Space24",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "xf9Ji",
+              "name": "未开启 · 闭眼",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "NsqeZ",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "a77lO",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "w4cUFR",
+                      "x": 4,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "kksSd",
+                      "x": 4,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "Hu9yF",
+                      "x": 11,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "Ppsiu",
+                      "x": 11,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "b2LwMz",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "未开启 · 闭眼",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "W8t8d",
+              "name": "开启 · 睁眼",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "r1vcMV",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "sZJys",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "q7TGi",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "开启 · 睁眼",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "nRMG1",
+          "name": "Shortcut recording state",
+          "gap": "$Space8",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "qJSHQ",
+              "name": "Recording",
+              "fill": "$ColorTextSecondary",
+              "content": "按下快捷键…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "FgwPm",
+      "x": 0,
+      "y": 6200,
+      "name": "R05 zh-CN dark",
+      "theme": {
+        "language": "zh-CN",
+        "mode": "dark"
+      },
+      "width": 1600,
+      "height": 1600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space32",
+      "children": [
+        {
+          "type": "frame",
+          "id": "p9fTX",
+          "name": "Native menus",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "NnuMw",
+              "type": "ref",
+              "ref": "uxJfm",
+              "name": "Menu",
+              "descendants": {
+                "hRUWA": {
+                  "content": "未开启"
+                },
+                "b2Z6t": {
+                  "content": "开启常亮"
+                },
+                "e1Kj0E": {
+                  "content": "模式"
+                },
+                "s38dUH": {
+                  "content": "时长"
+                },
+                "ZrdS3": {
+                  "content": "跟随进程…"
+                },
+                "mXkOp": {
+                  "content": "设置…"
+                },
+                "UCpy1": {
+                  "content": "退出 Cubbix"
+                }
+              }
+            },
+            {
+              "id": "aX2PU",
+              "type": "ref",
+              "ref": "aoORB",
+              "name": "Menu",
+              "descendants": {
+                "LI4Yd": {
+                  "content": "屏幕常亮 · 剩余 1:24"
+                },
+                "l2nq6S": {
+                  "content": "模式"
+                },
+                "Hc10W": {
+                  "content": "时长"
+                },
+                "NrZRG": {
+                  "content": "跟随进程…"
+                },
+                "IAlUJ": {
+                  "content": "停止"
+                },
+                "WvdY1": {
+                  "content": "设置…"
+                },
+                "GRMS0": {
+                  "content": "退出 Cubbix"
+                }
+              }
+            },
+            {
+              "id": "wZ0JI",
+              "type": "ref",
+              "ref": "hHsCT",
+              "name": "Menu",
+              "descendants": {
+                "QUcva": {
+                  "content": "保持屏幕常亮"
+                },
+                "yA4aG": {
+                  "content": "仅保持任务"
+                }
+              }
+            },
+            {
+              "id": "i2Vu4",
+              "type": "ref",
+              "ref": "c76CW",
+              "name": "Menu",
+              "descendants": {
+                "xvlxj": {
+                  "content": "30 分钟"
+                },
+                "q9P3yc": {
+                  "content": "1 小时"
+                },
+                "kzVvA": {
+                  "content": "2 小时"
+                },
+                "c6FSXF": {
+                  "content": "4 小时"
+                },
+                "Is7KK": {
+                  "content": "自定义…"
+                },
+                "coJ6x": {
+                  "content": "直到某时刻…"
+                },
+                "oVbOL": {
+                  "content": "不限时"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Io4UY",
+          "name": "Dialogs",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "WOiL1",
+              "type": "ref",
+              "ref": "XY52K",
+              "name": "Dialog",
+              "descendants": {
+                "PTrix": {
+                  "content": "自定义时长"
+                },
+                "qD39J": {
+                  "content": "小时"
+                },
+                "RWtZp": {
+                  "content": "分钟"
+                },
+                "G7wkZ7": {
+                  "content": "取消"
+                },
+                "Z34pK": {
+                  "content": "确定"
+                }
+              }
+            },
+            {
+              "id": "ACzZm",
+              "type": "ref",
+              "ref": "ORQUx",
+              "name": "Dialog",
+              "descendants": {
+                "pd1R5": {
+                  "content": "直到某时刻"
+                },
+                "lJGst": {
+                  "content": "取消"
+                },
+                "vU6Zf": {
+                  "content": "确定"
+                }
+              }
+            },
+            {
+              "id": "irRe1",
+              "type": "ref",
+              "ref": "AApos",
+              "name": "Dialog",
+              "descendants": {
+                "GbVnm": {
+                  "content": "跟随进程"
+                },
+                "segTv": {
+                  "content": "搜索进程"
+                },
+                "o0Wrcj": {
+                  "content": "取消"
+                },
+                "H4IC9": {
+                  "content": "确定"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "KNvTi",
+          "name": "Settings pages",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "w7jz4",
+              "type": "ref",
+              "ref": "t7Eog",
+              "name": "Settings",
+              "descendants": {
+                "J417S": {
+                  "content": "通用"
+                },
+                "fUNMm": {
+                  "content": "格子"
+                },
+                "I9GGC": {
+                  "content": "快捷键"
+                },
+                "EySMQ": {
+                  "content": "关于"
+                },
+                "azZYU": {
+                  "content": "常亮"
+                }
+              }
+            },
+            {
+              "id": "j2pL8P",
+              "type": "ref",
+              "ref": "tHJu2",
+              "name": "Settings",
+              "descendants": {
+                "e7AkF": {
+                  "content": "通用"
+                },
+                "Qdm49": {
+                  "content": "格子"
+                },
+                "duJPc": {
+                  "content": "快捷键"
+                },
+                "kB99y": {
+                  "content": "关于"
+                },
+                "U8NI5D": {
+                  "content": "常亮开关"
+                },
+                "sB9Fc": {
+                  "content": "与已知快捷键冲突"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "aXudA",
+          "name": "Additional status variants",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "text",
+              "id": "KLCi9",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "仅保持任务 · 剩余 1:24",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "b9Sym",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "屏幕常亮 · 直到 02:30",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "yb3iZ",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "仅保持任务 · 跟随 codex",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "FeJ1z",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "屏幕常亮 · 不限时",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "iEj7z",
+          "name": "System notification copy",
+          "layout": "vertical",
+          "gap": "$Space4",
+          "children": [
+            {
+              "type": "text",
+              "id": "t2tPD",
+              "name": "Notification title",
+              "fill": "$ColorText",
+              "content": "已切换到电池供电",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightSemibold"
+            },
+            {
+              "type": "text",
+              "id": "ht6hV",
+              "name": "Notification body",
+              "fill": "$ColorText",
+              "content": "常亮仍在运行。",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "d9eHh",
+          "name": "Menu bar icon proposals",
+          "gap": "$Space24",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "IX3RO",
+              "name": "Off · eyes closed",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "QsurT",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "AKXW0",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "xq8IR",
+                      "x": 4,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "KUSvj",
+                      "x": 4,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "Brb9o",
+                      "x": 11,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "vuxjQ",
+                      "x": 11,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "CAQRQ",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "未开启 · 闭眼",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "g0Yk5k",
+              "name": "On · eyes open",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "p7bnJ",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "jSMYc",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "w0mfP",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "开启 · 睁眼",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "K8rTir",
+          "name": "Shortcut recording state",
+          "gap": "$Space8",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "kiP23",
+              "name": "Recording",
+              "fill": "$ColorTextSecondary",
+              "content": "按下快捷键…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Q4c4qO",
+      "x": 1700,
+      "y": 4500,
+      "name": "R05 en light",
+      "theme": {
+        "language": "en",
+        "mode": "light"
+      },
+      "width": 1600,
+      "height": 1600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space32",
+      "children": [
+        {
+          "type": "frame",
+          "id": "i3VZD",
+          "name": "Native menus",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "J16Tz",
+              "type": "ref",
+              "ref": "uxJfm",
+              "name": "Menu",
+              "descendants": {
+                "hRUWA": {
+                  "content": "Off"
+                },
+                "b2Z6t": {
+                  "content": "Start keep awake"
+                },
+                "e1Kj0E": {
+                  "content": "Mode"
+                },
+                "s38dUH": {
+                  "content": "Duration"
+                },
+                "ZrdS3": {
+                  "content": "Follow a process…"
+                },
+                "mXkOp": {
+                  "content": "Settings…"
+                },
+                "UCpy1": {
+                  "content": "Quit Cubbix"
+                }
+              }
+            },
+            {
+              "id": "EWStV",
+              "type": "ref",
+              "ref": "aoORB",
+              "name": "Menu",
+              "descendants": {
+                "LI4Yd": {
+                  "content": "Display awake · 1:24 left"
+                },
+                "l2nq6S": {
+                  "content": "Mode"
+                },
+                "Hc10W": {
+                  "content": "Duration"
+                },
+                "NrZRG": {
+                  "content": "Follow a process…"
+                },
+                "IAlUJ": {
+                  "content": "Stop"
+                },
+                "WvdY1": {
+                  "content": "Settings…"
+                },
+                "GRMS0": {
+                  "content": "Quit Cubbix"
+                }
+              }
+            },
+            {
+              "id": "kDnYI",
+              "type": "ref",
+              "ref": "hHsCT",
+              "name": "Menu",
+              "descendants": {
+                "QUcva": {
+                  "content": "Keep display awake"
+                },
+                "yA4aG": {
+                  "content": "Keep tasks awake"
+                }
+              }
+            },
+            {
+              "id": "AhpU1",
+              "type": "ref",
+              "ref": "c76CW",
+              "name": "Menu",
+              "descendants": {
+                "xvlxj": {
+                  "content": "30 minutes"
+                },
+                "q9P3yc": {
+                  "content": "1 hour"
+                },
+                "kzVvA": {
+                  "content": "2 hours"
+                },
+                "c6FSXF": {
+                  "content": "4 hours"
+                },
+                "Is7KK": {
+                  "content": "Custom…"
+                },
+                "coJ6x": {
+                  "content": "Until a time…"
+                },
+                "oVbOL": {
+                  "content": "Indefinitely"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YbG7h",
+          "name": "Dialogs",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "pNd7f",
+              "type": "ref",
+              "ref": "XY52K",
+              "name": "Dialog",
+              "descendants": {
+                "PTrix": {
+                  "content": "Custom duration"
+                },
+                "qD39J": {
+                  "content": "hours"
+                },
+                "RWtZp": {
+                  "content": "minutes"
+                },
+                "G7wkZ7": {
+                  "content": "Cancel"
+                },
+                "Z34pK": {
+                  "content": "Confirm"
+                }
+              }
+            },
+            {
+              "id": "afClr",
+              "type": "ref",
+              "ref": "ORQUx",
+              "name": "Dialog",
+              "descendants": {
+                "pd1R5": {
+                  "content": "Until a time"
+                },
+                "lJGst": {
+                  "content": "Cancel"
+                },
+                "vU6Zf": {
+                  "content": "Confirm"
+                }
+              }
+            },
+            {
+              "id": "u7ZvkY",
+              "type": "ref",
+              "ref": "AApos",
+              "name": "Dialog",
+              "descendants": {
+                "GbVnm": {
+                  "content": "Follow a process"
+                },
+                "segTv": {
+                  "content": "Search processes"
+                },
+                "o0Wrcj": {
+                  "content": "Cancel"
+                },
+                "H4IC9": {
+                  "content": "Confirm"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "iY1BV",
+          "name": "Settings pages",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "iJTrM",
+              "type": "ref",
+              "ref": "t7Eog",
+              "name": "Settings",
+              "descendants": {
+                "J417S": {
+                  "content": "General"
+                },
+                "fUNMm": {
+                  "content": "Tiles"
+                },
+                "I9GGC": {
+                  "content": "Shortcuts"
+                },
+                "EySMQ": {
+                  "content": "About"
+                },
+                "azZYU": {
+                  "content": "Keep awake"
+                }
+              }
+            },
+            {
+              "id": "hsz7A",
+              "type": "ref",
+              "ref": "tHJu2",
+              "name": "Settings",
+              "descendants": {
+                "e7AkF": {
+                  "content": "General"
+                },
+                "Qdm49": {
+                  "content": "Tiles"
+                },
+                "duJPc": {
+                  "content": "Shortcuts"
+                },
+                "kB99y": {
+                  "content": "About"
+                },
+                "U8NI5D": {
+                  "content": "Toggle keep awake"
+                },
+                "sB9Fc": {
+                  "content": "Conflicts with a known shortcut"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "eIC9q",
+          "name": "Additional status variants",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "text",
+              "id": "bEt8X",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Tasks awake · 1:24 left",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "lQcic",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Display awake · until 02:30",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "S0zMx",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Tasks awake · following codex",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "CdFhj",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Display awake · indefinitely",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "FHelL",
+          "name": "System notification copy",
+          "layout": "vertical",
+          "gap": "$Space4",
+          "children": [
+            {
+              "type": "text",
+              "id": "zzwUV",
+              "name": "Notification title",
+              "fill": "$ColorText",
+              "content": "Switched to battery power",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightSemibold"
+            },
+            {
+              "type": "text",
+              "id": "ztFeM",
+              "name": "Notification body",
+              "fill": "$ColorText",
+              "content": "Keep awake is still active.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "L43DaV",
+          "name": "Menu bar icon proposals",
+          "gap": "$Space24",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "l0mTw4",
+              "name": "未开启 · 闭眼",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "a84q9O",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "w3lO4",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "PQFLx",
+                      "x": 4,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "IH8X1",
+                      "x": 4,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "A4PMD",
+                      "x": 11,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "BnKHQ",
+                      "x": 11,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "f2P5PY",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "Off · eyes closed",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "NHtLh",
+              "name": "开启 · 睁眼",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "RjXGN",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "NYGoO",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "z8fxHo",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "On · eyes open",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YZNMg",
+          "name": "Shortcut recording state",
+          "gap": "$Space8",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "hHlTd",
+              "name": "Recording",
+              "fill": "$ColorTextSecondary",
+              "content": "Press shortcut…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "X1t0E",
+      "x": 1700,
+      "y": 6200,
+      "name": "R05 en dark",
+      "theme": {
+        "language": "en",
+        "mode": "dark"
+      },
+      "width": 1600,
+      "height": 1600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space32",
+      "children": [
+        {
+          "type": "frame",
+          "id": "RijQ1",
+          "name": "Native menus",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "P6tBE6",
+              "type": "ref",
+              "ref": "uxJfm",
+              "name": "Menu",
+              "descendants": {
+                "hRUWA": {
+                  "content": "Off"
+                },
+                "b2Z6t": {
+                  "content": "Start keep awake"
+                },
+                "e1Kj0E": {
+                  "content": "Mode"
+                },
+                "s38dUH": {
+                  "content": "Duration"
+                },
+                "ZrdS3": {
+                  "content": "Follow a process…"
+                },
+                "mXkOp": {
+                  "content": "Settings…"
+                },
+                "UCpy1": {
+                  "content": "Quit Cubbix"
+                }
+              }
+            },
+            {
+              "id": "XaVQ1",
+              "type": "ref",
+              "ref": "aoORB",
+              "name": "Menu",
+              "descendants": {
+                "LI4Yd": {
+                  "content": "Display awake · 1:24 left"
+                },
+                "l2nq6S": {
+                  "content": "Mode"
+                },
+                "Hc10W": {
+                  "content": "Duration"
+                },
+                "NrZRG": {
+                  "content": "Follow a process…"
+                },
+                "IAlUJ": {
+                  "content": "Stop"
+                },
+                "WvdY1": {
+                  "content": "Settings…"
+                },
+                "GRMS0": {
+                  "content": "Quit Cubbix"
+                }
+              }
+            },
+            {
+              "id": "OrV2I",
+              "type": "ref",
+              "ref": "hHsCT",
+              "name": "Menu",
+              "descendants": {
+                "QUcva": {
+                  "content": "Keep display awake"
+                },
+                "yA4aG": {
+                  "content": "Keep tasks awake"
+                }
+              }
+            },
+            {
+              "id": "e8pb4U",
+              "type": "ref",
+              "ref": "c76CW",
+              "name": "Menu",
+              "descendants": {
+                "xvlxj": {
+                  "content": "30 minutes"
+                },
+                "q9P3yc": {
+                  "content": "1 hour"
+                },
+                "kzVvA": {
+                  "content": "2 hours"
+                },
+                "c6FSXF": {
+                  "content": "4 hours"
+                },
+                "Is7KK": {
+                  "content": "Custom…"
+                },
+                "coJ6x": {
+                  "content": "Until a time…"
+                },
+                "oVbOL": {
+                  "content": "Indefinitely"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "UkzV3",
+          "name": "Dialogs",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "MNLkS",
+              "type": "ref",
+              "ref": "XY52K",
+              "name": "Dialog",
+              "descendants": {
+                "PTrix": {
+                  "content": "Custom duration"
+                },
+                "qD39J": {
+                  "content": "hours"
+                },
+                "RWtZp": {
+                  "content": "minutes"
+                },
+                "G7wkZ7": {
+                  "content": "Cancel"
+                },
+                "Z34pK": {
+                  "content": "Confirm"
+                }
+              }
+            },
+            {
+              "id": "JOUT0",
+              "type": "ref",
+              "ref": "ORQUx",
+              "name": "Dialog",
+              "descendants": {
+                "pd1R5": {
+                  "content": "Until a time"
+                },
+                "lJGst": {
+                  "content": "Cancel"
+                },
+                "vU6Zf": {
+                  "content": "Confirm"
+                }
+              }
+            },
+            {
+              "id": "Nhqap",
+              "type": "ref",
+              "ref": "AApos",
+              "name": "Dialog",
+              "descendants": {
+                "GbVnm": {
+                  "content": "Follow a process"
+                },
+                "segTv": {
+                  "content": "Search processes"
+                },
+                "o0Wrcj": {
+                  "content": "Cancel"
+                },
+                "H4IC9": {
+                  "content": "Confirm"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YisNz",
+          "name": "Settings pages",
+          "gap": "$Space16",
+          "children": [
+            {
+              "id": "W6PSP",
+              "type": "ref",
+              "ref": "t7Eog",
+              "name": "Settings",
+              "descendants": {
+                "J417S": {
+                  "content": "General"
+                },
+                "fUNMm": {
+                  "content": "Tiles"
+                },
+                "I9GGC": {
+                  "content": "Shortcuts"
+                },
+                "EySMQ": {
+                  "content": "About"
+                },
+                "azZYU": {
+                  "content": "Keep awake"
+                }
+              }
+            },
+            {
+              "id": "pnqoT",
+              "type": "ref",
+              "ref": "tHJu2",
+              "name": "Settings",
+              "descendants": {
+                "e7AkF": {
+                  "content": "General"
+                },
+                "Qdm49": {
+                  "content": "Tiles"
+                },
+                "duJPc": {
+                  "content": "Shortcuts"
+                },
+                "kB99y": {
+                  "content": "About"
+                },
+                "U8NI5D": {
+                  "content": "Toggle keep awake"
+                },
+                "sB9Fc": {
+                  "content": "Conflicts with a known shortcut"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Fi5YL",
+          "name": "Additional status variants",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "text",
+              "id": "Wqc9r",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Tasks awake · 1:24 left",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "p3BAr",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Display awake · until 02:30",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "X7NRT",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Tasks awake · following codex",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "PQree",
+              "name": "Status",
+              "fill": "$ColorText",
+              "content": "Display awake · indefinitely",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "n1Sfq",
+          "name": "System notification copy",
+          "layout": "vertical",
+          "gap": "$Space4",
+          "children": [
+            {
+              "type": "text",
+              "id": "MmEMV",
+              "name": "Notification title",
+              "fill": "$ColorText",
+              "content": "Switched to battery power",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightSemibold"
+            },
+            {
+              "type": "text",
+              "id": "PzOO9",
+              "name": "Notification body",
+              "fill": "$ColorText",
+              "content": "Keep awake is still active.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "xR6f1",
+          "name": "Menu bar icon proposals",
+          "gap": "$Space24",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "b8Nun",
+              "name": "Off · eyes closed",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ax8rK",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "B74yy0",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "SZCZc",
+                      "x": 4,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "TukF1",
+                      "x": 4,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "pCxJS",
+                      "x": 11,
+                      "y": 5,
+                      "name": "Close eye",
+                      "fill": "$ColorText",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "rqqnN",
+                      "x": 11,
+                      "y": 7,
+                      "name": "Eyelid",
+                      "fill": "$ColorWindow",
+                      "width": 5,
+                      "height": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "iLBbI",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "Off · eyes closed",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "NAl63",
+              "name": "On · eyes open",
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "X03bP",
+                  "name": "Cat status proposal",
+                  "width": 20,
+                  "height": 20,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "W5KApz",
+                      "type": "ref",
+                      "ref": "r2xEJ",
+                      "name": "Brand shape",
+                      "x": 0,
+                      "y": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "OLlXH",
+                  "name": "State",
+                  "fill": "$ColorText",
+                  "content": "On · eyes open",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCJK",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "E9Ap74",
+          "name": "Shortcut recording state",
+          "gap": "$Space8",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "H614zP",
+              "name": "Recording",
+              "fill": "$ColorTextSecondary",
+              "content": "Press shortcut…",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamilyCJK",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        }
+      ]
     }
   ],
   "themes": {
@@ -6590,6 +10812,737 @@
           "value": "#333333",
           "theme": {
             "mode": "dark"
+          }
+        }
+      ]
+    },
+    "R05Off": {
+      "type": "string",
+      "value": [
+        {
+          "value": "未开启",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Off",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05On": {
+      "type": "string",
+      "value": [
+        {
+          "value": "屏幕常亮 · 剩余 1:24",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Display awake · 1:24 left",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05TasksOn": {
+      "type": "string",
+      "value": [
+        {
+          "value": "仅保持任务 · 剩余 1:24",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Tasks awake · 1:24 left",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05UntilStatus": {
+      "type": "string",
+      "value": [
+        {
+          "value": "屏幕常亮 · 直到 02:30",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Display awake · until 02:30",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05FollowStatus": {
+      "type": "string",
+      "value": [
+        {
+          "value": "仅保持任务 · 跟随 codex",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Tasks awake · following codex",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05UnlimitedStatus": {
+      "type": "string",
+      "value": [
+        {
+          "value": "屏幕常亮 · 不限时",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Display awake · indefinitely",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Start": {
+      "type": "string",
+      "value": [
+        {
+          "value": "开启常亮",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Start keep awake",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Mode": {
+      "type": "string",
+      "value": [
+        {
+          "value": "模式",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Mode",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Screen": {
+      "type": "string",
+      "value": [
+        {
+          "value": "保持屏幕常亮",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Keep display awake",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Tasks": {
+      "type": "string",
+      "value": [
+        {
+          "value": "仅保持任务",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Keep tasks awake",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Duration": {
+      "type": "string",
+      "value": [
+        {
+          "value": "时长",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Duration",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Half": {
+      "type": "string",
+      "value": [
+        {
+          "value": "30 分钟",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "30 minutes",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Hour": {
+      "type": "string",
+      "value": [
+        {
+          "value": "1 小时",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "1 hour",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Two": {
+      "type": "string",
+      "value": [
+        {
+          "value": "2 小时",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "2 hours",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Four": {
+      "type": "string",
+      "value": [
+        {
+          "value": "4 小时",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "4 hours",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Custom": {
+      "type": "string",
+      "value": [
+        {
+          "value": "自定义…",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Custom…",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Until": {
+      "type": "string",
+      "value": [
+        {
+          "value": "直到某时刻…",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Until a time…",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Unlimited": {
+      "type": "string",
+      "value": [
+        {
+          "value": "不限时",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Indefinitely",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Follow": {
+      "type": "string",
+      "value": [
+        {
+          "value": "跟随进程…",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Follow a process…",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Stop": {
+      "type": "string",
+      "value": [
+        {
+          "value": "停止",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Stop",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Settings": {
+      "type": "string",
+      "value": [
+        {
+          "value": "设置…",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Settings…",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Quit": {
+      "type": "string",
+      "value": [
+        {
+          "value": "退出 Cubbix",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Quit Cubbix",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05CustomTitle": {
+      "type": "string",
+      "value": [
+        {
+          "value": "自定义时长",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Custom duration",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05UntilTitle": {
+      "type": "string",
+      "value": [
+        {
+          "value": "直到某时刻",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Until a time",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05FollowTitle": {
+      "type": "string",
+      "value": [
+        {
+          "value": "跟随进程",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Follow a process",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Hours": {
+      "type": "string",
+      "value": [
+        {
+          "value": "小时",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "hours",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Minutes": {
+      "type": "string",
+      "value": [
+        {
+          "value": "分钟",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "minutes",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Cancel": {
+      "type": "string",
+      "value": [
+        {
+          "value": "取消",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Cancel",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Confirm": {
+      "type": "string",
+      "value": [
+        {
+          "value": "确定",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Confirm",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Search": {
+      "type": "string",
+      "value": [
+        {
+          "value": "搜索进程",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Search processes",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Tiles": {
+      "type": "string",
+      "value": [
+        {
+          "value": "格子",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Tiles",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Shortcuts": {
+      "type": "string",
+      "value": [
+        {
+          "value": "快捷键",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Shortcuts",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05General": {
+      "type": "string",
+      "value": [
+        {
+          "value": "通用",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "General",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05About": {
+      "type": "string",
+      "value": [
+        {
+          "value": "关于",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "About",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Awake": {
+      "type": "string",
+      "value": [
+        {
+          "value": "常亮",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Keep awake",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05ShortcutLabel": {
+      "type": "string",
+      "value": [
+        {
+          "value": "常亮开关",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Toggle keep awake",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Recording": {
+      "type": "string",
+      "value": [
+        {
+          "value": "按下快捷键…",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Press shortcut…",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Conflict": {
+      "type": "string",
+      "value": [
+        {
+          "value": "与已知快捷键冲突",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Conflicts with a known shortcut",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05BatteryTitle": {
+      "type": "string",
+      "value": [
+        {
+          "value": "已切换到电池供电",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Switched to battery power",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05BatteryBody": {
+      "type": "string",
+      "value": [
+        {
+          "value": "常亮仍在运行。",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Keep awake is still active.",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Closed": {
+      "type": "string",
+      "value": [
+        {
+          "value": "未开启",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Off",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Open": {
+      "type": "string",
+      "value": [
+        {
+          "value": "开启",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "On",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R05Alternative": {
+      "type": "string",
+      "value": [
+        {
+          "value": "备选：状态点",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Alternative: status dot",
+          "theme": {
+            "language": "en"
           }
         }
       ]
