@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" color="#24352e" role="img" aria-labelledby="title description">
+  <title id="title">Cubbix · 栖雀</title>
+  <desc id="description">A perched bird shelters a cubby underneath its wing. Hand-built cubic curves. Closed subpaths are transparent cutouts using evenodd fill.</desc>
+  <g id="perched-bird" fill="currentColor" fill-rule="evenodd">
+    <path id="bird-eye-and-cubby-wing" d="
+      M 28 64 C 28 41.909 45.909 24 68 24 H 80
+      C 93.255 24 104 34.745 104 48
+      C 104 50.209 105.791 52 108 52 H 112
+      C 116.418 52 120 55.582 120 60
+      C 120 64.418 116.418 68 112 68 H 108
+      C 105.791 68 104 69.791 104 72 V 80
+      C 104 97.673 89.673 112 72 112 H 24
+      C 19.582 112 16 108.418 16 104
+      C 16 99.582 19.582 96 24 96
+      C 26.209 96 28 94.209 28 92 V 64 Z
+
+      M 88 44 C 88 46.209 86.209 48 84 48
+      C 81.791 48 80 46.209 80 44
+      C 80 41.791 81.791 40 84 40
+      C 86.209 40 88 41.791 88 44 Z
+
+      M 44 64 H 72 C 76.418 64 80 67.582 80 72 V 80
+      C 80 88.837 72.837 96 64 96 H 48
+      C 43.582 96 40 92.418 40 88 V 68
+      C 40 65.791 41.791 64 44 64 Z"/>
+  </g>
+</svg>

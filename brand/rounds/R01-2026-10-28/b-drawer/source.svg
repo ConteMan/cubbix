@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" color="#24352e" role="img" aria-labelledby="title description">
+  <title id="title">Cubbix · 抽格</title>
+  <desc id="description">Three cubbies at rest; one module ready to use. Hand-built cubic curves. Closed subpaths are transparent cutouts using evenodd fill.</desc>
+  <g id="modular-cabinet" fill="currentColor">
+    <path id="three-cubby-frame" fill-rule="evenodd" d="
+      M 32 24 H 56 C 60.418 24 64 27.582 64 32 V 56
+      C 64 60.418 67.582 64 72 64 H 88
+      C 96.837 64 104 71.163 104 80 V 96
+      C 104 104.837 96.837 112 88 112 H 32
+      C 23.163 112 16 104.837 16 96 V 40
+      C 16 31.163 23.163 24 32 24 Z
+
+      M 32 36 H 48 C 50.209 36 52 37.791 52 40 V 56
+      C 52 58.209 50.209 60 48 60 H 32
+      C 29.791 60 28 58.209 28 56 V 40
+      C 28 37.791 29.791 36 32 36 Z
+
+      M 32 76 H 48 C 50.209 76 52 77.791 52 80 V 96
+      C 52 98.209 50.209 100 48 100 H 32
+      C 29.791 100 28 98.209 28 96 V 80
+      C 28 77.791 29.791 76 32 76 Z
+
+      M 76 76 H 88 C 90.209 76 92 77.791 92 80 V 96
+      C 92 98.209 90.209 100 88 100 H 76
+      C 73.791 100 72 98.209 72 96 V 80
+      C 72 77.791 73.791 76 76 76 Z"/>
+    <rect id="ready-module" x="80" y="16" width="32" height="32" rx="8"/>
+  </g>
+</svg>

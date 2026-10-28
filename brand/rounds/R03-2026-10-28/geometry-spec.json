@@ -1,0 +1,43 @@
+{
+  "coordinate_system": [
+    128,
+    128
+  ],
+  "head_side_cubics_per_side": 5,
+  "concave_min_radius": 4,
+  "convex_radius_tiers": {
+    "ear_tip": 1,
+    "paw_minimum": 4,
+    "rim_end_caps": 4,
+    "box_outer": 8
+  },
+  "box_outer_bounds": [
+    20,
+    76,
+    88,
+    44
+  ],
+  "box_opening_bounds": [
+    28,
+    84,
+    72,
+    28
+  ],
+  "main_negative_gap_target": 4,
+  "head_visibility_baseline": 72,
+  "optical_template": {
+    "box_shift_from_R02": 8,
+    "gap_before_fit": 8,
+    "fit_scale": 0.9375,
+    "fit_translation": [
+      4,
+      4
+    ]
+  },
+  "core_path_ids": [
+    "cat-head",
+    "box-frame",
+    "left-paw",
+    "right-paw"
+  ]
+}
