@@ -38,5 +38,10 @@
   "UnsavedTitle": "Unsaved JSON documents",
   "UnsavedBody": "Save your documents to keep your changes, then restart to update.",
   "Cancel": "Cancel",
-  "ReturnToDocuments": "Return to documents"
+  "ReturnToDocuments": "Return to documents",
+  "UpdateSourceMissing": "No update source configured",
+  "CheckAction": "Check for updates",
+  "UpdateNotesUnavailable": "Update notes are not configured",
+  "LoginError": "Could not change launch at login",
+  "ConfigError": "Could not save settings"
 }
