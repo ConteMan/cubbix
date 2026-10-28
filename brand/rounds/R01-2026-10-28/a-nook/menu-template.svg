@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 128 128" color="#000000" role="img" aria-labelledby="title description">
+  <title id="title">Cubbix · 格伴</title>
+  <desc id="description">Monochrome 16pt template study. A quiet companion carrying one cubby. Hand-built cubic curves. Closed subpaths are transparent cutouts using evenodd fill.</desc>
+  <g id="quiet-companion" fill="currentColor" fill-rule="evenodd">
+    <path id="body-eyes-and-cubby" d="
+      M 24 52 V 30
+      C 24 21.163 31.163 14 40 14
+      C 48.837 14 56 21.163 56 30
+      C 56 32 58 32 60 32 H 68
+      C 70 32 72 32 72 30
+      C 72 21.163 79.163 14 88 14
+      C 96.837 14 104 21.163 104 30 V 52
+      C 104 60 112 64 112 76 V 88
+      C 112 105.673 90.509 116 64 116
+      C 37.491 116 16 105.673 16 88 V 76
+      C 16 64 24 60 24 52 Z
+
+      M 38 54 H 50 C 52.209 54 54 55.791 54 58
+      C 54 60.209 52.209 62 50 62 H 38
+      C 35.791 62 34 60.209 34 58
+      C 34 55.791 35.791 54 38 54 Z
+
+      M 78 54 H 90 C 92.209 54 94 55.791 94 58
+      C 94 60.209 92.209 62 90 62 H 78
+      C 75.791 62 74 60.209 74 58
+      C 74 55.791 75.791 54 78 54 Z
+
+      M 52 78 H 76 C 80.418 78 84 81.582 84 86 V 94
+      C 84 98.418 80.418 102 76 102 H 52
+      C 47.582 102 44 98.418 44 94 V 86
+      C 44 81.582 47.582 78 52 78 Z"/>
+  </g>
+</svg>

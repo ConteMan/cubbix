@@ -1,0 +1,324 @@
+{
+  "files": [
+    {
+      "file": "a-nook/previews/light-1024.png",
+      "size": 1024,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "a-nook/previews/light-128.png",
+      "size": 128,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "a-nook/previews/light-32.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "a-nook/previews/light-16.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "a-nook/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "a-nook/previews/template-light-context-1x.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "a-nook/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "a-nook/previews/template-light-context-2x.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "a-nook/previews/dark-1024.png",
+      "size": 1024,
+      "background": "#24312c"
+    },
+    {
+      "file": "a-nook/previews/dark-128.png",
+      "size": 128,
+      "background": "#24312c"
+    },
+    {
+      "file": "a-nook/previews/dark-32.png",
+      "size": 32,
+      "background": "#24312c"
+    },
+    {
+      "file": "a-nook/previews/dark-16.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "a-nook/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "a-nook/previews/template-dark-context-1x.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "a-nook/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "a-nook/previews/template-dark-context-2x.png",
+      "size": 32,
+      "background": "#24312c"
+    },
+    {
+      "file": "b-drawer/previews/light-1024.png",
+      "size": 1024,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "b-drawer/previews/light-128.png",
+      "size": 128,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "b-drawer/previews/light-32.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "b-drawer/previews/light-16.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "b-drawer/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "b-drawer/previews/template-light-context-1x.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "b-drawer/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "b-drawer/previews/template-light-context-2x.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "b-drawer/previews/dark-1024.png",
+      "size": 1024,
+      "background": "#24312c"
+    },
+    {
+      "file": "b-drawer/previews/dark-128.png",
+      "size": 128,
+      "background": "#24312c"
+    },
+    {
+      "file": "b-drawer/previews/dark-32.png",
+      "size": 32,
+      "background": "#24312c"
+    },
+    {
+      "file": "b-drawer/previews/dark-16.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "b-drawer/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "b-drawer/previews/template-dark-context-1x.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "b-drawer/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "b-drawer/previews/template-dark-context-2x.png",
+      "size": 32,
+      "background": "#24312c"
+    },
+    {
+      "file": "c-tray/previews/light-1024.png",
+      "size": 1024,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "c-tray/previews/light-128.png",
+      "size": 128,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "c-tray/previews/light-32.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "c-tray/previews/light-16.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "c-tray/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "c-tray/previews/template-light-context-1x.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "c-tray/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "c-tray/previews/template-light-context-2x.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "c-tray/previews/dark-1024.png",
+      "size": 1024,
+      "background": "#24312c"
+    },
+    {
+      "file": "c-tray/previews/dark-128.png",
+      "size": 128,
+      "background": "#24312c"
+    },
+    {
+      "file": "c-tray/previews/dark-32.png",
+      "size": 32,
+      "background": "#24312c"
+    },
+    {
+      "file": "c-tray/previews/dark-16.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "c-tray/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "c-tray/previews/template-dark-context-1x.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "c-tray/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "c-tray/previews/template-dark-context-2x.png",
+      "size": 32,
+      "background": "#24312c"
+    },
+    {
+      "file": "d-perch/previews/light-1024.png",
+      "size": 1024,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "d-perch/previews/light-128.png",
+      "size": 128,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "d-perch/previews/light-32.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "d-perch/previews/light-16.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "d-perch/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "d-perch/previews/template-light-context-1x.png",
+      "size": 16,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "d-perch/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "d-perch/previews/template-light-context-2x.png",
+      "size": 32,
+      "background": "#f5f3ed"
+    },
+    {
+      "file": "d-perch/previews/dark-1024.png",
+      "size": 1024,
+      "background": "#24312c"
+    },
+    {
+      "file": "d-perch/previews/dark-128.png",
+      "size": 128,
+      "background": "#24312c"
+    },
+    {
+      "file": "d-perch/previews/dark-32.png",
+      "size": 32,
+      "background": "#24312c"
+    },
+    {
+      "file": "d-perch/previews/dark-16.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "d-perch/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "background": null
+    },
+    {
+      "file": "d-perch/previews/template-dark-context-1x.png",
+      "size": 16,
+      "background": "#24312c"
+    },
+    {
+      "file": "d-perch/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "background": null
+    },
+    {
+      "file": "d-perch/previews/template-dark-context-2x.png",
+      "size": 32,
+      "background": "#24312c"
+    }
+  ]
+}

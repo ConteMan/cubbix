@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 128 128" color="#000000" role="img" aria-labelledby="title description">
+  <title id="title">Cubbix · 托格</title>
+  <desc id="description">A single tool module above an open receiving tray. Hand-built tangent cubic curves and an editable rounded rectangle. Monochrome template study at 16pt.</desc>
+  <g id="tool-and-receiving-tray" fill="currentColor">
+    <rect id="tool-module" x="44" y="20" width="40" height="28" rx="8"/>
+    <path id="open-tray" d="
+      M 16 56 C 16 51.582 19.582 48 24 48
+      C 28.418 48 32 51.582 32 56 V 72
+      C 32 85.255 46.327 96 64 96
+      C 81.673 96 96 85.255 96 72 V 56
+      C 96 51.582 99.582 48 104 48
+      C 108.418 48 112 51.582 112 56 V 72
+      C 112 94.091 90.509 112 64 112
+      C 37.491 112 16 94.091 16 72 V 56 Z"/>
+  </g>
+</svg>
