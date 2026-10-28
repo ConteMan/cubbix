@@ -14,9 +14,9 @@
   "AutomaticUpdates": "Automatic updates",
   "UpdateGroup": "Updates",
   "DownloadReady": "Update ready",
-  "DownloadHint": "Reopen to apply",
-  "Reopen": "Reopen",
-  "CloseSettings": "Close settings (⌘W)",
+  "DownloadHint": "Applies after restart",
+  "Reopen": "Restart to update",
+  "CloseSettings": "Close settings (⌘W / Esc)",
   "StartAwake": "Start keep awake (⌃⌥⌘K)",
   "Awake": "Keep awake",
   "JSON": "JSON",
@@ -31,7 +31,12 @@
   "Chinese": "简体中文",
   "English": "English",
   "Empty": "",
-  "System": "Use system setting",
+  "System": "System default",
   "GeneralDescription": "Choose the interface language",
-  "ButtonGeneric": "Reopen"
+  "ButtonGeneric": "Restart to update",
+  "RestartUpdate": "Restart to update",
+  "UnsavedTitle": "Unsaved JSON documents",
+  "UnsavedBody": "Save your documents to keep your changes, then restart to update.",
+  "Cancel": "Cancel",
+  "ReturnToDocuments": "Return to documents"
 }

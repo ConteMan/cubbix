@@ -24,7 +24,7 @@
           "id": "r5PYC",
           "name": "Foundation title",
           "fill": "$ColorText",
-          "content": "Cubbix · 设计基础 R01",
+          "content": "Cubbix · 设计基础 R02",
           "lineHeight": "$LineHeightTitle",
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeDisplay",
@@ -1431,7 +1431,7 @@
         {
           "type": "frame",
           "id": "Hs9NC",
-          "x": 260,
+          "x": 230,
           "y": 164,
           "name": "Segmented control",
           "reusable": true,
@@ -1439,13 +1439,39 @@
             "type": "interaction",
             "role": "radiogroup"
           },
-          "width": 220,
+          "width": 318,
           "height": 28,
           "fill": "$ColorControl",
           "cornerRadius": "$RadiusControl",
           "gap": "$Space2",
           "padding": "$Space2",
           "children": [
+            {
+              "type": "frame",
+              "id": "OW8Hc",
+              "name": "System segment",
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": "$ColorTransparent",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "gap": "$Space0",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "RRg9B",
+                  "name": "System label",
+                  "fill": "$ColorText",
+                  "content": "跟随系统",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightMedium"
+                }
+              ]
+            },
             {
               "type": "frame",
               "id": "X2e2V",
@@ -1502,7 +1528,7 @@
         {
           "type": "text",
           "id": "u3fOIs",
-          "x": 260,
+          "x": 230,
           "y": 138,
           "name": "Segmented label",
           "fill": "$ColorTextSecondary",
@@ -1515,7 +1541,7 @@
         {
           "type": "frame",
           "id": "n2ixa",
-          "x": 550,
+          "x": 620,
           "y": 160,
           "name": "Icon button",
           "reusable": true,
@@ -1547,7 +1573,7 @@
           "type": "ref",
           "ref": "n2ixa",
           "name": "Icon button hover",
-          "x": 594,
+          "x": 664,
           "y": 160,
           "fill": "$ColorControlHover"
         },
@@ -1556,7 +1582,7 @@
           "type": "ref",
           "ref": "n2ixa",
           "name": "Icon button focus visible",
-          "x": 638,
+          "x": 708,
           "y": 160,
           "stroke": "$ColorAccent",
           "strokeWidth": "$StrokeIcon"
@@ -1564,7 +1590,7 @@
         {
           "type": "frame",
           "id": "sFUcN",
-          "x": 550,
+          "x": 620,
           "y": 198,
           "name": "Tooltip",
           "reusable": true,
@@ -1593,7 +1619,7 @@
         {
           "type": "text",
           "id": "unNyD",
-          "x": 550,
+          "x": 620,
           "y": 128,
           "name": "Icon button label",
           "fill": "$ColorTextSecondary",
@@ -1606,7 +1632,7 @@
         {
           "type": "frame",
           "id": "GaYMc",
-          "x": 790,
+          "x": 950,
           "y": 160,
           "name": "Text button",
           "reusable": true,
@@ -1631,7 +1657,7 @@
               "id": "qEQlb",
               "name": "Button label",
               "fill": "$ColorOnAccent",
-              "content": "重新打开",
+              "content": "重启更新",
               "lineHeight": "$LineHeightBody",
               "fontFamily": "$FontFamily",
               "fontSize": "$FontSizeSmall",
@@ -1642,7 +1668,7 @@
         {
           "type": "text",
           "id": "o4jfmh",
-          "x": 790,
+          "x": 950,
           "y": 128,
           "name": "Text button label",
           "fill": "$ColorTextSecondary",
@@ -2218,7 +2244,7 @@
                   "id": "v3iwe",
                   "name": "Download hint",
                   "fill": "$ColorTextSecondary",
-                  "content": "重新打开后生效",
+                  "content": "重启后生效",
                   "lineHeight": "$LineHeightBody",
                   "fontFamily": "$FontFamily",
                   "fontSize": "$FontSizeSmall",
@@ -2241,7 +2267,7 @@
           "y": 668,
           "name": "Notice label",
           "fill": "$ColorTextSecondary",
-          "content": "下载完成后才出现的提示",
+          "content": "下载完成后 · 重启更新前检查未保存文档",
           "lineHeight": "$LineHeightBody",
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeSmall",
@@ -2306,6 +2332,174 @@
               "name": "Check updates"
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "qxNp2",
+          "x": 1250,
+          "y": 540,
+          "name": "Brand placeholder · 待替换为 Logo",
+          "reusable": true,
+          "metadata": {
+            "type": "brand-placeholder",
+            "status": "待替换为 Logo",
+            "temporary": true
+          },
+          "width": 120,
+          "height": 28,
+          "gap": "$Space0",
+          "padding": [
+            "$Space0",
+            "$Space8"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "uPtza",
+              "name": "Brand name",
+              "fill": "$ColorText",
+              "content": "Cubbix",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightSemibold"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "A1aVb",
+          "x": 1250,
+          "y": 508,
+          "name": "Brand placeholder note",
+          "fill": "$ColorTextSecondary",
+          "content": "品牌占位 · 待替换为 Logo",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "frame",
+          "id": "ewQJq",
+          "x": 1250,
+          "y": 650,
+          "name": "Restart confirmation",
+          "reusable": true,
+          "metadata": {
+            "type": "dialog",
+            "trigger": "restart-update with unsaved JSON documents",
+            "primaryAction": "return-to-documents",
+            "closeKeys": [
+              "Escape"
+            ],
+            "unsavedChanges": "preserved"
+          },
+          "width": 440,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusWindow",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space16",
+          "padding": "$Space20",
+          "children": [
+            {
+              "type": "frame",
+              "id": "B6Y4xU",
+              "name": "Confirmation title row",
+              "width": "fill_container",
+              "gap": "$Space12",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "gCgFB",
+                  "type": "ref",
+                  "ref": "sWO1O",
+                  "name": "Unsaved alert",
+                  "descendants": {
+                    "QdblK": {
+                      "stroke": "$ColorDanger"
+                    }
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "q5pB4f",
+                  "name": "Confirmation title",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "有未保存的 JSON 文档",
+                  "lineHeight": "$LineHeightTitle",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeTitle",
+                  "fontWeight": "$FontWeightSemibold"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "oLqI9",
+              "name": "Confirmation body",
+              "fill": "$ColorTextSecondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "请先保存文档以保留更改，再重启更新。",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "frame",
+              "id": "Ao8c5",
+              "name": "Confirmation actions",
+              "width": "fill_container",
+              "gap": "$Space8",
+              "justifyContent": "end",
+              "children": [
+                {
+                  "id": "wy34C",
+                  "type": "ref",
+                  "ref": "GaYMc",
+                  "name": "Cancel restart",
+                  "fill": "$ColorControl",
+                  "descendants": {
+                    "qEQlb": {
+                      "content": "取消",
+                      "fill": "$ColorText"
+                    }
+                  }
+                },
+                {
+                  "id": "rVXzp",
+                  "type": "ref",
+                  "ref": "GaYMc",
+                  "name": "Return to documents",
+                  "descendants": {
+                    "qEQlb": {
+                      "content": "返回文档"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "cQask",
+          "x": 1250,
+          "y": 618,
+          "name": "Confirmation state label",
+          "fill": "$ColorTextSecondary",
+          "content": "重启更新 · 有未保存文档时先提示",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
         }
       ]
     },
@@ -2323,8 +2517,8 @@
         "contentMaxWidthToken": "SizeContentMaxWidth"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 176,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "stroke": "$ColorSeparator",
@@ -2335,45 +2529,22 @@
           "type": "frame",
           "id": "b3WHS",
           "name": "Sidebar",
-          "width": 168,
+          "width": 144,
           "height": "fill_container",
           "fill": "$ColorSidebar",
           "layout": "vertical",
           "gap": "$Space24",
           "padding": [
-            "$Space32",
+            "$Space24",
             "$Space12"
           ],
           "children": [
             {
-              "type": "frame",
-              "id": "BLKzA",
-              "name": "Brand",
-              "gap": "$Space8",
-              "padding": [
-                "$Space0",
-                "$Space8"
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "id": "PJCPf",
-                  "type": "ref",
-                  "ref": "Ectkj",
-                  "name": "Cubbix mark"
-                },
-                {
-                  "type": "text",
-                  "id": "QS56E",
-                  "name": "Cubbix name",
-                  "fill": "$ColorText",
-                  "content": "Cubbix",
-                  "lineHeight": "$LineHeightBody",
-                  "fontFamily": "$FontFamily",
-                  "fontSize": "$FontSizeBody",
-                  "fontWeight": "$FontWeightSemibold"
-                }
-              ]
+              "id": "QsPFu",
+              "type": "ref",
+              "ref": "qxNp2",
+              "name": "Brand placeholder · 待替换为 Logo",
+              "width": "fill_container"
             },
             {
               "type": "frame",
@@ -2422,50 +2593,17 @@
           "width": "fill_container",
           "height": "fill_container",
           "layout": "vertical",
-          "gap": "$Space24",
-          "padding": "$Space32",
+          "gap": "$Space0",
+          "padding": "$Space24",
           "alignItems": "center",
           "children": [
             {
               "type": "frame",
-              "id": "t2g8tl",
-              "name": "Page header",
-              "width": 528,
-              "gap": "$Space0",
-              "justifyContent": "space_between",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "T2VbQ",
-                  "name": "Page title",
-                  "fill": "$ColorText",
-                  "content": "通用",
-                  "lineHeight": "$LineHeightTitle",
-                  "fontFamily": "$FontFamily",
-                  "fontSize": "$FontSizeTitle",
-                  "fontWeight": "$FontWeightSemibold"
-                },
-                {
-                  "id": "e6rVej",
-                  "type": "ref",
-                  "ref": "n2ixa",
-                  "name": "Close settings",
-                  "children": [
-                    {
-                      "id": "eomxN",
-                      "type": "ref",
-                      "ref": "QBOEx",
-                      "name": "Close icon"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
               "id": "i1QUPx",
+              "x": 72,
+              "y": 84,
               "name": "Page content",
+              "enabled": false,
               "slot": [],
               "width": 528,
               "layout": "vertical",
@@ -2495,7 +2633,8 @@
       "name": "general-zh-CN-light",
       "theme": {
         "mode": "light",
-        "language": "zh-CN"
+        "language": "zh-CN",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -2505,21 +2644,21 @@
         "state": "normal"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 176,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "uxYpF",
+          "id": "UhO7s",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 176,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft"
@@ -2534,20 +2673,14 @@
             "vENnM/namsg": {
               "content": "关于",
               "fill": "$ColorText"
-            },
-            "T2VbQ": {
-              "content": "通用"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "zagPX",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -2562,18 +2695,7 @@
               "gap": "$Space8",
               "children": [
                 {
-                  "type": "text",
-                  "id": "byoIk",
-                  "name": "Group title",
-                  "fill": "$ColorTextSecondary",
-                  "content": "偏好设置",
-                  "lineHeight": "$LineHeightBody",
-                  "fontFamily": "$FontFamily",
-                  "fontSize": "$FontSizeCaption",
-                  "fontWeight": "$FontWeightRegular"
-                },
-                {
-                  "id": "W5if29",
+                  "id": "igOyl",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -2583,11 +2705,14 @@
                       "content": "语言"
                     },
                     "kqrak/WyToO": {
-                      "id": "JMY4N",
+                      "id": "vDdQ5",
                       "type": "ref",
                       "ref": "Hs9NC",
                       "name": "Language selector",
                       "descendants": {
+                        "RRg9B": {
+                          "content": "跟随系统"
+                        },
                         "X2e2V": {
                           "fill": "$ColorCard"
                         },
@@ -2625,12 +2750,13 @@
     {
       "type": "frame",
       "id": "ztBBK",
-      "x": 920,
+      "x": 800,
       "y": 1640,
       "name": "general-en-light",
       "theme": {
         "mode": "light",
-        "language": "en"
+        "language": "en",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -2640,21 +2766,21 @@
         "state": "normal"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 176,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "io3Be",
+          "id": "NpShZ",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 176,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft"
@@ -2669,20 +2795,14 @@
             "vENnM/namsg": {
               "content": "About",
               "fill": "$ColorText"
-            },
-            "T2VbQ": {
-              "content": "General"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "tAkH2",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -2697,18 +2817,7 @@
               "gap": "$Space8",
               "children": [
                 {
-                  "type": "text",
-                  "id": "C6ei8",
-                  "name": "Group title",
-                  "fill": "$ColorTextSecondary",
-                  "content": "Preferences",
-                  "lineHeight": "$LineHeightBody",
-                  "fontFamily": "$FontFamily",
-                  "fontSize": "$FontSizeCaption",
-                  "fontWeight": "$FontWeightRegular"
-                },
-                {
-                  "id": "H7BpP",
+                  "id": "JJ6dj",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -2718,11 +2827,14 @@
                       "content": "Language"
                     },
                     "kqrak/WyToO": {
-                      "id": "p1g8Lk",
+                      "id": "BLsyU",
                       "type": "ref",
                       "ref": "Hs9NC",
                       "name": "Language selector",
                       "descendants": {
+                        "RRg9B": {
+                          "content": "System default"
+                        },
                         "X2e2V": {
                           "fill": "$ColorTransparent"
                         },
@@ -2761,11 +2873,12 @@
       "type": "frame",
       "id": "d3UD1",
       "x": 0,
-      "y": 2300,
+      "y": 1896,
       "name": "about-zh-CN-light",
       "theme": {
         "mode": "light",
-        "language": "zh-CN"
+        "language": "zh-CN",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -2775,21 +2888,21 @@
         "state": "download-ready"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 316,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "bhjlD",
+          "id": "NJ6Tm",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 316,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorTransparent"
@@ -2804,20 +2917,14 @@
             "vENnM/namsg": {
               "content": "关于",
               "fill": "$ColorAccent"
-            },
-            "T2VbQ": {
-              "content": "关于"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "H6aOMT",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -2843,7 +2950,7 @@
                   "fontWeight": "$FontWeightRegular"
                 },
                 {
-                  "id": "oB3Od",
+                  "id": "Uwr8F",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -2853,7 +2960,7 @@
                       "content": "版本"
                     },
                     "kqrak/WyToO": {
-                      "id": "lvCU7",
+                      "id": "R0MA7O",
                       "type": "ref",
                       "ref": "vUQhl",
                       "name": "Version and check",
@@ -2867,7 +2974,7 @@
                       "content": "更新内容"
                     },
                     "ZWWO1/WyToO": {
-                      "id": "kqCe5",
+                      "id": "IDTQq",
                       "type": "ref",
                       "ref": "MTEP9",
                       "name": "Release notes disclosure"
@@ -2896,10 +3003,10 @@
                   "content": "更新已就绪"
                 },
                 "v3iwe": {
-                  "content": "重新打开后生效"
+                  "content": "重启后生效"
                 },
                 "CLm8u/qEQlb": {
-                  "content": "重新打开"
+                  "content": "重启更新"
                 }
               }
             }
@@ -2910,12 +3017,13 @@
     {
       "type": "frame",
       "id": "nknJR",
-      "x": 920,
-      "y": 2300,
+      "x": 800,
+      "y": 1896,
       "name": "about-en-light",
       "theme": {
         "mode": "light",
-        "language": "en"
+        "language": "en",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -2925,21 +3033,21 @@
         "state": "download-ready"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 316,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "ZKnZQ",
+          "id": "u5Vf8e",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 316,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorTransparent"
@@ -2954,20 +3062,14 @@
             "vENnM/namsg": {
               "content": "About",
               "fill": "$ColorAccent"
-            },
-            "T2VbQ": {
-              "content": "About"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "CtMNC",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -2993,7 +3095,7 @@
                   "fontWeight": "$FontWeightRegular"
                 },
                 {
-                  "id": "e3j70",
+                  "id": "elRBc",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -3003,7 +3105,7 @@
                       "content": "Version"
                     },
                     "kqrak/WyToO": {
-                      "id": "F7vF32",
+                      "id": "HJzaq",
                       "type": "ref",
                       "ref": "vUQhl",
                       "name": "Version and check",
@@ -3017,7 +3119,7 @@
                       "content": "What’s new"
                     },
                     "ZWWO1/WyToO": {
-                      "id": "x78Ke",
+                      "id": "pkwuI",
                       "type": "ref",
                       "ref": "MTEP9",
                       "name": "Release notes disclosure"
@@ -3046,10 +3148,10 @@
                   "content": "Update ready"
                 },
                 "v3iwe": {
-                  "content": "Reopen to apply"
+                  "content": "Applies after restart"
                 },
                 "CLm8u/qEQlb": {
-                  "content": "Reopen"
+                  "content": "Restart to update"
                 }
               }
             }
@@ -3061,11 +3163,12 @@
       "type": "frame",
       "id": "Pz9Qv",
       "x": 0,
-      "y": 2960,
+      "y": 2292,
       "name": "general-zh-CN-dark",
       "theme": {
         "mode": "dark",
-        "language": "zh-CN"
+        "language": "zh-CN",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -3075,21 +3178,21 @@
         "state": "normal"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 176,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "z48oF",
+          "id": "ctHLM",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 176,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft"
@@ -3104,20 +3207,14 @@
             "vENnM/namsg": {
               "content": "关于",
               "fill": "$ColorText"
-            },
-            "T2VbQ": {
-              "content": "通用"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "V1TumQ",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -3132,18 +3229,7 @@
               "gap": "$Space8",
               "children": [
                 {
-                  "type": "text",
-                  "id": "dWIu1",
-                  "name": "Group title",
-                  "fill": "$ColorTextSecondary",
-                  "content": "偏好设置",
-                  "lineHeight": "$LineHeightBody",
-                  "fontFamily": "$FontFamily",
-                  "fontSize": "$FontSizeCaption",
-                  "fontWeight": "$FontWeightRegular"
-                },
-                {
-                  "id": "HAMM8",
+                  "id": "fGNYo",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -3153,11 +3239,14 @@
                       "content": "语言"
                     },
                     "kqrak/WyToO": {
-                      "id": "vOdbV",
+                      "id": "T98J0",
                       "type": "ref",
                       "ref": "Hs9NC",
                       "name": "Language selector",
                       "descendants": {
+                        "RRg9B": {
+                          "content": "跟随系统"
+                        },
                         "X2e2V": {
                           "fill": "$ColorCard"
                         },
@@ -3195,12 +3284,13 @@
     {
       "type": "frame",
       "id": "G04tZ",
-      "x": 920,
-      "y": 2960,
+      "x": 800,
+      "y": 2292,
       "name": "general-en-dark",
       "theme": {
         "mode": "dark",
-        "language": "en"
+        "language": "en",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -3210,21 +3300,21 @@
         "state": "normal"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 176,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "BTlWL",
+          "id": "bbh6c",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 176,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorAccentSoft"
@@ -3239,20 +3329,14 @@
             "vENnM/namsg": {
               "content": "About",
               "fill": "$ColorText"
-            },
-            "T2VbQ": {
-              "content": "General"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "WgNKr",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -3267,18 +3351,7 @@
               "gap": "$Space8",
               "children": [
                 {
-                  "type": "text",
-                  "id": "qWiSo",
-                  "name": "Group title",
-                  "fill": "$ColorTextSecondary",
-                  "content": "Preferences",
-                  "lineHeight": "$LineHeightBody",
-                  "fontFamily": "$FontFamily",
-                  "fontSize": "$FontSizeCaption",
-                  "fontWeight": "$FontWeightRegular"
-                },
-                {
-                  "id": "XoTnm",
+                  "id": "Dh9lf",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -3288,11 +3361,14 @@
                       "content": "Language"
                     },
                     "kqrak/WyToO": {
-                      "id": "avnvh",
+                      "id": "bp9CE",
                       "type": "ref",
                       "ref": "Hs9NC",
                       "name": "Language selector",
                       "descendants": {
+                        "RRg9B": {
+                          "content": "System default"
+                        },
                         "X2e2V": {
                           "fill": "$ColorTransparent"
                         },
@@ -3331,11 +3407,12 @@
       "type": "frame",
       "id": "wUVXs",
       "x": 0,
-      "y": 3620,
+      "y": 2548,
       "name": "about-zh-CN-dark",
       "theme": {
         "mode": "dark",
-        "language": "zh-CN"
+        "language": "zh-CN",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -3345,21 +3422,21 @@
         "state": "download-ready"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 316,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "KEN1P",
+          "id": "WkTp6",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 316,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorTransparent"
@@ -3374,20 +3451,14 @@
             "vENnM/namsg": {
               "content": "关于",
               "fill": "$ColorAccent"
-            },
-            "T2VbQ": {
-              "content": "关于"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "lWqTB",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -3413,7 +3484,7 @@
                   "fontWeight": "$FontWeightRegular"
                 },
                 {
-                  "id": "Zvi8N",
+                  "id": "D1SAPc",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -3423,7 +3494,7 @@
                       "content": "版本"
                     },
                     "kqrak/WyToO": {
-                      "id": "W4llKo",
+                      "id": "lBF21",
                       "type": "ref",
                       "ref": "vUQhl",
                       "name": "Version and check",
@@ -3437,7 +3508,7 @@
                       "content": "更新内容"
                     },
                     "ZWWO1/WyToO": {
-                      "id": "cvggI",
+                      "id": "GfosL",
                       "type": "ref",
                       "ref": "MTEP9",
                       "name": "Release notes disclosure"
@@ -3466,10 +3537,10 @@
                   "content": "更新已就绪"
                 },
                 "v3iwe": {
-                  "content": "重新打开后生效"
+                  "content": "重启后生效"
                 },
                 "CLm8u/qEQlb": {
-                  "content": "重新打开"
+                  "content": "重启更新"
                 }
               }
             }
@@ -3480,12 +3551,13 @@
     {
       "type": "frame",
       "id": "H1kV1",
-      "x": 920,
-      "y": 3620,
+      "x": 800,
+      "y": 2548,
       "name": "about-en-dark",
       "theme": {
         "mode": "dark",
-        "language": "en"
+        "language": "en",
+        "accent": "blue"
       },
       "metadata": {
         "type": "sample",
@@ -3495,21 +3567,21 @@
         "state": "download-ready"
       },
       "clip": true,
-      "width": 840,
-      "height": 580,
+      "width": 720,
+      "height": 316,
       "fill": "$ColorWindow",
       "cornerRadius": "$RadiusWindow",
       "layout": "none",
       "children": [
         {
-          "id": "v8fqh",
+          "id": "zUcL4",
           "type": "ref",
           "ref": "y6tUf",
           "name": "Settings window instance",
           "x": 0,
           "y": 0,
-          "width": 840,
-          "height": 580,
+          "width": 720,
+          "height": 316,
           "descendants": {
             "ezKZw": {
               "fill": "$ColorTransparent"
@@ -3524,20 +3596,14 @@
             "vENnM/namsg": {
               "content": "About",
               "fill": "$ColorAccent"
-            },
-            "T2VbQ": {
-              "content": "About"
-            },
-            "i1QUPx": {
-              "enabled": false
             }
           }
         },
         {
           "type": "frame",
           "id": "UDbCh",
-          "x": 240,
-          "y": 84,
+          "x": 168,
+          "y": 24,
           "name": "Page content",
           "width": 528,
           "layout": "vertical",
@@ -3563,7 +3629,7 @@
                   "fontWeight": "$FontWeightRegular"
                 },
                 {
-                  "id": "qdj0V",
+                  "id": "M9hSgG",
                   "type": "ref",
                   "ref": "X6uV6",
                   "name": "Settings group card",
@@ -3573,7 +3639,7 @@
                       "content": "Version"
                     },
                     "kqrak/WyToO": {
-                      "id": "eeYkk",
+                      "id": "xJXdZ",
                       "type": "ref",
                       "ref": "vUQhl",
                       "name": "Version and check",
@@ -3587,7 +3653,7 @@
                       "content": "What’s new"
                     },
                     "ZWWO1/WyToO": {
-                      "id": "V5Ebv",
+                      "id": "JxLCo",
                       "type": "ref",
                       "ref": "MTEP9",
                       "name": "Release notes disclosure"
@@ -3616,10 +3682,1386 @@
                   "content": "Update ready"
                 },
                 "v3iwe": {
-                  "content": "Reopen to apply"
+                  "content": "Applies after restart"
                 },
                 "CLm8u/qEQlb": {
-                  "content": "Reopen"
+                  "content": "Restart to update"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "dMJHG",
+      "x": 0,
+      "y": 3736,
+      "name": "accent-comparison",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN",
+        "accent": "blue"
+      },
+      "metadata": {
+        "type": "comparison",
+        "defaultAccent": "blue",
+        "experimentalAccent": "orange",
+        "purpose": "compare only; keep default samples blue"
+      },
+      "clip": true,
+      "width": 1512,
+      "height": 540,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "VncCe",
+          "name": "Accent comparison title",
+          "fill": "$ColorText",
+          "content": "强调色对比 · 蓝色默认 / 橘色试验",
+          "lineHeight": "$LineHeightTitle",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeDisplay",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "Y4NHXq",
+          "name": "Accent comparison light",
+          "width": "fill_container",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "r4Pqqf",
+              "name": "blue light",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Dv9nv",
+                  "name": "Accent label blue light",
+                  "fill": "$ColorTextSecondary",
+                  "content": "当前蓝色 · 浅色",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "FxkAR",
+                  "name": "blue-light-comparison",
+                  "theme": {
+                    "language": "zh-CN",
+                    "mode": "light",
+                    "accent": "blue"
+                  },
+                  "metadata": {
+                    "type": "comparison-pane",
+                    "mode": "light",
+                    "accent": "blue"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "jK51h",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "cWm9F",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "oHGT3",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "bObeI",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "u24NH",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorCard"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "qAkUE",
+              "name": "orange light",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "f31WN",
+                  "name": "Accent label orange light",
+                  "fill": "$ColorTextSecondary",
+                  "content": "橘色试验 · 浅色",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "QRffF",
+                  "name": "orange-light-comparison",
+                  "theme": {
+                    "language": "zh-CN",
+                    "mode": "light",
+                    "accent": "orange"
+                  },
+                  "metadata": {
+                    "type": "comparison-pane",
+                    "mode": "light",
+                    "accent": "orange"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "L5DrSY",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Mq3un",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "qUhVw",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "p58zs",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "L3IZpm",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorCard"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "m8Glti",
+          "name": "Accent comparison dark",
+          "width": "fill_container",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "qjJq4",
+              "name": "blue dark",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "s8BWKD",
+                  "name": "Accent label blue dark",
+                  "fill": "$ColorTextSecondary",
+                  "content": "当前蓝色 · 深色",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "kLwBH",
+                  "name": "blue-dark-comparison",
+                  "theme": {
+                    "language": "zh-CN",
+                    "mode": "dark",
+                    "accent": "blue"
+                  },
+                  "metadata": {
+                    "type": "comparison-pane",
+                    "mode": "dark",
+                    "accent": "blue"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "UICC2",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "P8cAi",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zwNgd",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "NgvZK",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "uyzQC",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorCard"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "vXWf0",
+              "name": "orange dark",
+              "width": 720,
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "k7qSs",
+                  "name": "Accent label orange dark",
+                  "fill": "$ColorTextSecondary",
+                  "content": "橘色试验 · 深色",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "lUbxx",
+                  "name": "orange-dark-comparison",
+                  "theme": {
+                    "language": "zh-CN",
+                    "mode": "dark",
+                    "accent": "orange"
+                  },
+                  "metadata": {
+                    "type": "comparison-pane",
+                    "mode": "dark",
+                    "accent": "orange"
+                  },
+                  "clip": true,
+                  "width": 720,
+                  "height": 176,
+                  "fill": "$ColorWindow",
+                  "cornerRadius": "$RadiusWindow",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "id": "bMCWc",
+                      "type": "ref",
+                      "ref": "y6tUf",
+                      "name": "Settings window instance",
+                      "x": 0,
+                      "y": 0,
+                      "width": 720,
+                      "height": 176,
+                      "descendants": {
+                        "ezKZw": {
+                          "fill": "$ColorAccentSoft"
+                        },
+                        "ezKZw/namsg": {
+                          "content": "通用",
+                          "fill": "$ColorAccent"
+                        },
+                        "vENnM": {
+                          "fill": "$ColorTransparent"
+                        },
+                        "vENnM/namsg": {
+                          "content": "关于",
+                          "fill": "$ColorText"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "x9dey",
+                      "x": 168,
+                      "y": 24,
+                      "name": "Page content",
+                      "width": 528,
+                      "layout": "vertical",
+                      "gap": "$Space24",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "P0Ly6",
+                          "name": "Settings group",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": "$Space8",
+                          "children": [
+                            {
+                              "id": "J61ixV",
+                              "type": "ref",
+                              "ref": "X6uV6",
+                              "name": "Settings group card",
+                              "width": "fill_container",
+                              "descendants": {
+                                "kqrak/iJGB1": {
+                                  "content": "语言"
+                                },
+                                "kqrak/WyToO": {
+                                  "id": "sUwEr",
+                                  "type": "ref",
+                                  "ref": "Hs9NC",
+                                  "name": "Language selector",
+                                  "descendants": {
+                                    "RRg9B": {
+                                      "content": "跟随系统"
+                                    },
+                                    "X2e2V": {
+                                      "fill": "$ColorCard"
+                                    },
+                                    "pYbgH": {
+                                      "content": "简体中文"
+                                    },
+                                    "ZR7tO": {
+                                      "fill": "$ColorTransparent"
+                                    },
+                                    "ExLjG": {
+                                      "content": "English"
+                                    }
+                                  }
+                                },
+                                "ZWWO1/iJGB1": {
+                                  "content": "开机启动"
+                                },
+                                "YxJOl": {
+                                  "enabled": false
+                                },
+                                "YvjK5": {
+                                  "enabled": false
+                                },
+                                "YvjK5/iJGB1": {
+                                  "content": "自动更新"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "f9UC6",
+      "x": 0,
+      "y": 2944,
+      "name": "restart-confirmation-zh-CN-light",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN",
+        "accent": "blue"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "restart-confirmation",
+        "language": "zh-CN",
+        "mode": "light",
+        "state": "unsaved-json"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 316,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "ZIRRW",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 316,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "通用",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "关于",
+              "fill": "$ColorAccent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "JV3K9",
+          "x": 168,
+          "y": 24,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "cpIa6",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "j2nCQ",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "更新",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "j6UhoO",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "版本"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "Y4gHEs",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "更新内容"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "pmgLl",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "自动更新"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "sYyZw",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "更新已就绪"
+                },
+                "v3iwe": {
+                  "content": "重启后生效"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "重启更新"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": "$RadiusWindow",
+          "id": "T4H9tV",
+          "x": 0,
+          "y": 0,
+          "name": "Modal scrim",
+          "fill": "$ColorOverlay",
+          "width": 720,
+          "height": 316
+        },
+        {
+          "type": "frame",
+          "id": "hgzGY",
+          "x": 0,
+          "y": 0,
+          "name": "Confirmation layer",
+          "width": 720,
+          "height": 316,
+          "layout": "vertical",
+          "gap": "$Space0",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "R1PiE",
+              "type": "ref",
+              "ref": "ewQJq",
+              "name": "Unsaved JSON confirmation",
+              "descendants": {
+                "q5pB4f": {
+                  "content": "有未保存的 JSON 文档"
+                },
+                "oLqI9": {
+                  "content": "请先保存文档以保留更改，再重启更新。"
+                },
+                "wy34C/qEQlb": {
+                  "content": "取消"
+                },
+                "rVXzp/qEQlb": {
+                  "content": "返回文档"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "EdVPb",
+      "x": 800,
+      "y": 2944,
+      "name": "restart-confirmation-en-light",
+      "theme": {
+        "mode": "light",
+        "language": "en",
+        "accent": "blue"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "restart-confirmation",
+        "language": "en",
+        "mode": "light",
+        "state": "unsaved-json"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 316,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "wQoOt",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 316,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "General",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "About",
+              "fill": "$ColorAccent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "aHYpp",
+          "x": 168,
+          "y": 24,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Zbhbf",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "C9Ele",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "Updates",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "o5kSJu",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "Version"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "iMxks",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "What’s new"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "OFEru",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "Automatic updates"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Lu3vA",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "Update ready"
+                },
+                "v3iwe": {
+                  "content": "Applies after restart"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "Restart to update"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": "$RadiusWindow",
+          "id": "y8mptt",
+          "x": 0,
+          "y": 0,
+          "name": "Modal scrim",
+          "fill": "$ColorOverlay",
+          "width": 720,
+          "height": 316
+        },
+        {
+          "type": "frame",
+          "id": "AuehG",
+          "x": 0,
+          "y": 0,
+          "name": "Confirmation layer",
+          "width": 720,
+          "height": 316,
+          "layout": "vertical",
+          "gap": "$Space0",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "q0P0wI",
+              "type": "ref",
+              "ref": "ewQJq",
+              "name": "Unsaved JSON confirmation",
+              "descendants": {
+                "q5pB4f": {
+                  "content": "Unsaved JSON documents"
+                },
+                "oLqI9": {
+                  "content": "Save your documents to keep your changes, then restart to update."
+                },
+                "wy34C/qEQlb": {
+                  "content": "Cancel"
+                },
+                "rVXzp/qEQlb": {
+                  "content": "Return to documents"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "IxA8h",
+      "x": 0,
+      "y": 3340,
+      "name": "restart-confirmation-zh-CN-dark",
+      "theme": {
+        "mode": "dark",
+        "language": "zh-CN",
+        "accent": "blue"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "restart-confirmation",
+        "language": "zh-CN",
+        "mode": "dark",
+        "state": "unsaved-json"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 316,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "yqaYK",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 316,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "通用",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "关于",
+              "fill": "$ColorAccent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "ZFB59",
+          "x": 168,
+          "y": 24,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "W0kNwO",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "nNAAm",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "更新",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "W55gt",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "版本"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "RqhzU",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "更新内容"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "S5du4",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "自动更新"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "gPjSD",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "更新已就绪"
+                },
+                "v3iwe": {
+                  "content": "重启后生效"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "重启更新"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": "$RadiusWindow",
+          "id": "O4L6jq",
+          "x": 0,
+          "y": 0,
+          "name": "Modal scrim",
+          "fill": "$ColorOverlay",
+          "width": 720,
+          "height": 316
+        },
+        {
+          "type": "frame",
+          "id": "k3Cz3D",
+          "x": 0,
+          "y": 0,
+          "name": "Confirmation layer",
+          "width": 720,
+          "height": 316,
+          "layout": "vertical",
+          "gap": "$Space0",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "dF4kS",
+              "type": "ref",
+              "ref": "ewQJq",
+              "name": "Unsaved JSON confirmation",
+              "descendants": {
+                "q5pB4f": {
+                  "content": "有未保存的 JSON 文档"
+                },
+                "oLqI9": {
+                  "content": "请先保存文档以保留更改，再重启更新。"
+                },
+                "wy34C/qEQlb": {
+                  "content": "取消"
+                },
+                "rVXzp/qEQlb": {
+                  "content": "返回文档"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "M0z6f1",
+      "x": 800,
+      "y": 3340,
+      "name": "restart-confirmation-en-dark",
+      "theme": {
+        "mode": "dark",
+        "language": "en",
+        "accent": "blue"
+      },
+      "metadata": {
+        "type": "sample",
+        "page": "restart-confirmation",
+        "language": "en",
+        "mode": "dark",
+        "state": "unsaved-json"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 316,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "id": "XR97c",
+          "type": "ref",
+          "ref": "y6tUf",
+          "name": "Settings window instance",
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 316,
+          "descendants": {
+            "ezKZw": {
+              "fill": "$ColorTransparent"
+            },
+            "ezKZw/namsg": {
+              "content": "General",
+              "fill": "$ColorText"
+            },
+            "vENnM": {
+              "fill": "$ColorAccentSoft"
+            },
+            "vENnM/namsg": {
+              "content": "About",
+              "fill": "$ColorAccent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "R8a2Y",
+          "x": 168,
+          "y": 24,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "npIK4",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "i4M62",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "Updates",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "oLFet",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "Version"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "C4kji",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.1.0"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "What’s new"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "QIkPX",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "Automatic updates"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "r1HjSO",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "Update ready"
+                },
+                "v3iwe": {
+                  "content": "Applies after restart"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "Restart to update"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": "$RadiusWindow",
+          "id": "yrRpW",
+          "x": 0,
+          "y": 0,
+          "name": "Modal scrim",
+          "fill": "$ColorOverlay",
+          "width": 720,
+          "height": 316
+        },
+        {
+          "type": "frame",
+          "id": "porCW",
+          "x": 0,
+          "y": 0,
+          "name": "Confirmation layer",
+          "width": 720,
+          "height": 316,
+          "layout": "vertical",
+          "gap": "$Space0",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "M7bgRw",
+              "type": "ref",
+              "ref": "ewQJq",
+              "name": "Unsaved JSON confirmation",
+              "descendants": {
+                "q5pB4f": {
+                  "content": "Unsaved JSON documents"
+                },
+                "oLqI9": {
+                  "content": "Save your documents to keep your changes, then restart to update."
+                },
+                "wy34C/qEQlb": {
+                  "content": "Cancel"
+                },
+                "rVXzp/qEQlb": {
+                  "content": "Return to documents"
                 }
               }
             }
@@ -3636,6 +5078,10 @@
     "language": [
       "zh-CN",
       "en"
+    ],
+    "accent": [
+      "blue",
+      "orange"
     ]
   },
   "variables": {
@@ -3794,51 +5240,111 @@
     },
     "ColorAccent": {
       "type": "color",
+      "value": "$AccentFill"
+    },
+    "AccentFill": {
+      "type": "color",
       "value": [
         {
           "value": "#0068D9",
           "theme": {
-            "mode": "light"
+            "mode": "light",
+            "accent": "blue"
           }
         },
         {
           "value": "#5AA8FF",
           "theme": {
-            "mode": "dark"
+            "mode": "dark",
+            "accent": "blue"
+          }
+        },
+        {
+          "value": "#B84A00",
+          "theme": {
+            "mode": "light",
+            "accent": "orange"
+          }
+        },
+        {
+          "value": "#FF9A52",
+          "theme": {
+            "mode": "dark",
+            "accent": "orange"
           }
         }
       ]
     },
     "ColorAccentSoft": {
       "type": "color",
+      "value": "$AccentSoft"
+    },
+    "AccentSoft": {
+      "type": "color",
       "value": [
         {
           "value": "#DAE9FC",
           "theme": {
-            "mode": "light"
+            "mode": "light",
+            "accent": "blue"
           }
         },
         {
           "value": "#263E59",
           "theme": {
-            "mode": "dark"
+            "mode": "dark",
+            "accent": "blue"
+          }
+        },
+        {
+          "value": "#FFF0E2",
+          "theme": {
+            "mode": "light",
+            "accent": "orange"
+          }
+        },
+        {
+          "value": "#4E3423",
+          "theme": {
+            "mode": "dark",
+            "accent": "orange"
           }
         }
       ]
     },
     "ColorOnAccent": {
       "type": "color",
+      "value": "$AccentOnFill"
+    },
+    "AccentOnFill": {
+      "type": "color",
       "value": [
         {
           "value": "#FFFFFF",
           "theme": {
-            "mode": "light"
+            "mode": "light",
+            "accent": "blue"
           }
         },
         {
           "value": "#102640",
           "theme": {
-            "mode": "dark"
+            "mode": "dark",
+            "accent": "blue"
+          }
+        },
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "mode": "light",
+            "accent": "orange"
+          }
+        },
+        {
+          "value": "#301800",
+          "theme": {
+            "mode": "dark",
+            "accent": "orange"
           }
         }
       ]
@@ -4067,15 +5573,15 @@
     },
     "SizeSidebarWidth": {
       "type": "number",
-      "value": 168
+      "value": 144
     },
     "SizeWindowWidth": {
       "type": "number",
-      "value": 840
+      "value": 720
     },
     "SizeWindowHeight": {
       "type": "number",
-      "value": 580
+      "value": 176
     },
     "SizeContentMaxWidth": {
       "type": "number",
@@ -4401,13 +5907,13 @@
       "type": "string",
       "value": [
         {
-          "value": "重新打开后生效",
+          "value": "重启后生效",
           "theme": {
             "language": "zh-CN"
           }
         },
         {
-          "value": "Reopen to apply",
+          "value": "Applies after restart",
           "theme": {
             "language": "en"
           }
@@ -4418,13 +5924,13 @@
       "type": "string",
       "value": [
         {
-          "value": "重新打开",
+          "value": "重启更新",
           "theme": {
             "language": "zh-CN"
           }
         },
         {
-          "value": "Reopen",
+          "value": "Restart to update",
           "theme": {
             "language": "en"
           }
@@ -4435,13 +5941,13 @@
       "type": "string",
       "value": [
         {
-          "value": "关闭设置 (⌘W)",
+          "value": "关闭设置 (⌘W / Esc)",
           "theme": {
             "language": "zh-CN"
           }
         },
         {
-          "value": "Close settings (⌘W)",
+          "value": "Close settings (⌘W / Esc)",
           "theme": {
             "language": "en"
           }
@@ -4696,7 +6202,7 @@
           }
         },
         {
-          "value": "Use system setting",
+          "value": "System default",
           "theme": {
             "language": "en"
           }
@@ -4724,13 +6230,13 @@
       "type": "string",
       "value": [
         {
-          "value": "重新打开",
+          "value": "重启更新",
           "theme": {
             "language": "zh-CN"
           }
         },
         {
-          "value": "Reopen",
+          "value": "Restart to update",
           "theme": {
             "language": "en"
           }
@@ -4740,6 +6246,124 @@
     "FontFamilyCJK": {
       "type": "string",
       "value": "Noto Sans SC"
+    },
+    "ColorOverlay": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#00000033",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#00000066",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "SizeWindowMinHeight": {
+      "type": "number",
+      "value": 176
+    },
+    "SizeWindowHeightAbout": {
+      "type": "number",
+      "value": 316
+    },
+    "SizeDialogWidth": {
+      "type": "number",
+      "value": 440
+    },
+    "SizeLanguageSelectorWidth": {
+      "type": "number",
+      "value": 318
+    },
+    "CopyRestartUpdate": {
+      "type": "string",
+      "value": [
+        {
+          "value": "重启更新",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Restart to update",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyUnsavedTitle": {
+      "type": "string",
+      "value": [
+        {
+          "value": "有未保存的 JSON 文档",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Unsaved JSON documents",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyUnsavedBody": {
+      "type": "string",
+      "value": [
+        {
+          "value": "请先保存文档以保留更改，再重启更新。",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Save your documents to keep your changes, then restart to update.",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyCancel": {
+      "type": "string",
+      "value": [
+        {
+          "value": "取消",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Cancel",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "CopyReturnToDocuments": {
+      "type": "string",
+      "value": [
+        {
+          "value": "返回文档",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "Return to documents",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
     }
   },
   "fileToken": "d54ef04c-78c9-405f-bd8d-0848edd09a7a"

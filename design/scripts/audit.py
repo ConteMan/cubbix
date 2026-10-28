@@ -15,6 +15,7 @@ def audit():
     literals = {key: [] for key in ('colors', 'cornerRadius', 'fontSize', 'spacing')}
     missing = []
     components, refs, samples, placeholders = [], [], [], []
+    authored_nodes = []
 
     def leaves(value):
         if isinstance(value, list):
@@ -31,6 +32,8 @@ def audit():
             for index, child in enumerate(value):
                 walk(child, f'{path}[{index}]')
         elif isinstance(value, dict):
+            if value.get('type') in ('frame', 'ref', 'text') and value.get('name'):
+                authored_nodes.append(value)
             if value.get('reusable'):
                 components.append({'id': value['id'], 'name': value['name']})
             if value.get('type') == 'ref':
@@ -55,9 +58,26 @@ def audit():
     walk(document['children'])
     component_ids = {item['id'] for item in components}
     dangling_refs = [item for item in refs if item['ref'] not in component_ids]
-    matrix = {(s['page'], s['language'], s['mode']) for s in samples}
+    core_samples = [s for s in samples if s['page'] in ('general', 'about')]
+    prompt_samples = [s for s in samples if s['page'] == 'restart-confirmation']
+    matrix = {(s['page'], s['language'], s['mode']) for s in core_samples}
+    prompts = {(s['language'], s['mode']) for s in prompt_samples}
     expected = {(p, l, m) for p in ('general', 'about') for l in ('zh-CN', 'en') for m in ('light', 'dark')}
     token_drift = [key for key, value in tokens.items() if document['variables'].get(key) != value]
+    by_name = {node['name']: node for node in authored_nodes if node.get('reusable')}
+    segmented = by_name['Segmented control']
+    brand = by_name['Brand placeholder · 待替换为 Logo']
+    default_boards = [node for node in document['children'] if node.get('metadata', {}).get('type') == 'sample']
+    r02_checks = {
+        'noRepeatedPageHeaderOrCloseButton': not any(node['name'] in ('Page header', 'Page title', 'Close settings') for node in authored_nodes),
+        'fixedWidthAndContentHeight': all(node['width'] == 720 and node['height'] == (176 if node['metadata']['page'] == 'general' else 316) for node in default_boards),
+        'defaultSamplesRemainBlue': all(node['theme'].get('accent') == 'blue' for node in default_boards),
+        'languageOptionsInOrder': [node['name'] for node in segmented['children']] == ['System segment', 'Chinese segment', 'English segment'],
+        'defaultLanguageIsChinese': segmented['children'][1].get('fill') == '$ColorCard',
+        'brandPlaceholderMarked': brand['metadata'].get('status') == '待替换为 Logo',
+        'accentAliasesCentralized': all(tokens[key]['value'] == '$' + target for key, target in {'ColorAccent': 'AccentFill', 'ColorAccentSoft': 'AccentSoft', 'ColorOnAccent': 'AccentOnFill'}.items()),
+        'orangeComparisonExists': any(node.get('name') == 'accent-comparison' for node in document['children']),
+    }
     result = {
         'schemaVersion': 1,
         'scope': 'All authored canvas children and descendants; variable definitions excluded; geometry x/y/width/height excluded from spacing.',
@@ -74,10 +94,12 @@ def audit():
         'missingVariables': missing,
         'danglingRefs': dangling_refs,
         'tokenDrift': token_drift,
+        'r02Checks': r02_checks,
         'unfinishedPlaceholders': placeholders,
-        'completeSampleMatrix': matrix == expected and len(samples) == 8,
+        'completeSampleMatrix': matrix == expected and len(core_samples) == 8,
+        'completePromptMatrix': prompts == {(l, m) for l in ('zh-CN', 'en') for m in ('light', 'dark')} and len(prompt_samples) == 4,
     }
-    result['passed'] = not any(literals.values()) and not any((missing, dangling_refs, token_drift, placeholders)) and result['completeSampleMatrix']
+    result['passed'] = not any(literals.values()) and not any((missing, dangling_refs, token_drift, placeholders)) and result['completeSampleMatrix'] and result['completePromptMatrix'] and all(r02_checks.values())
     return result
 
 

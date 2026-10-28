@@ -1,8 +1,14 @@
 # Token 与 Go 标识符映射
 
-本轮提出 65 个样式 Token。名称使用合法的 Go 导出标识符，未来实现使用同名字段；值以 `cubbix.pen` 为设计事实源，`tokens.json` 是可审计快照。
+R02 共 73 个样式 Token。名称使用合法的 Go 导出标识符，未来实现使用同名字段；`cubbix.pen` 是设计事实源，`tokens.json` 是可审计快照。
 
-颜色使用 `mode=light/dark`，字体使用 `language=zh-CN/en`。文案事实源是 `locales/`；画布内另保留 35 个 `Copy…` 字符串变量作资源映射，实际显示文案由资源值写入实例。
+## accent 组
+
+`groups.accent` 集中维护 `AccentFill`、`AccentSoft`、`AccentOnFill`。旧语义名 `ColorAccent`、`ColorAccentSoft`、`ColorOnAccent` 只作引用别名，画布节点继续使用这些语义名。
+
+`accent=blue` 是当前默认槽，`accent=orange` 仅作对比。Logo 定色后只改该组默认槽的三个值，不改节点。每个槽都按 `mode=light/dark` 定义。
+
+## 全量映射
 
 | Token / Go 字段 | 类型 | 值 |
 | --- | --- | --- |
@@ -15,9 +21,9 @@
 | `ColorTextSecondary` | color | `mode=light: #63636B / mode=dark: #B5B5BD` |
 | `ColorTextDisabled` | color | `mode=light: #85858F / mode=dark: #92929B` |
 | `ColorSeparator` | color | `mode=light: #DEDEE3 / mode=dark: #47474D` |
-| `ColorAccent` | color | `mode=light: #0068D9 / mode=dark: #5AA8FF` |
-| `ColorAccentSoft` | color | `mode=light: #DAE9FC / mode=dark: #263E59` |
-| `ColorOnAccent` | color | `mode=light: #FFFFFF / mode=dark: #102640` |
+| `ColorAccent` | color | `$AccentFill` |
+| `ColorAccentSoft` | color | `$AccentSoft` |
+| `ColorOnAccent` | color | `$AccentOnFill` |
 | `ColorThumb` | color | `mode=light: #FFFFFF / mode=dark: #FFFFFF` |
 | `ColorSuccess` | color | `mode=light: #18733D / mode=dark: #6ED59A` |
 | `ColorDanger` | color | `mode=light: #BC3030 / mode=dark: #FF8D8D` |
@@ -54,9 +60,9 @@
 | `SizeSwitchWidth` | number | `34` |
 | `SizeSwitchHeight` | number | `20` |
 | `SizeSwitchThumb` | number | `14` |
-| `SizeSidebarWidth` | number | `168` |
-| `SizeWindowWidth` | number | `840` |
-| `SizeWindowHeight` | number | `580` |
+| `SizeSidebarWidth` | number | `144` |
+| `SizeWindowWidth` | number | `720` |
+| `SizeWindowHeight` | number | `176` |
 | `SizeContentMaxWidth` | number | `528` |
 | `SizeRowHeight` | number | `48` |
 | `SizeNavHeight` | number | `32` |
@@ -71,9 +77,19 @@
 | `FontWeightSemibold` | string | `600` |
 | `FontFamily` | string | `language=zh-CN: Noto Sans SC / language=en: Inter` |
 | `FontFamilyCJK` | string | `Noto Sans SC` |
+| `AccentFill` | color | `mode=light, accent=blue: #0068D9 / mode=dark, accent=blue: #5AA8FF / mode=light, accent=orange: #B84A00 / mode=dark, accent=orange: #FF9A52` |
+| `AccentSoft` | color | `mode=light, accent=blue: #DAE9FC / mode=dark, accent=blue: #263E59 / mode=light, accent=orange: #FFF0E2 / mode=dark, accent=orange: #4E3423` |
+| `AccentOnFill` | color | `mode=light, accent=blue: #FFFFFF / mode=dark, accent=blue: #102640 / mode=light, accent=orange: #FFFFFF / mode=dark, accent=orange: #301800` |
+| `ColorOverlay` | color | `mode=light: #00000033 / mode=dark: #00000066` |
+| `SizeWindowMinHeight` | number | `176` |
+| `SizeWindowHeightAbout` | number | `316` |
+| `SizeDialogWidth` | number | `440` |
+| `SizeLanguageSelectorWidth` | number | `318` |
 
-## 几何尺寸
+## 尺寸与文案
 
-`Size…` Token 描述几何尺寸。CLI 0.3.13 未保留 `width/height` 的变量绑定，本轮将其解析为数值尺寸；`padding/gap` 等布局间距仍使用变量。画布位置和几何尺寸不计入间距写死数，统计口径在 `scripts/audit.py` 中固定。
+固定窗口宽 720、侧栏宽 144、最大内容宽 528；最小高 176，关于页高 316。按内容与上下留白计算高度，再按 Space4 向上取整。提示框宽 440；三段语言选择宽 318。
 
-窗口 840 × 580，侧栏宽 168；右侧内容最大宽 528，并在右侧区域居中。设置行高 48。字号、字重、行高、颜色、圆角、padding 和 gap 均保留变量引用。
+`Size…` 为几何尺寸。CLI 0.3.13 不保留 width/height 的变量绑定，本轮按 Token 解析数值尺寸；padding/gap 等布局间距仍保留变量。
+
+颜色、字号、字重、行高和圆角均引用变量。语言资源包含 40 个键，画布另保留 40 个 Copy 字符串变量作映射；实际显示文案由资源值写入实例，language 主题切换字体。

@@ -1,6 +1,6 @@
 # 组件索引
 
-29 个 reusable：14 个固定版本 Lucide 图标、15 个界面组件。实例数统计包含 `children` 与 `descendants` 中的 ref；运行 `scripts/audit.py` 可重新生成清单。
+R02 共 31 个 reusable：14 个 Lucide 图标、17 个界面组件。源稿共 107 个 ref；审计包含 children 和 descendants。
 
 | 组件 | 节点 ID |
 | --- | --- |
@@ -32,8 +32,15 @@
 | Menu bar dropdown | `zh2Qo` |
 | Download ready notice | `BVbwx` |
 | Version control | `vUQhl` |
+| Brand placeholder · 待替换为 Logo | `qxNp2` |
+| Restart confirmation | `ewQJq` |
 | Settings window | `y6tUf` |
 
-状态约定：开关有开／关／不可用；分段选择有中文／英文选中态；图标按钮有常态／悬停／键盘焦点及 tooltip；状态组件有 loader／check／alert。设置行支持一行可选辅助文字，样张仅在下载完成提示中保留必要说明。
+## R02 组件变化
 
-卡片母组件有三个行槽，第三行默认隐藏；「关于」实例开启第三行。窗口实例负责外壳、导航和页标题，页面内容使用独立的普通布局框承载卡片实例，避免嵌套内容插槽在 CLI 保存时改变结构。
+- 分段选择按「跟随系统／简体中文／English」排列，母组件默认选中简体中文。
+- 设置窗口移除页头与关闭按钮；品牌引用中性文字占位组件，标注「待替换为 Logo」。
+- 新增未保存 JSON 文档的重启提示，提供取消和返回文档；不执行隐式丢弃。
+- 下载完成提示使用「重启更新」操作；恢复规则见 R02 README。
+
+开关保留开／关／不可用状态；图标按钮保留常态／悬停／键盘焦点及 tooltip；反馈使用 loader／check／alert。卡片的第三行默认隐藏，关于页开启第三行。窗口外壳和卡片使用 ref，页面内容由普通布局框承载。

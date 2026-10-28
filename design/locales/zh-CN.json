@@ -14,9 +14,9 @@
   "AutomaticUpdates": "自动更新",
   "UpdateGroup": "更新",
   "DownloadReady": "更新已就绪",
-  "DownloadHint": "重新打开后生效",
-  "Reopen": "重新打开",
-  "CloseSettings": "关闭设置 (⌘W)",
+  "DownloadHint": "重启后生效",
+  "Reopen": "重启更新",
+  "CloseSettings": "关闭设置 (⌘W / Esc)",
   "StartAwake": "开始常亮 (⌃⌥⌘K)",
   "Awake": "常亮",
   "JSON": "JSON",
@@ -33,5 +33,10 @@
   "Empty": "",
   "System": "跟随系统",
   "GeneralDescription": "选择界面语言",
-  "ButtonGeneric": "重新打开"
+  "ButtonGeneric": "重启更新",
+  "RestartUpdate": "重启更新",
+  "UnsavedTitle": "有未保存的 JSON 文档",
+  "UnsavedBody": "请先保存文档以保留更改，再重启更新。",
+  "Cancel": "取消",
+  "ReturnToDocuments": "返回文档"
 }
