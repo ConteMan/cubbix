@@ -1,0 +1,484 @@
+{
+  "files": [
+    {
+      "file": "a-box-cat/previews/color-1024.png",
+      "size": 1024,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "a-box-cat/previews/color-128.png",
+      "size": 128,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "a-box-cat/previews/color-32.png",
+      "size": 32,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "a-box-cat/previews/color-16.png",
+      "size": 16,
+      "kind": "full-bleed-color",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-light-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-light-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-light-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-light-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-light-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-light-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-dark-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-dark-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-dark-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "a-box-cat/previews/mono-dark-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-dark-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "a-box-cat/previews/template-dark-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/color-1024.png",
+      "size": 1024,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "b-side-eye/previews/color-128.png",
+      "size": 128,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "b-side-eye/previews/color-32.png",
+      "size": 32,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "b-side-eye/previews/color-16.png",
+      "size": 16,
+      "kind": "full-bleed-color",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-light-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-light-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-light-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-light-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-light-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-light-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-dark-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-dark-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-dark-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "b-side-eye/previews/mono-dark-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-dark-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "b-side-eye/previews/template-dark-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/color-1024.png",
+      "size": 1024,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/color-128.png",
+      "size": 128,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/color-32.png",
+      "size": 32,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/color-16.png",
+      "size": 16,
+      "kind": "full-bleed-color",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-light-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-light-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-light-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-light-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-light-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-light-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-dark-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-dark-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-dark-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/mono-dark-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-dark-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "c-coil-cat/previews/template-dark-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/color-1024.png",
+      "size": 1024,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/color-128.png",
+      "size": 128,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/color-32.png",
+      "size": 32,
+      "kind": "full-bleed-color",
+      "geometry": "source.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/color-16.png",
+      "size": 16,
+      "kind": "full-bleed-color",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-light-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-light-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-light-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-light-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-light-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-light-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-light-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-light-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-dark-1024.png",
+      "size": 1024,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-dark-128.png",
+      "size": 128,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-dark-32.png",
+      "size": 32,
+      "kind": "monochrome",
+      "geometry": "mono.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/mono-dark-16.png",
+      "size": 16,
+      "kind": "monochrome",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-dark-transparent-1x.png",
+      "size": 16,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-dark-context-1x.png",
+      "size": 16,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-dark-transparent-2x.png",
+      "size": 32,
+      "kind": "menu-transparent",
+      "geometry": "menu-template.svg"
+    },
+    {
+      "file": "d-sitting-cat/previews/template-dark-context-2x.png",
+      "size": 32,
+      "kind": "menu-context",
+      "geometry": "menu-template.svg"
+    }
+  ]
+}
