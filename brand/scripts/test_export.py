@@ -30,6 +30,7 @@ class ActiveExportTests(unittest.TestCase):
     def test_rejects_invalid_overlay_geometry_and_styles(self):
         mutations = [
             lambda s: s.update(width=512),
+            lambda s: s.update(fill=logo.ORANGE),
             lambda s: s.update(x=self.master['x'] + 1024),
             lambda s: s.update(rotation=15),
             lambda s: s['children'].append(copy.deepcopy(s['children'][0])),
@@ -51,6 +52,23 @@ class ActiveExportTests(unittest.TestCase):
             mutate(invalid)
             with self.subTest(mutation=index), self.assertRaises(ValueError):
                 logo.active_nodes(invalid, self.master, self.bounds)
+
+    def test_backdrops_are_white_and_clearance_fill_does_not_affect_export(self):
+        self.assertEqual(self.master['fill'], logo.CANVAS_BG)
+        self.assertEqual(self.state['fill'], logo.CANVAS_BG)
+        invalid = copy.deepcopy(self.master)
+        invalid['fill'] = logo.ORANGE
+        with self.assertRaises(ValueError):
+            logo.source_nodes(invalid)
+        original = logo.active_nodes(self.state, self.master, self.bounds)
+        expected = logo.svg_bytes(logo.template_svg(self.nodes, self.bounds, self.pupils, 1, original))
+        for color in ('#FFFFFF', '#FF9A3D', '#123456'):
+            state = copy.deepcopy(self.state)
+            next(n for n in state['children'] if n['name'] == '常亮点留白')['fill'] = color
+            with self.subTest(color=color):
+                active = logo.active_nodes(state, self.master, self.bounds)
+                actual = logo.svg_bytes(logo.template_svg(self.nodes, self.bounds, self.pupils, 1, active))
+                self.assertEqual(actual, expected)
 
     def test_vector_cutout_is_transparent_and_dot_is_solid(self):
         # A solid synthetic mark makes the eraser's effect unambiguous.

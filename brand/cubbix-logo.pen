@@ -10,7 +10,7 @@
       "clip": true,
       "width": 1024,
       "height": 1024,
-      "fill": "$logo-bg",
+      "fill": "$canvas-bg",
       "layout": "none",
       "children": [
         {
@@ -100,7 +100,7 @@
       "clip": true,
       "width": 1024,
       "height": 1024,
-      "fill": "$logo-bg",
+      "fill": "$canvas-bg",
       "layout": "none",
       "children": [
         {
@@ -134,6 +134,10 @@
     "logo-ink": {
       "type": "color",
       "value": "#202522"
+    },
+    "canvas-bg": {
+      "type": "color",
+      "value": "#FFFFFF"
     }
   },
   "fileToken": "4ae03077-02d9-4aaf-b48d-5be9bc54b399"
