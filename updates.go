@@ -204,7 +204,7 @@ func updateErrorKey(err error) string {
 		return "UpdateDisabled"
 	case errors.Is(err, context.DeadlineExceeded), errors.As(err, &network):
 		return "UpdateNetworkError"
-	case strings.Contains(err.Error(), "signature"), strings.Contains(err.Error(), "public key"):
+	case strings.Contains(err.Error(), "signature"), strings.Contains(err.Error(), "public key"), strings.Contains(err.Error(), "not signed with the app's key"):
 		return "UpdateSignatureError"
 	case strings.Contains(err.Error(), "404"):
 		return "UpdateFeedUnavailable"

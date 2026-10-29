@@ -129,7 +129,7 @@ func TestFailedInstallCannotBecomeReadyAndCanRetry(t *testing.T) {
 	u, changes := testUpdateManager(t, func(context.Context) (*updateCandidate, error) {
 		return &updateCandidate{"0.0.2", func(context.Context) error {
 			if attempts.Add(1) == 1 {
-				return errors.New("invalid update signature")
+				return errors.New("mygo: installing the update: the update is not signed with the app's key")
 			}
 			return nil
 		}}, nil
