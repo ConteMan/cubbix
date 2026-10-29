@@ -90,6 +90,40 @@
           "height": 352
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "rNNp5",
+      "x": 1144,
+      "y": 0,
+      "name": "菜单栏状态 · 常亮点",
+      "clip": true,
+      "width": 1024,
+      "height": 1024,
+      "fill": "$logo-bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "ellipse",
+          "id": "Z6eSR",
+          "x": 654,
+          "y": 724,
+          "name": "常亮点留白",
+          "fill": "$logo-bg",
+          "width": 252,
+          "height": 252
+        },
+        {
+          "type": "ellipse",
+          "id": "JCRHd",
+          "x": 704,
+          "y": 774,
+          "name": "常亮点",
+          "fill": "$logo-ink",
+          "width": 152,
+          "height": 152
+        }
+      ]
     }
   ],
   "variables": {
