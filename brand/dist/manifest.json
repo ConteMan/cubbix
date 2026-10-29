@@ -1,19 +1,26 @@
 {
-  "schema": 1,
+  "schema": 2,
   "source": {
     "file": "brand/cubbix-logo.pen",
-    "sha256": "e3b22dd28aac216405aed27b4dadf12a8ce83276199934af4284383ee200517c",
+    "sha256": "f75b2fa6384f85b07e29b7a909012726d776bc21df11a353772e65a851f46ce0",
     "artboard_id": "n0a0W",
     "node_count": 6,
     "geometry_sha256": "2d7ff25d277894d911ee810259b533f133f63d8fe9c0548d6b1b9b44161fcfa5",
     "pupil_node_ids": [
       "o6Smr",
       "A38atD"
+    ],
+    "active_artboard_id": "rNNp5",
+    "active_artboard_name": "菜单栏状态 · 常亮点",
+    "active_geometry_sha256": "f807d1b6e4bbce478233d7e9e9854ddaa3493ddc40de70bb42ecdb07f7f52b03",
+    "active_node_ids": [
+      "JCRHd",
+      "Z6eSR"
     ]
   },
   "generator": {
     "file": "brand/scripts/export.py",
-    "sha256": "1bd3d0588fbf1f111f685c19c34caa2dd147b1f196a3faf06a94e0587c68b9fa",
+    "sha256": "7b31ac8eddfe5faade84bf7c2c0fa86c1d45b8f5845e82909595bf321923a543",
     "versions": {
       "pen_cli": "0.3.12",
       "resvg": "2.6.2",
@@ -48,7 +55,16 @@
         9,
         9
       ],
-      "pupils": false
+      "pupils": false,
+      "active": {
+        "center_source": [
+          780.0,
+          850.0
+        ],
+        "dot_diameter_pt": 3.110677661300071,
+        "clearance_width_pt": 1.023249230690813,
+        "preserve_bounds": true
+      }
     }
   },
   "files": [
@@ -112,6 +128,34 @@
       "bytes": 1670
     },
     {
+      "file": "menubar-preview-active-dark.png",
+      "sha256": "2d61eec74c96e9528fdd2967a48e25ec80446ef6608df3110d832eb0912f62de",
+      "bytes": 459,
+      "width": 18,
+      "height": 18
+    },
+    {
+      "file": "menubar-preview-active-dark@2x.png",
+      "sha256": "24eb14ea5c6e8da194199f039ce6e57ae4eec19b3e646ccd7deda93f2a6e0e47",
+      "bytes": 837,
+      "width": 36,
+      "height": 36
+    },
+    {
+      "file": "menubar-preview-active-light.png",
+      "sha256": "b02147470183c6f5c16aeffa87fd2dae2f227aada4ba85ce96fb8dd8bcd1d054",
+      "bytes": 464,
+      "width": 18,
+      "height": 18
+    },
+    {
+      "file": "menubar-preview-active-light@2x.png",
+      "sha256": "1cf0404f7c3b219bd5d434c116d8c9aa496b1055ce0a463a896c09b96869064e",
+      "bytes": 875,
+      "width": 36,
+      "height": 36
+    },
+    {
       "file": "menubar-preview-dark.png",
       "sha256": "78ff98bc0fa2fae3e3d3f066aaeb60dd2744b4b9ada571b7bd991c3523606e8a",
       "bytes": 420,
@@ -136,6 +180,20 @@
       "file": "menubar-preview-light@2x.png",
       "sha256": "b0502a01169cd1773cb35e3a2252e91d48f8ff6666ee63be492dbc9585002f0e",
       "bytes": 779,
+      "width": 36,
+      "height": 36
+    },
+    {
+      "file": "menubar-template-active.png",
+      "sha256": "9e15f8a7ae11a9c07e81321b5bb60e420db859b840778ca812debf447138331b",
+      "bytes": 289,
+      "width": 18,
+      "height": 18
+    },
+    {
+      "file": "menubar-template-active@2x.png",
+      "sha256": "6250502f98ce3026f13fbf435e298dd20a22cafba923e779367f465ccd3aa0ed",
+      "bytes": 540,
       "width": 36,
       "height": 36
     },
