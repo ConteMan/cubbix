@@ -137,6 +137,55 @@ func nativeWindowChecks(a *application, dir string) error {
 		if saved.WindowWidth != 1000 || saved.WindowHeight != 600 {
 			return fmt.Errorf("resize not persisted: %+v", saved)
 		}
+
+		for _, kind := range []string{"custom", "until", "follow"} {
+			d := &awakeDialog{kind: kind, hours: "1", minutes: "30", until: "02:30"}
+			a.dialog = d
+			a.createAwakeDialogWindow(d)
+			if d.window.IsVisible() || d.window.IsFocused() {
+				return fmt.Errorf("dialog became visible or focused")
+			}
+			native := objc.ID(d.window.NativeHandle())
+			mask := objc.Send[uint](native, objc.RegisterName("styleMask"))
+			if mask&8 != 0 || objc.Send[int](native, objc.RegisterName("titleVisibility")) != 1 || !objc.Send[bool](native, objc.RegisterName("titlebarAppearsTransparent")) {
+				return fmt.Errorf("dialog has titlebar or is resizable: %s %d", kind, mask)
+			}
+			for button := 0; button < 3; button++ {
+				if !objc.Send[bool](native.Send(objc.RegisterName("standardWindowButton:"), button), objc.RegisterName("isHidden")) {
+					return fmt.Errorf("dialog system buttons visible")
+				}
+			}
+			a.closeAwakeDialog()
+			if err := checkHidden(); err != nil {
+				return err
+			}
+		}
+		data, _ := assets.ReadFile("assets/menubar-template.tiff")
+		tray, err := mygo.NewTray(mygo.TrayOptions{Icon: data, IconIsTemplate: true, Menu: a.menuForLocale("en")})
+		if err != nil {
+			return err
+		}
+		defer tray.Destroy()
+		active, _ := assets.ReadFile("assets/menubar-template-active.tiff")
+		if err := tray.SetIcon(active, true); err != nil {
+			return err
+		}
+		tray.SetMenu(a.menuForLocale("zh-CN"))
+		if err := tray.SetIcon(data, true); err != nil {
+			return err
+		}
+		const shortcut = "Ctrl+Alt+Cmd+Shift+F10"
+		if err := mygo.GlobalShortcut.Register(shortcut, func() {}); err != nil {
+			return fmt.Errorf("native global shortcut registration: %w", err)
+		}
+		if !mygo.GlobalShortcut.IsRegistered(shortcut) {
+			return fmt.Errorf("global shortcut not registered")
+		}
+		mygo.GlobalShortcut.Unregister(shortcut)
+		if mygo.GlobalShortcut.IsRegistered(shortcut) {
+			return fmt.Errorf("global shortcut not released")
+		}
+		fmt.Println("PASS: three hidden frameless dialogs; native template icon swapping and translated tray menus; global shortcut registered and released")
 		a.window.Close()
 		return policy(1)
 	}); err != nil {

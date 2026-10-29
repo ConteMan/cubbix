@@ -41,7 +41,7 @@ func TestSettingsNavigationAndLocale(t *testing.T) {
 	}
 	defer app.updates.close()
 	app.updates.check = func(ctx context.Context) (*updateCandidate, error) { <-ctx.Done(); return nil, ctx.Err() }
-	tester := ui.NewTester(app.view, 720, 176)
+	tester := ui.NewTester(app.view, 720, 340)
 	tester.SetLocale("zh-CN")
 	if !tester.HasText("语言") {
 		t.Fatalf("missing general page: %v", tester.Texts())
@@ -94,10 +94,10 @@ func TestReadyUIRequiresExplicitRestart(t *testing.T) {
 		t.Fatalf("explicit restart count = %d", restarts)
 	}
 	menu := app.menuForLocale("en")
-	if len(menu.Items()) != 3 || menu.Items()[1].Label != app.text("en", "MenuRestartUpdate") {
+	if menu.ItemByID("restart-update") == nil || menu.ItemByID("restart-update").Label != app.text("en", "MenuRestartUpdate") {
 		t.Fatalf("ready menu: %#v", menu.Items())
 	}
-	menu.Items()[1].Click(nil, nil)
+	menu.ItemByID("restart-update").Click(nil, nil)
 	if restarts != 3 {
 		t.Fatal("tray restart did not run")
 	}
@@ -136,7 +136,7 @@ func TestLanguageAndPreferencesPersist(t *testing.T) {
 	}
 	var selectedLocale string
 	app.setLocale = func(locale string) { selectedLocale = locale }
-	tester := ui.NewTester(app.view, 720, 176)
+	tester := ui.NewTester(app.view, 720, 340)
 	tester.SetLocale("zh-CN")
 	if err := tester.Click("English"); err != nil {
 		t.Fatal(err)
@@ -177,7 +177,7 @@ func TestPreview(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tester := ui.NewTester(app.view, 720, 176)
+	tester := ui.NewTester(app.view, 720, 340)
 	tester.SetLocale("zh-CN")
 	file, err := os.Create(path)
 	if err != nil {

@@ -14,8 +14,18 @@ func (a *application) changeAutomaticUpdates() {
 
 func (a *application) restartUpdate() {
 	if a.updates.snapshot().Phase == updateReady && a.relaunch != nil {
-		// M0 has no documents or awake sessions. Future tiles must register
-		// quit guards and persist their sessions before Relaunch is allowed.
+		s := a.awake.snapshot()
+		a.config.RestoreAwake = s.Active
+		a.config.AwakeSession = nil
+		if s.Active {
+			copy := s.Session
+			a.config.AwakeSession = &copy
+		}
+		if err := saveConfig(a.path, a.config); err != nil {
+			a.settingsError = "ConfigError"
+			a.invalidateWindow()
+			return
+		}
 		a.relaunch()
 	}
 }

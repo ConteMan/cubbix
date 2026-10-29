@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -16,26 +17,37 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-//go:embed design/locales/*.json assets/menubar-template.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
+//go:embed design/locales/*.json assets/*.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
 var assets embed.FS
 
 const appVersion = "0.0.3"
 
 type application struct {
-	config        Config
-	path          string
-	catalog       *i18n.Catalog
-	window        *mygo.Window
-	tray          *mygo.Tray
-	page          int
-	language      int
-	updates       *updateManager
-	notesPage     bool
-	relaunch      func()
-	settingsError string
-	quitting      bool
-	setLogin      func(bool) error
-	setLocale     func(string)
+	registerShortcut       func(string, func()) error
+	shortcutSuspended      bool
+	refreshApplicationMenu func()
+	unregisterShortcut     func(string)
+	awake                  *awakeController
+	dialog                 *awakeDialog
+	shortcutRecording      bool
+	shortcutDraft          string
+	shortcutError          string
+	stopAwakeServices      context.CancelFunc
+	notifyBattery          func(string, string)
+	config                 Config
+	path                   string
+	catalog                *i18n.Catalog
+	window                 *mygo.Window
+	tray                   *mygo.Tray
+	page                   int
+	language               int
+	updates                *updateManager
+	notesPage              bool
+	relaunch               func()
+	settingsError          string
+	quitting               bool
+	setLogin               func(bool) error
+	setLocale              func(string)
 }
 
 func newApplication(path string) (*application, error) {
@@ -51,7 +63,7 @@ func newApplication(path string) (*application, error) {
 	if err != nil {
 		return nil, err
 	}
-	a := &application{config: config, path: path, catalog: catalog}
+	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister}
 	a.updates = newUpdateManager(checkMyGoUpdate, newReleaseNotesClient(appVersion).load, nil)
 	for index, language := range []string{"system", "zh-CN", "en"} {
 		if config.Language == language {
@@ -156,6 +168,7 @@ func (a *application) visibility(visible bool) {
 }
 
 func (a *application) hide() {
+	a.cancelShortcutRecording()
 	if a.window == nil {
 		return
 	}
@@ -165,6 +178,11 @@ func (a *application) hide() {
 }
 
 func (a *application) escape() {
+	if a.shortcutRecording {
+		a.cancelShortcutRecording()
+		a.invalidateWindow()
+		return
+	}
 	if a.notesPage {
 		a.backNotes()
 		return
@@ -177,11 +195,11 @@ func (a *application) menu() *mygo.Menu {
 }
 
 func (a *application) menuForLocale(locale string) *mygo.Menu {
-	items := []*mygo.MenuItem{
+	items := append(a.awakeMenu(locale), []*mygo.MenuItem{
 		{Label: a.text(locale, "MenuSettings"), Accelerator: "Cmd+,", Click: func(*mygo.MenuItem, *mygo.Window) { a.show() }},
-	}
+	}...)
 	if a.updates.snapshot().Phase == updateReady {
-		items = append(items, &mygo.MenuItem{Label: a.text(locale, "MenuRestartUpdate"), Click: func(*mygo.MenuItem, *mygo.Window) { a.restartUpdate() }})
+		items = append(items, &mygo.MenuItem{ID: "restart-update", Label: a.text(locale, "MenuRestartUpdate"), Click: func(*mygo.MenuItem, *mygo.Window) { a.restartUpdate() }})
 	}
 	items = append(items, &mygo.MenuItem{Label: a.text(locale, "Quit"), Accelerator: "Cmd+Q", Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }})
 	return mygo.NewMenu(items)
@@ -198,6 +216,9 @@ func (a *application) show() {
 
 func (a *application) applicationMenu(locale string) *mygo.Menu {
 	text := func(key string) string { return a.text(locale, key) }
+	if a.shortcutRecording {
+		return mygo.NewMenu([]*mygo.MenuItem{{Label: "Cubbix", Submenu: []*mygo.MenuItem{{Label: text("R05Recording"), Disabled: true}}}})
+	}
 	return mygo.NewMenu([]*mygo.MenuItem{
 		{Label: "Cubbix", Submenu: []*mygo.MenuItem{
 			{Label: text("MenuAbout"), Click: func(*mygo.MenuItem, *mygo.Window) { a.page = 1; a.notesPage = false; a.invalidateWindow(); a.show() }},
@@ -223,7 +244,7 @@ func (a *application) createSettingsWindow() {
 	minWidth, minHeight := settingsMinimumSize()
 	a.window = mygo.NewWindow(mygo.WindowOptions{Title: "Cubbix", Width: width, Height: height, MinWidth: minWidth, MinHeight: minHeight, Hidden: true, TitleBarStyle: mygo.TitleBarHidden, TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space12)}, DisableMinimize: true, DisableMaximize: true, DisableFullScreen: true, Content: ui.View(a.view)})
 	a.window.OnShow(func() { a.visibility(true) })
-	a.window.OnHide(func() { a.visibility(false) })
+	a.window.OnHide(func() { a.cancelShortcutRecording(); a.visibility(false) })
 	a.window.OnClosed(func() { a.visibility(false) })
 	a.window.OnResize(a.rememberWindowSize)
 
@@ -240,6 +261,7 @@ func (a *application) ready() {
 	a.setLocale = mygo.App.SetLocale
 	a.setLogin = mygo.App.SetOpenAtLogin
 	a.relaunch = mygo.App.Relaunch
+	a.refreshApplicationMenu = func() { mygo.App.SetMenu(a.applicationMenu(mygo.App.Locale())) }
 	a.updates.notes = newReleaseNotesClient(runningVersion()).load
 	if os.Getenv("CUBBIX_QA") != "" {
 		if os.Getenv("MYGO_LOCALE") == "en" {
@@ -271,7 +293,7 @@ func (a *application) ready() {
 		log.Fatal(err)
 	}
 	mygo.App.OnLocaleChanged(func(locale string) {
-		a.tray.SetMenu(a.menu())
+		a.refreshAwake()
 		mygo.App.SetMenu(a.applicationMenu(locale))
 		a.window.Invalidate()
 	})
@@ -284,7 +306,16 @@ func (a *application) ready() {
 			a.tray.SetMenu(a.menu())
 		})
 	}
-	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { a.quitting = true; a.updates.close() })
+	a.startAwakeServices()
+	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) {
+		a.quitting = true
+		if a.stopAwakeServices != nil {
+			a.stopAwakeServices()
+		}
+		a.awake.stop()
+		mygo.GlobalShortcut.UnregisterAll()
+		a.updates.close()
+	})
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.tray.Destroy() })
 	if os.Getenv("CUBBIX_QA") == "" || !a.qaUpdateState() {
 		a.updates.start(a.config.AutomaticUpdates, updateInterval)
@@ -360,9 +391,13 @@ func (a *application) view(c *ui.Context) {
 	locale, t := applyTheme(c)
 	update := a.updates.snapshot()
 	text := func(key string) string { return a.text(locale, key) }
-	c.OnShortcut(ui.Cmd, ui.KeyW, a.hide)
+	if !a.shortcutRecording {
+		c.OnShortcut(ui.Cmd, ui.KeyW, a.hide)
+	}
 	c.OnShortcut(0, ui.KeyEscape, a.escape)
-	c.OnShortcut(ui.Cmd, ui.KeyQ, func() { mygo.App.Quit() })
+	if !a.shortcutRecording {
+		c.OnShortcut(ui.Cmd, ui.KeyQ, func() { mygo.App.Quit() })
+	}
 	ui.Row(c).Fill().Background(ui.Hex(t.ColorWindow)).Children(func() {
 		ui.Column(c).Width(t.SizeSidebarWidth).FillHeight().Padding(t.Space12).Gap(t.Space16).Background(ui.Hex(t.ColorSidebar)).DragWindow().Children(func() {
 			ui.Box(c).Height(t.Space24)
@@ -371,7 +406,9 @@ func (a *application) view(c *ui.Context) {
 				ui.Text(c, "Cubbix").FontSize(t.FontSizeBody).Bold()
 			})
 			ui.Column(c).FillWidth().Gap(t.Space4).Children(func() {
-				for index, item := range []struct{ key, glyph string }{{"General", "settings-2"}, {"About", "info"}} {
+				for _, navIndex := range []int{0, 2, 3, 1} {
+					item := []struct{ key, glyph string }{{"General", "settings-2"}, {"About", "info"}, {"R05Tiles", "blocks"}, {"R05Shortcuts", "keyboard"}}[navIndex]
+					index := navIndex
 					selected := index == a.page
 					background := ui.Hex(t.ColorTransparent)
 					if selected {
@@ -382,6 +419,7 @@ func (a *application) view(c *ui.Context) {
 						background = ui.Hex(t.ColorNavHover)
 					}
 					button.Background(background).OnClick(func() {
+						a.cancelShortcutRecording()
 						a.page, a.notesPage = index, false
 						a.invalidateWindow()
 					}).Children(func() {
@@ -403,7 +441,9 @@ func (a *application) view(c *ui.Context) {
 					ui.Text(c, text("UpdateGroup")).Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
 				}
 				ui.Column(c).FillWidth().PaddingX(t.Space16).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
-					if a.page == 0 {
+					if a.page >= 2 {
+						a.awakeSettings(c, t, locale)
+					} else if a.page == 0 {
 						a.row(c, t, text("Language"), func() {
 							parts := ui.SegmentedBase(c.Key("language"), &a.language, 3)
 							parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("Language")).OnChange(a.changeLanguage).Children(func() {
@@ -446,8 +486,12 @@ func (a *application) view(c *ui.Context) {
 					ui.Box(c).Height(t.Space8)
 					a.readyCard(c, t, text)
 				}
-				if a.settingsError != "" {
-					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(a.settingsError))
+				errorKey := a.settingsError
+				if errorKey == "" {
+					errorKey = a.awake.snapshot().Error
+				}
+				if errorKey != "" {
+					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(errorKey))
 				}
 			})
 		})
