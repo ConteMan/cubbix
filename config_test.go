@@ -65,3 +65,26 @@ func TestConfigRejectsMissingVersion(t *testing.T) {
 		t.Fatal("expected missing version error")
 	}
 }
+
+func TestWindowSizePersistsAndOldConfigStillLoads(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.toml")
+	if err := os.WriteFile(path, []byte("version=1\nlanguage='zh-CN'\nautomatic_updates=false\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	c, err := loadConfig(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, h := settingsSize(c.WindowWidth, c.WindowHeight)
+	if w != 720 || h != 340 || c.AutomaticUpdates {
+		t.Fatalf("old config: %+v", c)
+	}
+	c.WindowWidth, c.WindowHeight = 1000, 600
+	if err := saveConfig(path, c); err != nil {
+		t.Fatal(err)
+	}
+	got, err := loadConfig(path)
+	if err != nil || got != c {
+		t.Fatalf("saved window size: %+v %v", got, err)
+	}
+}

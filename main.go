@@ -19,7 +19,7 @@ import (
 //go:embed design/locales/*.json assets/menubar-template.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
 var assets embed.FS
 
-const appVersion = "0.0.2"
+const appVersion = "0.0.3"
 
 type application struct {
 	config        Config
@@ -30,7 +30,7 @@ type application struct {
 	page          int
 	language      int
 	updates       *updateManager
-	notesWindow   *mygo.Window
+	notesPage     bool
 	relaunch      func()
 	settingsError string
 	quitting      bool
@@ -70,7 +70,7 @@ func (a *application) save() {
 	} else {
 		a.settingsError = ""
 	}
-	a.resizeWindow()
+	a.invalidateWindow()
 }
 
 func (a *application) changeLanguage() {
@@ -96,7 +96,7 @@ func (a *application) changeLogin() {
 			}
 			a.config.OpenAtLogin = !a.config.OpenAtLogin
 			a.settingsError = "LoginError"
-			a.resizeWindow()
+			a.invalidateWindow()
 			log.Print(err)
 			return
 		}
@@ -116,15 +116,60 @@ func settingsHeight(t tokenValues, page int, hasError bool) int {
 	return int(math.Ceil(float64(height/t.Space4)) * float64(t.Space4))
 }
 
-func (a *application) resizeWindow() {
+// The ready card and a settings error are the tallest non-scrolling page.
+func settingsMinimumSize() (int, int) {
+	t := tokens(false, "zh-CN")
+	return int(t.SizeWindowWidth), settingsHeight(t, 1, true) + int(2*t.Space24+t.SizeRowHeight)
+}
+
+func settingsSize(width, height int) (int, int) {
+	minWidth, minHeight := settingsMinimumSize()
+	return max(minWidth, width), max(minHeight, height)
+}
+
+func (a *application) invalidateWindow() {
 	if a.window != nil {
-		t := tokens(false, "zh-CN")
-		height := settingsHeight(t, a.page, a.settingsError != "")
-		if a.page == 1 && a.updates.snapshot().Phase == updateReady {
-			height += int(t.Space24 + t.SizeRowHeight + t.Space24)
-		}
-		a.window.SetSize(int(t.SizeWindowWidth), height)
+		// Page changes invalidate content without replacing the user's chosen size.
+		a.window.Invalidate()
 	}
+}
+
+func (a *application) rememberWindowSize() {
+	if a.window == nil {
+		return
+	}
+	width, height := a.window.Size()
+	width, height = settingsSize(width, height)
+	if a.config.WindowWidth == width && a.config.WindowHeight == height {
+		return
+	}
+	a.config.WindowWidth, a.config.WindowHeight = width, height
+	a.save()
+}
+
+func (a *application) visibility(visible bool) {
+	policy := mygo.ActivationPolicyAccessory
+	if visible {
+		policy = mygo.ActivationPolicyRegular
+	}
+	mygo.App.SetActivationPolicy(policy)
+}
+
+func (a *application) hide() {
+	if a.window == nil {
+		return
+	}
+	a.rememberWindowSize()
+	a.window.Hide()
+	a.visibility(false)
+}
+
+func (a *application) escape() {
+	if a.notesPage {
+		a.backNotes()
+		return
+	}
+	a.hide()
 }
 
 func (a *application) menu() *mygo.Menu {
@@ -142,7 +187,53 @@ func (a *application) menuForLocale(locale string) *mygo.Menu {
 	return mygo.NewMenu(items)
 }
 
-func (a *application) show() { a.window.Show(); a.window.Focus() }
+func (a *application) show() {
+	if a.window == nil {
+		return
+	}
+	a.visibility(true)
+	a.window.Show()
+	a.window.Focus()
+}
+
+func (a *application) applicationMenu(locale string) *mygo.Menu {
+	text := func(key string) string { return a.text(locale, key) }
+	return mygo.NewMenu([]*mygo.MenuItem{
+		{Label: "Cubbix", Submenu: []*mygo.MenuItem{
+			{Label: text("MenuAbout"), Click: func(*mygo.MenuItem, *mygo.Window) { a.page = 1; a.notesPage = false; a.invalidateWindow(); a.show() }},
+			{Label: text("MenuSettings"), Accelerator: "Cmd+,", Click: func(*mygo.MenuItem, *mygo.Window) { a.show() }},
+			mygo.Separator(),
+			{Label: text("Quit"), Role: mygo.RoleQuit, Accelerator: "Cmd+Q"},
+		}},
+		{Label: text("MenuEdit"), Submenu: []*mygo.MenuItem{
+			{Label: text("MenuUndo"), Role: mygo.RoleUndo},
+			{Label: text("MenuRedo"), Role: mygo.RoleRedo},
+			mygo.Separator(),
+			{Label: text("MenuCut"), Role: mygo.RoleCut},
+			{Label: text("MenuCopy"), Role: mygo.RoleCopy},
+			{Label: text("MenuPaste"), Role: mygo.RolePaste},
+			{Label: text("MenuSelectAll"), Role: mygo.RoleSelectAll},
+		}},
+	})
+}
+
+func (a *application) createSettingsWindow() {
+	t := tokens(false, "zh-CN")
+	width, height := settingsSize(a.config.WindowWidth, a.config.WindowHeight)
+	minWidth, minHeight := settingsMinimumSize()
+	a.window = mygo.NewWindow(mygo.WindowOptions{Title: "Cubbix", Width: width, Height: height, MinWidth: minWidth, MinHeight: minHeight, Hidden: true, TitleBarStyle: mygo.TitleBarHidden, TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space12)}, DisableMinimize: true, DisableMaximize: true, DisableFullScreen: true, Content: ui.View(a.view)})
+	a.window.OnShow(func() { a.visibility(true) })
+	a.window.OnHide(func() { a.visibility(false) })
+	a.window.OnClosed(func() { a.visibility(false) })
+	a.window.OnResize(a.rememberWindowSize)
+
+	a.window.OnClose(func(event *mygo.CloseEvent) {
+		if !a.quitting {
+			event.PreventDefault()
+			a.hide()
+		}
+	})
+}
 
 func (a *application) ready() {
 	mygo.App.SetLanguages("zh-CN", "en")
@@ -164,12 +255,11 @@ func (a *application) ready() {
 	}
 	a.changeLanguage()
 	a.config.OpenAtLogin = mygo.App.OpenAtLogin()
-	t := tokens(false, "zh-CN")
-	a.window = mygo.NewWindow(mygo.WindowOptions{Title: "Cubbix", Width: int(t.SizeWindowWidth), Height: int(t.SizeWindowHeight), Hidden: true, Frameless: true, DisableResize: true, DisableMinimize: true, DisableMaximize: true, DisableFullScreen: true, Content: ui.View(a.view)})
-	a.window.OnClose(func(event *mygo.CloseEvent) {
-		if !a.quitting {
-			event.PreventDefault()
-			a.window.Hide()
+	a.createSettingsWindow()
+	mygo.App.SetMenu(a.applicationMenu(mygo.App.Locale()))
+	mygo.App.OnActivate(func(visible bool) {
+		if !visible {
+			a.show()
 		}
 	})
 	icon, err := assets.ReadFile("assets/menubar-template.tiff")
@@ -182,22 +272,16 @@ func (a *application) ready() {
 	}
 	mygo.App.OnLocaleChanged(func(locale string) {
 		a.tray.SetMenu(a.menu())
-		if a.notesWindow != nil {
-			a.notesWindow.SetTitle(a.text(locale, "WhatsNew"))
-			a.notesWindow.Invalidate()
-		}
+		mygo.App.SetMenu(a.applicationMenu(locale))
+		a.window.Invalidate()
 	})
 	a.updates.changed = func() {
 		mygo.RunOnMain(func() {
 			if a.quitting {
 				return
 			}
-			a.resizeWindow()
-			a.window.Invalidate()
+			a.invalidateWindow()
 			a.tray.SetMenu(a.menu())
-			if a.notesWindow != nil {
-				a.notesWindow.Invalidate()
-			}
 		})
 	}
 	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { a.quitting = true; a.updates.close() })
@@ -206,9 +290,12 @@ func (a *application) ready() {
 		a.updates.start(a.config.AutomaticUpdates, updateInterval)
 	}
 	if os.Getenv("CUBBIX_QA") != "" {
+		if os.Getenv("CUBBIX_QA_PAGE") == "notes" {
+			a.page, a.notesPage = 1, true
+		}
 		if os.Getenv("CUBBIX_QA_PAGE") == "about" {
 			a.page = 1
-			a.resizeWindow()
+			a.invalidateWindow()
 		}
 		log.Printf("status item window: %+v", a.tray.Bounds())
 		a.window.ShowInactive()
@@ -273,19 +360,12 @@ func (a *application) view(c *ui.Context) {
 	locale, t := applyTheme(c)
 	update := a.updates.snapshot()
 	text := func(key string) string { return a.text(locale, key) }
-	c.OnShortcut(ui.Cmd, ui.KeyW, func() {
-		if a.window != nil {
-			a.window.Hide()
-		}
-	})
-	c.OnShortcut(0, ui.KeyEscape, func() {
-		if a.window != nil {
-			a.window.Hide()
-		}
-	})
+	c.OnShortcut(ui.Cmd, ui.KeyW, a.hide)
+	c.OnShortcut(0, ui.KeyEscape, a.escape)
 	c.OnShortcut(ui.Cmd, ui.KeyQ, func() { mygo.App.Quit() })
 	ui.Row(c).Fill().Background(ui.Hex(t.ColorWindow)).Children(func() {
 		ui.Column(c).Width(t.SizeSidebarWidth).FillHeight().Padding(t.Space12).Gap(t.Space16).Background(ui.Hex(t.ColorSidebar)).DragWindow().Children(func() {
+			ui.Box(c).Height(t.Space24)
 			ui.Row(c).Height(t.SizeRowHeight).AlignItems(ui.Center).PaddingX(t.Space8).Gap(t.Space8).Children(func() {
 				ui.Icon(c, brand(t.ColorText)).Size(t.SizeBrandMark, t.SizeBrandMark).TextColor(ui.Hex(t.ColorText))
 				ui.Text(c, "Cubbix").FontSize(t.FontSizeBody).Bold()
@@ -302,8 +382,8 @@ func (a *application) view(c *ui.Context) {
 						background = ui.Hex(t.ColorNavHover)
 					}
 					button.Background(background).OnClick(func() {
-						a.page = index
-						a.resizeWindow()
+						a.page, a.notesPage = index, false
+						a.invalidateWindow()
 					}).Children(func() {
 						ui.Row(c).Fill().AlignItems(ui.Center).PaddingX(t.Space8).Gap(t.Space8).Children(func() {
 							ui.Icon(c, icon(item.glyph)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
@@ -313,58 +393,74 @@ func (a *application) view(c *ui.Context) {
 				}
 			})
 		})
-		ui.Column(c).Grow(1).FillHeight().Padding(t.Space24).Gap(t.Space8).DragWindow().Children(func() {
-			if a.page == 1 {
-				ui.Text(c, text("UpdateGroup")).Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
-			}
-			ui.Column(c).FillWidth().PaddingX(t.Space16).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
-				if a.page == 0 {
-					a.row(c, t, text("Language"), func() {
-						parts := ui.SegmentedBase(c.Key("language"), &a.language, 3)
-						parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("Language")).OnChange(a.changeLanguage).Children(func() {
-							for index, label := range []string{text("System"), text("Chinese"), text("English")} {
-								color, background := t.ColorText, t.ColorTransparent
-								if index == a.language {
-									color, background = t.ColorOnAccent, t.ColorAccent
+		ui.Column(c).Grow(1).FillHeight().Padding(t.Space24).AlignItems(ui.Center).DragWindow().Children(func() {
+			ui.Column(c).FillWidth().MaxWidth(t.SizeContentMaxWidth).FillHeight().Gap(t.Space8).Children(func() {
+				if a.notesPage {
+					a.notesView(c)
+					return
+				}
+				if a.page == 1 {
+					ui.Text(c, text("UpdateGroup")).Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
+				}
+				ui.Column(c).FillWidth().PaddingX(t.Space16).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
+					if a.page == 0 {
+						a.row(c, t, text("Language"), func() {
+							parts := ui.SegmentedBase(c.Key("language"), &a.language, 3)
+							parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("Language")).OnChange(a.changeLanguage).Children(func() {
+								for index, label := range []string{text("System"), text("Chinese"), text("English")} {
+									color, background := t.ColorText, t.ColorTransparent
+									if index == a.language {
+										color, background = t.ColorOnAccent, t.ColorAccent
+									}
+									parts.Segment(index).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(background)).FocusRing(true).Children(func() { ui.Text(c, label).FontSize(t.FontSizeBody).TextColor(ui.Hex(color)) })
 								}
-								parts.Segment(index).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(background)).FocusRing(true).Children(func() { ui.Text(c, label).FontSize(t.FontSizeBody).TextColor(ui.Hex(color)) })
-							}
+							})
 						})
-					})
-					ui.Divider(c)
-					a.row(c, t, text("LaunchAtLogin"), func() { a.switchControl(c, t, "login", text("LaunchAtLogin"), &a.config.OpenAtLogin, a.changeLogin) })
-				} else {
-					a.row(c, t, text("Version"), func() {
-						ui.Text(c, version()).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
-						ui.ButtonBase(c.Key("check")).Size(t.SizeIconButton, t.SizeIconButton).Disabled(update.Phase == updateChecking || update.Phase == updateDownloading || update.Phase == updateReady).Label(text("CheckAction")).Tooltip(text("CheckAction")).OnClick(func() { a.updates.request(true) }).Children(func() {
-							ui.Icon(c, icon("refresh-cw")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
+						ui.Divider(c)
+						a.row(c, t, text("LaunchAtLogin"), func() { a.switchControl(c, t, "login", text("LaunchAtLogin"), &a.config.OpenAtLogin, a.changeLogin) })
+					} else {
+						a.row(c, t, text("Version"), func() {
+							ui.Text(c, version()).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
+							ui.ButtonBase(c.Key("check")).Size(t.SizeIconButton, t.SizeIconButton).Disabled(update.Phase == updateChecking || update.Phase == updateDownloading || update.Phase == updateReady).Label(text("CheckAction")).Tooltip(text("CheckAction")).OnClick(func() { a.updates.request(true) }).Children(func() {
+								ui.Icon(c, icon("refresh-cw")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
+							})
+							a.updateIndicator(c, t, update, text)
 						})
-						a.updateIndicator(c, t, update, text)
-					})
-					ui.Divider(c)
-					a.row(c, t, text("WhatsNew"), func() {
-						ui.ButtonBase(c.Key("notes")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("WhatsNew")).Tooltip(text("WhatsNew")).OnClick(a.showNotes).Children(func() {
-							ui.Icon(c, icon("chevron-right")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
+						ui.Divider(c)
+						ui.ButtonBase(c.Key("notes")).FillWidth().Height(t.SizeRowHeight).FocusRing(true).OnClick(a.showNotes).Children(func() {
+							ui.Row(c).Fill().AlignItems(ui.Center).Gap(t.Space8).Children(func() {
+								ui.Text(c, text("WhatsNew")).FontSize(t.FontSizeBody).Grow(1)
+								ui.Icon(c, icon("chevron-right")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).Tooltip(text("WhatsNew"))
+								if update.NotesError != "" {
+									ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(update.NotesError))
+								}
+							})
 						})
-						if update.NotesError != "" {
-							ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(update.NotesError))
-						}
-					})
-					ui.Divider(c)
-					a.row(c, t, text("AutomaticUpdates"), func() {
-						a.switchControl(c, t, "auto", text("AutomaticUpdates"), &a.config.AutomaticUpdates, a.changeAutomaticUpdates)
-					})
+						ui.Divider(c)
+						a.row(c, t, text("AutomaticUpdates"), func() {
+							a.switchControl(c, t, "auto", text("AutomaticUpdates"), &a.config.AutomaticUpdates, a.changeAutomaticUpdates)
+						})
+					}
+				})
+				if a.page == 1 && update.Phase == updateReady {
+					ui.Box(c).Height(t.Space8)
+					a.readyCard(c, t, text)
+				}
+				if a.settingsError != "" {
+					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(a.settingsError))
 				}
 			})
-			if a.page == 1 && update.Phase == updateReady {
-				ui.Box(c).Height(t.Space8)
-				a.readyCard(c, t, text)
-			}
-			if a.settingsError != "" {
-				ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(a.settingsError))
-			}
 		})
 	})
+	// The subpage owns Esc even while a tooltip is visible. Register last so
+	// its handler takes precedence over the tooltip's dismiss shortcut.
+	if a.notesPage {
+		ui.Overlay(c, func() {
+			if ui.Box(c.Key("notes-escape")).Size(0, 0).PassThrough().OverlayShortcut(0, ui.KeyEscape) {
+				a.backNotes()
+			}
+		})
+	}
 }
 
 func (a *application) switchControl(c *ui.Context, t tokenValues, key, label string, value *bool, changed func()) {

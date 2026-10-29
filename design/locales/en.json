@@ -110,6 +110,14 @@
   "UpdateFailed": "Could not complete the update. Check that the install location is writable and try again.",
   "UpdateDownloading": "Downloading and verifying the update",
   "NotesLoading": "Loading release notes",
-  "NotesNoNewer": "No release notes since this version",
-  "CloseNotes": "Close release notes (⌘W / Esc)"
+  "BackNotes": "Back (Esc)",
+  "CurrentVersion": "Current",
+  "MenuAbout": "About Cubbix",
+  "MenuEdit": "Edit",
+  "MenuUndo": "Undo",
+  "MenuRedo": "Redo",
+  "MenuCut": "Cut",
+  "MenuCopy": "Copy",
+  "MenuPaste": "Paste",
+  "MenuSelectAll": "Select All"
 }

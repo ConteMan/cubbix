@@ -1,0 +1,9 @@
+./scripts/selftest.sh: PASS (exit 0)
+CGO_ENABLED=0; Go 1.27.1; MyGo v0.6.2
+PASS: gofmt, generated tokens, canvas layout (minimum gap 85; required 80)
+PASS: menu bar asset comparison, go vet ./..., go test ./...
+PASS: background AppKit constraints (hidden window; no focus or activation)
+PASS: darwin/arm64 Cubbix 0.0.3 build, ad hoc signing
+No DMG, notarization, upload, merge or release was performed.
+UI images: ui.Tester in-memory renders of application.view at 2×.
+Native screenshots omitted to preserve the foreground app and Space.

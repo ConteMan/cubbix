@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/markdown"
 )
@@ -50,51 +49,45 @@ func (a *application) readyCard(c *ui.Context, t tokenValues, text func(string) 
 }
 
 func (a *application) showNotes() {
-	if a.notesWindow == nil {
-		t := tokens(false, "zh-CN")
-		a.notesWindow = mygo.NewWindow(mygo.WindowOptions{Title: a.text(mygo.App.Locale(), "WhatsNew"), Width: int(t.SizeWindowWidth), Height: int(t.SizeWindowHeightAbout), Frameless: true, DisableMinimize: true, DisableMaximize: true, DisableFullScreen: true, Content: ui.View(a.notesView)})
-		a.notesWindow.OnClose(func(event *mygo.CloseEvent) {
-			if !a.quitting {
-				event.PreventDefault()
-				a.notesWindow.Hide()
-			}
-		})
-	}
-	a.notesWindow.Show()
-	a.notesWindow.Focus()
+	a.page, a.notesPage = 1, true
+	a.invalidateWindow()
 	a.updates.loadNotes()
+}
+
+func (a *application) backNotes() {
+	a.notesPage = false
+	a.invalidateWindow()
 }
 
 func (a *application) notesView(c *ui.Context) {
 	locale, t := applyTheme(c)
 	text := func(key string) string { return a.text(locale, key) }
-	closeNotes := func() {
-		if a.notesWindow != nil {
-			a.notesWindow.Hide()
-		}
-	}
-	c.OnShortcut(ui.Cmd, ui.KeyW, closeNotes)
-	c.OnShortcut(0, ui.KeyEscape, closeNotes)
-	c.OnShortcut(ui.Cmd, ui.KeyQ, func() { mygo.App.Quit() })
 	state := a.updates.snapshot()
-	ui.Column(c).Fill().Padding(t.Space24).Gap(t.Space16).Background(ui.Hex(t.ColorWindow)).Children(func() {
-		ui.Row(c).FillWidth().Height(t.SizeButtonHeight).AlignItems(ui.Center).DragWindow().Children(func() {
-			ui.Text(c, text("WhatsNew")).FontSize(t.FontSizeBody).Grow(1)
-			if state.NotesLoading {
-				ui.Spinner(c).Size(t.SizeIcon, t.SizeIcon).Tooltip(text("NotesLoading"))
-			}
-			if state.NotesError != "" {
-				ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(state.NotesError))
-			}
-			ui.ButtonBase(c.Key("close-notes")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("CloseNotes")).Tooltip(text("CloseNotes")).OnClick(closeNotes).Children(func() {
-				ui.Icon(c, icon("x")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-			})
+	ui.Row(c).FillWidth().Height(t.SizeIconButton).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+		ui.ButtonBase(c.Key("back-notes")).Size(t.SizeIconButton, t.SizeIconButton).Radius(t.RadiusControl).FocusRing(true).Label(text("BackNotes")).Tooltip(text("BackNotes")).OnClick(a.backNotes).Children(func() {
+			ui.Icon(c, icon("chevron-left")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 		})
-		ui.Scroll(c).FillWidth().Grow(1).Children(func() {
-			if state.Notes != "" {
-				markdown.View(c, state.Notes, nil).FillWidth()
-			} else if !state.NotesLoading && state.NotesError == "" {
-				ui.Text(c, text("NotesNoNewer")).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
+		ui.Text(c, text("WhatsNew")).FontSize(t.FontSizeBody).Grow(1)
+		if state.NotesLoading {
+			ui.Spinner(c).Size(t.SizeIcon, t.SizeIcon).Tooltip(text("NotesLoading"))
+		}
+		if state.NotesError != "" {
+			ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(state.NotesError))
+		}
+	})
+	ui.Scroll(c.Key("release-history")).FillWidth().Grow(1).Children(func() {
+		ui.Column(c).FillWidth().Gap(t.Space24).Children(func() {
+			for _, entry := range releaseHistory(locale, state.Notes) {
+				ui.Column(c.Key(entry.Version)).FillWidth().Gap(t.Space8).Children(func() {
+					ui.Row(c).FillWidth().Gap(t.Space12).AlignItems(ui.Center).Children(func() {
+						ui.Text(c, entry.Version).FontSize(t.FontSizeBody).Bold()
+						ui.Text(c, entry.Date).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
+						if entry.Version == runningVersion() {
+							ui.Text(c, text("CurrentVersion")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
+						}
+					})
+					markdown.View(c, entry.Notes, nil).FillWidth()
+				})
 			}
 		})
 	})
@@ -105,7 +98,7 @@ func (a *application) notesView(c *ui.Context) {
 func (a *application) qaUpdateState() bool {
 	switch os.Getenv("CUBBIX_QA_UPDATE") {
 	case "ready":
-		a.updates.state = updateState{Phase: updateReady, Version: "0.0.2"}
+		a.updates.state = updateState{Phase: updateReady, Version: "0.0.4"}
 	case "network":
 		a.updates.state.ErrorKey = "UpdateNetworkError"
 	case "signature":
