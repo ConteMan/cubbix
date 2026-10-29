@@ -11770,6 +11770,1828 @@
           "fontWeight": "$FontWeightRegular"
         }
       ]
+    },
+    {
+      "type": "text",
+      "id": "KZBMx",
+      "x": 0,
+      "y": 3870,
+      "name": "R06 / 设置窗口体验修正",
+      "fill": "$ColorText",
+      "content": "R06 / 设置窗口体验修正",
+      "fontFamily": "$FontFamily",
+      "fontSize": "$FontSizeTitle",
+      "fontWeight": "$FontWeightSemibold"
+    },
+    {
+      "type": "frame",
+      "id": "D9jJ2",
+      "x": 0,
+      "y": 3982,
+      "name": "notes-zh-CN-light",
+      "theme": {
+        "language": "zh-CN",
+        "mode": "light"
+      },
+      "metadata": {
+        "type": "r06-review"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 560,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "x9gNr4",
+          "x": 0,
+          "y": 0,
+          "name": "R06 Window shell",
+          "width": 720,
+          "height": 560,
+          "fill": "$ColorWindow",
+          "cornerRadius": "$RadiusWindow",
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "jFwZD",
+              "x": 0,
+              "y": 0,
+              "name": "Sidebar",
+              "width": 144,
+              "height": 560,
+              "fill": "$ColorSidebar",
+              "layout": "vertical",
+              "gap": "$Space16",
+              "padding": "$Space12",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "JLdrA",
+                  "name": "Window controls clearance",
+                  "width": "fill_container",
+                  "height": 24
+                },
+                {
+                  "type": "frame",
+                  "id": "igHFo",
+                  "name": "Brand row",
+                  "width": "fill_container",
+                  "height": 48,
+                  "padding": "$Space8",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "j68FYk",
+                      "type": "ref",
+                      "ref": "ivtHk",
+                      "width": "fill_container"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "c1kswK",
+                  "name": "Navigation",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$Space4",
+                  "children": [
+                    {
+                      "id": "XzLG2",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorTransparent",
+                      "descendants": {
+                        "namsg": {
+                          "content": "通用"
+                        }
+                      }
+                    },
+                    {
+                      "id": "lXtTk",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorAccentSoft",
+                      "descendants": {
+                        "HsBCN/Tw4ru": {
+                          "geometry": "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0 M12 16v-4 M12 8h.01"
+                        },
+                        "namsg": {
+                          "content": "关于"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "ellipse",
+              "id": "XZNqd",
+              "x": 12,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "mNc6Y",
+              "x": 32,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "n0rW2",
+              "x": 52,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "KIJfH",
+          "x": 168,
+          "y": 24,
+          "name": "Release history",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "RcXTY",
+              "name": "Subpage header",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Q8ON2",
+                  "name": "Back (Esc)",
+                  "width": 28,
+                  "height": 28,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "yXOlh",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "width": 16,
+                      "height": 16,
+                      "descendants": {
+                        "F9086": {
+                          "geometry": "M15 18l-6-6 6-6"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "DwLS0",
+                  "fill": "$ColorText",
+                  "content": "更新内容",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ruDVy",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "pwrZW",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "GEINs",
+                      "fill": "$ColorText",
+                      "content": "0.0.3 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "CiZlw",
+                      "fill": "$ColorTextSecondary",
+                      "content": "当前",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "f3PmQ",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 更新内容搬进设置了，按版本慢慢翻；按 Esc 就能回去。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "I1NFG",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 设置窗口可以拉大，也会记住你喜欢的大小。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "AY36N",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 打开窗口时，菜单栏和 Dock 会跟着切到 Cubbix；关掉窗口后，继续在菜单栏安静待命。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "HoxGG",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WaemK",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "rJdxU",
+                      "fill": "$ColorText",
+                      "content": "0.0.2 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "vWz4X",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 自动更新跑通啦，下次有新版，Cubbix 会帮你准备好。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "uSf9j",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "jTMvA",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "WWNTV",
+                      "fill": "$ColorText",
+                      "content": "0.0.1 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "SmbXz",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Cubbix 搬进菜单栏了，点开猫标就能找到设置。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "TRmYx",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 可以切换中文、英文或跟随系统，也能选择开机时自动打开。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "NDfVu",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 有新版会帮你下载好，等你点「重启更新」再换上；想提前看看，也可以手动检查。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "q2XXO9",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 在「更新内容」里看看这次多了什么。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "YmaUD",
+      "x": 820,
+      "y": 3982,
+      "name": "notes-en-light",
+      "theme": {
+        "language": "en",
+        "mode": "light"
+      },
+      "metadata": {
+        "type": "r06-review"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 560,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Vy4F7",
+          "x": 0,
+          "y": 0,
+          "name": "R06 Window shell",
+          "width": 720,
+          "height": 560,
+          "fill": "$ColorWindow",
+          "cornerRadius": "$RadiusWindow",
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "y1IGt",
+              "x": 0,
+              "y": 0,
+              "name": "Sidebar",
+              "width": 144,
+              "height": 560,
+              "fill": "$ColorSidebar",
+              "layout": "vertical",
+              "gap": "$Space16",
+              "padding": "$Space12",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "IXT93",
+                  "name": "Window controls clearance",
+                  "width": "fill_container",
+                  "height": 24
+                },
+                {
+                  "type": "frame",
+                  "id": "boEna",
+                  "name": "Brand row",
+                  "width": "fill_container",
+                  "height": 48,
+                  "padding": "$Space8",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "xtRwM",
+                      "type": "ref",
+                      "ref": "ivtHk",
+                      "width": "fill_container"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "soXlc",
+                  "name": "Navigation",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$Space4",
+                  "children": [
+                    {
+                      "id": "qnY0S",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorTransparent",
+                      "descendants": {
+                        "namsg": {
+                          "content": "General"
+                        }
+                      }
+                    },
+                    {
+                      "id": "K0CwN",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorAccentSoft",
+                      "descendants": {
+                        "HsBCN/Tw4ru": {
+                          "geometry": "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0 M12 16v-4 M12 8h.01"
+                        },
+                        "namsg": {
+                          "content": "About"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "ellipse",
+              "id": "F9XVCF",
+              "x": 12,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "Ba0NN",
+              "x": 32,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "b04aj",
+              "x": 52,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "yAYFI",
+          "x": 168,
+          "y": 24,
+          "name": "Release history",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "lEFje",
+              "name": "Subpage header",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "YIRYI",
+                  "name": "Back (Esc)",
+                  "width": 28,
+                  "height": 28,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "rljsX",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "width": 16,
+                      "height": 16,
+                      "descendants": {
+                        "F9086": {
+                          "geometry": "M15 18l-6-6 6-6"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "Ba1a0",
+                  "fill": "$ColorText",
+                  "content": "What’s new",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "at4L9",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "KHT3L",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "OZtiq",
+                      "fill": "$ColorText",
+                      "content": "0.0.3 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "f6hAwI",
+                      "fill": "$ColorTextSecondary",
+                      "content": "Current",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "g5bKa",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• What’s new now lives in Settings. Browse by version, then press Esc to go back.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "Mhkk1",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Make Settings roomier if you like. Cubbix remembers the size for next time.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "aT4PC",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Open a window and Cubbix joins the menu bar and Dock. Close it and the little cat goes back to waiting in the menu bar.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "AbDBx",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "miIMy",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "seYlZ",
+                      "fill": "$ColorText",
+                      "content": "0.0.2 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "V4ykS",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Automatic updates are up and running. Cubbix will get the next version ready for you.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "l1a9tB",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Jdxro",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wYdYe",
+                      "fill": "$ColorText",
+                      "content": "0.0.1 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "qyCIg",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Cubbix has moved into the menu bar. Click the cat to find Settings.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "NTkyC",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Choose Chinese, English, or your system language, and decide whether Cubbix opens at login.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "ahGz8",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• New versions download for you and wait until you choose “Restart to update”. You can check for updates yourself, too.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "NKN7b",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Visit “What’s new” to see what just landed.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "sX725",
+      "x": 1640,
+      "y": 3982,
+      "name": "notes-zh-CN-dark",
+      "theme": {
+        "language": "zh-CN",
+        "mode": "dark"
+      },
+      "metadata": {
+        "type": "r06-review"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 560,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "ekYZH",
+          "x": 0,
+          "y": 0,
+          "name": "R06 Window shell",
+          "width": 720,
+          "height": 560,
+          "fill": "$ColorWindow",
+          "cornerRadius": "$RadiusWindow",
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "uqBLe",
+              "x": 0,
+              "y": 0,
+              "name": "Sidebar",
+              "width": 144,
+              "height": 560,
+              "fill": "$ColorSidebar",
+              "layout": "vertical",
+              "gap": "$Space16",
+              "padding": "$Space12",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "J681C",
+                  "name": "Window controls clearance",
+                  "width": "fill_container",
+                  "height": 24
+                },
+                {
+                  "type": "frame",
+                  "id": "oGDMP",
+                  "name": "Brand row",
+                  "width": "fill_container",
+                  "height": 48,
+                  "padding": "$Space8",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "WAGJs",
+                      "type": "ref",
+                      "ref": "ivtHk",
+                      "width": "fill_container"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "EgjzX",
+                  "name": "Navigation",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$Space4",
+                  "children": [
+                    {
+                      "id": "D0S9b",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorTransparent",
+                      "descendants": {
+                        "namsg": {
+                          "content": "通用"
+                        }
+                      }
+                    },
+                    {
+                      "id": "bAz33",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorAccentSoft",
+                      "descendants": {
+                        "HsBCN/Tw4ru": {
+                          "geometry": "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0 M12 16v-4 M12 8h.01"
+                        },
+                        "namsg": {
+                          "content": "关于"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "ellipse",
+              "id": "u49SD",
+              "x": 12,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "A26Cyp",
+              "x": 32,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "cBNUh",
+              "x": 52,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ubIoA",
+          "x": 168,
+          "y": 24,
+          "name": "Release history",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "T6nse",
+              "name": "Subpage header",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "vuvW7",
+                  "name": "Back (Esc)",
+                  "width": 28,
+                  "height": 28,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "fvGcK",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "width": 16,
+                      "height": 16,
+                      "descendants": {
+                        "F9086": {
+                          "geometry": "M15 18l-6-6 6-6"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "uMr7D",
+                  "fill": "$ColorText",
+                  "content": "更新内容",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "i1Od9",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ldevc",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AAf1r",
+                      "fill": "$ColorText",
+                      "content": "0.0.3 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rD5qj",
+                      "fill": "$ColorTextSecondary",
+                      "content": "当前",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "r6je0P",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 更新内容搬进设置了，按版本慢慢翻；按 Esc 就能回去。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "b6DC8r",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 设置窗口可以拉大，也会记住你喜欢的大小。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "R8oYnP",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 打开窗口时，菜单栏和 Dock 会跟着切到 Cubbix；关掉窗口后，继续在菜单栏安静待命。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "xwvgi",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "w3mCWz",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RUF8Z",
+                      "fill": "$ColorText",
+                      "content": "0.0.2 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "vDn7d",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 自动更新跑通啦，下次有新版，Cubbix 会帮你准备好。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "U7T1mi",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "OjWEq",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "BMrLv",
+                      "fill": "$ColorText",
+                      "content": "0.0.1 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "Jwb9S",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Cubbix 搬进菜单栏了，点开猫标就能找到设置。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "Axr42",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 可以切换中文、英文或跟随系统，也能选择开机时自动打开。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "IdfMH",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 有新版会帮你下载好，等你点「重启更新」再换上；想提前看看，也可以手动检查。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "voKCH",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• 在「更新内容」里看看这次多了什么。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "NPjA1",
+      "x": 2460,
+      "y": 3982,
+      "name": "notes-en-dark",
+      "theme": {
+        "language": "en",
+        "mode": "dark"
+      },
+      "metadata": {
+        "type": "r06-review"
+      },
+      "clip": true,
+      "width": 720,
+      "height": 560,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "jQ797",
+          "x": 0,
+          "y": 0,
+          "name": "R06 Window shell",
+          "width": 720,
+          "height": 560,
+          "fill": "$ColorWindow",
+          "cornerRadius": "$RadiusWindow",
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "afz0J",
+              "x": 0,
+              "y": 0,
+              "name": "Sidebar",
+              "width": 144,
+              "height": 560,
+              "fill": "$ColorSidebar",
+              "layout": "vertical",
+              "gap": "$Space16",
+              "padding": "$Space12",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "lO80o",
+                  "name": "Window controls clearance",
+                  "width": "fill_container",
+                  "height": 24
+                },
+                {
+                  "type": "frame",
+                  "id": "C1gvlI",
+                  "name": "Brand row",
+                  "width": "fill_container",
+                  "height": 48,
+                  "padding": "$Space8",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "oTPIc",
+                      "type": "ref",
+                      "ref": "ivtHk",
+                      "width": "fill_container"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PqaZJ",
+                  "name": "Navigation",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$Space4",
+                  "children": [
+                    {
+                      "id": "icY5F",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorTransparent",
+                      "descendants": {
+                        "namsg": {
+                          "content": "General"
+                        }
+                      }
+                    },
+                    {
+                      "id": "kWygZ",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorAccentSoft",
+                      "descendants": {
+                        "HsBCN/Tw4ru": {
+                          "geometry": "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0 M12 16v-4 M12 8h.01"
+                        },
+                        "namsg": {
+                          "content": "About"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "ellipse",
+              "id": "NeY5l",
+              "x": 12,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "i0n0gz",
+              "x": 32,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "gfEJO",
+              "x": 52,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "J24hTu",
+          "x": 168,
+          "y": 24,
+          "name": "Release history",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Eaqbb",
+              "name": "Subpage header",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "pZ0lT",
+                  "name": "Back (Esc)",
+                  "width": 28,
+                  "height": 28,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "NvcT4",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "width": 16,
+                      "height": 16,
+                      "descendants": {
+                        "F9086": {
+                          "geometry": "M15 18l-6-6 6-6"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "McsqT",
+                  "fill": "$ColorText",
+                  "content": "What’s new",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "P1EqT",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "OiPBa",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jDwqv",
+                      "fill": "$ColorText",
+                      "content": "0.0.3 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "SAr9S",
+                      "fill": "$ColorTextSecondary",
+                      "content": "Current",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "MSiLu",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• What’s new now lives in Settings. Browse by version, then press Esc to go back.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "hRyG7",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Make Settings roomier if you like. Cubbix remembers the size for next time.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "tDOAn",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Open a window and Cubbix joins the menu bar and Dock. Close it and the little cat goes back to waiting in the menu bar.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "coYmP",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "vqRIk",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CrbD0",
+                      "fill": "$ColorText",
+                      "content": "0.0.2 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "S0iq85",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Automatic updates are up and running. Cubbix will get the next version ready for you.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "BHC06",
+              "name": "Version entry",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fmy7Z",
+                  "name": "Version and date",
+                  "width": "fill_container",
+                  "gap": "$Space12",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wLW88",
+                      "fill": "$ColorText",
+                      "content": "0.0.1 — 2026-10-29",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "mu4eI",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Cubbix has moved into the menu bar. Click the cat to find Settings.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "qA8Yk",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Choose Chinese, English, or your system language, and decide whether Cubbix opens at login.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "U9bOR",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• New versions download for you and wait until you choose “Restart to update”. You can check for updates yourself, too.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "wdRzV",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "• Visit “What’s new” to see what just landed.",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "B00pd",
+      "x": 3280,
+      "y": 3982,
+      "name": "enlarged-settings",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN"
+      },
+      "metadata": {
+        "type": "r06-review"
+      },
+      "clip": true,
+      "width": 1000,
+      "height": 600,
+      "fill": "$ColorWindow",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "bP6WY",
+          "x": 0,
+          "y": 0,
+          "name": "R06 Window shell",
+          "width": 1000,
+          "height": 600,
+          "fill": "$ColorWindow",
+          "cornerRadius": "$RadiusWindow",
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "tSkpQ",
+              "x": 0,
+              "y": 0,
+              "name": "Sidebar",
+              "width": 144,
+              "height": 600,
+              "fill": "$ColorSidebar",
+              "layout": "vertical",
+              "gap": "$Space16",
+              "padding": "$Space12",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zCTes",
+                  "name": "Window controls clearance",
+                  "width": "fill_container",
+                  "height": 24
+                },
+                {
+                  "type": "frame",
+                  "id": "iQt7r",
+                  "name": "Brand row",
+                  "width": "fill_container",
+                  "height": 48,
+                  "padding": "$Space8",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "d4rrBE",
+                      "type": "ref",
+                      "ref": "ivtHk",
+                      "width": "fill_container"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "R531Nu",
+                  "name": "Navigation",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$Space4",
+                  "children": [
+                    {
+                      "id": "HPFf3",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorTransparent",
+                      "descendants": {
+                        "namsg": {
+                          "content": "通用"
+                        }
+                      }
+                    },
+                    {
+                      "id": "f9Y7g",
+                      "type": "ref",
+                      "ref": "zlRGT",
+                      "width": "fill_container",
+                      "fill": "$ColorAccentSoft",
+                      "descendants": {
+                        "HsBCN/Tw4ru": {
+                          "geometry": "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0 M12 16v-4 M12 8h.01"
+                        },
+                        "namsg": {
+                          "content": "关于"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "ellipse",
+              "id": "J4lKD0",
+              "x": 12,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "P2nqF8",
+              "x": 32,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            },
+            {
+              "type": "ellipse",
+              "id": "PtL9x",
+              "x": 52,
+              "y": 12,
+              "name": "Inactive native window control",
+              "fill": "$ColorTextDisabled",
+              "width": 12,
+              "height": 12
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "yU9JA",
+          "x": 308,
+          "y": 24,
+          "name": "Page content",
+          "width": 528,
+          "layout": "vertical",
+          "gap": "$Space24",
+          "children": [
+            {
+              "type": "frame",
+              "id": "T8JDG",
+              "name": "Settings group",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": "$Space8",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "UVsHJ",
+                  "name": "Group title",
+                  "fill": "$ColorTextSecondary",
+                  "content": "更新",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeCaption",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "id": "FSngX",
+                  "type": "ref",
+                  "ref": "X6uV6",
+                  "name": "Settings group card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "kqrak/iJGB1": {
+                      "content": "版本"
+                    },
+                    "kqrak/WyToO": {
+                      "id": "BJWfS",
+                      "type": "ref",
+                      "ref": "vUQhl",
+                      "name": "Version and check",
+                      "descendants": {
+                        "O1OO9W": {
+                          "content": "0.0.3"
+                        }
+                      }
+                    },
+                    "ZWWO1/iJGB1": {
+                      "content": "更新内容"
+                    },
+                    "ZWWO1/WyToO": {
+                      "id": "p0E6au",
+                      "type": "ref",
+                      "ref": "MTEP9",
+                      "name": "Release notes disclosure"
+                    },
+                    "YxJOl": {
+                      "enabled": true
+                    },
+                    "YvjK5": {
+                      "enabled": true
+                    },
+                    "YvjK5/iJGB1": {
+                      "content": "自动更新"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "HK8m1",
+              "type": "ref",
+              "ref": "BVbwx",
+              "name": "Download ready prompt",
+              "width": "fill_container",
+              "descendants": {
+                "uW0wa": {
+                  "content": "更新已就绪"
+                },
+                "v3iwe": {
+                  "content": "重启后生效"
+                },
+                "CLm8u/qEQlb": {
+                  "content": "重启更新"
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "themes": {

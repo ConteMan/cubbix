@@ -1,0 +1,1 @@
+PASS: hidden NSApplication policies 1→0→1; native resizable style, minimum 720×340; saved 1000×600; application/edit menu actions and close button present. Window stayed hidden and inactive. No native screenshots or foreground requests.

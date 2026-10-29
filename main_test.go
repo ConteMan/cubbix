@@ -188,3 +188,130 @@ func TestPreview(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestNotesStayInSettingsAndReturn(t *testing.T) {
+	a, err := newApplication(filepath.Join(t.TempDir(), "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.updates.close()
+	a.updates.notes = func(context.Context) (string, error) { return "", context.DeadlineExceeded }
+	for _, locale := range []string{"zh-CN", "en"} {
+		a.page, a.notesPage = 1, false
+		tt := ui.NewTester(a.view, 720, 340)
+		tt.SetLocale(locale)
+		if err := tt.Click(a.text(locale, "WhatsNew")); err != nil {
+			t.Fatal(err)
+		}
+		if !a.notesPage || a.window != nil || !tt.HasText(a.text(locale, "CurrentVersion")) {
+			t.Fatalf("notes did not open within settings: %v", tt.Texts())
+		}
+		count := 0
+		for _, text := range tt.Texts() {
+			if text == a.text(locale, "CurrentVersion") {
+				count++
+			}
+		}
+		if count != 1 {
+			t.Fatalf("current version markers: %d", count)
+		}
+		back, ok := tt.Find(a.text(locale, "BackNotes"))
+		if !ok {
+			t.Fatal("missing accessible back button")
+		}
+		tt.Move(back.X+back.W/2, back.Y+back.H/2)
+		tt.Advance(700 * time.Millisecond)
+		tt.Frame()
+		if !tt.HasText(a.text(locale, "BackNotes")) {
+			t.Fatal("missing return tooltip")
+		}
+		tt.Key(0, ui.KeyEscape)
+		if a.notesPage || !tt.HasText(a.text(locale, "AutomaticUpdates")) {
+			t.Fatal("Esc did not return to About")
+		}
+		if err := tt.Click(a.text(locale, "WhatsNew")); err != nil {
+			t.Fatal(err)
+		}
+		if err := tt.Click(a.text(locale, "BackNotes")); err != nil {
+			t.Fatal(err)
+		}
+		if a.notesPage {
+			t.Fatal("back button did not return")
+		}
+		if err := tt.Click(a.text(locale, "WhatsNew")); err != nil {
+			t.Fatal(err)
+		}
+		if err := tt.Click(a.text(locale, "General")); err != nil {
+			t.Fatal(err)
+		}
+		if a.notesPage || a.page != 0 {
+			t.Fatal("sidebar did not leave notes")
+		}
+	}
+}
+
+func TestSettingsMinimumAndWideContent(t *testing.T) {
+	minW, minH := settingsMinimumSize()
+	if minW != 720 || minH != 340 {
+		t.Fatalf("minimum=%dx%d", minW, minH)
+	}
+	for _, size := range [][2]int{{0, 0}, {-1, -1}, {719, 339}, {1000, 600}} {
+		w, h := settingsSize(size[0], size[1])
+		if w < minW || h < minH {
+			t.Fatal("size below minimum")
+		}
+		if size[0] >= minW && (w != size[0] || h != size[1]) {
+			t.Fatal("valid saved size changed")
+		}
+	}
+	a, err := newApplication(filepath.Join(t.TempDir(), "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.updates.close()
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, size := range [][2]int{{720, 340}, {1000, 600}} {
+			a.page = 1
+			a.updates.state = updateState{Phase: updateReady}
+			a.settingsError = "ConfigError"
+			tt := ui.NewTester(a.view, size[0], size[1])
+			tt.SetLocale(locale)
+			r, ok := tt.Find(a.text(locale, "RestartUpdate"))
+			if !ok || r.Y+r.H > float32(size[1]) {
+				t.Fatalf("ready card clipped: %+v", r)
+			}
+			a.page = 0
+			tt.Frame()
+			r, ok = tt.Find(a.text(locale, "Language"))
+			if !ok {
+				t.Fatal("missing language")
+			}
+			wantX := float32(144 + (size[0]-144-528)/2 + 16 + 1)
+			if r.X != wantX {
+				t.Fatalf("content not centered in %s at %v: x=%v want=%v", locale, size, r.X, wantX)
+			}
+		}
+	}
+}
+
+func TestApplicationMenuLocalesAndRoles(t *testing.T) {
+	a, err := newApplication(filepath.Join(t.TempDir(), "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.updates.close()
+	for _, locale := range []string{"zh-CN", "en"} {
+		items := a.applicationMenu(locale).Items()
+		if len(items) != 2 || items[0].Submenu[0].Label != a.text(locale, "MenuAbout") || items[1].Label != a.text(locale, "MenuEdit") {
+			t.Fatal("untranslated application menu")
+		}
+		appItems := items[0].Submenu
+		if appItems[1].Accelerator != "Cmd+," || appItems[3].Role != mygo.RoleQuit || appItems[3].Accelerator != "Cmd+Q" {
+			t.Fatal("missing application shortcuts")
+		}
+		edit := items[1].Submenu
+		if edit[3].Role != mygo.RoleCut || edit[4].Role != mygo.RoleCopy || edit[5].Role != mygo.RolePaste || edit[6].Role != mygo.RoleSelectAll {
+			t.Fatal("missing standard edit roles")
+		}
+	}
+}

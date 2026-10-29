@@ -1,0 +1,27 @@
+{
+  "method": "ui.Tester, real application.view, in-memory rendering; no native window",
+  "scale": 2,
+  "nativeScreenshots": "omitted; native checks keep window hidden and inactive",
+  "screenshots": [
+    {
+      "file": "ui-notes-en-dark.png",
+      "sha256": "25b4f348cbcb6595421b102698a6489561b02fd6c0cc02a63959459637037421"
+    },
+    {
+      "file": "ui-notes-en-light.png",
+      "sha256": "3579b120c440721f7ee9eb23274c96034884d73c05ccd66f239e30fad478dde3"
+    },
+    {
+      "file": "ui-notes-zh-CN-dark.png",
+      "sha256": "c02d25d4af94e8185b22b6f867b5361a4d1ea0d15bfbf53e09b640d10cca0e04"
+    },
+    {
+      "file": "ui-notes-zh-CN-light.png",
+      "sha256": "e7255346d3f8c127ca9c2747439e11b38f593709e32ab48510be0fd24c9b576a"
+    },
+    {
+      "file": "ui-settings-enlarged-zh-CN-light.png",
+      "sha256": "933d3f74748e3d40781528dc2667ff4f4635c281e14ffb05bbfbae705b3ebe3b"
+    }
+  ]
+}

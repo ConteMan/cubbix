@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,10 +28,11 @@ func newReleaseNotesClient(current string) *releaseNotesClient {
 }
 
 type githubRelease struct {
-	Tag        string `json:"tag_name"`
-	Draft      bool   `json:"draft"`
-	Prerelease bool   `json:"prerelease"`
-	Assets     []struct {
+	PublishedAt string `json:"published_at"`
+	Tag         string `json:"tag_name"`
+	Draft       bool   `json:"draft"`
+	Prerelease  bool   `json:"prerelease"`
+	Assets      []struct {
 		Name string `json:"name"`
 		URL  string `json:"browser_download_url"`
 	} `json:"assets"`
@@ -39,7 +41,7 @@ type githubRelease struct {
 // Notes come from each platform manifest, not GitHub's independently editable body.
 // Include every stable version since the running version, even when versions were skipped.
 func (c *releaseNotesClient) load(ctx context.Context) (string, error) {
-	type entry struct{ version, notes string }
+	type entry struct{ version, date, notes string }
 	var entries []entry
 	seen := map[string]bool{}
 	for page := 1; ; page++ {
@@ -71,7 +73,7 @@ func (c *releaseNotesClient) load(ctx context.Context) (string, error) {
 				if manifest.Version != v {
 					return "", fmt.Errorf("release manifest version does not match its tag")
 				}
-				entries = append(entries, entry{v, manifest.Notes})
+				entries = append(entries, entry{v, strings.Split(release.PublishedAt, "T")[0], manifest.Notes})
 				seen[v] = true
 			}
 		}
@@ -82,7 +84,11 @@ func (c *releaseNotesClient) load(ctx context.Context) (string, error) {
 	slices.SortFunc(entries, func(a, b entry) int { return -compareVersions(a.version, b.version) })
 	var notes strings.Builder
 	for _, entry := range entries {
-		fmt.Fprintf(&notes, "## %s\n\n%s\n\n", entry.version, entry.notes)
+		heading := entry.version
+		if entry.date != "" {
+			heading += " — " + entry.date
+		}
+		fmt.Fprintf(&notes, "## %s\n\n%s\n\n", heading, entry.notes)
 	}
 	return strings.TrimSpace(notes.String()), nil
 }
@@ -138,4 +144,52 @@ func compareVersions(a, b string) int {
 		}
 	}
 	return 0
+}
+
+// The changelogs are the bilingual source for shipped history, including offline use.
+//
+//go:embed CHANGELOG.md
+var changelogChinese string
+
+//go:embed CHANGELOG.en.md
+var changelogEnglish string
+
+type releaseEntry struct{ Version, Date, Notes string }
+
+func parseReleaseNotes(notes string) []releaseEntry {
+	var entries []releaseEntry
+	for _, line := range strings.Split(notes, "\n") {
+		if heading, ok := strings.CutPrefix(line, "## "); ok {
+			version, date, _ := strings.Cut(heading, " — ")
+			if stableVersion(version) {
+				entries = append(entries, releaseEntry{Version: version, Date: date})
+			}
+		} else if len(entries) > 0 {
+			entries[len(entries)-1].Notes += line + "\n"
+		}
+	}
+	for i := range entries {
+		entries[i].Notes = strings.TrimSpace(entries[i].Notes)
+	}
+	return entries
+}
+
+func releaseHistory(locale, remote string) []releaseEntry {
+	notes := changelogChinese
+	if locale == "en" {
+		notes = changelogEnglish
+	}
+	entries := parseReleaseNotes(notes)
+	seen := map[string]bool{}
+	for _, e := range entries {
+		seen[e.Version] = true
+	}
+	for _, e := range parseReleaseNotes(remote) {
+		if !seen[e.Version] && compareVersions(e.Version, runningVersion()) > 0 {
+			entries = append(entries, e)
+			seen[e.Version] = true
+		}
+	}
+	slices.SortFunc(entries, func(a, b releaseEntry) int { return -compareVersions(a.Version, b.Version) })
+	return entries
 }

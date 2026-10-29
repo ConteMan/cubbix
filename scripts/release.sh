@@ -22,9 +22,10 @@ from pathlib import Path
 version = json.loads(Path('mygo.json').read_text())['version']
 if not re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', version):
     raise SystemExit('Release requires a stable semantic version')
-headings = re.findall(r'^## (.+)$', Path('CHANGELOG.md').read_text(), re.M)
-if not headings or headings[0] != version:
-    raise SystemExit('Version must match the first CHANGELOG.md section (## x.y.z)')
+for name in ['CHANGELOG.md', 'CHANGELOG.en.md']:
+    headings = re.findall(r'^## (\d+\.\d+\.\d+) — (\d{4}-\d{2}-\d{2})$', Path(name).read_text(), re.M)
+    if not headings or headings[0][0] != version:
+        raise SystemExit(f'Version must match the first {name} section (## x.y.z — YYYY-MM-DD)')
 fallback = re.search(r'const appVersion = "([^"]+)"', Path('main.go').read_text())
 if fallback is None or fallback[1] != version:
     raise SystemExit('appVersion must match mygo.json')

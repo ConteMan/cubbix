@@ -1,7 +1,7 @@
 {
   "name": "Cubbix",
   "identifier": "com.conteman.cubbix",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "icon": "brand/dist/app-icon-1024.png",
   "out": "build",
   "macos": {

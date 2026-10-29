@@ -110,6 +110,14 @@
   "UpdateFailed": "无法完成更新，请检查安装位置是否可写并重试",
   "UpdateDownloading": "正在下载并验证更新",
   "NotesLoading": "正在读取更新内容",
-  "NotesNoNewer": "当前版本以来暂无更新内容",
-  "CloseNotes": "关闭更新内容 (⌘W / Esc)"
+  "BackNotes": "返回 (Esc)",
+  "CurrentVersion": "当前",
+  "MenuAbout": "关于 Cubbix",
+  "MenuEdit": "编辑",
+  "MenuUndo": "撤销",
+  "MenuRedo": "重做",
+  "MenuCut": "剪切",
+  "MenuCopy": "复制",
+  "MenuPaste": "粘贴",
+  "MenuSelectAll": "全选"
 }

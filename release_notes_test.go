@@ -78,3 +78,25 @@ func TestNotesRejectMismatchedManifestVersion(t *testing.T) {
 		t.Fatal("accepted manifest for another version")
 	}
 }
+
+func TestBundledHistoryIsBilingualOrderedAndMatchesVersion(t *testing.T) {
+	zh, en := parseReleaseNotes(changelogChinese), parseReleaseNotes(changelogEnglish)
+	if len(zh) != 3 || len(en) != len(zh) || zh[0].Version != appVersion {
+		t.Fatal("bundled version history mismatch")
+	}
+	for i := range zh {
+		if zh[i].Version != en[i].Version || zh[i].Date != en[i].Date || len(zh[i].Date) != 10 || zh[i].Notes == en[i].Notes {
+			t.Fatalf("invalid translation pair: %+v %+v", zh[i], en[i])
+		}
+		if i > 0 && compareVersions(zh[i-1].Version, zh[i].Version) <= 0 {
+			t.Fatal("history not descending")
+		}
+	}
+	remote := "## 0.0.10 — 2026-11-01\n\n- New notes\n\n## 0.0.3 — 2026-10-29\n\nWRONG BODY"
+	for _, locale := range []string{"zh-CN", "en"} {
+		history := releaseHistory(locale, remote)
+		if len(history) != 4 || history[0].Version != "0.0.10" || history[0].Date != "2026-11-01" || strings.Contains(history[1].Notes, "WRONG BODY") {
+			t.Fatalf("merged history: %+v", history)
+		}
+	}
+}

@@ -16,6 +16,8 @@ type Config struct {
 	Language         string `toml:"language"`
 	OpenAtLogin      bool   `toml:"open_at_login"`
 	AutomaticUpdates bool   `toml:"automatic_updates"`
+	WindowWidth      int    `toml:"window_width,omitempty"`
+	WindowHeight     int    `toml:"window_height,omitempty"`
 }
 
 func defaultConfig() Config {
