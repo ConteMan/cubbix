@@ -4,5 +4,17 @@
   "version": "0.0.1",
   "icon": "brand/dist/app-icon-1024.png",
   "out": "build",
-  "macos": {"infoPlist": {"LSUIElement": true}}
+  "macos": {
+    "infoPlist": {
+      "LSUIElement": true
+    },
+    "signingIdentity": "Developer ID Application",
+    "notarize": {
+      "keychainProfile": "cubbix-notary"
+    }
+  },
+  "updates": {
+    "publicKey": "TxYEVmjZVSVQ2Pg8DiSSZDWHkBTDhB6HKnt2kV1boUQ=",
+    "github": "ConteMan/cubbix"
+  }
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-//go:embed design/locales/*.json assets/menubar-template.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/settings-2.svg design/assets/lucide-0.468.0/info.svg design/assets/lucide-0.468.0/refresh-cw.svg design/assets/lucide-0.468.0/triangle-alert.svg design/assets/lucide-0.468.0/chevron-right.svg
+//go:embed design/locales/*.json assets/menubar-template.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
 var assets embed.FS
 
 const appVersion = "0.0.1"
@@ -29,7 +29,9 @@ type application struct {
 	tray          *mygo.Tray
 	page          int
 	language      int
-	updateError   bool
+	updates       *updateManager
+	notesWindow   *mygo.Window
+	relaunch      func()
 	settingsError string
 	quitting      bool
 	setLogin      func(bool) error
@@ -50,6 +52,7 @@ func newApplication(path string) (*application, error) {
 		return nil, err
 	}
 	a := &application{config: config, path: path, catalog: catalog}
+	a.updates = newUpdateManager(checkMyGoUpdate, newReleaseNotesClient(appVersion).load, nil)
 	for index, language := range []string{"system", "zh-CN", "en"} {
 		if config.Language == language {
 			a.language = index
@@ -116,16 +119,27 @@ func settingsHeight(t tokenValues, page int, hasError bool) int {
 func (a *application) resizeWindow() {
 	if a.window != nil {
 		t := tokens(false, "zh-CN")
-		a.window.SetSize(int(t.SizeWindowWidth), settingsHeight(t, a.page, a.settingsError != ""))
+		height := settingsHeight(t, a.page, a.settingsError != "")
+		if a.page == 1 && a.updates.snapshot().Phase == updateReady {
+			height += int(t.Space24 + t.SizeRowHeight + t.Space24)
+		}
+		a.window.SetSize(int(t.SizeWindowWidth), height)
 	}
 }
 
 func (a *application) menu() *mygo.Menu {
-	locale := mygo.App.Locale()
-	return mygo.NewMenu([]*mygo.MenuItem{
+	return a.menuForLocale(mygo.App.Locale())
+}
+
+func (a *application) menuForLocale(locale string) *mygo.Menu {
+	items := []*mygo.MenuItem{
 		{Label: a.text(locale, "MenuSettings"), Accelerator: "Cmd+,", Click: func(*mygo.MenuItem, *mygo.Window) { a.show() }},
-		{Label: a.text(locale, "Quit"), Accelerator: "Cmd+Q", Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }},
-	})
+	}
+	if a.updates.snapshot().Phase == updateReady {
+		items = append(items, &mygo.MenuItem{Label: a.text(locale, "MenuRestartUpdate"), Click: func(*mygo.MenuItem, *mygo.Window) { a.restartUpdate() }})
+	}
+	items = append(items, &mygo.MenuItem{Label: a.text(locale, "Quit"), Accelerator: "Cmd+Q", Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }})
+	return mygo.NewMenu(items)
 }
 
 func (a *application) show() { a.window.Show(); a.window.Focus() }
@@ -134,6 +148,8 @@ func (a *application) ready() {
 	mygo.App.SetLanguages("zh-CN", "en")
 	a.setLocale = mygo.App.SetLocale
 	a.setLogin = mygo.App.SetOpenAtLogin
+	a.relaunch = mygo.App.Relaunch
+	a.updates.notes = newReleaseNotesClient(runningVersion()).load
 	if os.Getenv("CUBBIX_QA") != "" {
 		if os.Getenv("MYGO_LOCALE") == "en" {
 			a.language = 2
@@ -164,9 +180,31 @@ func (a *application) ready() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	mygo.App.OnLocaleChanged(func(string) { a.tray.SetMenu(a.menu()) })
-	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { a.quitting = true })
+	mygo.App.OnLocaleChanged(func(locale string) {
+		a.tray.SetMenu(a.menu())
+		if a.notesWindow != nil {
+			a.notesWindow.SetTitle(a.text(locale, "WhatsNew"))
+			a.notesWindow.Invalidate()
+		}
+	})
+	a.updates.changed = func() {
+		mygo.RunOnMain(func() {
+			if a.quitting {
+				return
+			}
+			a.resizeWindow()
+			a.window.Invalidate()
+			a.tray.SetMenu(a.menu())
+			if a.notesWindow != nil {
+				a.notesWindow.Invalidate()
+			}
+		})
+	}
+	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { a.quitting = true; a.updates.close() })
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.tray.Destroy() })
+	if os.Getenv("CUBBIX_QA") == "" || !a.qaUpdateState() {
+		a.updates.start(a.config.AutomaticUpdates, updateInterval)
+	}
 	if os.Getenv("CUBBIX_QA") != "" {
 		if os.Getenv("CUBBIX_QA_PAGE") == "about" {
 			a.page = 1
@@ -193,18 +231,25 @@ func brand(color string) *ui.SVG {
 	return ui.MustParseSVG([]byte(strings.ReplaceAll(string(data), "#202522", color)))
 }
 
-func version() string {
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			if setting.Key == "vcs.revision" && len(setting.Value) >= 7 {
-				return appVersion + " (" + setting.Value[:7] + ")"
-			}
-		}
+func runningVersion() string {
+	if v := mygo.App.Version(); stableVersion(v) {
+		return v
 	}
 	return appVersion
 }
 
-func (a *application) view(c *ui.Context) {
+func version() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" && len(setting.Value) >= 7 {
+				return runningVersion() + " (" + setting.Value[:7] + ")"
+			}
+		}
+	}
+	return runningVersion()
+}
+
+func applyTheme(c *ui.Context) (string, tokenValues) {
 	locale := c.Locale()
 	if locale == "" {
 		locale = "zh-CN"
@@ -221,6 +266,12 @@ func (a *application) view(c *ui.Context) {
 	theme.Radius, theme.Spacing, theme.FontSize = t.RadiusControl, t.Space4, t.FontSizeBody
 	theme.Font = t.FontFamily
 	c.SetTheme(&theme)
+	return locale, t
+}
+
+func (a *application) view(c *ui.Context) {
+	locale, t := applyTheme(c)
+	update := a.updates.snapshot()
 	text := func(key string) string { return a.text(locale, key) }
 	c.OnShortcut(ui.Cmd, ui.KeyW, func() {
 		if a.window != nil {
@@ -285,23 +336,30 @@ func (a *application) view(c *ui.Context) {
 				} else {
 					a.row(c, t, text("Version"), func() {
 						ui.Text(c, version()).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
-						ui.ButtonBase(c.Key("check")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("CheckAction")).Tooltip(text("CheckAction")).OnClick(func() { a.updateError = true }).Children(func() {
+						ui.ButtonBase(c.Key("check")).Size(t.SizeIconButton, t.SizeIconButton).Disabled(update.Phase == updateChecking || update.Phase == updateDownloading || update.Phase == updateReady).Label(text("CheckAction")).Tooltip(text("CheckAction")).OnClick(func() { a.updates.request(true) }).Children(func() {
 							ui.Icon(c, icon("refresh-cw")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 						})
-						if a.updateError {
-							ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text("UpdateSourceMissing"))
-						}
+						a.updateIndicator(c, t, update, text)
 					})
 					ui.Divider(c)
 					a.row(c, t, text("WhatsNew"), func() {
-						ui.ButtonBase(c.Key("notes")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("WhatsNew")).Tooltip(text("UpdateNotesUnavailable")).OnClick(func() { a.updateError = true }).Children(func() {
+						ui.ButtonBase(c.Key("notes")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("WhatsNew")).Tooltip(text("WhatsNew")).OnClick(a.showNotes).Children(func() {
 							ui.Icon(c, icon("chevron-right")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 						})
+						if update.NotesError != "" {
+							ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(update.NotesError))
+						}
 					})
 					ui.Divider(c)
-					a.row(c, t, text("AutomaticUpdates"), func() { a.switchControl(c, t, "auto", text("AutomaticUpdates"), &a.config.AutomaticUpdates, a.save) })
+					a.row(c, t, text("AutomaticUpdates"), func() {
+						a.switchControl(c, t, "auto", text("AutomaticUpdates"), &a.config.AutomaticUpdates, a.changeAutomaticUpdates)
+					})
 				}
 			})
+			if a.page == 1 && update.Phase == updateReady {
+				ui.Box(c).Height(t.Space8)
+				a.readyCard(c, t, text)
+			}
 			if a.settingsError != "" {
 				ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(a.settingsError))
 			}

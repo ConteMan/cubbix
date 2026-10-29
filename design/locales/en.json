@@ -39,9 +39,7 @@
   "UnsavedBody": "Save your documents to keep your changes, then restart to update.",
   "Cancel": "Cancel",
   "ReturnToDocuments": "Return to documents",
-  "UpdateSourceMissing": "No update source configured",
   "CheckAction": "Check for updates",
-  "UpdateNotesUnavailable": "Update notes are not configured",
   "LoginError": "Could not change launch at login",
   "ConfigError": "Could not save settings",
   "R05Off": "Off",
@@ -102,5 +100,16 @@
   "R05Alt": "Alternative · dot when on",
   "R05Stress": "16pt legibility check",
   "R05App": "Cubbix",
-  "R05Esc": "Esc"
+  "R05Esc": "Esc",
+  "MenuRestartUpdate": "Restart to finish updating",
+  "UpdateDisabled": "This build or install location cannot update. Use a release build in a writable location.",
+  "UpdateNetworkError": "Cannot reach the update service. Check your connection and try again.",
+  "UpdateSignatureError": "Update signature verification failed. No update was installed. Try again.",
+  "UpdateFeedUnavailable": "No public update manifest is available for this platform yet. Try again later.",
+  "UpdateRateLimited": "The update service is limiting requests. Try again later.",
+  "UpdateFailed": "Could not complete the update. Check that the install location is writable and try again.",
+  "UpdateDownloading": "Downloading and verifying the update",
+  "NotesLoading": "Loading release notes",
+  "NotesNoNewer": "No release notes since this version",
+  "CloseNotes": "Close release notes (⌘W / Esc)"
 }
