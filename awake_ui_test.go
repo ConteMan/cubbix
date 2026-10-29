@@ -17,6 +17,9 @@ func awakeTestApp(t *testing.T) *application {
 	if err != nil {
 		t.Fatal(err)
 	}
+	a.notifyBattery = func(string, string) {
+		t.Fatal("unexpected battery notification; replace the sender in notification tests")
+	}
 	a.registerShortcut = func(string, func()) error { return nil }
 	a.unregisterShortcut = func(string) {}
 	a.awake, _ = fakeAwake(time.Now())
