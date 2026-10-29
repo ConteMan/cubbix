@@ -1,0 +1,76 @@
+# R07 · JSON 格子
+
+本轮为 [M2 / #3](https://github.com/ConteMan/cubbix/issues/3) 提供可评审的静态设计，尚未实现 JSON 功能。事实源为 `design/cubbix.pen`，通过 pen.dev headless CLI 0.3.13 编辑、保存、复开和导出。所有 R07 母版、评审板与标签均位于 R07 轮次带；历史画板保留。
+
+## 目标与预览
+
+粘贴、读入或拖入 JSON 后，立即得到清楚的行号、折叠和高亮；偶尔在底部补一句 `this` 表达式；多个独立窗口用于对照，也能逐个置顶。采用 #1 已确认的 CodeMirror 6、独立 Worker 和 200ms 超时，不引入 Monaco。
+
+| 预览 | 中文浅色 | 中文深色 | 英文浅色 | 英文深色 |
+| --- | --- | --- | --- | --- |
+| 全部场景 · 1× | [PNG](zh-CN-light.png) | [PNG](zh-CN-dark.png) | [PNG](en-light.png) | [PNG](en-dark.png) |
+| JSON 主窗口 · 2× | [PNG](window-zh-CN-light.png) | [PNG](window-zh-CN-dark.png) | [PNG](window-en-light.png) | [PNG](window-en-dark.png) |
+
+每张评审板从上到下是主窗口／空窗口与工具勾选表、六种状态、菜单、设置。工具清单和小号场景标签均为画板批注，不进入应用窗口；tooltip 仅在悬停或键盘聚焦时出现，不常驻。数组／对象等状态板展示的是编辑区底部局部，不是另开一个结果窗口。
+
+## 已采用的设计取舍
+
+- **窗口**：主样例 840 × 520，无系统标题栏；左上保留系统红绿灯，空白工具区可拖动，窗口可调整大小。红绿灯沿用 R06 的非活动灰阶示意；活动态交由 macOS 绘制。显示 JSON 主窗口时进入 Dock 并使用系统应用／编辑菜单；关闭最后一个可见主窗口后退回菜单栏常驻。每个窗口的内容、表达式、结果和置顶状态独立，关闭后释放其 WebView／Worker。
+- **顶部**：只有置顶、打开文件、复制三个图标。置顶以中性选中色块表示，tooltip 随开关变为「置顶 (⌥⌘P)」／「取消置顶 (⌥⌘P)」；快捷键仅作用于当前 JSON 窗口。打开文件为 ⌘O；复制整份当前 JSON 为 ⌘⇧C，保留系统 ⌘C 复制选区。复制成功短暂以 check 替换原图标；失败以 alert + tooltip 说明。
+- **语法高亮**：不增加强调色。键名用 ColorText + Semibold；数字用 ColorText；字符串、布尔、括号和标点用 ColorTextSecondary；行号同为次要灰阶。JetBrains Mono 等宽排版，少量字重与明暗变化足够区分结构，多个窗口对照也不会被彩色键名分散注意。正常界面没有状态标签；红色仅用于失败图标。
+- **this 与结果**：固定 `this` 前缀不可编辑，右侧只输入后缀，例如 `.data.items.length` 或 `.data.items.map(x => x.val)`。选择编辑区下方、输入栏上方的独立结果面板，避免长数组挤占输入宽度；数字、字符串、数组和对象始终在同一位置呈现。面板可拖动分隔线调整高度，结构结果支持折叠和滚动，稿中数组／对象展示展开态。
+- **求值状态**：主窗口数字结果为 `3`；局部样张涵盖数组、对象、弱化的 `undefined`、求值错误、200ms 超时及大文件模式。错误或超时立即清空旧结果，仅保留输入框末尾 alert，原因在 tooltip；超时中止 Worker，修改表达式后创建新 Worker。JSON／表达式变化后短暂防抖求值，使用最新文档快照和任务序号丢弃过期结果；仅表示持续计算时显示 loader，不闪动成功标签。
+- **空状态**：只有弱化的 Lucide file-input 图标，没有帮助文案。粘贴／拖入后直接格式化显示；工具区保持位置，内容相关操作停用。全局新建窗口自动读取剪贴板：可解析的 JSON 直接显示；不适用的剪贴板内容则保留空窗口。编辑无效 JSON 时保留原内容、清空旧结果并以 alert + tooltip 提示位置，修正后恢复求值。
+- **大文件**：超长单行先保留原样，暂停高亮和折叠，用单个 gauge 图标提示；tooltip 给原因。保留滚动、复制及打开文件，避免默认执行一次昂贵的全量格式化。表达式仍受 Worker 200ms 限制，较大结果在结果面板中滚动；具体阈值、格式化和结果体积限制列为待决定。
+- **菜单与设置**：R05 常亮组下方新增「新建 JSON 窗口」，之后画出两个已打开窗口条目（可选，选择即激活对应窗口）。设置延续 R06 最小 720 × 340、侧栏 144、内容最大宽 528 与 24 留白；「格子」中的 JSON 开关可用且当前开启，「快捷键」增加新建 JSON 窗口一行。关闭 JSON 格子后隐藏入口并注销其全局快捷键；已有文档先按未保存文档流程处理，不静默丢弃。
+
+## 8 个工具 · 请维护者勾选
+
+底部目前完整画出 8 个纯图标按钮，按原插件功能顺序排列；每项都有独立 reusable Action、Lucide 图标和双语 tooltip。勾选框仅放在画板旁的评审清单。以下是建议，不代表已获维护者确认。
+
+| 选择 | 功能 / tooltip | 图标 | 推荐 |
+| --- | --- | --- | --- |
+| [ ] | 重新格式化 | braces | 建议保留 |
+| [ ] | 折叠全部 | fold-vertical | 建议保留 |
+| [ ] | 展开全部 | unfold-vertical | 建议保留 |
+| [ ] | 去除注释 | message-square-x | 可选 |
+| [ ] | 压缩并复制 | clipboard-copy | 建议保留 |
+| [ ] | 压缩转义并复制 | text-quote | 可选 |
+| [ ] | 转 XML 并复制 | code-xml | 可选 |
+| [ ] | 转 TypeScript 并复制 | file-type | 可选 |
+
+建议保留项直接服务查看与复制；转义、XML、TypeScript 的使用频率尚不明确。格式化和去注释属于编辑操作，应可撤销；后四项转换结果仅写入剪贴板，不替换文档。输入不支持相应转换时用 alert + tooltip 提示；支持 JSONC 的范围和转换细节在实现前确认。
+
+## 待决定
+
+1. **首版工具范围**：推荐保留格式化、折叠、展开、压缩复制，其余待勾选；本稿仍展示全部 8 项，便于评审。
+2. **新建窗口快捷键**：推荐全局 ⌃⌥⌘J，与已用的常亮 ⌃⌥⌘K 对称，避开常见系统编辑组合；不能保证没有用户自定义冲突，沿用已有快捷键录制／冲突流程。置顶 ⌥⌘P 为窗口内快捷键，不全局注册。
+3. **已打开窗口列表**：推荐保留，未命名文档按序号命名，文件按文件名显示；较多窗口改为子菜单，数量阈值留待实现验证。
+4. **大文件阈值**：推荐以单行长度与文档体积共同判断，先做实际 CodeMirror 验证再定具体数值；不把任意阈值写进产品文案。超大 Worker 数据传递与结果大小上限也需实测。
+5. **结果面板与求值节奏**：推荐默认折叠空结果、首次有效结果展开，结构结果可调整高度；先试 120ms 防抖（不属于 Worker 的 200ms 执行预算），再根据实际输入体验调整。
+6. **脏文档与剪贴板范围**：推荐复用既有未保存文档提示；仅新建窗口读取剪贴板，已有窗口获得焦点不自动覆盖。JSONC、去注释及 XML／TypeScript 的输出约定在实现阶段确认。
+
+以上均按推荐方案先画，等待维护者评审，不阻塞本轮交付。
+
+## 变量、组件与验证
+
+复用 R04 的 Icon button 尺寸／Tooltip／Settings window／Settings row／Switch／Inset divider／Navigation item，以及 R05 Native menu item 和 Keyboard shortcut（Space2 键间距）。新增组件清单和源节点 ID 见 [组件索引](../../component-index.md) 与 [复开记录](render-validation.json)。15 个新增 Lucide 0.468.0 SVG 与既有 ISC 许可证一并保存于 assets 目录。
+
+[拟议 Token](proposed-tokens.json) 包含等宽字体和 JSON 几何尺寸，只用于本轮设计；既有应用 Token 与 Go 代码未修改。文案纳入中英文资源；颜色、圆角、字号、字重、行高与 padding／gap 引用变量。几何 x/y/width/height 按既有 CLI 约定保存解析值，不计作样式写死。
+
+```sh
+python3 design/scripts/export-r07.py --cli-file "$PEN_CLI_FILE"
+python3 design/scripts/audit.py --out design/rounds/R07-2026-10-30-JSON/audit.json
+python3 design/scripts/layout.py --cli-file "$PEN_CLI_FILE" --out design/rounds/R07-2026-10-30-JSON/layout-validation.json
+python3 design/scripts/contrast.py --out design/rounds/R07-2026-10-30-JSON/contrast-validation.json
+./scripts/selftest.sh
+```
+
+- [样式审计](audit.json)：颜色、圆角、字号、间距写死均为 **0**，无缺失变量、悬空 ref 或既有 Token 漂移。
+- [布局检查](layout-validation.json)：检查真实展开尺寸、轮次标签和顶层对象间距；要求至少 80，R06／R07 带间超过 200。
+- [复开检查](render-validation.json)：四张双语主题评审板及四张 2× 主窗口，0 裁切、0 可见英文场景混入中文，空窗口文字数量为 0。全部 PNG 已离线目视核对。
+- [对比度](contrast-validation.json)：沿用灰阶和语义红，活动文字最低 4.55:1，必要图形最低 4.05:1；不计停用控件和装饰分隔线。
+- [历史核对](historical-validation.json)：CLI 比较历史顶层子树的序列化长度与双指纹，历史归档和品牌资产无改动。
+- `./scripts/selftest.sh` 全部通过，覆盖格式、Token 生成一致性、防重叠、TIFF、go vet、go test、darwin/arm64 构建与 ad hoc 签名。没有启动或激活应用窗口；静态设计不代替 JSON 编辑器、Worker、快捷键和多窗口的运行验收。
+
+本轮仅交付设计资源与设计导出脚本；不写应用功能代码、不连接桌面端、不做浏览器检查、不上传截图附件、不合并。

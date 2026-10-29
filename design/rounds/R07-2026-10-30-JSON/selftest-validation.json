@@ -1,0 +1,16 @@
+{
+  "command": "./scripts/selftest.sh",
+  "passed": true,
+  "exitCode": 0,
+  "checks": [
+    "gofmt",
+    "generated tokens match",
+    "headless canvas overlap check",
+    "menu bar TIFF assets",
+    "go vet ./...",
+    "go test ./...",
+    "darwin/arm64 build",
+    "ad hoc signature"
+  ],
+  "runtimeUI": false
+}

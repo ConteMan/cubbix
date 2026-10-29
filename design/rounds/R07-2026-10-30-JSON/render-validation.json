@@ -1,0 +1,277 @@
+{
+  "cliVersion": "0.3.13",
+  "sourceSha256": "90ac9f3f8ae97a74c117ff4c54a04068be57f585cacb528c5b2e7430c252ad10",
+  "nativeLayout": {
+    "nodes": 3148,
+    "problems": [],
+    "emptyWindowTextCount": 0,
+    "localizationProblems": [],
+    "windowSizes": [
+      {
+        "language": "zh-CN",
+        "mode": "light",
+        "width": 840,
+        "height": 520
+      },
+      {
+        "language": "zh-CN",
+        "mode": "dark",
+        "width": 840,
+        "height": 520
+      },
+      {
+        "language": "en",
+        "mode": "light",
+        "width": 840,
+        "height": 520
+      },
+      {
+        "language": "en",
+        "mode": "dark",
+        "width": 840,
+        "height": 520
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "vnA76",
+      "name": "R07 Icon/pin"
+    },
+    {
+      "id": "Sr9bx",
+      "name": "R07 Icon/folder-open"
+    },
+    {
+      "id": "YHZ39",
+      "name": "R07 Icon/copy"
+    },
+    {
+      "id": "vq9Aj",
+      "name": "R07 Icon/fold-vertical"
+    },
+    {
+      "id": "k5lTWJ",
+      "name": "R07 Icon/unfold-vertical"
+    },
+    {
+      "id": "cf6H7",
+      "name": "R07 Icon/message-square-x"
+    },
+    {
+      "id": "VqDNy",
+      "name": "R07 Icon/clipboard-copy"
+    },
+    {
+      "id": "VoL1f",
+      "name": "R07 Icon/text-quote"
+    },
+    {
+      "id": "Met7Z",
+      "name": "R07 Icon/code-xml"
+    },
+    {
+      "id": "iakjU",
+      "name": "R07 Icon/file-type"
+    },
+    {
+      "id": "i8eMV",
+      "name": "R07 Icon/file-input"
+    },
+    {
+      "id": "Lq8Qv",
+      "name": "R07 Icon/chevron-down"
+    },
+    {
+      "id": "Faq6Y",
+      "name": "R07 Icon/gauge"
+    },
+    {
+      "id": "tyiHF",
+      "name": "R07 Icon/clock-3"
+    },
+    {
+      "id": "EUd6P",
+      "name": "R07 Icon/square"
+    },
+    {
+      "id": "rcCKQ",
+      "name": "R07 Native window controls"
+    },
+    {
+      "id": "hYJPT",
+      "name": "R07 Window toolbar"
+    },
+    {
+      "id": "kAiAF",
+      "name": "R07 Utility toolbar"
+    },
+    {
+      "id": "Q4Xx4j",
+      "name": "R07 this input"
+    },
+    {
+      "id": "hmKwu",
+      "name": "R07 Code line"
+    },
+    {
+      "id": "zXt8W",
+      "name": "R07 JSON editor"
+    },
+    {
+      "id": "kCDl6",
+      "name": "R07 Result panel"
+    },
+    {
+      "id": "i1Q1N8",
+      "name": "R07 JSON window"
+    },
+    {
+      "id": "CqaJa",
+      "name": "R07 Empty window"
+    },
+    {
+      "id": "NUat9",
+      "name": "R07 State / Array"
+    },
+    {
+      "id": "vZdRC",
+      "name": "R07 State / Object"
+    },
+    {
+      "id": "Q39nxd",
+      "name": "R07 State / Undefined"
+    },
+    {
+      "id": "EJtG6",
+      "name": "R07 State / Error"
+    },
+    {
+      "id": "BVTVj",
+      "name": "R07 State / Timeout"
+    },
+    {
+      "id": "i2RJ2q",
+      "name": "R07 State / Large"
+    },
+    {
+      "id": "j22mq",
+      "name": "R07 Native menu / off"
+    },
+    {
+      "id": "XQacm",
+      "name": "R07 Native menu / active"
+    },
+    {
+      "id": "ik3nL",
+      "name": "R07 Settings / tiles"
+    },
+    {
+      "id": "SuszQ",
+      "name": "R07 Settings / shortcuts"
+    },
+    {
+      "id": "cocmG",
+      "name": "R07 Tool selection"
+    },
+    {
+      "id": "PByrK",
+      "name": "R07 Action / Format"
+    },
+    {
+      "id": "Ng6hD",
+      "name": "R07 Action / Fold"
+    },
+    {
+      "id": "g3HzZW",
+      "name": "R07 Action / Unfold"
+    },
+    {
+      "id": "QEYwF",
+      "name": "R07 Action / Comments"
+    },
+    {
+      "id": "VnixZ",
+      "name": "R07 Action / Minify"
+    },
+    {
+      "id": "kIrp3",
+      "name": "R07 Action / Escape"
+    },
+    {
+      "id": "Mrqdh",
+      "name": "R07 Action / XML"
+    },
+    {
+      "id": "Vlafs",
+      "name": "R07 Action / TypeScript"
+    },
+    {
+      "id": "NMhjk",
+      "name": "R07 Action / Pin"
+    },
+    {
+      "id": "sFk8V",
+      "name": "R07 Action / Unpin"
+    },
+    {
+      "id": "ICb8f",
+      "name": "R07 Action / Open"
+    },
+    {
+      "id": "gPAiw",
+      "name": "R07 Action / Copy"
+    }
+  ],
+  "exports": [
+    {
+      "nodeId": "FMK4c",
+      "file": "zh-CN-light.png",
+      "scale": 1,
+      "sha256": "69acffd47516d9c04f40952dc8396c354e0b13500ca4f7d3e8ea63750c8aa4b0"
+    },
+    {
+      "nodeId": "vrywv",
+      "file": "window-zh-CN-light.png",
+      "scale": 2,
+      "sha256": "254b7f2ca6ce6b58c8bbfdc05ebb0e99acbe1b8444f4be179235f7a6a7eab70a"
+    },
+    {
+      "nodeId": "ENGSi",
+      "file": "zh-CN-dark.png",
+      "scale": 1,
+      "sha256": "515afbdc0ebffe8994de2c1f1bc9b74148b8a60c80416aebb164bd8fa31e074f"
+    },
+    {
+      "nodeId": "vqA8M",
+      "file": "window-zh-CN-dark.png",
+      "scale": 2,
+      "sha256": "bcf6a7e9690c26c06553412cb1d0478b2ad9e346808f89f117f0d53ba5bf1165"
+    },
+    {
+      "nodeId": "YOReS",
+      "file": "en-light.png",
+      "scale": 1,
+      "sha256": "7c5860383d24fe07fc5a30f3dc1d69dbfceab1f155a79897cc3b91a562ada864"
+    },
+    {
+      "nodeId": "NdDcl",
+      "file": "window-en-light.png",
+      "scale": 2,
+      "sha256": "254b7f2ca6ce6b58c8bbfdc05ebb0e99acbe1b8444f4be179235f7a6a7eab70a"
+    },
+    {
+      "nodeId": "JHzan",
+      "file": "en-dark.png",
+      "scale": 1,
+      "sha256": "07e6f3126b1d618c1c6a2ddc5795b9dcb83ef364dc09f276ab6eb86fa1343c93"
+    },
+    {
+      "nodeId": "LolgQ",
+      "file": "window-en-dark.png",
+      "scale": 2,
+      "sha256": "bcf6a7e9690c26c06553412cb1d0478b2ad9e346808f89f117f0d53ba5bf1165"
+    }
+  ],
+  "passed": true
+}
