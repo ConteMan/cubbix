@@ -19,7 +19,7 @@ import (
 //go:embed design/locales/*.json assets/menubar-template.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
 var assets embed.FS
 
-const appVersion = "0.0.1"
+const appVersion = "0.0.2"
 
 type application struct {
 	config        Config
