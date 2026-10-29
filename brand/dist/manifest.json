@@ -2,7 +2,7 @@
   "schema": 2,
   "source": {
     "file": "brand/cubbix-logo.pen",
-    "sha256": "f75b2fa6384f85b07e29b7a909012726d776bc21df11a353772e65a851f46ce0",
+    "sha256": "61ca02ce07b257a7e27dde6f7473a2eb9371bd8ac38912ce9a1988ec7bcd870d",
     "artboard_id": "n0a0W",
     "node_count": 6,
     "geometry_sha256": "2d7ff25d277894d911ee810259b533f133f63d8fe9c0548d6b1b9b44161fcfa5",
@@ -20,7 +20,7 @@
   },
   "generator": {
     "file": "brand/scripts/export.py",
-    "sha256": "7b31ac8eddfe5faade84bf7c2c0fa86c1d45b8f5845e82909595bf321923a543",
+    "sha256": "fc63a044f0d467fa0f9bf3a56873aa3721b8c5e7929ccb82a156f49efbe5e37f",
     "versions": {
       "pen_cli": "0.3.12",
       "resvg": "2.6.2",

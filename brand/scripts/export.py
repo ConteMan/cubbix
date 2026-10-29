@@ -31,6 +31,7 @@ MASTER_ID = 'n0a0W'
 STATE_NAME = '菜单栏状态 · 常亮点'
 INK = '#202522'
 ORANGE = '#FF9A3D'
+CANVAS_BG = '#FFFFFF'
 SIZES = (16, 32, 64, 128, 256, 512, 1024)
 NS = '{http://www.w3.org/2000/svg}'
 ET.register_namespace('', NS[1:-1])
@@ -137,6 +138,8 @@ def active_nodes(state: dict, master: dict, bounds) -> tuple[dict, dict]:
                 raise ValueError('Artboard coordinates must be finite numbers')
     if (state['width'], state['height']) != (1024, 1024):
         raise ValueError('The active-state canvas must remain 1024 by 1024')
+    if str(state.get('fill', '')).upper() != CANVAS_BG:
+        raise ValueError('The active-state frame must use a white editing backdrop')
     if state['x'] < master['x'] + master['width'] + 80 or state['y'] != master['y']:
         raise ValueError('Place the active-state artboard to the right with at least 80 units of space')
     if state.get('layout', 'none') != 'none' or unsupported_style(state):
@@ -157,8 +160,9 @@ def active_nodes(state: dict, master: dict, bounds) -> tuple[dict, dict]:
             raise ValueError('Active-state circles must stay inside the 1024 canvas')
     dot = next(n for n in layers if n['name'] == '常亮点')
     clearance = next(n for n in layers if n['name'] == '常亮点留白')
-    if str(dot.get('fill', '')).upper() != INK or str(clearance.get('fill', '')).upper() != ORANGE:
-        raise ValueError('Use ink for the dot and the master background for the clearance guide')
+    if str(dot.get('fill', '')).upper() != INK:
+        raise ValueError('Use ink for the dot')
+    # Clearance fill is an editing guide only; the eraser uses circle geometry.
     if any(not math.isclose(dot[k] + dot['width'] / 2, clearance[k] + clearance['width'] / 2,
                             rel_tol=0, abs_tol=1e-7) for k in ('x', 'y')):
         raise ValueError('The dot and clearance must be concentric')
@@ -204,8 +208,8 @@ def source_nodes(master: dict) -> list[dict]:
             if vw <= 0 or vh <= 0:
                 raise ValueError('A path has an empty viewBox')
             parse_path(node['geometry'])
-    if str(master.get('fill', '')).upper() != ORANGE:
-        raise ValueError('The master frame must retain the approved orange')
+    if str(master.get('fill', '')).upper() != CANVAS_BG:
+        raise ValueError('The master frame must use a white editing backdrop')
     return nodes
 
 
