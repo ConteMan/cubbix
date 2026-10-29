@@ -81,7 +81,7 @@ func TestNotesRejectMismatchedManifestVersion(t *testing.T) {
 
 func TestBundledHistoryIsBilingualOrderedAndMatchesVersion(t *testing.T) {
 	zh, en := parseReleaseNotes(changelogChinese), parseReleaseNotes(changelogEnglish)
-	if len(zh) != 3 || len(en) != len(zh) || zh[0].Version != appVersion {
+	if len(zh) == 0 || len(en) != len(zh) || zh[0].Version != appVersion {
 		t.Fatal("bundled version history mismatch")
 	}
 	for i := range zh {
@@ -92,10 +92,10 @@ func TestBundledHistoryIsBilingualOrderedAndMatchesVersion(t *testing.T) {
 			t.Fatal("history not descending")
 		}
 	}
-	remote := "## 0.0.10 — 2026-11-01\n\n- New notes\n\n## 0.0.3 — 2026-10-29\n\nWRONG BODY"
+	remote := "## 99.0.0 — 2099-01-01\n\n- New notes\n\n## 0.0.3 — 2026-10-29\n\nWRONG BODY"
 	for _, locale := range []string{"zh-CN", "en"} {
 		history := releaseHistory(locale, remote)
-		if len(history) != 4 || history[0].Version != "0.0.10" || history[0].Date != "2026-11-01" || strings.Contains(history[1].Notes, "WRONG BODY") {
+		if len(history) != len(zh)+1 || history[0].Version != "99.0.0" || history[0].Date != "2099-01-01" || strings.Contains(history[1].Notes, "WRONG BODY") {
 			t.Fatalf("merged history: %+v", history)
 		}
 	}

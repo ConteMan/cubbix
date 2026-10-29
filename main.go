@@ -20,7 +20,7 @@ import (
 //go:embed design/locales/*.json assets/*.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
 var assets embed.FS
 
-const appVersion = "0.0.3"
+const appVersion = "0.1.0"
 
 type application struct {
 	registerShortcut       func(string, func()) error
