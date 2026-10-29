@@ -18,6 +18,8 @@ python3 scripts/tokens.py --check
 python3 design/scripts/layout.py
 tiffutil -cathidpicheck brand/dist/menubar-template.png brand/dist/menubar-template@2x.png -out "$tmp_dir/menubar-template.tiff"
 cmp assets/menubar-template.tiff "$tmp_dir/menubar-template.tiff"
+tiffutil -cathidpicheck brand/dist/menubar-template-active.png brand/dist/menubar-template-active@2x.png -out "$tmp_dir/menubar-template-active.tiff"
+cmp assets/menubar-template-active.tiff "$tmp_dir/menubar-template-active.tiff"
 go vet ./...
 go test ./...
 release_dir="$HOME/Projects/temp/cubbix/release"

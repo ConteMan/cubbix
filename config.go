@@ -12,16 +12,23 @@ import (
 const configVersion = 1
 
 type Config struct {
-	Version          int    `toml:"version"`
-	Language         string `toml:"language"`
-	OpenAtLogin      bool   `toml:"open_at_login"`
-	AutomaticUpdates bool   `toml:"automatic_updates"`
-	WindowWidth      int    `toml:"window_width,omitempty"`
-	WindowHeight     int    `toml:"window_height,omitempty"`
+	Version          int           `toml:"version"`
+	Language         string        `toml:"language"`
+	OpenAtLogin      bool          `toml:"open_at_login"`
+	AutomaticUpdates bool          `toml:"automatic_updates"`
+	AwakeEnabled     bool          `toml:"awake_enabled"`
+	AwakeMode        string        `toml:"awake_mode"`
+	AwakeMinutes     int           `toml:"awake_minutes"`
+	AwakeUntil       string        `toml:"awake_until,omitempty"`
+	AwakeShortcut    string        `toml:"awake_shortcut"`
+	AwakeSession     *awakeSession `toml:"awake_session,omitempty"`
+	RestoreAwake     bool          `toml:"restore_awake,omitempty"`
+	WindowWidth      int           `toml:"window_width,omitempty"`
+	WindowHeight     int           `toml:"window_height,omitempty"`
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true}
+	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, AwakeMode: "screen", AwakeMinutes: 60, AwakeShortcut: "Ctrl+Alt+Cmd+K"}
 }
 
 func loadConfig(path string) (Config, error) {

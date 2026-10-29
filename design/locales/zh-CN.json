@@ -119,5 +119,19 @@
   "MenuCut": "剪切",
   "MenuCopy": "复制",
   "MenuPaste": "粘贴",
-  "MenuSelectAll": "全选"
+  "MenuSelectAll": "全选",
+  "AwakeRemaining": "剩余 %d:%02d",
+  "AwakeFollowing": "跟随 %s",
+  "AwakeStartError": "无法开启常亮，请重试",
+  "AwakeExitError": "常亮进程意外退出，请重新开启",
+  "DurationError": "请输入有效的小时和分钟（1 分钟至 8760 小时 59 分钟）",
+  "TimeError": "请输入 24 小时制时间，例如 02:30",
+  "ProcessListError": "无法读取进程列表，请重试",
+  "ProcessEnded": "所选进程已结束，请重新选择",
+  "ShortcutUnavailable": "快捷键无法注册，可能已被占用",
+  "ShortcutAppConflict": "此组合键已用于本应用的其他操作",
+  "ShortcutSystemConflict": "此组合键是已知的系统快捷键",
+  "ShortcutModifierRequired": "请至少使用一个修饰键",
+  "ShortcutRecordAction": "录制常亮快捷键",
+  "ShortcutSettingsSuffix": "已用于打开设置"
 }

@@ -119,5 +119,19 @@
   "MenuCut": "Cut",
   "MenuCopy": "Copy",
   "MenuPaste": "Paste",
-  "MenuSelectAll": "Select All"
+  "MenuSelectAll": "Select All",
+  "AwakeRemaining": "%d:%02d left",
+  "AwakeFollowing": "following %s",
+  "AwakeStartError": "Could not start keep awake. Try again.",
+  "AwakeExitError": "Keep awake stopped unexpectedly. Start it again.",
+  "DurationError": "Enter valid hours and minutes (1 minute to 8760 hours 59 minutes).",
+  "TimeError": "Enter a time in 24-hour format, such as 02:30.",
+  "ProcessListError": "Could not read the process list. Try again.",
+  "ProcessEnded": "The selected process has ended. Choose another.",
+  "ShortcutUnavailable": "Could not register this shortcut. It may already be in use.",
+  "ShortcutAppConflict": "This shortcut is already used by another app action.",
+  "ShortcutSystemConflict": "This combination is a known system shortcut.",
+  "ShortcutModifierRequired": "Include at least one modifier key.",
+  "ShortcutRecordAction": "Record keep awake shortcut",
+  "ShortcutSettingsSuffix": "opens Settings"
 }
