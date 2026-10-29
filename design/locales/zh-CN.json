@@ -39,9 +39,7 @@
   "UnsavedBody": "请先保存文档以保留更改，再重启更新。",
   "Cancel": "取消",
   "ReturnToDocuments": "返回文档",
-  "UpdateSourceMissing": "尚未配置更新源",
   "CheckAction": "检查更新",
-  "UpdateNotesUnavailable": "尚未配置更新内容",
   "LoginError": "无法更改开机启动设置",
   "ConfigError": "无法保存设置",
   "R05Off": "未开启",
@@ -102,5 +100,16 @@
   "R05Alt": "备选 · 开启时加点",
   "R05Stress": "16pt 辨识检查",
   "R05App": "Cubbix",
-  "R05Esc": "Esc"
+  "R05Esc": "Esc",
+  "MenuRestartUpdate": "重启以完成更新",
+  "UpdateDisabled": "此构建或安装位置不支持自动更新，请使用可写位置中的正式版本",
+  "UpdateNetworkError": "无法连接更新服务，请检查网络后重试",
+  "UpdateSignatureError": "更新验签失败，未安装更新，请重试",
+  "UpdateFeedUnavailable": "尚无此平台的公开更新清单，请稍后重试",
+  "UpdateRateLimited": "更新服务暂时限制请求，请稍后重试",
+  "UpdateFailed": "无法完成更新，请检查安装位置是否可写并重试",
+  "UpdateDownloading": "正在下载并验证更新",
+  "NotesLoading": "正在读取更新内容",
+  "NotesNoNewer": "当前版本以来暂无更新内容",
+  "CloseNotes": "关闭更新内容 (⌘W / Esc)"
 }
