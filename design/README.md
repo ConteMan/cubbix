@@ -1,10 +1,12 @@
-# Cubbix 设计系统 R04 · 收尾
+# Cubbix 设计系统 · 常亮 R05B
 
-设计源为 [`cubbix.pen`](cubbix.pen)，本轮预览、规则与验证见 [R04 目录](rounds/R04-2026-10-28-收尾/README.md)。本轮在 main 的 Logo 定稿基础上完成单色猫标接入，并移除导航选中描边。R01／R02／R03 目录保留为历史归档。
+当前常亮菜单、三个小窗口、格子与快捷键设置、系统通知及菜单栏状态提案见 [R05B 交付](rounds/R05-2026-10-29-常亮/README.md)，覆盖中英文与浅深主题。设置页直接复用 R04 基础组件，当前共 82 个样式 Token、53 个 reusable、104 个中英文资源键。
 
-- [Token 映射](token-index.md)：74 个样式 Token，强调色只按浅深主题解析黑白灰。
-- [组件索引](component-index.md)：33 个 reusable、110 个源稿 ref。
-- [语言资源](locales/)：中文和英文各 40 个资源键。
+设计源为 [`cubbix.pen`](cubbix.pen)，R04 基础系统的预览、规则与验证见 [R04 目录](rounds/R04-2026-10-28-收尾/README.md)。R04 在 main 的 Logo 定稿基础上完成单色猫标接入，并移除导航选中描边。R01／R02／R03 目录保留为历史归档。
+
+- [Token 映射](token-index.md)：当前 82 个样式 Token，强调色只按浅深主题解析黑白灰。
+- [组件索引](component-index.md)：当前 53 个 reusable、234 个源稿 ref。
+- [语言资源](locales/)：中文和英文各 104 个资源键。
 - [Lucide 0.468.0 图标与 ISC 许可证](assets/lucide-0.468.0/)；品牌猫标来自 [`mark.svg`](../brand/dist/mark.svg)。
 
 ## 品牌与导航
@@ -25,6 +27,10 @@
 
 ## 验证与导出
 
+新画板用 `FindEmptySpace` 或按轮次带放置（同轮从左到右、轮次带间至少 200）；顶层画板及轮次标签之间至少留 80，提交前必须通过 `python3 design/scripts/layout.py` 防重叠检查，`scripts/selftest.sh` 已接入该检查。检查通过 headless CLI 0.3.13 读取实际尺寸，包含自动高度及 reusable ref；可用 `--cli-file` 或 `PEN_CLI_FILE` 复用本地 CLI。
+
+画布从上到下为 R01–R05。R01–R03 仅保留主题标签与带位，历史预览见对应归档目录；现存画板分别排入 R04、R05，不复制历史 PNG 为新画板。
+
 ```sh
 python3 design/scripts/audit.py --out design/rounds/R04-2026-10-28-收尾/audit.json
 python3 design/scripts/contrast.py --out design/rounds/R04-2026-10-28-收尾/contrast-validation.json
@@ -36,4 +42,4 @@ python3 design/scripts/review.py
 
 静态对比度按 W3C sRGB 公式计算，活动文字统一以 4.5:1、必要图形以 3:1 为阈值；停用控件和装饰分隔线除外。该检查不代替运行时可访问性验收。
 
-颜色、圆角、字号、字重、行高、padding 与 gap 保留变量。CLI 不保留 width/height 变量绑定，几何尺寸由 Token 解析为数值；文案来自语言资源。未上传截图附件、未做浏览器检查或应用自测；仓库尚无 `scripts/selftest.sh`。PR #10 仅推送，保留未合并。
+颜色、圆角、字号、字重、行高、padding 与 gap 保留变量。CLI 不保留 width/height 变量绑定，几何尺寸由 Token 解析为数值；文案来自语言资源。R05B 未上传截图附件、未做浏览器检查；仓库现有 `scripts/selftest.sh` 已全部通过，静态交互仍需后续运行验收。PR #13 保持可评审、未合并。

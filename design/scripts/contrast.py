@@ -29,6 +29,14 @@ def contrast(a, b):
     return (light + 0.05) / (dark + 0.05)
 
 
+def composite(color, background):
+    if len(color) != 9:
+        return color
+    alpha = int(color[7:9], 16) / 255
+    channels = [round(int(color[i:i + 2], 16) * alpha + int(background[i:i + 2], 16) * (1 - alpha)) for i in (1, 3, 5)]
+    return '#' + ''.join(f'{channel:02X}' for channel in channels)
+
+
 def audit():
     variables = json.loads((ROOT / 'tokens.json').read_text())['variables']
     text_pairs = [
@@ -39,6 +47,9 @@ def audit():
     for surface in ('ColorWindow', 'ColorCard', 'ColorSidebar', 'ColorControl', 'ColorAccentSoft', 'ColorNavHover'):
         for foreground in ('ColorText', 'ColorTextSecondary'):
             text_pairs.append((foreground + ' on ' + surface, foreground, surface))
+    if 'ColorMenuSurface' in variables:
+        for foreground in ('ColorText', 'ColorTextSecondary'):
+            text_pairs.append((foreground + ' on native menu', foreground, 'ColorMenuSurface'))
     graphic_pairs = [
         ('on switch thumb', 'ColorThumb', 'ColorAccent'),
         ('off switch thumb', 'ColorText', 'ColorControlHover'),
@@ -56,6 +67,7 @@ def audit():
         for category, items, threshold in (('text', text_pairs, 4.5), ('graphic', graphic_pairs, 3.0)):
             for purpose, foreground, background in items:
                 fg, bg = resolve(variables, foreground, mode), resolve(variables, background, mode)
+                bg = composite(bg, resolve(variables, 'ColorWindow', mode))
                 ratio = contrast(fg, bg)
                 pairs.append({'mode': mode, 'category': category, 'purpose': purpose,
                               'foregroundToken': foreground, 'backgroundToken': background,

@@ -1,0 +1,855 @@
+{
+  "schemaVersion": 1,
+  "cliVersion": "0.3.13",
+  "positionOnlyPhase": {
+    "existingTopLevelNodes": 38,
+    "nonPositionChanges": 0,
+    "variablesUnchanged": true,
+    "scale": 2,
+    "directExportsIdentical": 34,
+    "directExportBackdropDifferences": 4,
+    "isolatedExportsIdentical": 38,
+    "isolatedChangedPixels": 0,
+    "note": "Four originally overlapping translucent menu masters sampled each other through background blur. Isolated exports move only the target to the same empty area in temporary copies; all RGBA pixels match. All review-board PNGs match directly.",
+    "exports": [
+      {
+        "id": "AJEuu",
+        "name": "01 Foundations",
+        "width": 3680,
+        "height": 960,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "FO7EW",
+        "name": "02 Components and states",
+        "width": 3680,
+        "height": 2000,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "y6tUf",
+        "name": "Settings window",
+        "width": 1442,
+        "height": 354,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "rIbMb",
+        "name": "general-zh-CN-light",
+        "width": 1440,
+        "height": 352,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "ztBBK",
+        "name": "general-en-light",
+        "width": 1440,
+        "height": 352,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "d3UD1",
+        "name": "about-zh-CN-light",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "nknJR",
+        "name": "about-en-light",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "Pz9Qv",
+        "name": "general-zh-CN-dark",
+        "width": 1440,
+        "height": 352,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "G04tZ",
+        "name": "general-en-dark",
+        "width": 1440,
+        "height": 352,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "wUVXs",
+        "name": "about-zh-CN-dark",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "H1kV1",
+        "name": "about-en-dark",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "f9UC6",
+        "name": "restart-confirmation-zh-CN-light",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "EdVPb",
+        "name": "restart-confirmation-en-light",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "IxA8h",
+        "name": "restart-confirmation-zh-CN-dark",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "M0z6f1",
+        "name": "restart-confirmation-en-dark",
+        "width": 1440,
+        "height": 632,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "nfzJX",
+        "name": "brand-comparison",
+        "width": 3024,
+        "height": 1112,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "O8Imme",
+        "name": "R05 Icon/terminal",
+        "width": 32,
+        "height": 32,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "H8TPWq",
+        "name": "R05 Icon/keyboard",
+        "width": 32,
+        "height": 32,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "GgZ43",
+        "name": "R05 Icon/search",
+        "width": 32,
+        "height": 32,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "xz4Am",
+        "name": "R05 Native menu item",
+        "width": 704,
+        "height": 56,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "RLMny",
+        "name": "R05 Native menu / off",
+        "width": 778,
+        "height": 526,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "re5DI",
+        "name": "R05 Native menu / active",
+        "width": 778,
+        "height": 520,
+        "changedPixels": 269389,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "vXGvH",
+        "name": "R05 Native submenu / mode",
+        "width": 778,
+        "height": 214,
+        "changedPixels": 95360,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "IuqUj",
+        "name": "R05 Native submenu / duration",
+        "width": 778,
+        "height": 520,
+        "changedPixels": 307906,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "DUqvf",
+        "name": "R05 Native status variants",
+        "width": 778,
+        "height": 334,
+        "changedPixels": 177301,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "X88ii6",
+        "name": "R05 Keyboard field",
+        "width": 328,
+        "height": 56,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "Dh9pW",
+        "name": "R05 Shortcut recorder",
+        "width": 376,
+        "height": 56,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "sE9lv",
+        "name": "R05 Conflict tooltip",
+        "width": 238,
+        "height": 60,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "d2Shh",
+        "name": "R05 Dialog / duration",
+        "width": 882,
+        "height": 182,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "bxxcd",
+        "name": "R05 Dialog / time",
+        "width": 882,
+        "height": 182,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "n2m80",
+        "name": "R05 Dialog / process",
+        "width": 882,
+        "height": 514,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "zKcs0",
+        "name": "R05 Settings / tiles",
+        "width": 1442,
+        "height": 466,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "QgsRX",
+        "name": "R05 Settings / shortcuts",
+        "width": 1442,
+        "height": 466,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "wHXVo",
+        "name": "R05 System notification",
+        "width": 954,
+        "height": 260,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "nFPPv",
+        "name": "R05 zh-CN light",
+        "width": 3040,
+        "height": 2572,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "vGd6A",
+        "name": "R05 zh-CN dark",
+        "width": 3040,
+        "height": 2572,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "Tdb02",
+        "name": "R05 en light",
+        "width": 3040,
+        "height": 2572,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      },
+      {
+        "id": "PSKKt",
+        "name": "R05 en dark",
+        "width": 3040,
+        "height": 2572,
+        "changedPixels": 0,
+        "isolatedChangedPixels": 0
+      }
+    ]
+  },
+  "finalLayout": {
+    "minimumRequiredGap": 80,
+    "minimumGap": 96.0,
+    "nodeCount": 45,
+    "errors": [],
+    "passed": true
+  },
+  "roundLabels": [
+    {
+      "round": "R01",
+      "name": "R01 / 设计系统 · 历史预览归档",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 112,
+        "height": 16
+      }
+    },
+    {
+      "round": "R02",
+      "name": "R02 / 设计系统修订 · 历史预览归档",
+      "bounds": {
+        "x": 0,
+        "y": 320,
+        "width": 127,
+        "height": 16
+      }
+    },
+    {
+      "round": "R03",
+      "name": "R03 / 黑白灰 · 历史预览归档",
+      "bounds": {
+        "x": 0,
+        "y": 640,
+        "width": 105,
+        "height": 16
+      }
+    },
+    {
+      "round": "R04",
+      "name": "R04 / 品牌与基础组件",
+      "bounds": {
+        "x": 0,
+        "y": 960,
+        "width": 81,
+        "height": 16
+      }
+    },
+    {
+      "round": "R05",
+      "name": "R05 / 常亮格子",
+      "bounds": {
+        "x": 0,
+        "y": 2272,
+        "width": 60,
+        "height": 16
+      }
+    }
+  ],
+  "roundBandGap": 200,
+  "sameRoundBoardGap": 120,
+  "r01ToR03": "Historical PNG archives only; labeled bands reserved without duplicating content.",
+  "r04ContentUnchanged": 16,
+  "nativeMenuContentUnchanged": 6,
+  "shortcut": {
+    "gapToken": "Space2",
+    "gap": 2,
+    "component": "NKc7D",
+    "symbolLayers": 4,
+    "verticalAlignment": "center",
+    "customFieldMethod": "Space2 letterSpacing on existing text layers; recording placeholders and numeric fields use Space0.",
+    "checkedCustomShortcutFields": 15,
+    "checkedComponentInstancesAndMaster": 11,
+    "nativeMenuShortcutsUnchanged": true,
+    "resolved": [
+      {
+        "id": "s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "v1kPU/s4vo4",
+        "content": "1"
+      },
+      {
+        "id": "IVybi/s4vo4",
+        "content": "30"
+      },
+      {
+        "id": "O4B2Hm/s4vo4",
+        "content": "02 : 30"
+      },
+      {
+        "id": "o1Wrb/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "NVCeE/v1kPU/s4vo4",
+        "content": "1"
+      },
+      {
+        "id": "NVCeE/IVybi/s4vo4",
+        "content": "30"
+      },
+      {
+        "id": "khiDI/O4B2Hm/s4vo4",
+        "content": "02 : 30"
+      },
+      {
+        "id": "Uk6K4/F9YA7/kqrak/o1Wrb/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "VBI2i/DzPjc/s4vo4",
+        "content": "按下组合键…"
+      },
+      {
+        "id": "iHJIz/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "OCdud/tqQL2",
+        "content": "开始常亮 ("
+      },
+      {
+        "id": "OCdud/fAuNp",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃"
+          },
+          {
+            "name": "Option",
+            "content": "⌥"
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": "K"
+          }
+        ]
+      },
+      {
+        "id": "iiTlf/DzPjc/s4vo4",
+        "content": "⌘,",
+        "letterSpacing": 2
+      },
+      {
+        "id": "l3VGN6/s0jMyu",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃",
+            "enabled": false
+          },
+          {
+            "name": "Option",
+            "content": "⌥",
+            "enabled": false
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": ","
+          }
+        ]
+      },
+      {
+        "id": "l3VGN6/a48efV",
+        "content": " 已用于打开设置"
+      },
+      {
+        "id": "hjoCI/v1kPU/s4vo4",
+        "content": "1"
+      },
+      {
+        "id": "hjoCI/IVybi/s4vo4",
+        "content": "30"
+      },
+      {
+        "id": "uvYxD/O4B2Hm/s4vo4",
+        "content": "02 : 30"
+      },
+      {
+        "id": "w3doQ/F9YA7/kqrak/o1Wrb/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "a9siqz/DzPjc/s4vo4",
+        "content": "按下组合键…"
+      },
+      {
+        "id": "HaGvO/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "PV1ZZ/tqQL2",
+        "content": "开始常亮 ("
+      },
+      {
+        "id": "PV1ZZ/fAuNp",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃"
+          },
+          {
+            "name": "Option",
+            "content": "⌥"
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": "K"
+          }
+        ]
+      },
+      {
+        "id": "fYRn8/DzPjc/s4vo4",
+        "content": "⌘,",
+        "letterSpacing": 2
+      },
+      {
+        "id": "aJsF1/s0jMyu",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃",
+            "enabled": false
+          },
+          {
+            "name": "Option",
+            "content": "⌥",
+            "enabled": false
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": ","
+          }
+        ]
+      },
+      {
+        "id": "aJsF1/a48efV",
+        "content": " 已用于打开设置"
+      },
+      {
+        "id": "ezwL7/v1kPU/s4vo4",
+        "content": "1"
+      },
+      {
+        "id": "ezwL7/IVybi/s4vo4",
+        "content": "30"
+      },
+      {
+        "id": "InPC1/O4B2Hm/s4vo4",
+        "content": "02 : 30"
+      },
+      {
+        "id": "mwHqL/F9YA7/kqrak/o1Wrb/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "Ypcaq/DzPjc/s4vo4",
+        "content": "Press keys…"
+      },
+      {
+        "id": "YrioG/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "v9kdIs/tqQL2",
+        "content": "Start keep awake ("
+      },
+      {
+        "id": "v9kdIs/fAuNp",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃"
+          },
+          {
+            "name": "Option",
+            "content": "⌥"
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": "K"
+          }
+        ]
+      },
+      {
+        "id": "CXvio/DzPjc/s4vo4",
+        "content": "⌘,",
+        "letterSpacing": 2
+      },
+      {
+        "id": "yMn3E/s0jMyu",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃",
+            "enabled": false
+          },
+          {
+            "name": "Option",
+            "content": "⌥",
+            "enabled": false
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": ","
+          }
+        ]
+      },
+      {
+        "id": "yMn3E/a48efV",
+        "content": " opens Settings"
+      },
+      {
+        "id": "VNizC/v1kPU/s4vo4",
+        "content": "1"
+      },
+      {
+        "id": "VNizC/IVybi/s4vo4",
+        "content": "30"
+      },
+      {
+        "id": "XJRpH/O4B2Hm/s4vo4",
+        "content": "02 : 30"
+      },
+      {
+        "id": "Y7o6Y/F9YA7/kqrak/o1Wrb/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "rHnBF/DzPjc/s4vo4",
+        "content": "Press keys…"
+      },
+      {
+        "id": "EQof8/DzPjc/s4vo4",
+        "content": "⌃⌥⌘K",
+        "letterSpacing": 2
+      },
+      {
+        "id": "uJIya/tqQL2",
+        "content": "Start keep awake ("
+      },
+      {
+        "id": "uJIya/fAuNp",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃"
+          },
+          {
+            "name": "Option",
+            "content": "⌥"
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": "K"
+          }
+        ]
+      },
+      {
+        "id": "U3Cje/DzPjc/s4vo4",
+        "content": "⌘,",
+        "letterSpacing": 2
+      },
+      {
+        "id": "VIhhp/s0jMyu",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃",
+            "enabled": false
+          },
+          {
+            "name": "Option",
+            "content": "⌥",
+            "enabled": false
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": ","
+          }
+        ]
+      },
+      {
+        "id": "VIhhp/a48efV",
+        "content": " opens Settings"
+      },
+      {
+        "id": "NKc7D",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃"
+          },
+          {
+            "name": "Option",
+            "content": "⌥"
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": "K"
+          }
+        ]
+      },
+      {
+        "id": "s0jMyu",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃",
+            "enabled": false
+          },
+          {
+            "name": "Option",
+            "content": "⌥",
+            "enabled": false
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": ","
+          }
+        ]
+      },
+      {
+        "id": "a48efV",
+        "content": " 已用于打开设置"
+      },
+      {
+        "id": "tqQL2",
+        "content": "开始常亮 ("
+      },
+      {
+        "id": "fAuNp",
+        "gap": 2,
+        "alignItems": "center",
+        "keys": [
+          {
+            "name": "Control",
+            "content": "⌃"
+          },
+          {
+            "name": "Option",
+            "content": "⌥"
+          },
+          {
+            "name": "Command",
+            "content": "⌘"
+          },
+          {
+            "name": "Key",
+            "content": "K"
+          }
+        ]
+      }
+    ]
+  },
+  "sourceSha256": "27c444c1c05b29f9a2f97770e4fd1d8826bb61260e62a5dfcb91ce1a25abdfee",
+  "selftestPassed": true,
+  "passed": true
+}

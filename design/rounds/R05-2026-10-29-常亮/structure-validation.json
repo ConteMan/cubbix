@@ -1,0 +1,39 @@
+{
+  "checks": {
+    "r04NodesPreserved": true,
+    "r04ArchivedFilesPreserved": true,
+    "brandFilesPreserved": true,
+    "twoSettingsPagesAt720x232": true,
+    "sameBilingualResourceKeys": true,
+    "allMenubarAssetsMatchManifest": true,
+    "closedEyesPreserveOuterAlpha": true
+  },
+  "preservedR04RootNodes": 16,
+  "preservedR04ArchivedFiles": 23,
+  "preservedBrandFiles": 287,
+  "r04ReusableIds": [
+    "y6tUf",
+    "X6uV6",
+    "PodLz",
+    "KfHWu",
+    "fezUM",
+    "zlRGT",
+    "sFUcN"
+  ],
+  "menubarProposalAssetCount": 48,
+  "localeKeysPerLanguage": 104,
+  "selftest": {
+    "command": "./scripts/selftest.sh",
+    "exitCode": 0,
+    "checks": [
+      "gofmt",
+      "generated tokens",
+      "menu bar TIFF",
+      "go vet",
+      "go test",
+      "darwin/arm64 build",
+      "ad hoc signing"
+    ]
+  },
+  "passed": true
+}
