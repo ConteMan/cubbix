@@ -15,6 +15,7 @@ if [ -n "$unformatted" ]; then
   exit 1
 fi
 python3 scripts/tokens.py --check
+python3 design/scripts/layout.py
 tiffutil -cathidpicheck brand/dist/menubar-template.png brand/dist/menubar-template@2x.png -out "$tmp_dir/menubar-template.tiff"
 cmp assets/menubar-template.tiff "$tmp_dir/menubar-template.tiff"
 go vet ./...

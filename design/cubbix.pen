@@ -5,7 +5,7 @@
       "type": "frame",
       "id": "AJEuu",
       "x": 0,
-      "y": 0,
+      "y": 1072,
       "name": "01 Foundations",
       "theme": {
         "mode": "light",
@@ -854,8 +854,8 @@
     {
       "type": "frame",
       "id": "FO7EW",
-      "x": 0,
-      "y": 560,
+      "x": 1960,
+      "y": 1072,
       "name": "02 Components and states",
       "theme": {
         "mode": "light",
@@ -2693,8 +2693,8 @@
     {
       "type": "frame",
       "id": "y6tUf",
-      "x": 1920,
-      "y": 560,
+      "x": 3920,
+      "y": 1072,
       "name": "Settings window",
       "reusable": true,
       "metadata": {
@@ -2815,8 +2815,8 @@
     {
       "type": "frame",
       "id": "rIbMb",
-      "x": 0,
-      "y": 1640,
+      "x": 4760,
+      "y": 1072,
       "name": "general-zh-CN-light",
       "theme": {
         "mode": "light",
@@ -2942,8 +2942,8 @@
     {
       "type": "frame",
       "id": "ztBBK",
-      "x": 800,
-      "y": 1640,
+      "x": 5600,
+      "y": 1072,
       "name": "general-en-light",
       "theme": {
         "mode": "light",
@@ -3069,8 +3069,8 @@
     {
       "type": "frame",
       "id": "d3UD1",
-      "x": 0,
-      "y": 1896,
+      "x": 6440,
+      "y": 1072,
       "name": "about-zh-CN-light",
       "theme": {
         "mode": "light",
@@ -3217,8 +3217,8 @@
     {
       "type": "frame",
       "id": "nknJR",
-      "x": 800,
-      "y": 1896,
+      "x": 7280,
+      "y": 1072,
       "name": "about-en-light",
       "theme": {
         "mode": "light",
@@ -3365,8 +3365,8 @@
     {
       "type": "frame",
       "id": "Pz9Qv",
-      "x": 0,
-      "y": 2292,
+      "x": 8120,
+      "y": 1072,
       "name": "general-zh-CN-dark",
       "theme": {
         "mode": "dark",
@@ -3492,8 +3492,8 @@
     {
       "type": "frame",
       "id": "G04tZ",
-      "x": 800,
-      "y": 2292,
+      "x": 8960,
+      "y": 1072,
       "name": "general-en-dark",
       "theme": {
         "mode": "dark",
@@ -3619,8 +3619,8 @@
     {
       "type": "frame",
       "id": "wUVXs",
-      "x": 0,
-      "y": 2548,
+      "x": 9800,
+      "y": 1072,
       "name": "about-zh-CN-dark",
       "theme": {
         "mode": "dark",
@@ -3767,8 +3767,8 @@
     {
       "type": "frame",
       "id": "H1kV1",
-      "x": 800,
-      "y": 2548,
+      "x": 10640,
+      "y": 1072,
       "name": "about-en-dark",
       "theme": {
         "mode": "dark",
@@ -3915,8 +3915,8 @@
     {
       "type": "frame",
       "id": "f9UC6",
-      "x": 0,
-      "y": 2944,
+      "x": 11480,
+      "y": 1072,
       "name": "restart-confirmation-zh-CN-light",
       "theme": {
         "mode": "light",
@@ -4109,8 +4109,8 @@
     {
       "type": "frame",
       "id": "EdVPb",
-      "x": 800,
-      "y": 2944,
+      "x": 12320,
+      "y": 1072,
       "name": "restart-confirmation-en-light",
       "theme": {
         "mode": "light",
@@ -4303,8 +4303,8 @@
     {
       "type": "frame",
       "id": "IxA8h",
-      "x": 0,
-      "y": 3340,
+      "x": 13160,
+      "y": 1072,
       "name": "restart-confirmation-zh-CN-dark",
       "theme": {
         "mode": "dark",
@@ -4497,8 +4497,8 @@
     {
       "type": "frame",
       "id": "M0z6f1",
-      "x": 800,
-      "y": 3340,
+      "x": 14000,
+      "y": 1072,
       "name": "restart-confirmation-en-dark",
       "theme": {
         "mode": "dark",
@@ -4691,8 +4691,8 @@
     {
       "type": "frame",
       "id": "nfzJX",
-      "x": 0,
-      "y": 3100,
+      "x": 14840,
+      "y": 1072,
       "name": "brand-comparison",
       "theme": {
         "mode": "light",
@@ -5345,8 +5345,8 @@
     {
       "type": "frame",
       "id": "O8Imme",
-      "x": 4100,
-      "y": 200,
+      "x": 0,
+      "y": 2384,
       "name": "R05 Icon/terminal",
       "reusable": true,
       "width": 16,
@@ -5379,8 +5379,8 @@
     {
       "type": "frame",
       "id": "H8TPWq",
-      "x": 4100,
-      "y": 240,
+      "x": 136,
+      "y": 2384,
       "name": "R05 Icon/keyboard",
       "reusable": true,
       "width": 16,
@@ -5413,8 +5413,8 @@
     {
       "type": "frame",
       "id": "GgZ43",
-      "x": 4100,
-      "y": 280,
+      "x": 272,
+      "y": 2384,
       "name": "R05 Icon/search",
       "reusable": true,
       "width": 16,
@@ -5447,8 +5447,8 @@
     {
       "type": "frame",
       "id": "xz4Am",
-      "x": 4200,
-      "y": 200,
+      "x": 408,
+      "y": 2384,
       "name": "R05 Native menu item",
       "reusable": true,
       "width": 352,
@@ -5523,8 +5523,8 @@
     {
       "type": "frame",
       "id": "RLMny",
-      "x": 4200,
-      "y": 300,
+      "x": 880,
+      "y": 2384,
       "name": "R05 Native menu / off",
       "reusable": true,
       "metadata": {
@@ -5748,8 +5748,8 @@
     {
       "type": "frame",
       "id": "re5DI",
-      "x": 4200,
-      "y": 300,
+      "x": 1352,
+      "y": 2384,
       "name": "R05 Native menu / active",
       "reusable": true,
       "metadata": {
@@ -5963,8 +5963,8 @@
     {
       "type": "frame",
       "id": "vXGvH",
-      "x": 4200,
-      "y": 300,
+      "x": 1824,
+      "y": 2384,
       "name": "R05 Native submenu / mode",
       "reusable": true,
       "metadata": {
@@ -6048,8 +6048,8 @@
     {
       "type": "frame",
       "id": "IuqUj",
-      "x": 4200,
-      "y": 300,
+      "x": 2296,
+      "y": 2384,
       "name": "R05 Native submenu / duration",
       "reusable": true,
       "metadata": {
@@ -6263,8 +6263,8 @@
     {
       "type": "frame",
       "id": "DUqvf",
-      "x": 4200,
-      "y": 300,
+      "x": 2768,
+      "y": 2384,
       "name": "R05 Native status variants",
       "reusable": true,
       "metadata": {
@@ -6396,8 +6396,8 @@
     {
       "type": "frame",
       "id": "X88ii6",
-      "x": 4600,
-      "y": 200,
+      "x": 3240,
+      "y": 2384,
       "name": "R05 Keyboard field",
       "reusable": true,
       "width": 164,
@@ -6421,7 +6421,8 @@
           "lineHeight": "$LineHeightBody",
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeBody",
-          "fontWeight": "$FontWeightRegular"
+          "fontWeight": "$FontWeightRegular",
+          "letterSpacing": "$Space2"
         },
         {
           "type": "text",
@@ -6443,8 +6444,8 @@
     {
       "type": "frame",
       "id": "Dh9pW",
-      "x": 4600,
-      "y": 260,
+      "x": 3524,
+      "y": 2384,
       "name": "R05 Shortcut recorder",
       "reusable": true,
       "width": 188,
@@ -6457,6 +6458,9 @@
           "ref": "X88ii6",
           "name": "Shortcut field",
           "descendants": {
+            "s4vo4": {
+              "letterSpacing": "$Space2"
+            },
             "lv8Vb": {
               "enabled": false
             }
@@ -6477,24 +6481,10 @@
       ]
     },
     {
-      "id": "sE9lv",
-      "type": "ref",
-      "reusable": true,
-      "ref": "sFUcN",
-      "name": "R05 Conflict tooltip",
-      "x": 4600,
-      "y": 320,
-      "descendants": {
-        "w4rXY": {
-          "content": "⌘, 已用于打开设置"
-        }
-      }
-    },
-    {
       "type": "frame",
       "id": "d2Shh",
-      "x": 5000,
-      "y": 200,
+      "x": 3832,
+      "y": 2384,
       "name": "R05 Dialog / duration",
       "reusable": true,
       "metadata": {
@@ -6544,7 +6534,8 @@
               "width": 96,
               "descendants": {
                 "s4vo4": {
-                  "content": "1"
+                  "content": "1",
+                  "letterSpacing": "$Space0"
                 },
                 "lv8Vb": {
                   "enabled": false
@@ -6574,7 +6565,8 @@
               "width": 96,
               "descendants": {
                 "s4vo4": {
-                  "content": "30"
+                  "content": "30",
+                  "letterSpacing": "$Space0"
                 }
               }
             },
@@ -6600,8 +6592,8 @@
     {
       "type": "frame",
       "id": "bxxcd",
-      "x": 5000,
-      "y": 360,
+      "x": 4392,
+      "y": 2384,
       "name": "R05 Dialog / time",
       "reusable": true,
       "metadata": {
@@ -6643,7 +6635,8 @@
           "width": "fill_container",
           "descendants": {
             "s4vo4": {
-              "content": "02 : 30"
+              "content": "02 : 30",
+              "letterSpacing": "$Space0"
             }
           }
         }
@@ -6652,8 +6645,8 @@
     {
       "type": "frame",
       "id": "n2m80",
-      "x": 5500,
-      "y": 200,
+      "x": 4952,
+      "y": 2384,
       "name": "R05 Dialog / process",
       "reusable": true,
       "metadata": {
@@ -7000,8 +6993,8 @@
     {
       "type": "frame",
       "id": "zKcs0",
-      "x": 4200,
-      "y": 700,
+      "x": 5512,
+      "y": 2384,
       "name": "R05 Settings / tiles",
       "reusable": true,
       "metadata": {
@@ -7156,8 +7149,8 @@
     {
       "type": "frame",
       "id": "QgsRX",
-      "x": 4200,
-      "y": 1000,
+      "x": 6352,
+      "y": 2384,
       "name": "R05 Settings / shortcuts",
       "reusable": true,
       "metadata": {
@@ -7299,7 +7292,7 @@
                       "strokeWidth": "$StrokeHairline"
                     },
                     "DzPjc/s4vo4": {
-                      "content": "⌃⌥⌘K"
+                      "letterSpacing": "$Space2"
                     },
                     "clcyo": {
                       "opacity": 0
@@ -7321,8 +7314,8 @@
     {
       "type": "frame",
       "id": "wHXVo",
-      "x": 5000,
-      "y": 700,
+      "x": 7192,
+      "y": 2384,
       "name": "R05 System notification",
       "reusable": true,
       "metadata": {
@@ -7453,8 +7446,8 @@
     {
       "type": "frame",
       "id": "nFPPv",
-      "x": 0,
-      "y": 4500,
+      "x": 7752,
+      "y": 2384,
       "name": "R05 zh-CN light",
       "theme": {
         "language": "zh-CN",
@@ -7691,11 +7684,17 @@
                     "NGoO0": {
                       "content": "自定义时长"
                     },
+                    "v1kPU/s4vo4": {
+                      "letterSpacing": "$Space0"
+                    },
                     "v1kPU/lv8Vb": {
                       "content": "↵"
                     },
                     "Cqqc1": {
                       "content": "小时"
+                    },
+                    "IVybi/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "IVybi/lv8Vb": {
                       "content": "↵"
@@ -7713,6 +7712,9 @@
                   "descendants": {
                     "YVJO0": {
                       "content": "直到某时刻"
+                    },
+                    "O4B2Hm/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "O4B2Hm/lv8Vb": {
                       "content": "↵"
@@ -7841,10 +7843,7 @@
                       "content": "登录后在菜单栏中运行"
                     },
                     "o1Wrb/DzPjc/s4vo4": {
-                      "content": "⌃⌥⌘K"
-                    },
-                    "o1Wrb/DzPjc/lv8Vb": {
-                      "content": "↵"
+                      "letterSpacing": "$Space2"
                     },
                     "F9YA7/ZWWO1/iJGB1": {
                       "content": "开机启动"
@@ -7904,6 +7903,7 @@
                         },
                         "DzPjc/s4vo4": {
                           "content": "按下组合键…",
+                          "letterSpacing": "$Space0",
                           "fontSize": "$FontSizeSmall",
                           "fill": "$ColorTextSecondary"
                         },
@@ -7951,13 +7951,24 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
-                          "content": "⌃⌥⌘K"
+                          "letterSpacing": "$Space2"
                         },
                         "DzPjc/lv8Vb": {
                           "content": "↵"
                         },
                         "clcyo": {
                           "opacity": 0
+                        }
+                      }
+                    },
+                    {
+                      "id": "OCdud",
+                      "type": "ref",
+                      "ref": "MUuwC",
+                      "name": "Start action tooltip",
+                      "descendants": {
+                        "tqQL2": {
+                          "content": "开始常亮 ("
                         }
                       }
                     }
@@ -7997,6 +8008,7 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
+                          "letterSpacing": "$Space2",
                           "content": "⌘,"
                         },
                         "DzPjc/lv8Vb": {
@@ -8008,13 +8020,13 @@
                       }
                     },
                     {
-                      "id": "PBrKd",
+                      "id": "l3VGN6",
                       "type": "ref",
-                      "ref": "sE9lv",
+                      "ref": "P5KBDV",
                       "name": "Tooltip on hover or keyboard focus",
                       "descendants": {
-                        "w4rXY": {
-                          "content": "⌘, 已用于打开设置"
+                        "a48efV": {
+                          "content": " 已用于打开设置"
                         }
                       }
                     }
@@ -8449,8 +8461,8 @@
     {
       "type": "frame",
       "id": "vGd6A",
-      "x": 0,
-      "y": 6050,
+      "x": 9392,
+      "y": 2384,
       "name": "R05 zh-CN dark",
       "theme": {
         "language": "zh-CN",
@@ -8687,11 +8699,17 @@
                     "NGoO0": {
                       "content": "自定义时长"
                     },
+                    "v1kPU/s4vo4": {
+                      "letterSpacing": "$Space0"
+                    },
                     "v1kPU/lv8Vb": {
                       "content": "↵"
                     },
                     "Cqqc1": {
                       "content": "小时"
+                    },
+                    "IVybi/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "IVybi/lv8Vb": {
                       "content": "↵"
@@ -8709,6 +8727,9 @@
                   "descendants": {
                     "YVJO0": {
                       "content": "直到某时刻"
+                    },
+                    "O4B2Hm/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "O4B2Hm/lv8Vb": {
                       "content": "↵"
@@ -8837,10 +8858,7 @@
                       "content": "登录后在菜单栏中运行"
                     },
                     "o1Wrb/DzPjc/s4vo4": {
-                      "content": "⌃⌥⌘K"
-                    },
-                    "o1Wrb/DzPjc/lv8Vb": {
-                      "content": "↵"
+                      "letterSpacing": "$Space2"
                     },
                     "F9YA7/ZWWO1/iJGB1": {
                       "content": "开机启动"
@@ -8900,6 +8918,7 @@
                         },
                         "DzPjc/s4vo4": {
                           "content": "按下组合键…",
+                          "letterSpacing": "$Space0",
                           "fontSize": "$FontSizeSmall",
                           "fill": "$ColorTextSecondary"
                         },
@@ -8947,13 +8966,24 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
-                          "content": "⌃⌥⌘K"
+                          "letterSpacing": "$Space2"
                         },
                         "DzPjc/lv8Vb": {
                           "content": "↵"
                         },
                         "clcyo": {
                           "opacity": 0
+                        }
+                      }
+                    },
+                    {
+                      "id": "PV1ZZ",
+                      "type": "ref",
+                      "ref": "MUuwC",
+                      "name": "Start action tooltip",
+                      "descendants": {
+                        "tqQL2": {
+                          "content": "开始常亮 ("
                         }
                       }
                     }
@@ -8993,6 +9023,7 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
+                          "letterSpacing": "$Space2",
                           "content": "⌘,"
                         },
                         "DzPjc/lv8Vb": {
@@ -9004,13 +9035,13 @@
                       }
                     },
                     {
-                      "id": "kbaI2",
+                      "id": "aJsF1",
                       "type": "ref",
-                      "ref": "sE9lv",
+                      "ref": "P5KBDV",
                       "name": "Tooltip on hover or keyboard focus",
                       "descendants": {
-                        "w4rXY": {
-                          "content": "⌘, 已用于打开设置"
+                        "a48efV": {
+                          "content": " 已用于打开设置"
                         }
                       }
                     }
@@ -9445,8 +9476,8 @@
     {
       "type": "frame",
       "id": "Tdb02",
-      "x": 1600,
-      "y": 4500,
+      "x": 11032,
+      "y": 2384,
       "name": "R05 en light",
       "theme": {
         "language": "en",
@@ -9683,11 +9714,17 @@
                     "NGoO0": {
                       "content": "Custom duration"
                     },
+                    "v1kPU/s4vo4": {
+                      "letterSpacing": "$Space0"
+                    },
                     "v1kPU/lv8Vb": {
                       "content": "↵"
                     },
                     "Cqqc1": {
                       "content": "hours"
+                    },
+                    "IVybi/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "IVybi/lv8Vb": {
                       "content": "↵"
@@ -9705,6 +9742,9 @@
                   "descendants": {
                     "YVJO0": {
                       "content": "Until a time"
+                    },
+                    "O4B2Hm/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "O4B2Hm/lv8Vb": {
                       "content": "↵"
@@ -9833,10 +9873,7 @@
                       "content": "Run in the menu bar after login"
                     },
                     "o1Wrb/DzPjc/s4vo4": {
-                      "content": "⌃⌥⌘K"
-                    },
-                    "o1Wrb/DzPjc/lv8Vb": {
-                      "content": "↵"
+                      "letterSpacing": "$Space2"
                     },
                     "F9YA7/ZWWO1/iJGB1": {
                       "content": "Open at login"
@@ -9896,6 +9933,7 @@
                         },
                         "DzPjc/s4vo4": {
                           "content": "Press keys…",
+                          "letterSpacing": "$Space0",
                           "fontSize": "$FontSizeSmall",
                           "fill": "$ColorTextSecondary"
                         },
@@ -9943,13 +9981,24 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
-                          "content": "⌃⌥⌘K"
+                          "letterSpacing": "$Space2"
                         },
                         "DzPjc/lv8Vb": {
                           "content": "↵"
                         },
                         "clcyo": {
                           "opacity": 0
+                        }
+                      }
+                    },
+                    {
+                      "id": "v9kdIs",
+                      "type": "ref",
+                      "ref": "MUuwC",
+                      "name": "Start action tooltip",
+                      "descendants": {
+                        "tqQL2": {
+                          "content": "Start keep awake ("
                         }
                       }
                     }
@@ -9989,6 +10038,7 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
+                          "letterSpacing": "$Space2",
                           "content": "⌘,"
                         },
                         "DzPjc/lv8Vb": {
@@ -10000,13 +10050,13 @@
                       }
                     },
                     {
-                      "id": "j6AYcZ",
+                      "id": "yMn3E",
                       "type": "ref",
-                      "ref": "sE9lv",
+                      "ref": "P5KBDV",
                       "name": "Tooltip on hover or keyboard focus",
                       "descendants": {
-                        "w4rXY": {
-                          "content": "⌘, opens Settings"
+                        "a48efV": {
+                          "content": " opens Settings"
                         }
                       }
                     }
@@ -10441,8 +10491,8 @@
     {
       "type": "frame",
       "id": "PSKKt",
-      "x": 1600,
-      "y": 6050,
+      "x": 12672,
+      "y": 2384,
       "name": "R05 en dark",
       "theme": {
         "language": "en",
@@ -10679,11 +10729,17 @@
                     "NGoO0": {
                       "content": "Custom duration"
                     },
+                    "v1kPU/s4vo4": {
+                      "letterSpacing": "$Space0"
+                    },
                     "v1kPU/lv8Vb": {
                       "content": "↵"
                     },
                     "Cqqc1": {
                       "content": "hours"
+                    },
+                    "IVybi/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "IVybi/lv8Vb": {
                       "content": "↵"
@@ -10701,6 +10757,9 @@
                   "descendants": {
                     "YVJO0": {
                       "content": "Until a time"
+                    },
+                    "O4B2Hm/s4vo4": {
+                      "letterSpacing": "$Space0"
                     },
                     "O4B2Hm/lv8Vb": {
                       "content": "↵"
@@ -10829,10 +10888,7 @@
                       "content": "Run in the menu bar after login"
                     },
                     "o1Wrb/DzPjc/s4vo4": {
-                      "content": "⌃⌥⌘K"
-                    },
-                    "o1Wrb/DzPjc/lv8Vb": {
-                      "content": "↵"
+                      "letterSpacing": "$Space2"
                     },
                     "F9YA7/ZWWO1/iJGB1": {
                       "content": "Open at login"
@@ -10892,6 +10948,7 @@
                         },
                         "DzPjc/s4vo4": {
                           "content": "Press keys…",
+                          "letterSpacing": "$Space0",
                           "fontSize": "$FontSizeSmall",
                           "fill": "$ColorTextSecondary"
                         },
@@ -10939,13 +10996,24 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
-                          "content": "⌃⌥⌘K"
+                          "letterSpacing": "$Space2"
                         },
                         "DzPjc/lv8Vb": {
                           "content": "↵"
                         },
                         "clcyo": {
                           "opacity": 0
+                        }
+                      }
+                    },
+                    {
+                      "id": "uJIya",
+                      "type": "ref",
+                      "ref": "MUuwC",
+                      "name": "Start action tooltip",
+                      "descendants": {
+                        "tqQL2": {
+                          "content": "Start keep awake ("
                         }
                       }
                     }
@@ -10985,6 +11053,7 @@
                           "strokeWidth": "$StrokeHairline"
                         },
                         "DzPjc/s4vo4": {
+                          "letterSpacing": "$Space2",
                           "content": "⌘,"
                         },
                         "DzPjc/lv8Vb": {
@@ -10996,13 +11065,13 @@
                       }
                     },
                     {
-                      "id": "bImJP",
+                      "id": "VIhhp",
                       "type": "ref",
-                      "ref": "sE9lv",
+                      "ref": "P5KBDV",
                       "name": "Tooltip on hover or keyboard focus",
                       "descendants": {
-                        "w4rXY": {
-                          "content": "⌘, opens Settings"
+                        "a48efV": {
+                          "content": " opens Settings"
                         }
                       }
                     }
@@ -11431,6 +11500,274 @@
               ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "EPGCl",
+      "x": 0,
+      "y": 0,
+      "name": "R01 / 设计系统 · 历史预览归档",
+      "metadata": {
+        "type": "canvas-round-label",
+        "round": "R01"
+      },
+      "fill": "$ColorText",
+      "content": "R01 · 设计系统 · 历史预览归档",
+      "fontFamily": "$FontFamilyCJK",
+      "fontSize": "$FontSizeSmall",
+      "fontWeight": "$FontWeightMedium"
+    },
+    {
+      "type": "text",
+      "id": "gYUGN",
+      "x": 0,
+      "y": 320,
+      "name": "R02 / 设计系统修订 · 历史预览归档",
+      "metadata": {
+        "type": "canvas-round-label",
+        "round": "R02"
+      },
+      "fill": "$ColorText",
+      "content": "R02 · 设计系统修订 · 历史预览归档",
+      "fontFamily": "$FontFamilyCJK",
+      "fontSize": "$FontSizeSmall",
+      "fontWeight": "$FontWeightMedium"
+    },
+    {
+      "type": "text",
+      "id": "ehhAE",
+      "x": 0,
+      "y": 640,
+      "name": "R03 / 黑白灰 · 历史预览归档",
+      "metadata": {
+        "type": "canvas-round-label",
+        "round": "R03"
+      },
+      "fill": "$ColorText",
+      "content": "R03 · 黑白灰 · 历史预览归档",
+      "fontFamily": "$FontFamilyCJK",
+      "fontSize": "$FontSizeSmall",
+      "fontWeight": "$FontWeightMedium"
+    },
+    {
+      "type": "text",
+      "id": "vLPsI",
+      "x": 0,
+      "y": 960,
+      "name": "R04 / 品牌与基础组件",
+      "metadata": {
+        "type": "canvas-round-label",
+        "round": "R04"
+      },
+      "fill": "$ColorText",
+      "content": "R04 · 品牌与基础组件",
+      "fontFamily": "$FontFamilyCJK",
+      "fontSize": "$FontSizeSmall",
+      "fontWeight": "$FontWeightMedium"
+    },
+    {
+      "type": "text",
+      "id": "Ubugb",
+      "x": 0,
+      "y": 2272,
+      "name": "R05 / 常亮格子",
+      "metadata": {
+        "type": "canvas-round-label",
+        "round": "R05"
+      },
+      "fill": "$ColorText",
+      "content": "R05 · 常亮格子",
+      "fontFamily": "$FontFamilyCJK",
+      "fontSize": "$FontSizeSmall",
+      "fontWeight": "$FontWeightMedium"
+    },
+    {
+      "type": "frame",
+      "id": "NKc7D",
+      "x": 14312,
+      "y": 2384,
+      "name": "R05 Keyboard shortcut",
+      "reusable": true,
+      "metadata": {
+        "type": "keyboard-shortcut",
+        "gapToken": "Space2"
+      },
+      "gap": "$Space2",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "YzGQB",
+          "name": "Control",
+          "fill": "$ColorText",
+          "content": "⌃",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeBody",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "text",
+          "id": "CIzDF",
+          "name": "Option",
+          "fill": "$ColorText",
+          "content": "⌥",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeBody",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "text",
+          "id": "jjyta",
+          "name": "Command",
+          "fill": "$ColorText",
+          "content": "⌘",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeBody",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "type": "text",
+          "id": "U5T7s4",
+          "name": "Key",
+          "fill": "$ColorText",
+          "content": "K",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeBody",
+          "fontWeight": "$FontWeightRegular"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "P5KBDV",
+      "x": 14471,
+      "y": 2384,
+      "name": "R05 Conflict tooltip",
+      "reusable": true,
+      "fill": "$ColorTooltip",
+      "cornerRadius": "$RadiusControl",
+      "gap": "$Space0",
+      "padding": [
+        "$Space6",
+        "$Space8"
+      ],
+      "alignItems": "center",
+      "children": [
+        {
+          "id": "s0jMyu",
+          "type": "ref",
+          "ref": "NKc7D",
+          "name": "Keyboard shortcut",
+          "descendants": {
+            "YzGQB": {
+              "enabled": false,
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            },
+            "CIzDF": {
+              "enabled": false,
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            },
+            "jjyta": {
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            },
+            "U5T7s4": {
+              "content": ",",
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "a48efV",
+          "name": "Conflict reason",
+          "metadata": {
+            "type": "copy",
+            "key": "R05Conflict"
+          },
+          "fill": "$ColorTooltipText",
+          "content": " 已用于打开设置",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "MUuwC",
+      "x": 14675,
+      "y": 2384,
+      "name": "R05 Start keep awake tooltip",
+      "reusable": true,
+      "fill": "$ColorTooltip",
+      "cornerRadius": "$RadiusControl",
+      "gap": "$Space0",
+      "padding": [
+        "$Space6",
+        "$Space8"
+      ],
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "tqQL2",
+          "name": "Action tooltip prefix",
+          "metadata": {
+            "type": "copy",
+            "key": "StartAwake"
+          },
+          "fill": "$ColorTooltipText",
+          "content": "开始常亮 (",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
+        },
+        {
+          "id": "fAuNp",
+          "type": "ref",
+          "ref": "NKc7D",
+          "name": "Keyboard shortcut",
+          "descendants": {
+            "YzGQB": {
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            },
+            "CIzDF": {
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            },
+            "jjyta": {
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            },
+            "U5T7s4": {
+              "fill": "$ColorTooltipText",
+              "fontSize": "$FontSizeSmall"
+            }
+          }
+        },
+        {
+          "type": "text",
+          "id": "GEHwK",
+          "name": "Closing parenthesis",
+          "fill": "$ColorTooltipText",
+          "content": ")",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeSmall",
+          "fontWeight": "$FontWeightRegular"
         }
       ]
     }

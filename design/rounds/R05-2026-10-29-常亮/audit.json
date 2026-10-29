@@ -187,10 +187,6 @@
       "name": "R05 Shortcut recorder"
     },
     {
-      "id": "sE9lv",
-      "name": "R05 Conflict tooltip"
-    },
-    {
       "id": "d2Shh",
       "name": "R05 Dialog / duration"
     },
@@ -213,10 +209,22 @@
     {
       "id": "wHXVo",
       "name": "R05 System notification"
+    },
+    {
+      "id": "NKc7D",
+      "name": "R05 Keyboard shortcut"
+    },
+    {
+      "id": "P5KBDV",
+      "name": "R05 Conflict tooltip"
+    },
+    {
+      "id": "MUuwC",
+      "name": "R05 Start keep awake tooltip"
     }
   ],
-  "componentCount": 51,
-  "authoredRefCount": 229,
+  "componentCount": 53,
+  "authoredRefCount": 234,
   "samples": 12,
   "literalCounts": {
     "colors": {

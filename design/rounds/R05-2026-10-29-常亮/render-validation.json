@@ -1,9 +1,9 @@
 {
   "cliVersion": "0.3.13",
   "scale": 1,
-  "sourceSha256": "284845a3e655d4cbc33b434708b5b3c785943a0c3d6fe967ebd0d15a9f6b4454",
+  "sourceSha256": "27c444c1c05b29f9a2f97770e4fd1d8826bb61260e62a5dfcb91ce1a25abdfee",
   "nativeLayout": {
-    "nodes": 1868,
+    "nodes": 1920,
     "problems": [],
     "settings": [
       {
@@ -74,22 +74,22 @@
     {
       "nodeId": "nFPPv",
       "file": "zh-CN-light.png",
-      "sha256": "1f43ba9945938b1818b358bd00a6fad361a44fee416fb9cd09dc6a78863c7f47"
+      "sha256": "178dd6ea22ec170d4617b5680bcef742b5850c0575ed4da1afed9823b1725e51"
     },
     {
       "nodeId": "vGd6A",
       "file": "zh-CN-dark.png",
-      "sha256": "94ad2c949675a1fe888689f3aff3425f332337e7db676238201fd0d5b305023e"
+      "sha256": "73887b2bf6effa5517f0418bbf74486e6c6ac009fee22b09993fe6b6c8f9c043"
     },
     {
       "nodeId": "Tdb02",
       "file": "en-light.png",
-      "sha256": "3e2c8cd6b999446ccd7fc66b913713a57f69f9c7ce33078171d785eea71f3854"
+      "sha256": "1d4387aafde0d9a8d604813c9ee3b2578e3685e7067c91978eceae6fbbc56889"
     },
     {
       "nodeId": "PSKKt",
       "file": "en-dark.png",
-      "sha256": "541416289f706158835d8d5857a53056b4c5c68d684d01d40bca63390a398bf8"
+      "sha256": "c79970fa9fb602b049a19ff477d97ffcd2122936cc11aa126f68dd59cc15681a"
     }
   ]
 }
