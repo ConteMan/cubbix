@@ -1,0 +1,43 @@
+{
+  "cliVersion": "0.3.13",
+  "nativeLayout": {
+    "nodes": 480,
+    "problems": [],
+    "syntaxTokens": [
+      "$ColorSyntaxBool",
+      "$ColorSyntaxIndent",
+      "$ColorSyntaxKey",
+      "$ColorSyntaxNull",
+      "$ColorSyntaxNumber",
+      "$ColorSyntaxString"
+    ],
+    "guides": 32
+  },
+  "exports": [
+    {
+      "nodeId": "lRq5J",
+      "file": "zh-CN-light.png",
+      "scale": 2,
+      "sha256": "79d0e425c21dda9e02fde7d1d74d32eb3d1abbaca21b9c73220146e6f882370a"
+    },
+    {
+      "nodeId": "w9wK6l",
+      "file": "zh-CN-dark.png",
+      "scale": 2,
+      "sha256": "e059dc6d3d1385ec0e6ad0d4907edd674df402ab982fa0346e3e74ba337471d0"
+    },
+    {
+      "nodeId": "TmaJl",
+      "file": "en-light.png",
+      "scale": 2,
+      "sha256": "5519cdcac77361a8c84b9689b2801d0234d6436b7727fc06f0d0a4d158205be4"
+    },
+    {
+      "nodeId": "Ndwar",
+      "file": "en-dark.png",
+      "scale": 2,
+      "sha256": "3036701cf5ca62b365de8f454770fde9c60e3972287692699e6f8f9b627b07b3"
+    }
+  ],
+  "passed": true
+}

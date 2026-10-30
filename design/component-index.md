@@ -1,6 +1,6 @@
 # 组件索引
 
-当前 R07 共 100 个 reusable、452 个源稿 ref；R05B 阶段为 53 个 reusable、234 个源稿 ref。R04 基础组件保持原样，新增常亮组件见下方索引；四张双语主题样张见 [R05](rounds/R05-2026-10-29-常亮/README.md)。
+当前 R08 共 101 个 reusable、464 个源稿 ref；R07 为 100 个 reusable、452 个源稿 ref；R05B 阶段为 53 个 reusable、234 个源稿 ref。R04 基础组件保持原样，新增常亮组件见下方索引；四张双语主题样张见 [R05](rounds/R05-2026-10-29-常亮/README.md)。
 
 R05 新增可复用组件：原生菜单未开启／开启、模式／时长子菜单、自定义时长／时刻／进程窗口，以及格子／快捷键设置页。场景与交互约定见 [R05](rounds/R05-2026-10-29-常亮/README.md)。
 
@@ -135,3 +135,5 @@ R07 在 R04–R06 基础上新增 47 个 reusable；总计 100 个 reusable、45
 | R07 Action / Copy | `gPAiw` |
 
 工具 Action 母版持有 tooltipKey 与 focus-visible 约定；引用共享 Lucide 图标。JSON window 组合顶部工具区、CodeMirror 编辑器视觉样例、结果面板、固定 this 输入和 8 个工具；错误与超时清空结果，原因只在 tooltip。设置引用基础窗口／设置行／开关／导航；快捷键引用 R05 独立按键与 Space2 间距。
+
+R08 新增 `S8d6wZ`（R08 JSON split window）母版，保留统一窗口标题、左右编辑／结果区、缩进参考线、this 输入与四个工具，复用 R07 的原生控件与 Action 图标；四个浅深主题实例见 [R08](rounds/R08-2026-10-30-JSON修正/README.md)。上文 R07 的底部结果面板与八工具组合仅作历史归档。

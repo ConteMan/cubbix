@@ -1,0 +1,63 @@
+{
+  "method": "Hidden WKWebView CapturePage; no desktop capture, focus, activation or Space switching",
+  "screenshots": [
+    {
+      "file": "json-number-zh-CN-light.png",
+      "locale": "zh-CN",
+      "mode": "light",
+      "state": "number",
+      "sha256": "c18ed340d666bc65584b9b18db380ed4494b3ed0108a4f3f52959941a2c99543"
+    },
+    {
+      "file": "json-error-zh-CN-light.png",
+      "locale": "zh-CN",
+      "mode": "light",
+      "state": "error",
+      "sha256": "5fe0f6f43260d87ada7bdcf28389b27390e48bf8fcdd25a373f0d54a4fcd1c05"
+    },
+    {
+      "file": "json-number-zh-CN-dark.png",
+      "locale": "zh-CN",
+      "mode": "dark",
+      "state": "number",
+      "sha256": "5c79a89d6e890a96e7cfe36189909c5cff726b206afb9c3945b47ccf8432301f"
+    },
+    {
+      "file": "json-error-zh-CN-dark.png",
+      "locale": "zh-CN",
+      "mode": "dark",
+      "state": "error",
+      "sha256": "68495748e9f5377624246513780a62771ed27e4ae4aebeb7459953ef1038c86e"
+    },
+    {
+      "file": "json-number-en-light.png",
+      "locale": "en",
+      "mode": "light",
+      "state": "number",
+      "sha256": "f662770efbd116dfc108bd858449d11956f49f78dbd790a78271c2accdb559e9"
+    },
+    {
+      "file": "json-error-en-light.png",
+      "locale": "en",
+      "mode": "light",
+      "state": "error",
+      "sha256": "17114e217be76a6c07267fae4b5f5e0fbb97ec766e76b6794c0267fb4d0fae5c"
+    },
+    {
+      "file": "json-number-en-dark.png",
+      "locale": "en",
+      "mode": "dark",
+      "state": "number",
+      "sha256": "e4f1934ad2fa40e883550269489b0556beaf74348395e5499eb82fdcfc34971f"
+    },
+    {
+      "file": "json-error-en-dark.png",
+      "locale": "en",
+      "mode": "dark",
+      "state": "error",
+      "sha256": "c8afdc5d9ef60e15e437bb64276658aedc51b41ee074d73d0ba9f4a22113c529"
+    }
+  ],
+  "count": 8,
+  "passed": true
+}
