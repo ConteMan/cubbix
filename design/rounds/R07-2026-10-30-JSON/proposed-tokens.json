@@ -1,0 +1,57 @@
+{
+  "scope": "Design-only proposals; runtime tokens are unchanged.",
+  "variables": {
+    "FontFamilyCode": {
+      "type": "string",
+      "value": "JetBrains Mono"
+    },
+    "SizeJSONWindowWidth": {
+      "type": "number",
+      "value": 840
+    },
+    "SizeJSONWindowHeight": {
+      "type": "number",
+      "value": 520
+    },
+    "SizeJSONEmptyWidth": {
+      "type": "number",
+      "value": 672
+    },
+    "SizeJSONEmptyHeight": {
+      "type": "number",
+      "value": 220
+    },
+    "SizeJSONStateWidth": {
+      "type": "number",
+      "value": 756
+    },
+    "SizeJSONStateHeight": {
+      "type": "number",
+      "value": 182
+    },
+    "SizeJSONToolbarHeight": {
+      "type": "number",
+      "value": 44
+    },
+    "SizeJSONExpressionHeight": {
+      "type": "number",
+      "value": 44
+    },
+    "SizeJSONResultHeight": {
+      "type": "number",
+      "value": 56
+    },
+    "SizeJSONLineHeight": {
+      "type": "number",
+      "value": 24
+    },
+    "SizeJSONBoardWidth": {
+      "type": "number",
+      "value": 1600
+    },
+    "SizeJSONSettingsHeight": {
+      "type": "number",
+      "value": 340
+    }
+  }
+}
