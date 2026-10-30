@@ -1,7 +1,7 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { height: 100%; margin: 0; overflow: hidden; }
-body { display: flex; flex-direction: column; background: var(--ColorCard); color: var(--ColorText); font: var(--FontSizeBody) var(--FontFamily); }
+body { display: flex; flex-direction: column; background: var(--ColorCard); color: var(--ColorText); font: var(--FontSizeBody) var(--FontFamily), -apple-system, BlinkMacSystemFont, sans-serif; }
 button, input { font: inherit; color: inherit; }
 button { display: inline-flex; align-items: center; justify-content: center; width: var(--SizeIconButton); height: var(--SizeIconButton); border: 0; border-radius: var(--RadiusControl); background: transparent; padding: var(--Space4); cursor: default; }
 button:hover { background: var(--ColorControlHover); }
@@ -24,7 +24,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: v
 .cm-content { padding: var(--Space8) 0 !important; caret-color: var(--ColorText); }
 .cm-line { padding: 0 var(--Space12) !important; }
 /* Structural guides only: weak separator gray, one line per indentation level. */
-.cm-line.cm-guide { background-image: repeating-linear-gradient(to right, transparent 0 calc(1ch - var(--StrokeHairline)), var(--ColorSyntaxIndent) calc(1ch - var(--StrokeHairline)) 1ch); background-repeat: no-repeat; background-size: calc(var(--indent) * 1ch) 100%; background-position-x: var(--Space12); }
+.cm-line.cm-guide { background-image: repeating-linear-gradient(to right, transparent 0 calc(var(--indent-step) - var(--StrokeHairline)), var(--ColorSyntaxIndent) calc(var(--indent-step) - var(--StrokeHairline)) var(--indent-step)); background-repeat: no-repeat; background-size: calc(var(--indent) * var(--indent-step)) 100%; background-position-x: var(--Space12); }
 .cm-gutters { background: transparent !important; border: 0 !important; color: var(--ColorTextSecondary) !important; }
 .cm-lineNumbers .cm-gutterElement { min-width: var(--Space32); padding-left: var(--Space12); }
 .cm-foldGutter .cm-gutterElement { padding: 0 var(--Space4); }
@@ -49,4 +49,4 @@ footer { flex-shrink: 0; display: flex; align-items: center; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media(prefers-reduced-motion: reduce) { .loader { animation: none; } }
 
-#tooltip { position: fixed; z-index: 10; max-width: calc(100vw - var(--Space24)); padding: var(--Space6) var(--Space8); border-radius: var(--RadiusControl); background: var(--ColorTooltip); color: var(--ColorTooltipText); font: var(--FontSizeSmall)/var(--LineHeightBody) var(--FontFamily); pointer-events: none; }
+#tooltip { position: fixed; z-index: 10; max-width: calc(100vw - var(--Space24)); padding: var(--Space6) var(--Space8); border-radius: var(--RadiusControl); background: var(--ColorTooltip); color: var(--ColorTooltipText); font: var(--FontSizeSmall)/var(--LineHeightBody) var(--FontFamily), -apple-system, BlinkMacSystemFont, sans-serif; pointer-events: none; }

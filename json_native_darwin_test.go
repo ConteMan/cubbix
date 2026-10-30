@@ -35,22 +35,32 @@ func TestJSONHiddenWebKit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("hidden WebKit checks: %v\n%s", err, output)
 	}
-	if !strings.Contains(string(output), "PASS: hidden WebKit editor") {
+	if !strings.Contains(string(output), "PASS: hidden WebKit editor") || !strings.Contains(string(output), "PASS: actual quit with dirty JSON tool") {
 		t.Fatalf("helper exited before completing checks: %s", output)
 	}
 	t.Log(string(output))
 }
 func jsonNativeMain() int {
 	dir := os.Getenv("CUBBIX_JSON_EVIDENCE")
+	profile, err := os.MkdirTemp("", "cubbix-json-profile-")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	defer os.RemoveAll(profile)
 	mygo.App.SetName("Cubbix")
-	mygo.App.SetPath(mygo.PathUserData, filepath.Join(dir, "native-profile"))
+	mygo.App.SetPath(mygo.PathUserData, filepath.Join(profile, "native-profile"))
 	mygo.App.SetActivationPolicy(mygo.ActivationPolicyAccessory)
-	a, err := newApplication(filepath.Join(dir, "config.toml"))
+	a, err := newApplication(filepath.Join(profile, "config.toml"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 	a.setupJSON()
+	mygo.App.OnBeforeQuit(func(e *mygo.QuitEvent) {
+		a.beforeQuit(e)
+		fmt.Println("PASS: actual quit with dirty JSON tool, no confirmation")
+	})
 	mygo.App.OnWindowAllClosed(func() {})
 	reads := 0
 	a.jsonReadClipboard = func() string {
@@ -81,8 +91,10 @@ func jsonNativeMain() int {
 				for _, doc := range append([]*jsonDocument(nil), a.jsonDocuments...) {
 					a.destroyJSON(doc)
 				}
-				a.quitting = true
-				a.updates.close()
+				// Quit a dirty tool through the production OnBeforeQuit handler.
+				dirty := a.addJSONDocument("{broken", "", false)
+				a.createJSONWindow(dirty)
+				a.quitting = false
 				mygo.App.Quit()
 			})
 		}()
@@ -271,13 +283,13 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 		return err
 	}
 	// Folding is applied in the next view update, not in the click handler.
-	if err := wait("!!document.querySelector('#editor .cm-foldPlaceholder')"); err != nil {
+	if err := wait("(window.cubbix.editor().measure(), !!document.querySelector('#editor .cm-foldPlaceholder'))"); err != nil {
 		return err
 	}
 	if _, err := eval("document.getElementById('unfold').click()"); err != nil {
 		return err
 	}
-	if err := wait("!document.querySelector('#editor .cm-foldPlaceholder')"); err != nil {
+	if err := wait("(window.cubbix.editor().measure(), !document.querySelector('#editor .cm-foldPlaceholder'))"); err != nil {
 		return err
 	}
 	if _, err := eval("document.getElementById('copy').click();document.getElementById('minify').click()"); err != nil {
@@ -439,7 +451,13 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	// Every indentation level draws one weak guide under the aligned content.
 	if err := want(`(()=>{
 	  const lines = [...document.querySelectorAll('#editor .cm-line.cm-guide')];
-	  return lines.length > 0 && lines.every(line => Number(line.style.getPropertyValue('--indent')) > 0) &&
+	  return lines.length > 0 && lines.every(line => {
+      const levels = Number(line.style.getPropertyValue('--indent'));
+      const style = getComputedStyle(line), step = line.style.getPropertyValue('--indent-step');
+      const expected = Math.floor((line.textContent.match(/^ */)[0].length) / 2);
+      return levels === expected && levels > 0 && step === '2ch' &&
+        style.backgroundImage.includes('gradient') && parseFloat(style.backgroundSize) > 0;
+    }) &&
 	    getComputedStyle(document.documentElement).getPropertyValue('--ColorSyntaxIndent').trim() !== '';
 	})()`); err != nil {
 		return err
@@ -466,6 +484,62 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	if err := waitConfigSplit(45); err != nil {
 		return err
 	}
+	// Wide layouts and pointer events must stay within the same persisted limits.
+	mygo.RunOnMain(func() { d.window.SetSize(1600, 520) })
+	if err := wait("innerWidth===1600"); err != nil {
+		return err
+	}
+	if err := want(`(()=>{
+      const bar=document.getElementById('splitter');
+      // Synthetic pointers cannot acquire capture, so stub capture only; the
+      // production down/move/up handlers and native persistence still run.
+      const capture=bar.setPointerCapture;
+      bar.setPointerCapture=()=>{};
+      try {
+        bar.dispatchEvent(new PointerEvent('pointerdown',{pointerId:1,bubbles:true}));
+        bar.dispatchEvent(new PointerEvent('pointermove',{pointerId:1,clientX:1599,bubbles:true}));
+        bar.dispatchEvent(new PointerEvent('pointerup',{pointerId:1,bubbles:true}));
+      } finally { bar.setPointerCapture=capture; }
+      return window.cubbix.split().percent===75;
+    })()`); err != nil {
+		return err
+	}
+	if err := waitConfigSplit(75); err != nil {
+		return err
+	}
+	persisted, err := loadConfig(a.path)
+	if err != nil || persisted.JSONSplit != 75 {
+		return fmt.Errorf("split disk roundtrip: %+v, %v", persisted.JSONSplit, err)
+	}
+	mygo.RunOnMain(func() { d.window.SetSize(840, 520) })
+	if err := wait("innerWidth===840"); err != nil {
+		return err
+	}
+	// Scalar results use the same syntax tokens as object/array contents.
+	for _, dark := range []bool{false, true} {
+		mygo.RunOnMain(func() {
+			if dark {
+				mygo.Theme.SetSource(mygo.ThemeDark)
+			} else {
+				mygo.Theme.SetSource(mygo.ThemeLight)
+			}
+		})
+		expected := tokens(dark, "en").ColorCard
+		if err := wait(fmt.Sprintf("getComputedStyle(document.documentElement).getPropertyValue('--ColorCard').trim() === %q", expected)); err != nil {
+			return err
+		}
+		for _, item := range []struct{ suffix, token string }{{".data.label", "ColorSyntaxString"}, {".data.items.length", "ColorSyntaxNumber"}, {".ok", "ColorSyntaxBool"}, {".none", "ColorSyntaxNull"}} {
+			if err := want(fmt.Sprintf(`(async()=>{
+              await window.cubbix.evaluate(%q);
+              const pre=document.querySelector('#result pre');
+              const probe=document.createElement('span');probe.style.color='var(--'+%q+')';document.body.append(probe);
+              const same=!!pre&&getComputedStyle(pre).color===getComputedStyle(probe).color;
+              probe.remove();return same;
+            })()`, item.suffix, item.token)); err != nil {
+				return err
+			}
+		}
+	}
 	// Both windows are named for the app switcher; a new one never says "Untitled".
 	var titles [3]string
 	var extra *jsonDocument
@@ -485,7 +559,13 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	})()`); err != nil {
 		return err
 	}
-	mygo.RunOnMain(func() { a.destroyJSON(extra) })
+	mygo.RunOnMain(func() {
+		// The traffic-light close action reaches the same native close path.
+		objc.ID(extra.window.NativeHandle()).Send(objc.RegisterName("performClose:"), objc.ID(0))
+	})
+	if !extra.window.IsDestroyed() {
+		return fmt.Errorf("native close action did not destroy tool")
+	}
 	// Neither deactivation nor an activation-policy change closes or hides a
 	// window: only ⌘W, the red light, Close and quitting do.
 	if err := checkHidden(); err != nil {
@@ -506,14 +586,33 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	if active, visible, focused, count := windowsState(); active || focused || !visible || count != 2 {
 		return fmt.Errorf("inactive windows: active=%v focused=%v visible=%v count=%d", active, focused, visible, count)
 	}
+	var focusedEvents, blurredEvents, resignedEvents int
 	mygo.RunOnMain(func() {
-		// The user opened a window earlier, so the app is already regular.
+		nsapp := objc.ID(objc.GetClass("NSApplication")).Send(objc.RegisterName("sharedApplication"))
+		// Set the real native policy without MyGo's activating wrapper.
+		nsapp.Send(objc.RegisterName("setActivationPolicy:"), 0)
 		a.policy = mygo.ActivationPolicyRegular
+		for _, doc := range []*jsonDocument{d, other} {
+			doc.window.OnFocus(func() { focusedEvents++ })
+			doc.window.OnBlur(func() { blurredEvents++ })
+			delegate := objc.ID(doc.window.NativeHandle()).Send(objc.RegisterName("delegate"))
+			// Exercise AppKit -> MyGo event callbacks without making a real key
+			// window, activating the app, or disturbing the foreground Space.
+			delegate.Send(objc.RegisterName("windowDidBecomeKey:"), objc.ID(0))
+			delegate.Send(objc.RegisterName("windowDidResignKey:"), objc.ID(0))
+		}
+		mygo.App.OnDidResignActive(func() { resignedEvents++ })
+		nsapp.Send(objc.RegisterName("deactivate"))
+		nsapp.Send(objc.RegisterName("delegate")).Send(objc.RegisterName("applicationDidResignActive:"), objc.ID(0))
 		a.visibility(false)
 	})
+	if focusedEvents != 2 || blurredEvents != 2 || resignedEvents < 1 {
+		return fmt.Errorf("native event paths not exercised: focus=%d blur=%d resign=%d", focusedEvents, blurredEvents, resignedEvents)
+	}
+	fmt.Println("Focus evidence: native regular policy, two non-key windows, 2 simulated native focus/blur delegate pairs, resign-active delegate + deactivate; no foreground focus switching")
 	time.Sleep(250 * time.Millisecond)
 	if active, visible, focused, count := windowsState(); active || focused || !visible || count != 2 {
-		return fmt.Errorf("after deactivation and policy change: active=%v focused=%v visible=%v count=%d", active, focused, visible, count)
+		return fmt.Errorf("after native focus/blur callbacks and deactivation: active=%v focused=%v visible=%v count=%d", active, focused, visible, count)
 	}
 	mygo.RunOnMain(func() { d.window.Hide(); other.window.Hide() })
 	if err := checkHidden(); err != nil {
@@ -526,10 +625,6 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	if err := want("window.cubbix.snapshot().dirty"); err != nil {
 		return err
 	}
-	mygo.RunOnMain(func() { d.window.Close() })
-	if !d.window.IsDestroyed() || len(a.jsonDocuments) != 1 {
-		return fmt.Errorf("dirty window did not close on request")
-	}
 	// An update restart also proceeds without asking about unsaved text.
 	var relaunched bool
 	mygo.RunOnMain(func() {
@@ -539,6 +634,15 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	})
 	if !relaunched {
 		return fmt.Errorf("update restart waited for an unsaved JSON document")
+	}
+	// Send the shortcut through the real page bridge and close event.
+	_, _ = eval("document.dispatchEvent(new KeyboardEvent('keydown',{key:'w',metaKey:true,bubbles:true}))")
+	deadline := time.Now().Add(5 * time.Second)
+	for !d.window.IsDestroyed() && time.Now().Before(deadline) {
+		time.Sleep(20 * time.Millisecond)
+	}
+	if !d.window.IsDestroyed() || len(a.jsonDocuments) != 1 {
+		return fmt.Errorf("dirty window did not close on request")
 	}
 	// Disabling the tile closes the remaining window and releases the shortcut.
 	var registered, removed bool

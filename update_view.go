@@ -16,29 +16,21 @@ func (a *application) restartUpdate() {
 	if a.updates.snapshot().Phase != updateReady || a.relaunch == nil {
 		return
 	}
-	// Open JSON windows are tools without unsaved state to protect.
-	a.restartUpdateAfterJSON()
-}
-
-func (a *application) restartUpdateAfterJSON() {
-	if a.updates.snapshot().Phase == updateReady && a.relaunch != nil {
-		s := a.awake.snapshot()
-		a.config.RestoreAwake = s.Active
-		a.config.AwakeSession = nil
-		if s.Active {
-			copy := s.Session
-			a.config.AwakeSession = &copy
-		}
-		if err := saveConfig(a.path, a.config); err != nil {
-			a.settingsError = "ConfigError"
-			a.invalidateWindow()
-			return
-		}
-		// Relaunch runs the normal quit sequence. These documents already passed
-		// the async guard; re-entering it would cancel MyGo's pending relaunch.
-		a.quitting = true
-		a.relaunch()
+	s := a.awake.snapshot()
+	a.config.RestoreAwake = s.Active
+	a.config.AwakeSession = nil
+	if s.Active {
+		copy := s.Session
+		a.config.AwakeSession = &copy
 	}
+	if err := saveConfig(a.path, a.config); err != nil {
+		a.settingsError = "ConfigError"
+		a.invalidateWindow()
+		return
+	}
+	// Relaunch runs the normal quit sequence after persisting awake state.
+	a.quitting = true
+	a.relaunch()
 }
 
 func (a *application) updateIndicator(c *ui.Context, t tokenValues, update updateState, text func(string) string) {

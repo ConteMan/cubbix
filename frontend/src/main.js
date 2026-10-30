@@ -46,7 +46,7 @@ function indentGuides(view) {
     while (position <= to) {
       const line = view.state.doc.lineAt(position);
       const levels = Math.floor(leadingColumns(line.text, view.state.tabSize) / step);
-      if (levels > 0) marks.push(Decoration.line({ attributes: { class: 'cm-guide', style: '--indent:' + levels } }).range(line.from));
+      if (levels > 0) marks.push(Decoration.line({ attributes: { class: 'cm-guide', style: '--indent:' + levels + ';--indent-step:' + step + 'ch' } }).range(line.from));
       position = line.to + 1;
     }
   }
@@ -107,7 +107,7 @@ function paneMetrics() {
 }
 function applySplit(percent) {
   const { usable } = paneMetrics();
-  const minimum = Math.min(config.light.SizeJSONPaneMinWidth / usable * 100, 45);
+  const minimum = Math.max(25, Math.min(config.light.SizeJSONPaneMinWidth / usable * 100, 45));
   split = Math.max(minimum, Math.min(100 - minimum, percent));
   document.body.style.setProperty('--editor-width', Math.max(1, Math.round(usable * split / 100)) + 'px');
   const separator = $('splitter');
@@ -182,6 +182,8 @@ function renderResult(value) {
     const pre = document.createElement('pre');
     pre.textContent = value.text;
     if (value.kind === 'undefined') pre.className = 'muted';
+    const token = { string: 'ColorSyntaxString', number: 'ColorSyntaxNumber', boolean: 'ColorSyntaxBool', null: 'ColorSyntaxNull' }[value.kind];
+    if (token) pre.style.color = 'var(--' + token + ')';
     $('result').append(pre);
   }
 }
@@ -367,6 +369,7 @@ async function boot() {
   const stopDrag = () => { if (!dragging) return; dragging = false; persistSplit(true); };
   $('splitter').addEventListener('pointerup', stopDrag);
   $('splitter').addEventListener('pointercancel', stopDrag);
+  $('splitter').addEventListener('lostpointercapture', stopDrag);
   $('splitter').addEventListener('keydown', event => {
     if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault();

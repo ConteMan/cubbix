@@ -357,16 +357,7 @@ func (a *application) ready() {
 	a.startAwakeServices()
 	a.registerJSONShortcut()
 	mygo.App.OnWindowAllClosed(func() {})
-	mygo.App.OnBeforeQuit(func(e *mygo.QuitEvent) {
-		// JSON windows are tools: quitting never asks about unsaved text.
-		a.quitting = true
-		if a.stopAwakeServices != nil {
-			a.stopAwakeServices()
-		}
-		a.awake.stop()
-		mygo.GlobalShortcut.UnregisterAll()
-		a.updates.close()
-	})
+	mygo.App.OnBeforeQuit(a.beforeQuit)
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.tray.Destroy() })
 	if os.Getenv("CUBBIX_QA") == "" || !a.qaUpdateState() {
 		a.updates.start(a.config.AutomaticUpdates, updateInterval)
@@ -382,6 +373,18 @@ func (a *application) ready() {
 		log.Printf("status item window: %+v", a.tray.Bounds())
 		a.window.ShowInactive()
 	}
+}
+
+// beforeQuit releases services without guarding tool window contents.
+func (a *application) beforeQuit(*mygo.QuitEvent) {
+	// JSON windows are tools: quitting never asks about unsaved text.
+	a.quitting = true
+	if a.stopAwakeServices != nil {
+		a.stopAwakeServices()
+	}
+	a.awake.stop()
+	mygo.GlobalShortcut.UnregisterAll()
+	a.updates.close()
 }
 
 func icon(name string) *ui.SVG {
