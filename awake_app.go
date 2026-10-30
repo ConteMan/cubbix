@@ -13,6 +13,9 @@ import (
 
 func (a *application) awakeChanged() {
 	s := a.awake.snapshot()
+	if a.panel != nil {
+		a.panel.errorKey = ""
+	}
 	a.config.AwakeSession = nil
 	if s.Active {
 		copy := s.Session
@@ -41,9 +44,8 @@ func (a *application) startAwake(s awakeSession) error {
 	return a.awake.start(s)
 }
 
-// reportAwakeError keeps the settings error slot for the entries that still
-// report there, such as menu items. The palette and URL paths read the error
-// they get back instead of writing it here.
+// reportAwakeError serves the global shortcut and launch restoration. Panels
+// and URL actions consume their returned errors without writing Settings.
 func (a *application) reportAwakeError(err error) {
 	if err != nil {
 		a.settingsError = "AwakeStartError"
@@ -51,10 +53,7 @@ func (a *application) reportAwakeError(err error) {
 	}
 }
 func (a *application) selectedSession() awakeSession {
-	s := awakeSession{Mode: a.config.AwakeMode}
-	if s.Mode == "" {
-		s.Mode = "screen"
-	}
+	s := awakeSession{Mode: a.config.AwakeMode, Minutes: a.config.AwakeMinutes, Until: a.config.AwakeUntil}
 	if s.Mode == "" {
 		s.Mode = "screen"
 	}
@@ -101,7 +100,7 @@ func (a *application) setDuration(minutes int) error {
 	if minutes < 0 || minutes > awakeMinutesMaximum {
 		return fmt.Errorf("DurationError")
 	}
-	s := awakeSession{Mode: a.config.AwakeMode}
+	s := awakeSession{Mode: a.config.AwakeMode, Minutes: minutes}
 	if minutes > 0 {
 		s.End = time.Now().Add(time.Duration(minutes) * time.Minute)
 	}
@@ -154,8 +153,8 @@ func (a *application) awakeSuffix(locale string, session awakeSession, now time.
 	if session.PID > 0 {
 		return fmt.Sprintf(text("AwakeFollowing"), session.Name)
 	}
-	if a.config.AwakeUntil != "" {
-		return fmt.Sprintf(text("AwakeUntil"), a.config.AwakeUntil)
+	if session.Until != "" {
+		return fmt.Sprintf(text("AwakeUntil"), session.Until)
 	}
 	if session.End.IsZero() {
 		return text("R05Unlimited")

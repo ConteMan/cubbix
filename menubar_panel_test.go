@@ -235,7 +235,7 @@ func TestMenubarPanelStatusLines(t *testing.T) {
 		}
 		// A deadline wins over the countdown.
 		a.config.AwakeUntil = "18:30"
-		if err := a.startAwake(awakeSession{Mode: "screen", End: time.Now().Add(time.Hour)}); err != nil {
+		if err := a.startAwake(awakeSession{Mode: "screen", End: time.Now().Add(time.Hour), Until: "18:30"}); err != nil {
 			t.Fatal(err)
 		}
 		tt = panelView(a, locale)
@@ -279,7 +279,7 @@ func TestMenubarPanelProcessEndedWarning(t *testing.T) {
 		a.awake.state = awakeState{Error: "ProcessEnded"}
 		a.awake.mu.Unlock()
 		tt := panelView(a, locale)
-		if !tt.HasText(a.text(locale, "ProcessEnded")) {
+		if _, ok := tt.Find(a.text(locale, "ProcessEnded")); !ok {
 			t.Fatalf("%s: the ended process is not reported: %v", locale, tt.Texts())
 		}
 		// The warning sits in its own row, so the card grows by one.
@@ -517,7 +517,7 @@ func TestMenubarPanelFooterActions(t *testing.T) {
 		t.Fatalf("missing the version: %v", tt.Texts())
 	}
 	// The command palette button closes the panel and opens the palette.
-	if err := tt.Click(a.text("en", "PanelCommandPalette")); err != nil {
+	if err := tt.Click(a.menubarPanelTooltip("en", "PaletteShortcutLabel", a.config.PaletteShortcut)); err != nil {
 		t.Fatal(err)
 	}
 	if a.menubarPanelVisible() || !a.paletteVisible() {

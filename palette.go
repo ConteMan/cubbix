@@ -784,7 +784,7 @@ func (a *application) runURL(req paletteURLRequest) error {
 			session.Mode = req.Mode
 		}
 		if req.HasMinutes {
-			session = awakeSession{Mode: session.Mode}
+			session = awakeSession{Mode: session.Mode, Minutes: req.Minutes}
 			if req.Minutes > 0 {
 				session.End = time.Now().Add(time.Duration(req.Minutes) * time.Minute)
 			}

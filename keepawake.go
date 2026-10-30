@@ -16,6 +16,8 @@ import (
 type awakeSession struct {
 	Mode     string    `toml:"mode"`
 	End      time.Time `toml:"end"`
+	Minutes  int       `toml:"minutes,omitempty"`
+	Until    string    `toml:"until,omitempty"`
 	PID      int       `toml:"pid,omitempty"`
 	Identity string    `toml:"identity,omitempty"`
 	Name     string    `toml:"name,omitempty"`

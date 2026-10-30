@@ -246,28 +246,27 @@ func (a *application) panelSetDuration(minutes int) {
 // process, four hours and custom minutes highlight no pill.
 func (a *application) panelPreset(now time.Time) (int, bool) {
 	state := a.awake.snapshot()
-	switch {
-	case a.config.AwakeUntil != "":
-		return 0, false
-	case state.Active && state.Session.PID > 0:
-		return 0, false
-	case state.Active && state.Session.End.IsZero():
-		return 0, true
-	}
-	switch a.config.AwakeMinutes {
-	case 30, 60, 120:
-		if state.Active {
-			// A preset lasts its full length; anything longer is not it.
-			if state.Session.End.Sub(now) > time.Duration(a.config.AwakeMinutes+1)*time.Minute {
-				return 0, false
-			}
-		}
-		return a.config.AwakeMinutes, true
-	case 0:
-		if state.Active && !state.Session.End.IsZero() {
+	minutes := a.config.AwakeMinutes
+	if state.Active {
+		s := state.Session
+		if s.PID > 0 || s.Until != "" || !s.End.IsZero() && !s.End.After(now) {
 			return 0, false
 		}
-		return 0, true
+		if s.End.IsZero() {
+			return 0, true
+		}
+		minutes = s.Minutes
+		// Older saved sessions lack duration metadata; do not guess from
+		// either the remembered default or a shrinking countdown.
+		if minutes == 0 {
+			return 0, false
+		}
+	} else if a.config.AwakeUntil != "" {
+		return 0, false
+	}
+	switch minutes {
+	case 0, 30, 60, 120:
+		return minutes, true
 	}
 	return 0, false
 }

@@ -54,7 +54,7 @@ func TestMenubarPanelScreenshots(t *testing.T) {
 		}},
 		{"panel-until", func(a *application) {
 			a.config.AwakeUntil = "18:30"
-			if err := a.startAwake(awakeSession{Mode: "screen", End: time.Now().Add(time.Hour)}); err != nil {
+			if err := a.startAwake(awakeSession{Mode: "screen", End: time.Now().Add(time.Hour), Until: "18:30"}); err != nil {
 				t.Fatal(err)
 			}
 		}},

@@ -94,8 +94,10 @@ func nativeWindowChecks(a *application, dir string) error {
 		if err := policy(1); err != nil {
 			return err
 		}
-		// Change policy while the window stays hidden; only read NSApplication's value.
-		a.visibility(true)
+		// MyGo's regular-policy wrapper activates the application. Inspect
+		// native policy values directly without making a foreground request.
+		nsapp.Send(objc.RegisterName("setActivationPolicy:"), 0)
+		a.policy = mygo.ActivationPolicyRegular
 		if err := policy(0); err != nil {
 			return err
 		}
@@ -189,7 +191,10 @@ func nativeWindowChecks(a *application, dir string) error {
 			return fmt.Errorf("card panel flyout was not created")
 		}
 		panel := p.window
-		panel.SetVisibleOnAllWorkspaces(true)
+		behavior := objc.Send[uint](objc.ID(panel.NativeHandle()), objc.RegisterName("collectionBehavior"))
+		if behavior&1 == 0 {
+			return fmt.Errorf("card panel cannot join all workspaces")
+		}
 		if !panel.IsFlyout() || panel.IsVisible() || panel.IsFocused() || objc.Send[bool](nsapp, objc.RegisterName("isActive")) {
 			return fmt.Errorf("card panel flyout is not hidden and inactive")
 		}
@@ -197,16 +202,22 @@ func nativeWindowChecks(a *application, dir string) error {
 		if width, height := panel.Size(); width != int(token.SizeMenubarPanelWidth) || height != a.menubarPanelHeight(token) {
 			return fmt.Errorf("card panel size = %dx%d", width, height)
 		}
-		panel.SetContentSize(int(token.SizeMenubarPanelWidth), 313)
-		if _, height := panel.Size(); height != 313 {
-			return fmt.Errorf("card panel did not follow SetContentSize")
+		_, before := panel.Size()
+		a.config.JSONEnabled = false
+		a.refreshMenubarPanel()
+		if _, height := panel.Size(); height >= before || height != a.menubarPanelHeight(token) {
+			return fmt.Errorf("tile change did not resize card panel: %d -> %d", before, height)
 		}
 		panel.Close()
-		a.panel, a.tray = nil, nil
+		if a.panel != nil {
+			return fmt.Errorf("native card panel close left stale application state")
+		}
+		a.tray = nil
 		const shortcut = "Ctrl+Alt+Cmd+Shift+F10"
 		if err := mygo.GlobalShortcut.Register(shortcut, func() {}); err != nil {
 			return fmt.Errorf("native global shortcut registration: %w", err)
 		}
+		defer mygo.GlobalShortcut.Unregister(shortcut)
 		if !mygo.GlobalShortcut.IsRegistered(shortcut) {
 			return fmt.Errorf("global shortcut not registered")
 		}

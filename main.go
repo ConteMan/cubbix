@@ -29,6 +29,8 @@ type application struct {
 	jsonDocuments        []*jsonDocument
 	jsonNext             int
 	jsonReadClipboard    func() string
+	createJSONWindow     func(*jsonDocument)
+	presentJSONWindow    func(*jsonDocument)
 	jsonCopy             func(string) error
 	jsonChooseOpen       func(*mygo.Window) (string, error)
 	jsonChooseSave       func(*mygo.Window) (string, error)
@@ -91,6 +93,8 @@ func newApplication(path string) (*application, error) {
 	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
 	a.createPaletteWindow = a.buildPaletteWindow
 	a.createMenubarPanel = a.buildMenubarPanel
+	a.createJSONWindow = a.buildJSONWindow
+	a.presentJSONWindow = a.focusJSONWindow
 	a.updates = newUpdateManager(checkMyGoUpdate, newReleaseNotesClient(appVersion).load, nil)
 	for index, language := range []string{"system", "zh-CN", "en"} {
 		if config.Language == language {

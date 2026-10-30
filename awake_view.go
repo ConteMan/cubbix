@@ -89,14 +89,14 @@ func (a *application) confirmAwakeDialog() {
 			return
 		}
 		minutes = int(duration / time.Minute)
-		s = awakeSession{Mode: a.config.AwakeMode, End: time.Now().Add(duration)}
+		s = awakeSession{Mode: a.config.AwakeMode, Minutes: minutes, End: time.Now().Add(duration)}
 	case "until":
 		end, err := untilTime(d.until, time.Now())
 		if err != nil {
 			d.errorKey = "TimeError"
 			return
 		}
-		s = awakeSession{Mode: a.config.AwakeMode, End: end}
+		s = awakeSession{Mode: a.config.AwakeMode, End: end, Until: d.until}
 	case "follow":
 		if d.loading || d.errorKey == "ProcessListError" {
 			return

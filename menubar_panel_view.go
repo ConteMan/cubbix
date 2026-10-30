@@ -128,7 +128,7 @@ func (a *application) panelPills(c *ui.Context, t tokenValues, locale string) {
 				// Off: the remembered preset stays visible without emphasis.
 				background = t.ColorAccentSoft
 			}
-			button := ui.ButtonBase(c.Key(fmt.Sprintf("panel-duration-%d", minutes))).Width(t.SizePillButtonWidth).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(background)).FocusRing(true).Label(text(pill.key)).OnClick(func() { a.panelSetDuration(minutes) })
+			button := ui.ButtonBase(c.Key(fmt.Sprintf("panel-duration-%d", minutes))).Width(t.SizePillButtonWidth).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(background)).FocusRing(true).Role(ui.RoleRadio).Checked(selected).Label(text(pill.key)).OnClick(func() { a.panelSetDuration(minutes) })
 			if !selected && button.Hovered() {
 				button.Background(ui.Hex(t.ColorControlHover))
 			}
@@ -150,7 +150,6 @@ func (a *application) panelStatus(c *ui.Context, t tokenValues, locale string) {
 					ui.Text(c, label).FontSize(t.FontSizeSmall)
 				})
 			})
-			ui.Text(c, label).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorDanger)).Grow(1).SingleLine().Ellipsis("…")
 			return
 		}
 		ui.Text(c, a.menubarPanelStatusLine(locale, time.Now())).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).Grow(1).SingleLine().Ellipsis("…")
@@ -243,7 +242,7 @@ func (a *application) panelFooter(c *ui.Context, t tokenValues, locale string) {
 		ui.Box(c).FillWidth().Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
 		ui.Row(c).FillWidth().Height(t.SizeNavHeight).AlignItems(ui.Center).Children(func() {
 			ui.Text(c, "Cubbix v"+runningVersion()).FontSize(t.FontSizeCaption).TextColor(ui.Hex(t.ColorTextDisabled)).Grow(1).SingleLine()
-			a.panelIconButton(c, t, "panel-palette", "command", text("PanelCommandPalette"), a.showPalette)
+			a.panelIconButton(c, t, "panel-palette", "command", a.menubarPanelTooltip(locale, "PaletteShortcutLabel", a.config.PaletteShortcut), a.showPalette)
 			a.panelIconButton(c, t, "panel-settings", "settings-2", text("MenuSettings"), func() {
 				a.hideMenubarPanel()
 				a.show()
