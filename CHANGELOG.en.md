@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — 2026-10-30
+
+- JSON windows are now split in two: your data on the left, the this result on the right, with a divider you can drag.
+- Keys, strings and numbers each get their own color, and guide lines keep each level lined up.
+- Every window has a name now: JSON, JSON 2, or the name of the file you opened.
+- It's a quick tool, so closing a window just closes it. No more save prompts.
+
 ## 0.2.0 — 2026-10-30
 
 - Say hello to the second cubby, JSON. Press ⌃ ⌥ ⌘ J for a new window, and any JSON on your clipboard shows up neatly formatted, with highlighting, line numbers and folding.
