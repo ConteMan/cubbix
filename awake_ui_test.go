@@ -83,7 +83,7 @@ func TestAwakeDialogInputsAndSelection(t *testing.T) {
 			t.Fatal("until not confirmed")
 		}
 		a.awake.stop()
-		a.dialog = &awakeDialog{kind: "follow", processes: []runningProcess{{1, "codex", "one"}, {2, "claude", "two"}}, selected: 1}
+		a.dialog = &awakeDialog{kind: "follow", processes: []runningProcess{{PID: 1, Name: "codex", Identity: "one"}, {PID: 2, Name: "claude", Identity: "two"}}, selected: 1}
 		tt = ui.NewTester(a.awakeDialogView, 440, 280)
 		tt.SetLocale(locale)
 		if err := tt.Click("claude 2"); err != nil {
@@ -93,7 +93,7 @@ func TestAwakeDialogInputsAndSelection(t *testing.T) {
 		if a.dialog != nil || a.awake.snapshot().Session.PID != 2 {
 			t.Fatalf("wrong PID followed: dialog=%+v state=%+v", a.dialog, a.awake.snapshot())
 		}
-		a.dialog = &awakeDialog{kind: "follow", processes: []runningProcess{{3, "codex", "three"}}, selected: 3, search: "absent"}
+		a.dialog = &awakeDialog{kind: "follow", processes: []runningProcess{{PID: 3, Name: "codex", Identity: "three"}}, selected: 3, search: "absent"}
 		a.confirmAwakeDialog()
 		if a.dialog == nil {
 			t.Fatal("hidden selection confirmed")

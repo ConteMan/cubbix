@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
@@ -234,34 +233,6 @@ func (a *application) startAwakeServices() {
 			}
 		}
 	}()
-}
-
-type runningProcess struct {
-	PID            int
-	Name, Identity string
-}
-
-func listProcesses(ctx context.Context) ([]runningProcess, error) {
-	data, err := exec.CommandContext(ctx, "/bin/ps", "-axo", "pid=,lstart=,comm=").Output()
-	if err != nil {
-		return nil, err
-	}
-	var out []runningProcess
-	for _, line := range strings.Split(string(data), "\n") {
-		fields := strings.Fields(line)
-		if len(fields) < 7 {
-			continue
-		}
-		pid, err := strconv.Atoi(fields[0])
-		if err != nil {
-			continue
-		}
-		name := strings.Join(fields[6:], " ")
-		parts := strings.Split(name, "/")
-		name = parts[len(parts)-1]
-		out = append(out, runningProcess{pid, name, strings.Join(fields[1:6], " ")})
-	}
-	return out, nil
 }
 
 func (a *application) restoreAwakeAfterLaunch() {
