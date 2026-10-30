@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0 — 2026-10-30
+
+- Meet the first cubby, Keep Awake: tell your Mac to stay up, with the screen on or just your tasks running.
+- Pick how long: half an hour, a few hours, until a set time, or for as long as you like.
+- Follow a process, such as an agent that is still running. When it finishes, Keep Awake turns itself off.
+- Press ⌃ ⌥ ⌘ K to toggle it. While it is on, a small dot sits next to the cat.
+- If you unplug while Keep Awake is on, Cubbix gives you a heads-up.
+
 ## 0.0.3 — 2026-10-29
 
 - What’s new now lives in Settings. Browse by version, then press Esc to go back.
