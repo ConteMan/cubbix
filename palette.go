@@ -790,16 +790,18 @@ func (a *application) runURL(req paletteURLRequest) error {
 			}
 		}
 		// The request never writes the remembered duration or deadline.
-		return a.startAwake(session)
+		err := a.startAwake(session)
+		// A deep link has no other visible result, so it reports like a shortcut.
+		a.announceAwake(err)
+		return err
 	case "awake.stop":
 		a.awake.stop()
+		a.announceAwake(nil)
 	case "awake.toggle":
-		// The shortcut path reports failures in Settings; a deep link does not.
-		if a.awake.snapshot().Active {
-			a.awake.stop()
-		} else {
-			return a.startAwake(a.selectedSession())
-		}
+		// Same toggle as the shortcut, and the same hint when it fails.
+		err := a.toggleAwakeResult()
+		a.announceAwake(err)
+		return err
 	case "json.new":
 		a.openJSONText(req.Text)
 	case "palette":

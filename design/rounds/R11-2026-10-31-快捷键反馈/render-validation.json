@@ -1,0 +1,35 @@
+{
+  "cliVersion": "0.3.13",
+  "historicalRootsUnchanged": true,
+  "nativeLayout": {
+    "nodes": 1608,
+    "problems": []
+  },
+  "exports": [
+    {
+      "nodeId": "W6GFud",
+      "file": "zh-CN-light.png",
+      "scale": 2,
+      "sha256": "88e62d4bad495608c4f268346a8e942ca5e182395099ae171cb63febc889dc7c"
+    },
+    {
+      "nodeId": "eZole",
+      "file": "zh-CN-dark.png",
+      "scale": 2,
+      "sha256": "792a46cbdf73e29d6ce91282efc6bec719ca5100a52eb520986e8ca904d4dd4f"
+    },
+    {
+      "nodeId": "t2PRwi",
+      "file": "en-light.png",
+      "scale": 2,
+      "sha256": "dd2bebbe0eeecddc3a499600f47c83a66c9358715a2f8e37f2b93f48f2a6397d"
+    },
+    {
+      "nodeId": "O24qNm",
+      "file": "en-dark.png",
+      "scale": 2,
+      "sha256": "8d68443254cc51c075c88ee05c98f759b65172ba2f58ef27ca1a05ad911dfd57"
+    }
+  ],
+  "passed": true
+}

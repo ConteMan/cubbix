@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 — 2026-10-31
+
+- Click the cat and a small card pops up. Keep Awake's switch, mode and durations are right there, so tap 1h and you're set. New JSON windows and the ones you have open live here too.
+- Press ⌥ . for the command palette. Just like Raycast, type what you want, such as "awake 45m" or "awake until 18:30", and press Return. ⌘ K shows more actions.
+- When you toggle Keep Awake with a shortcut, a small hint in a corner of the screen tells you what happened. Pick where it shows up and how, or turn it off, in Settings.
+- Raycast and Shortcuts can now drive Cubbix too, for example by opening cubbix://awake?minutes=60.
+- Right-click the cat for a short menu: Settings, Restart to update, and Quit.
+
 ## 0.2.1 — 2026-10-30
 
 - JSON windows are now split in two: your data on the left, the this result on the right, with a divider you can drag.

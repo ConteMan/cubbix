@@ -1,0 +1,507 @@
+{
+  "schemaVersion": 1,
+  "scope": "All authored canvas children and descendants; variable definitions excluded; geometry x/y/width/height excluded from spacing.",
+  "styleTokens": 116,
+  "styleTokensByType": {
+    "color": 30,
+    "number": 80,
+    "string": 6
+  },
+  "documentVariables": 311,
+  "copyResourceKeys": 238,
+  "reusableComponents": [
+    {
+      "id": "Ectkj",
+      "name": "Icon/blocks"
+    },
+    {
+      "id": "O4KJZC",
+      "name": "Icon/settings-2"
+    },
+    {
+      "id": "uTgqT",
+      "name": "Icon/info"
+    },
+    {
+      "id": "YeT0w",
+      "name": "Icon/refresh-cw"
+    },
+    {
+      "id": "MTEP9",
+      "name": "Icon/chevron-right"
+    },
+    {
+      "id": "lPkvC",
+      "name": "Icon/sun"
+    },
+    {
+      "id": "Hvppf",
+      "name": "Icon/braces"
+    },
+    {
+      "id": "s4LWGi",
+      "name": "Icon/power"
+    },
+    {
+      "id": "xgZOR",
+      "name": "Icon/check"
+    },
+    {
+      "id": "sWO1O",
+      "name": "Icon/triangle-alert"
+    },
+    {
+      "id": "VFLqP",
+      "name": "Icon/loader-circle"
+    },
+    {
+      "id": "QBOEx",
+      "name": "Icon/x"
+    },
+    {
+      "id": "Jy4Q0",
+      "name": "Icon/download"
+    },
+    {
+      "id": "RrJvC",
+      "name": "Icon/external-link"
+    },
+    {
+      "id": "KfHWu",
+      "name": "Switch"
+    },
+    {
+      "id": "Hs9NC",
+      "name": "Segmented control"
+    },
+    {
+      "id": "n2ixa",
+      "name": "Icon button"
+    },
+    {
+      "id": "sFUcN",
+      "name": "Tooltip"
+    },
+    {
+      "id": "GaYMc",
+      "name": "Text button"
+    },
+    {
+      "id": "PodLz",
+      "name": "Settings row"
+    },
+    {
+      "id": "fezUM",
+      "name": "Inset divider"
+    },
+    {
+      "id": "X6uV6",
+      "name": "Settings card"
+    },
+    {
+      "id": "zlRGT",
+      "name": "Navigation item"
+    },
+    {
+      "id": "XlhBz",
+      "name": "Status icon"
+    },
+    {
+      "id": "SvwYl",
+      "name": "Menu item"
+    },
+    {
+      "id": "zh2Qo",
+      "name": "Menu bar dropdown"
+    },
+    {
+      "id": "BVbwx",
+      "name": "Download ready notice"
+    },
+    {
+      "id": "vUQhl",
+      "name": "Version control"
+    },
+    {
+      "id": "ewQJq",
+      "name": "Restart confirmation"
+    },
+    {
+      "id": "r2xEJ",
+      "name": "Logo/Mark"
+    },
+    {
+      "id": "ivtHk",
+      "name": "Brand lockup"
+    },
+    {
+      "id": "qSiSW",
+      "name": "Brand icon only"
+    },
+    {
+      "id": "y6tUf",
+      "name": "Settings window"
+    },
+    {
+      "id": "O8Imme",
+      "name": "R05 Icon/terminal"
+    },
+    {
+      "id": "H8TPWq",
+      "name": "R05 Icon/keyboard"
+    },
+    {
+      "id": "GgZ43",
+      "name": "R05 Icon/search"
+    },
+    {
+      "id": "xz4Am",
+      "name": "R05 Native menu item"
+    },
+    {
+      "id": "RLMny",
+      "name": "R05 Native menu / off"
+    },
+    {
+      "id": "re5DI",
+      "name": "R05 Native menu / active"
+    },
+    {
+      "id": "vXGvH",
+      "name": "R05 Native submenu / mode"
+    },
+    {
+      "id": "IuqUj",
+      "name": "R05 Native submenu / duration"
+    },
+    {
+      "id": "DUqvf",
+      "name": "R05 Native status variants"
+    },
+    {
+      "id": "X88ii6",
+      "name": "R05 Keyboard field"
+    },
+    {
+      "id": "Dh9pW",
+      "name": "R05 Shortcut recorder"
+    },
+    {
+      "id": "d2Shh",
+      "name": "R05 Dialog / duration"
+    },
+    {
+      "id": "bxxcd",
+      "name": "R05 Dialog / time"
+    },
+    {
+      "id": "n2m80",
+      "name": "R05 Dialog / process"
+    },
+    {
+      "id": "zKcs0",
+      "name": "R05 Settings / tiles"
+    },
+    {
+      "id": "QgsRX",
+      "name": "R05 Settings / shortcuts"
+    },
+    {
+      "id": "wHXVo",
+      "name": "R05 System notification"
+    },
+    {
+      "id": "NKc7D",
+      "name": "R05 Keyboard shortcut"
+    },
+    {
+      "id": "P5KBDV",
+      "name": "R05 Conflict tooltip"
+    },
+    {
+      "id": "MUuwC",
+      "name": "R05 Start keep awake tooltip"
+    },
+    {
+      "id": "vnA76",
+      "name": "R07 Icon/pin"
+    },
+    {
+      "id": "Sr9bx",
+      "name": "R07 Icon/folder-open"
+    },
+    {
+      "id": "YHZ39",
+      "name": "R07 Icon/copy"
+    },
+    {
+      "id": "vq9Aj",
+      "name": "R07 Icon/fold-vertical"
+    },
+    {
+      "id": "k5lTWJ",
+      "name": "R07 Icon/unfold-vertical"
+    },
+    {
+      "id": "cf6H7",
+      "name": "R07 Icon/message-square-x"
+    },
+    {
+      "id": "VqDNy",
+      "name": "R07 Icon/clipboard-copy"
+    },
+    {
+      "id": "VoL1f",
+      "name": "R07 Icon/text-quote"
+    },
+    {
+      "id": "Met7Z",
+      "name": "R07 Icon/code-xml"
+    },
+    {
+      "id": "iakjU",
+      "name": "R07 Icon/file-type"
+    },
+    {
+      "id": "i8eMV",
+      "name": "R07 Icon/file-input"
+    },
+    {
+      "id": "Lq8Qv",
+      "name": "R07 Icon/chevron-down"
+    },
+    {
+      "id": "Faq6Y",
+      "name": "R07 Icon/gauge"
+    },
+    {
+      "id": "tyiHF",
+      "name": "R07 Icon/clock-3"
+    },
+    {
+      "id": "EUd6P",
+      "name": "R07 Icon/square"
+    },
+    {
+      "id": "rcCKQ",
+      "name": "R07 Native window controls"
+    },
+    {
+      "id": "hYJPT",
+      "name": "R07 Window toolbar"
+    },
+    {
+      "id": "kAiAF",
+      "name": "R07 Utility toolbar"
+    },
+    {
+      "id": "Q4Xx4j",
+      "name": "R07 this input"
+    },
+    {
+      "id": "hmKwu",
+      "name": "R07 Code line"
+    },
+    {
+      "id": "zXt8W",
+      "name": "R07 JSON editor"
+    },
+    {
+      "id": "kCDl6",
+      "name": "R07 Result panel"
+    },
+    {
+      "id": "i1Q1N8",
+      "name": "R07 JSON window"
+    },
+    {
+      "id": "CqaJa",
+      "name": "R07 Empty window"
+    },
+    {
+      "id": "NUat9",
+      "name": "R07 State / Array"
+    },
+    {
+      "id": "vZdRC",
+      "name": "R07 State / Object"
+    },
+    {
+      "id": "Q39nxd",
+      "name": "R07 State / Undefined"
+    },
+    {
+      "id": "EJtG6",
+      "name": "R07 State / Error"
+    },
+    {
+      "id": "BVTVj",
+      "name": "R07 State / Timeout"
+    },
+    {
+      "id": "i2RJ2q",
+      "name": "R07 State / Large"
+    },
+    {
+      "id": "j22mq",
+      "name": "R07 Native menu / off"
+    },
+    {
+      "id": "XQacm",
+      "name": "R07 Native menu / active"
+    },
+    {
+      "id": "ik3nL",
+      "name": "R07 Settings / tiles"
+    },
+    {
+      "id": "SuszQ",
+      "name": "R07 Settings / shortcuts"
+    },
+    {
+      "id": "cocmG",
+      "name": "R07 Tool selection"
+    },
+    {
+      "id": "PByrK",
+      "name": "R07 Action / Format"
+    },
+    {
+      "id": "Ng6hD",
+      "name": "R07 Action / Fold"
+    },
+    {
+      "id": "g3HzZW",
+      "name": "R07 Action / Unfold"
+    },
+    {
+      "id": "QEYwF",
+      "name": "R07 Action / Comments"
+    },
+    {
+      "id": "VnixZ",
+      "name": "R07 Action / Minify"
+    },
+    {
+      "id": "kIrp3",
+      "name": "R07 Action / Escape"
+    },
+    {
+      "id": "Mrqdh",
+      "name": "R07 Action / XML"
+    },
+    {
+      "id": "Vlafs",
+      "name": "R07 Action / TypeScript"
+    },
+    {
+      "id": "NMhjk",
+      "name": "R07 Action / Pin"
+    },
+    {
+      "id": "sFk8V",
+      "name": "R07 Action / Unpin"
+    },
+    {
+      "id": "ICb8f",
+      "name": "R07 Action / Open"
+    },
+    {
+      "id": "gPAiw",
+      "name": "R07 Action / Copy"
+    },
+    {
+      "id": "S8d6wZ",
+      "name": "R08 JSON split window"
+    },
+    {
+      "id": "MSJBx",
+      "name": "R09 Palette shell"
+    },
+    {
+      "id": "I6d8xa",
+      "name": "R09 Shortcuts"
+    },
+    {
+      "id": "wVqfV",
+      "name": "R09 Icon/star"
+    },
+    {
+      "id": "f312q",
+      "name": "R10 Icon/plus"
+    },
+    {
+      "id": "NCxfb",
+      "name": "R10 Icon/command"
+    },
+    {
+      "id": "f23cLA",
+      "name": "R10 Switch"
+    },
+    {
+      "id": "E96Ez8",
+      "name": "R11 Icon/sun"
+    },
+    {
+      "id": "vjo7q",
+      "name": "R11 Icon/power"
+    },
+    {
+      "id": "bVN9P",
+      "name": "R11 Icon/triangle-alert"
+    }
+  ],
+  "componentCount": 110,
+  "authoredRefCount": 1142,
+  "samples": 12,
+  "literalCounts": {
+    "colors": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    },
+    "cornerRadius": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    },
+    "fontSize": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    },
+    "spacing": {
+      "occurrences": 0,
+      "uniqueValues": 0
+    }
+  },
+  "literalDetails": {
+    "colors": [],
+    "cornerRadius": [],
+    "fontSize": [],
+    "spacing": []
+  },
+  "missingVariables": [],
+  "danglingRefs": [],
+  "tokenDrift": [],
+  "r04Checks": {
+    "noRepeatedPageHeaderOrCloseButton": true,
+    "fixedWidthAndContentHeight": true,
+    "modeOnlySamples": true,
+    "languageOptionsInOrder": true,
+    "defaultLanguageIsChinese": true,
+    "brandLockupInstalled": true,
+    "noBrandPlaceholder": true,
+    "bothBrandVariants": true,
+    "navigationHasNoStroke": true,
+    "navigationStatesShareShape": true,
+    "navigationStatesUseDistinctColors": true,
+    "accentAliasesCentralized": true,
+    "noComparisonBoard": true,
+    "neutralSuccess": true,
+    "selectedTextUsesOnAccent": true,
+    "primaryButtonTextUsesOnAccent": true,
+    "accentUsesModeOnly": true
+  },
+  "unfinishedPlaceholders": [],
+  "completeSampleMatrix": true,
+  "completePromptMatrix": true,
+  "passed": true
+}

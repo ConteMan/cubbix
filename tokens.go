@@ -114,6 +114,9 @@ type tokenValues struct {
 	SizeMenubarPanelWidth     float32
 	SizePillButtonWidth       float32
 	SizeIconSmall             float32
+	SizeToastSlotWidth        float32
+	SizeToastHeight           float32
+	SizeFeedbackPositionWidth float32
 }
 
 func tokens(dark bool, language string) tokenValues {
@@ -227,6 +230,9 @@ func tokens(dark bool, language string) tokenValues {
 		SizeMenubarPanelWidth:     320,
 		SizePillButtonWidth:       64,
 		SizeIconSmall:             12,
+		SizeToastSlotWidth:        320,
+		SizeToastHeight:           36,
+		SizeFeedbackPositionWidth: 144,
 	}
 	if dark {
 		t.ColorWindow = "#202020"

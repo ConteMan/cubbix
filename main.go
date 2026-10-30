@@ -23,7 +23,7 @@ var assets embed.FS
 //go:embed frontend/dist/*
 var jsonAssets embed.FS
 
-const appVersion = "0.2.1"
+const appVersion = "0.3.0"
 
 type application struct {
 	jsonDocuments        []*jsonDocument
@@ -38,6 +38,9 @@ type application struct {
 	shortcutTarget       string
 	palette              *paletteState
 	paletteShortcutError string
+	feedback             *feedbackPresenter
+	feedbackMode         int // index into feedbackModes
+	feedbackCorner       int // index into feedbackCorners
 	panel                *menubarPanelState
 	// createPaletteWindow and createMenubarPanel are seams: tests replace
 	// them so no case creates a native window.
@@ -95,6 +98,13 @@ func newApplication(path string) (*application, error) {
 	a.createMenubarPanel = a.buildMenubarPanel
 	a.createJSONWindow = a.buildJSONWindow
 	a.presentJSONWindow = a.focusJSONWindow
+	a.feedbackMode = feedbackIndex(feedbackModes, config.FeedbackMode)
+	a.feedbackCorner = feedbackIndex(feedbackCorners, config.FeedbackCorner)
+	a.feedback = newFeedbackPresenter()
+	a.feedback.mode = a.effectiveFeedbackMode
+	a.feedback.corner = a.feedbackCornerName
+	a.feedback.create = a.buildFeedbackWindow
+	a.feedback.changed = a.invalidateWindow
 	a.updates = newUpdateManager(checkMyGoUpdate, newReleaseNotesClient(appVersion).load, nil)
 	for index, language := range []string{"system", "zh-CN", "en"} {
 		if config.Language == language {
@@ -397,6 +407,7 @@ func (a *application) ready() {
 	a.startAwakeServices()
 	a.registerJSONShortcut()
 	a.registerPaletteShortcut()
+	a.feedback.watch()
 	if err := a.registerURLScheme("cubbix"); err != nil {
 		// A missing declaration only disables deep links; it must not block launch.
 		log.Print(err)
@@ -433,6 +444,7 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	a.quitting = true
 	a.hidePalette()
 	a.hideMenubarPanel()
+	a.feedback.close()
 	if a.stopAwakeServices != nil {
 		a.stopAwakeServices()
 	}

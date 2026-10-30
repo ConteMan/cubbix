@@ -94,6 +94,21 @@ func nativeWindowChecks(a *application, dir string) error {
 		if err := policy(1); err != nil {
 			return err
 		}
+		// Inspect the production hint panel while hidden; never display it.
+		a.buildFeedbackWindow(a.feedback)
+		hint := a.feedback.window.(*mygo.Window)
+		nativeHint := objc.ID(hint.NativeHandle())
+		hintStyle := objc.Send[uint](nativeHint, objc.RegisterName("styleMask"))
+		hintBehavior := objc.Send[uint](nativeHint, objc.RegisterName("collectionBehavior"))
+		const required = uint(1<<0 | 1<<3 | 1<<6 | 1<<8) // all Spaces, transient, ignores cycle, fullscreen auxiliary
+		if hintStyle&(1<<7) == 0 || hintBehavior&required != required || hint.IsVisible() || hint.IsFocused() || !objc.Send[bool](nativeHint, objc.RegisterName("ignoresMouseEvents")) || hint.HasShadow() || !hint.IsAlwaysOnTop() {
+			return fmt.Errorf("hidden feedback panel has unsafe native flags: style=%x behavior=%x", hintStyle, hintBehavior)
+		}
+		a.feedback.close()
+		if err := checkHidden(); err != nil {
+			return err
+		}
+		fmt.Println("PASS: hidden feedback panel is nonactivating, click-through, floating, all-Spaces/fullscreen auxiliary; no shadow or focus")
 		// MyGo's regular-policy wrapper activates the application. Inspect
 		// native policy values directly without making a foreground request.
 		nsapp.Send(objc.RegisterName("setActivationPolicy:"), 0)

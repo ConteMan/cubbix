@@ -219,5 +219,22 @@
   "PaletteMinutes": "%d 分钟",
   "PaletteJSONBlank": "新建空白窗口",
   "PaletteJSONClipboard": "从剪贴板新建",
-  "PaletteSwitchTo": "切过去"
+  "PaletteSwitchTo": "切过去",
+  "FeedbackMode": "反馈方式",
+  "FeedbackHint": "屏幕提示",
+  "FeedbackNotification": "系统通知",
+  "FeedbackOff": "关闭",
+  "FeedbackPosition": "提示位置",
+  "FeedbackTopLeft": "左上",
+  "FeedbackTopRight": "右上",
+  "FeedbackBottomLeft": "左下",
+  "FeedbackBottomRight": "右下",
+  "FeedbackCenter": "居中",
+  "FeedbackDenied": "系统通知未获授权，已改用屏幕提示",
+  "ToastAwakeOn": "常亮已开启 · %s",
+  "ToastAwakeOnUnlimited": "常亮已开启 · 不限时",
+  "ToastAwakeOnUntil": "常亮已开启 · 直到 %s",
+  "ToastAwakeOnFollow": "常亮已开启 · 跟随 %s",
+  "ToastAwakeOff": "常亮已关闭",
+  "ToastAwakeError": "常亮未能开启"
 }

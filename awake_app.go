@@ -44,8 +44,8 @@ func (a *application) startAwake(s awakeSession) error {
 	return a.awake.start(s)
 }
 
-// reportAwakeError serves the global shortcut and launch restoration. Panels
-// and URL actions consume their returned errors without writing Settings.
+// reportAwakeError serves launch restoration, which still reports in
+// Settings. Shortcuts, panels and URL actions consume their returned errors.
 func (a *application) reportAwakeError(err error) {
 	if err != nil {
 		a.settingsError = "AwakeStartError"
@@ -70,15 +70,25 @@ func (a *application) selectedSession() awakeSession {
 	}
 	return s
 }
-func (a *application) toggleAwake() {
+func (a *application) toggleAwake() { _ = a.toggleAwakeResult() }
+
+// shortcutToggleAwake is the global shortcut path: it reports through the
+// feedback presenter and still returns the result for the caller.
+func (a *application) shortcutToggleAwake() {
+	a.announceAwake(a.toggleAwakeResult())
+}
+
+// toggleAwakeResult is the shared toggle. toggleAwake keeps the old signature
+// for silent callers (menu-style actions), which show the new state themselves.
+func (a *application) toggleAwakeResult() error {
 	if !a.config.AwakeEnabled {
-		return
+		return nil
 	}
 	if a.awake.snapshot().Active {
 		a.awake.stop()
-	} else {
-		a.reportAwakeError(a.startAwake(a.selectedSession()))
+		return nil
 	}
+	return a.startAwake(a.selectedSession())
 }
 func (a *application) setMode(mode string) error {
 	if mode != "screen" && mode != "tasks" {
@@ -132,7 +142,7 @@ func (a *application) registerAwakeShortcut() {
 		a.shortcutError = reason
 		return
 	}
-	if err := a.registerShortcut(a.config.AwakeShortcut, a.toggleAwake); err != nil {
+	if err := a.registerShortcut(a.config.AwakeShortcut, a.shortcutToggleAwake); err != nil {
 		a.shortcutError = "ShortcutUnavailable"
 	}
 }

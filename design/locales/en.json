@@ -219,5 +219,22 @@
   "PaletteMinutes": "%d min",
   "PaletteJSONBlank": "New empty window",
   "PaletteJSONClipboard": "New from clipboard",
-  "PaletteSwitchTo": "Switch to"
+  "PaletteSwitchTo": "Switch to",
+  "FeedbackMode": "Feedback",
+  "FeedbackHint": "On-screen hint",
+  "FeedbackNotification": "Notification",
+  "FeedbackOff": "Off",
+  "FeedbackPosition": "Hint position",
+  "FeedbackTopLeft": "Top left",
+  "FeedbackTopRight": "Top right",
+  "FeedbackBottomLeft": "Bottom left",
+  "FeedbackBottomRight": "Bottom right",
+  "FeedbackCenter": "Center",
+  "FeedbackDenied": "Notifications aren't allowed; showing on-screen hints instead",
+  "ToastAwakeOn": "Keep awake on · %s",
+  "ToastAwakeOnUnlimited": "Keep awake on · No limit",
+  "ToastAwakeOnUntil": "Keep awake on · Until %s",
+  "ToastAwakeOnFollow": "Keep awake on · Following %s",
+  "ToastAwakeOff": "Keep awake off",
+  "ToastAwakeError": "Keep awake didn't start"
 }
