@@ -2,7 +2,8 @@
 
 - 规格：[002 快捷键反馈](../../../docs/specs/002-快捷键反馈.md)。本轮只实现该规格，不改变已合并的 001 卡片面板与 003 命令面板。
 - 记录日期：2026-10-31。
-- 画板：本轮只同步了 3 个尺寸 Token 到 `design/tokens.json` 与 `tokens.go`；`cubbix.pen` 的变量与 R11 画板按 R09 的做法留到评审步骤补齐，本轮未改写设计源。
+- 画板：`design/cubbix.pen` 已同步全部 116 个样式 Token，并新增 R11 一排中英 × 浅深四张评审板；历史画板节点保持不变。由固定版本 `@pen.dev/cli@0.3.13` headless `interactive --in/--out` 编辑、保存、重新打开与 2× 导出。
+- 预览：[中文浅色](zh-CN-light.png)、[中文深色](zh-CN-dark.png)、[英文浅色](en-light.png)、[英文深色](en-dark.png)。每张含七种胶囊、五种位置示意、屏幕提示／通知／拒绝降级／关闭四种五行设置页。
 
 ## 界面
 
@@ -36,3 +37,26 @@
 ## 未实测
 
 真实屏幕上的出现与淡出、全屏应用之上的层级、鼠标穿透、应用是否被激活与 ⌘Tab 顺序、Mission Control 与窗口循环、五个位置的实际边距、多显示器与拔显示器、设置窗口保持焦点、通知替换与无声音，均未在真实前台实测：本工作单要求测试一律后台，不在真实屏幕弹提示、不调用真实通知 Show。验收清单中这些条目记为未实测，不计为通过。
+
+## 评审修正
+
+- 首帧内连续触发原先会取消空根视图等待，提前构建胶囊；现在只替换待显示文案，保留入场帧。首次显示完整时间为 16 + 150 + 1200 + 166 = 1532 ms。
+- 胶囊图标与文字补 `ContentTransition`；进入关闭／正常通知模式会收起已显示的胶囊；改提示位置立即重排当前提示且不重置停留。
+- `awake.toggle` URL 返回本次失败，同时仍显示失败反馈，避免调用方把失败当成功。
+- 调度器测试断言实际窗口 `ShowInactive`／`Hide`／`Close` 调用与时间；`ui.Tester` 像素测试覆盖真实入场、替换、出场和主题切换，控件点击测试覆盖通知禁用、拒绝恢复可改与配置保存。
+
+## 焦点与通知安全
+
+- 核对 MyGo v0.6.2：`internal/darwin/window.go` 中 Panel 在创建时带 `styleNonactivatingPanel`，并设置 CanJoinAllSpaces、FullScreenAuxiliary、IgnoresCycle、Transient；`ShowInactive` 仅 `orderFrontRegardless`，不调用 `makeKeyAndOrderFront` 或 `activateIgnoringOtherApps`。`SetVisibleOnAllWorkspaces(true)` 保留这些行为位。
+- `TestNativeWindowConstraints` 仅创建隐藏的生产反馈窗口，检查 nonactivating、浮动层、所有 Space、全屏辅助、鼠标穿透、无阴影、无可见／key／应用激活状态；不调用显示或焦点 API。现有原生测试注册的快捷键随测试注销。
+- 生产通知入口仍为 `mygo.NewNotification(options).Show()`；测试发件器全部替换，不调用真实通知、不请求权限、不改系统默认 URL 处理程序。
+
+## 设计验证
+
+- `render-validation.json`：重新打开导出 4 张，1608 个展开节点无布局问题，附导出哈希；历史根节点完全不变。
+- `layout-validation.json`：139 个顶层节点，最小间距 80，新增轮次带与上一轮间距至少 240，防重叠通过。
+- `token-audit.json`：颜色／圆角／字号／间距写死各 0，Token 漂移、缺失变量、悬空组件引用和未完成 placeholder 各 0。三个新增尺寸与 `tokens.go` 一致。
+- 固定 CLI 的渲染器不解析变量形式的 opacity；禁用透明度从 `OpacityDisabled` 解析为 0.45，几何尺寸同样从 Token 解析。颜色、字号、圆角、padding 与 gap 保持变量引用。
+- `./scripts/selftest.sh` 全通过：格式、前端、Token、防重叠、TIFF、vet、全部 Go 测试、darwin/arm64 ad-hoc 签名构建。版本仍为 0.2.1。
+
+上述隐藏窗口属性与 headless 像素检查不代替真实桌面的行为验收；前文「未实测」清单继续适用。本 PR 可评审，未合并、未发布。
