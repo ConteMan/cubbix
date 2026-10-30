@@ -1,0 +1,18 @@
+{
+  "command": "./scripts/selftest.sh",
+  "exitCode": 0,
+  "checks": [
+    "gofmt",
+    "locked frontend rebuild and actual Node Worker tests",
+    "Go/design token consistency",
+    "headless canvas overlap check",
+    "menu TIFF consistency",
+    "go vet ./...",
+    "go test ./... with hidden native/WebKit integration",
+    "darwin/arm64 build and ad hoc signing"
+  ],
+  "nativeFocusValidation": "Two non-key windows remain visible after simulated native focus/blur delegate callbacks, resign-active callback and deactivate under real Regular policy; no real foreground focus switching.",
+  "version": "0.2.0",
+  "published": false,
+  "passed": true
+}

@@ -212,6 +212,66 @@
     },
     {
       "mode": "light",
+      "category": "text",
+      "purpose": "ColorSyntaxKey on ColorCard",
+      "foregroundToken": "ColorSyntaxKey",
+      "backgroundToken": "ColorCard",
+      "foreground": "#A31515",
+      "background": "#FFFFFF",
+      "ratio": 7.849291236713627,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "light",
+      "category": "text",
+      "purpose": "ColorSyntaxString on ColorCard",
+      "foregroundToken": "ColorSyntaxString",
+      "backgroundToken": "ColorCard",
+      "foreground": "#0953B7",
+      "background": "#FFFFFF",
+      "ratio": 7.160643157474802,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "light",
+      "category": "text",
+      "purpose": "ColorSyntaxNumber on ColorCard",
+      "foregroundToken": "ColorSyntaxNumber",
+      "backgroundToken": "ColorCard",
+      "foreground": "#097335",
+      "background": "#FFFFFF",
+      "ratio": 5.973856400302949,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "light",
+      "category": "text",
+      "purpose": "ColorSyntaxBool on ColorCard",
+      "foregroundToken": "ColorSyntaxBool",
+      "backgroundToken": "ColorCard",
+      "foreground": "#003388",
+      "background": "#FFFFFF",
+      "ratio": 11.48139963334193,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "light",
+      "category": "text",
+      "purpose": "ColorSyntaxNull on ColorCard",
+      "foregroundToken": "ColorSyntaxNull",
+      "backgroundToken": "ColorCard",
+      "foreground": "#003388",
+      "background": "#FFFFFF",
+      "ratio": 11.48139963334193,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "light",
       "category": "graphic",
       "purpose": "on switch thumb",
       "foregroundToken": "ColorThumb",
@@ -632,6 +692,66 @@
     },
     {
       "mode": "dark",
+      "category": "text",
+      "purpose": "ColorSyntaxKey on ColorCard",
+      "foregroundToken": "ColorSyntaxKey",
+      "backgroundToken": "ColorCard",
+      "foreground": "#FF7B72",
+      "background": "#2C2C2C",
+      "ratio": 5.538311216970071,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "dark",
+      "category": "text",
+      "purpose": "ColorSyntaxString on ColorCard",
+      "foregroundToken": "ColorSyntaxString",
+      "backgroundToken": "ColorCard",
+      "foreground": "#79C0FF",
+      "background": "#2C2C2C",
+      "ratio": 7.180007495073421,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "dark",
+      "category": "text",
+      "purpose": "ColorSyntaxNumber on ColorCard",
+      "foregroundToken": "ColorSyntaxNumber",
+      "backgroundToken": "ColorCard",
+      "foreground": "#7EE787",
+      "background": "#2C2C2C",
+      "ratio": 9.088917628022758,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "dark",
+      "category": "text",
+      "purpose": "ColorSyntaxBool on ColorCard",
+      "foregroundToken": "ColorSyntaxBool",
+      "backgroundToken": "ColorCard",
+      "foreground": "#6CB6FF",
+      "background": "#2C2C2C",
+      "ratio": 6.499013587147186,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "dark",
+      "category": "text",
+      "purpose": "ColorSyntaxNull on ColorCard",
+      "foregroundToken": "ColorSyntaxNull",
+      "backgroundToken": "ColorCard",
+      "foreground": "#6CB6FF",
+      "background": "#2C2C2C",
+      "ratio": 6.499013587147186,
+      "threshold": 4.5,
+      "passed": true
+    },
+    {
+      "mode": "dark",
       "category": "graphic",
       "purpose": "on switch thumb",
       "foregroundToken": "ColorThumb",
@@ -993,6 +1113,42 @@
       "allowed": true
     },
     {
+      "mode": "light",
+      "token": "ColorSyntaxKey",
+      "color": "#A31515",
+      "allowed": true
+    },
+    {
+      "mode": "light",
+      "token": "ColorSyntaxString",
+      "color": "#0953B7",
+      "allowed": true
+    },
+    {
+      "mode": "light",
+      "token": "ColorSyntaxNumber",
+      "color": "#097335",
+      "allowed": true
+    },
+    {
+      "mode": "light",
+      "token": "ColorSyntaxBool",
+      "color": "#003388",
+      "allowed": true
+    },
+    {
+      "mode": "light",
+      "token": "ColorSyntaxNull",
+      "color": "#003388",
+      "allowed": true
+    },
+    {
+      "mode": "light",
+      "token": "ColorSyntaxIndent",
+      "color": "#EBEBEB",
+      "allowed": true
+    },
+    {
       "mode": "dark",
       "token": "ColorWindow",
       "color": "#202020",
@@ -1134,6 +1290,42 @@
       "mode": "dark",
       "token": "ColorMenuSurface",
       "color": "#2C2C2CEB",
+      "allowed": true
+    },
+    {
+      "mode": "dark",
+      "token": "ColorSyntaxKey",
+      "color": "#FF7B72",
+      "allowed": true
+    },
+    {
+      "mode": "dark",
+      "token": "ColorSyntaxString",
+      "color": "#79C0FF",
+      "allowed": true
+    },
+    {
+      "mode": "dark",
+      "token": "ColorSyntaxNumber",
+      "color": "#7EE787",
+      "allowed": true
+    },
+    {
+      "mode": "dark",
+      "token": "ColorSyntaxBool",
+      "color": "#6CB6FF",
+      "allowed": true
+    },
+    {
+      "mode": "dark",
+      "token": "ColorSyntaxNull",
+      "color": "#6CB6FF",
+      "allowed": true
+    },
+    {
+      "mode": "dark",
+      "token": "ColorSyntaxIndent",
+      "color": "#3C3C3C",
       "allowed": true
     }
   ],

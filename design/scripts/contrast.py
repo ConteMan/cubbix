@@ -50,6 +50,9 @@ def audit():
     if 'ColorMenuSurface' in variables:
         for foreground in ('ColorText', 'ColorTextSecondary'):
             text_pairs.append((foreground + ' on native menu', foreground, 'ColorMenuSurface'))
+    for syntax_token in ('ColorSyntaxKey', 'ColorSyntaxString', 'ColorSyntaxNumber', 'ColorSyntaxBool', 'ColorSyntaxNull'):
+        if syntax_token in variables:
+            text_pairs.append((syntax_token + ' on ColorCard', syntax_token, 'ColorCard'))
     graphic_pairs = [
         ('on switch thumb', 'ColorThumb', 'ColorAccent'),
         ('off switch thumb', 'ColorText', 'ColorControlHover'),
@@ -79,7 +82,7 @@ def audit():
             color = resolve(variables, key, mode)
             rgb = [int(color[index:index + 2], 16) for index in (1, 3, 5)]
             palette.append({'mode': mode, 'token': key, 'color': color,
-                            'allowed': key == 'ColorDanger' or len(set(rgb)) == 1})
+                            'allowed': key == 'ColorDanger' or key.startswith('ColorSyntax') or len(set(rgb)) == 1})
     return {
         'method': 'WCAG 2.2 sRGB relative luminance; compare unrounded ratios against thresholds.',
         'sources': ['https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html',

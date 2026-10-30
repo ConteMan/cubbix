@@ -163,7 +163,7 @@ func TestRestartSavesRemainingSessionBeforeRelaunch(t *testing.T) {
 	var called bool
 	a.relaunch = func() {
 		if !a.quitting {
-			t.Fatal("relaunch would re-enter the JSON guard and cancel restart")
+			t.Fatal("relaunch must not ask about unsaved JSON")
 		}
 		called = true
 		config, err := loadConfig(a.path)

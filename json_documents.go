@@ -25,14 +25,16 @@ type jsonDocument struct {
 type jsonSnapshot struct {
 	Text     string `json:"text"`
 	Revision uint64 `json:"revision"`
-	Dirty    bool   `json:"dirty"`
 }
 
 func (d *jsonDocument) name(a *application, locale string) string {
 	if d.path != "" {
 		return filepath.Base(d.path)
 	}
-	return fmt.Sprintf(a.text(locale, "JSONUntitled"), d.number)
+	if d.number <= 1 {
+		return a.text(locale, "JSONWindowName")
+	}
+	return fmt.Sprintf(a.text(locale, "JSONWindowNameNumbered"), d.number)
 }
 
 func (d *jsonDocument) changed(revision uint64, dirty bool) {

@@ -15,6 +15,24 @@ import (
 
 //go:generate ./scripts/build-frontend.sh
 
+// The JSON window is a tool, not a document: it closes on request, never to
+// protect unsaved text. The editor shares its width with the this field.
+const (
+	jsonSplitDefault = 60
+	jsonSplitMinimum = 25
+	jsonSplitMaximum = 75
+)
+
+func clampJSONSplit(percent int) int {
+	if percent < jsonSplitMinimum {
+		return jsonSplitMinimum
+	}
+	if percent > jsonSplitMaximum {
+		return jsonSplitMaximum
+	}
+	return percent
+}
+
 func (a *application) setupJSON() {
 	frontend, _ := fs.Sub(jsonAssets, "frontend/dist")
 	mygo.SetFrontend(frontend)
@@ -30,20 +48,6 @@ func (a *application) setupJSON() {
 	}
 	a.jsonChooseSave = func(w *mygo.Window) (string, error) {
 		return mygo.Dialog.Save(mygo.SaveDialogOptions{Parent: w, Title: a.text(mygo.App.Locale(), "JSONSaveAs"), DefaultPath: "untitled.json", Filters: []mygo.FileFilter{{Name: "JSON", Extensions: []string{"json"}}}})
-	}
-	a.jsonConfirm = func(d *jsonDocument, restart bool) int {
-		locale := mygo.App.Locale()
-		buttons := []string{a.text(locale, "JSONSaveButton"), a.text(locale, "JSONDiscard"), a.text(locale, "Cancel")}
-		message := a.text(locale, "JSONUnsavedBody")
-		if restart {
-			buttons[1] = a.text(locale, "ReturnToDocuments")
-			message = a.text(locale, "UnsavedBody")
-		}
-		answer, err := mygo.Dialog.Message(mygo.MessageOptions{Parent: d.window, Type: mygo.MessageWarning, Title: a.text(locale, "UnsavedTitle"), Message: message, Detail: d.name(a, locale), Buttons: buttons, DefaultButton: 0, CancelButton: 2})
-		if err != nil {
-			return 2
-		}
-		return answer.Button
 	}
 }
 
@@ -72,20 +76,16 @@ func (a *application) changeJSONEnabled() {
 		a.refreshAwake()
 		return
 	}
-	// The switch is committed only after every document passes its close guard.
-	a.config.JSONEnabled = true
-	a.transitionJSON(false, func() {
-		a.config.JSONEnabled = false
-		if a.refreshApplicationMenu != nil {
-			a.refreshApplicationMenu()
-		}
-		a.unregisterShortcut(a.config.JSONShortcut)
-		for _, d := range append([]*jsonDocument(nil), a.jsonDocuments...) {
-			a.destroyJSON(d)
-		}
-		a.save()
-		a.refreshAwake()
-	})
+	a.config.JSONEnabled = false
+	if a.refreshApplicationMenu != nil {
+		a.refreshApplicationMenu()
+	}
+	a.unregisterShortcut(a.config.JSONShortcut)
+	for _, d := range append([]*jsonDocument(nil), a.jsonDocuments...) {
+		a.destroyJSON(d)
+	}
+	a.save()
+	a.refreshAwake()
 }
 
 func (a *application) createJSONWindow(d *jsonDocument) {
@@ -105,16 +105,9 @@ func (a *application) createJSONWindow(d *jsonDocument) {
 		}
 	})
 	d.window.Page().OnPageTitleUpdated(func(e *mygo.TitleEvent) { e.PreventDefault() })
-	d.window.OnShow(func() { a.visibility(true) })
+	// Showing is explicit: the app never gains windows by activation or focus.
 	d.window.OnHide(func() { a.visibility(false) })
 	d.window.OnClosed(func() { a.removeJSONDocument(d); a.visibility(false); a.refreshAwake() })
-	d.window.OnClose(func(e *mygo.CloseEvent) {
-		if a.quitting {
-			return
-		}
-		e.PreventDefault()
-		a.transitionJSONDocuments([]*jsonDocument{d}, false, func() { a.destroyJSON(d) })
-	})
 	d.window.OnResize(func() {
 		width, height := d.window.Size()
 		a.config.JSONWidth, a.config.JSONHeight = width, height
@@ -132,7 +125,7 @@ func (a *application) createJSONWindow(d *jsonDocument) {
 }
 
 func (a *application) newJSONWindow() {
-	if !a.config.JSONEnabled || a.jsonGuard {
+	if !a.config.JSONEnabled {
 		return
 	}
 	d := a.newJSONDocumentFromClipboard()
@@ -169,10 +162,30 @@ func (a *application) destroyJSON(d *jsonDocument) {
 
 func (a *application) refreshJSONTitles(locale string) {
 	for _, d := range a.jsonDocuments {
-		if d.window != nil {
-			d.window.SetTitle(d.name(a, locale))
+		if d.window == nil {
+			continue
 		}
+		// The window manager, the app switcher and the page show one name.
+		name := d.name(a, locale)
+		d.window.SetTitle(name)
+		go a.setJSONPageTitle(d, name)
 	}
+}
+
+func (a *application) setJSONPageTitle(d *jsonDocument, name string) {
+	var page *mygo.Page
+	mygo.RunOnMain(func() {
+		if d.window != nil && !d.closed {
+			page = d.window.Page()
+		}
+	})
+	if page == nil {
+		return
+	}
+	encoded, _ := json.Marshal(name)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	_, _ = page.EvalContext(ctx, "window.cubbix?.title("+string(encoded)+")")
 }
 
 func (a *application) openJSONFile(d *jsonDocument) {
@@ -191,7 +204,7 @@ func (a *application) openJSONFile(d *jsonDocument) {
 	}()
 }
 func (a *application) replaceJSONFile(d *jsonDocument, path string) {
-	if d.closed || a.jsonGuard {
+	if d.closed {
 		return
 	}
 	go func() {
@@ -208,20 +221,18 @@ func (a *application) replaceJSONFile(d *jsonDocument, path string) {
 			if d.closed {
 				return
 			}
-			a.transitionJSONDocuments([]*jsonDocument{d}, false, func() {
-				d.path = path
-				d.text = data
-				d.revision++
-				d.dirty = false
-				a.refreshJSONTitles(mygo.App.Locale())
-				a.refreshAwake()
-				encoded, _ := json.Marshal(data)
-				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-				defer cancel()
-				if _, err := d.window.Page().EvalContext(ctx, "window.cubbix.load("+string(encoded)+","+formatRevision(d.revision)+",true)"); err != nil {
-					a.jsonError(d, "read")
-				}
-			})
+			d.path = path
+			d.text = data
+			d.revision++
+			d.dirty = false
+			a.refreshJSONTitles(mygo.App.Locale())
+			a.refreshAwake()
+			encoded, _ := json.Marshal(data)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			if _, err := d.window.Page().EvalContext(ctx, "window.cubbix.load("+string(encoded)+","+formatRevision(d.revision)+",true)"); err != nil {
+				a.jsonError(d, "read")
+			}
 		})
 	}()
 }
@@ -235,22 +246,6 @@ func (a *application) jsonError(d *jsonDocument, status string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	_, _ = d.window.Page().EvalContext(ctx, "window.cubbix?.error("+string(encoded)+")")
-}
-
-func (a *application) snapshotJSON(d *jsonDocument) (jsonSnapshot, error) {
-	if d.window == nil {
-		return jsonSnapshot{Text: d.text, Revision: d.revision, Dirty: d.dirty}, nil
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	value, err := d.window.Page().EvalContext(ctx, "window.cubbix.snapshot()")
-	if err != nil {
-		return jsonSnapshot{}, err
-	}
-	data, _ := json.Marshal(value)
-	var snapshot jsonSnapshot
-	err = json.Unmarshal(data, &snapshot)
-	return snapshot, err
 }
 
 func (a *application) saveJSON(d *jsonDocument, snapshot jsonSnapshot, as bool) (bool, error) {
@@ -284,81 +279,6 @@ func (a *application) saveJSON(d *jsonDocument, snapshot jsonSnapshot, as bool) 
 		a.refreshAwake()
 	})
 	return true, nil
-}
-
-func (a *application) transitionJSON(restart bool, done func()) {
-	a.transitionJSONDocuments(append([]*jsonDocument(nil), a.jsonDocuments...), restart, done)
-}
-func (a *application) transitionJSONDocuments(documents []*jsonDocument, restart bool, done func()) {
-	if a.jsonGuard {
-		return
-	}
-	if len(documents) == 0 {
-		done()
-		return
-	}
-	a.jsonGuard = true
-	go func() {
-		allowed := true
-		defer func() {
-			mygo.RunOnMain(func() {
-				if allowed {
-					done()
-				}
-			})
-			for _, d := range documents {
-				if d.window != nil {
-					_, _ = d.window.Page().Eval("window.cubbix?.lock(false)")
-				}
-			}
-			mygo.RunOnMain(func() { a.jsonGuard = false; a.invalidateWindow() })
-		}()
-		// Freeze every page before inspecting any document, including during a
-		// sequence of save sheets. No edit can race with the final transition.
-		for _, d := range documents {
-			if d.window != nil {
-				if _, err := d.window.Page().Eval("window.cubbix.lock(true)"); err != nil {
-					allowed = false
-					return
-				}
-			}
-		}
-		for _, d := range documents {
-			snapshot, err := a.snapshotJSON(d)
-			if err != nil {
-				allowed = false
-				return
-			}
-			if !snapshot.Dirty {
-				continue
-			}
-			choice := 2
-			if a.jsonConfirm != nil {
-				choice = a.jsonConfirm(d, restart)
-			}
-			switch choice {
-			case 0:
-				var ok bool
-				if d.window != nil {
-					value, err := d.window.Page().Eval("window.cubbix.save()")
-					ok = err == nil && value == true
-				}
-				if !ok {
-					allowed = false
-					return
-				}
-			case 1:
-				if restart {
-					allowed = false
-					mygo.RunOnMain(func() { a.showJSON(d) })
-					return
-				}
-			default:
-				allowed = false
-				return
-			}
-		}
-	}()
 }
 
 // Only an app-owned JSON page may use these methods. Paths are kept in Go;
@@ -410,6 +330,8 @@ func (b *jsonBridge) Boot(ctx context.Context) (map[string]any, error) {
 		result["revision"] = d.revision
 		result["clean"] = !d.dirty
 		result["pinned"] = d.pinned
+		result["split"] = clampJSONSplit(b.app.config.JSONSplit)
+		result["name"] = d.name(b.app, mygo.App.Locale())
 		d.ready = true
 	})
 	return result, nil
@@ -420,6 +342,20 @@ func (b *jsonBridge) Changed(ctx context.Context, revision uint64, dirty bool) e
 		return err
 	}
 	mygo.RunOnMain(func() { d.changed(revision, dirty) })
+	return nil
+}
+func (b *jsonBridge) Split(ctx context.Context, percent int) error {
+	if _, err := b.document(ctx); err != nil {
+		return err
+	}
+	mygo.RunOnMain(func() {
+		clamped := clampJSONSplit(percent)
+		if b.app.config.JSONSplit == clamped {
+			return
+		}
+		b.app.config.JSONSplit = clamped
+		b.app.save()
+	})
 	return nil
 }
 func (b *jsonBridge) Copy(ctx context.Context, text string) error {

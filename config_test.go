@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -32,7 +33,7 @@ func TestConfigRoundTrip(t *testing.T) {
 	if err != nil || initial != defaultConfig() {
 		t.Fatalf("default config = %#v, %v", initial, err)
 	}
-	want := Config{Version: configVersion, Language: "en", OpenAtLogin: true, AutomaticUpdates: true}
+	want := Config{Version: configVersion, Language: "en", OpenAtLogin: true, AutomaticUpdates: true, JSONSplit: jsonSplitDefault}
 	if err := saveConfig(path, want); err != nil {
 		t.Fatal(err)
 	}
@@ -43,6 +44,28 @@ func TestConfigRoundTrip(t *testing.T) {
 	info, err := os.Stat(path)
 	if err != nil || info.Mode().Perm() != 0600 {
 		t.Fatalf("config permissions: %v, %v", info, err)
+	}
+}
+
+func TestConfigDefaultsAndClampsSplit(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.toml")
+	legacy := "version = 1\nlanguage = \"zh-CN\"\n"
+	if err := os.WriteFile(path, []byte(legacy), 0600); err != nil {
+		t.Fatal(err)
+	}
+	config, err := loadConfig(path)
+	if err != nil || config.JSONSplit != jsonSplitDefault {
+		t.Fatalf("legacy config split = %d, %v", config.JSONSplit, err)
+	}
+	for value, expected := range map[int]int{0: jsonSplitDefault, 10: jsonSplitMinimum, 95: jsonSplitMaximum, 45: 45} {
+		raw := fmt.Sprintf("version = 1\nlanguage = \"zh-CN\"\njson_split = %d\n", value)
+		if err := os.WriteFile(path, []byte(raw), 0600); err != nil {
+			t.Fatal(err)
+		}
+		config, err := loadConfig(path)
+		if err != nil || config.JSONSplit != expected {
+			t.Fatalf("json_split = %d loaded as %d, %v; want %d", value, config.JSONSplit, err, expected)
+		}
 	}
 }
 

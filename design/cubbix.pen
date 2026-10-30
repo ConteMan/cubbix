@@ -21809,6 +21809,984 @@
           "name": "Action icon"
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "s6fX6X",
+      "x": 0,
+      "y": 7349,
+      "name": "R08 round label",
+      "width": 840,
+      "height": 32,
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "VyBJd",
+          "x": 0,
+          "y": 0,
+          "name": "R08 title",
+          "fill": "$ColorTextSecondary",
+          "content": "R08 · JSON 修正 / JSON polish",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightRegular"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "S8d6wZ",
+      "x": 0,
+      "y": 7461,
+      "name": "R08 JSON split window",
+      "reusable": true,
+      "metadata": {
+        "type": "r08-master",
+        "defaultSplit": 60,
+        "title": "JSON",
+        "closeOnBlur": false,
+        "savePrompt": false
+      },
+      "clip": true,
+      "width": 840,
+      "height": 520,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "stroke": "$ColorSeparator",
+      "strokeWidth": "$StrokeHairline",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "UhtJs",
+          "x": 0,
+          "y": 0,
+          "name": "Title and actions",
+          "width": 840,
+          "height": 44,
+          "layout": "none",
+          "children": [
+            {
+              "id": "auAg2",
+              "type": "ref",
+              "ref": "rcCKQ",
+              "name": "Native window controls",
+              "x": 12,
+              "y": 16
+            },
+            {
+              "type": "text",
+              "id": "wN1p6",
+              "x": 76,
+              "y": 14,
+              "name": "Window name",
+              "fill": "$ColorText",
+              "content": "JSON",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightMedium"
+            },
+            {
+              "id": "k5RJUr",
+              "type": "ref",
+              "ref": "NMhjk",
+              "name": "Top action 0",
+              "x": 720,
+              "y": 8
+            },
+            {
+              "id": "v6RSn",
+              "type": "ref",
+              "ref": "ICb8f",
+              "name": "Top action 1",
+              "x": 756,
+              "y": 8
+            },
+            {
+              "id": "t14Nn",
+              "type": "ref",
+              "ref": "gPAiw",
+              "name": "Top action 2",
+              "x": 792,
+              "y": 8
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vDYFF",
+          "x": 0,
+          "y": 43,
+          "name": "Toolbar separator",
+          "width": 840,
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "d2QID8",
+          "x": 0,
+          "y": 44,
+          "name": "Left editor",
+          "clip": true,
+          "width": 500,
+          "height": 432,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "y4kMRU",
+              "x": 0,
+              "y": 8,
+              "name": "Code line 1",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "xLl3R",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 1",
+                  "fill": "$ColorTextSecondary",
+                  "content": "1",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "HDvDl",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RrM5T",
+                      "name": "Syntax 0 0",
+                      "fill": "$ColorTextSecondary",
+                      "content": "{",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "EApvZ",
+              "x": 0,
+              "y": 32,
+              "name": "Code line 2",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "v9VDHj",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 2",
+                  "fill": "$ColorTextSecondary",
+                  "content": "2",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "Yu4F8",
+                  "x": 70.6,
+                  "y": 0,
+                  "name": "Indent guide 1",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "XeGiB",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "cMaSm",
+                      "name": "Indentation",
+                      "fill": "$ColorText",
+                      "content": "  ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "s7ika",
+                      "name": "Syntax 1 0",
+                      "fill": "$ColorSyntaxKey",
+                      "content": "\"data\"",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "vVtQ0",
+                      "name": "Syntax 1 1",
+                      "fill": "$ColorTextSecondary",
+                      "content": ": {",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "I9Ost8",
+              "x": 0,
+              "y": 56,
+              "name": "Code line 3",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "IV9Ue",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 3",
+                  "fill": "$ColorTextSecondary",
+                  "content": "3",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "h9hIdO",
+                  "x": 70.6,
+                  "y": 0,
+                  "name": "Indent guide 1",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "nDT5n",
+                  "x": 86.2,
+                  "y": 0,
+                  "name": "Indent guide 2",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "l0LVU",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qWWJZ",
+                      "name": "Indentation",
+                      "fill": "$ColorText",
+                      "content": "    ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "PCvlp",
+                      "name": "Syntax 2 0",
+                      "fill": "$ColorSyntaxKey",
+                      "content": "\"label\"",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mWNxM",
+                      "name": "Syntax 2 1",
+                      "fill": "$ColorTextSecondary",
+                      "content": ": ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "FKYqe",
+                      "name": "Syntax 2 2",
+                      "fill": "$ColorSyntaxString",
+                      "content": "\"alpha\"",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "O3FOlu",
+                      "name": "Syntax 2 3",
+                      "fill": "$ColorTextSecondary",
+                      "content": ",",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nj3l9",
+              "x": 0,
+              "y": 80,
+              "name": "Code line 4",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "o3dtz",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 4",
+                  "fill": "$ColorTextSecondary",
+                  "content": "4",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "x0PgQ",
+                  "x": 70.6,
+                  "y": 0,
+                  "name": "Indent guide 1",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "jMxs9",
+                  "x": 86.2,
+                  "y": 0,
+                  "name": "Indent guide 2",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "JleXL",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "K0N2KD",
+                      "name": "Indentation",
+                      "fill": "$ColorText",
+                      "content": "    ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "GjrR6",
+                      "name": "Syntax 3 0",
+                      "fill": "$ColorSyntaxKey",
+                      "content": "\"items\"",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "qtwTI",
+                      "name": "Syntax 3 1",
+                      "fill": "$ColorTextSecondary",
+                      "content": ": [",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "eZwGk",
+                      "name": "Syntax 3 2",
+                      "fill": "$ColorSyntaxNumber",
+                      "content": "1",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NJBAs",
+                      "name": "Syntax 3 3",
+                      "fill": "$ColorTextSecondary",
+                      "content": ", ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ypQrv",
+                      "name": "Syntax 3 4",
+                      "fill": "$ColorSyntaxNumber",
+                      "content": "2",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "okASs",
+                      "name": "Syntax 3 5",
+                      "fill": "$ColorTextSecondary",
+                      "content": "]",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "EkQZm",
+              "x": 0,
+              "y": 104,
+              "name": "Code line 5",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "GAmZV",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 5",
+                  "fill": "$ColorTextSecondary",
+                  "content": "5",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "ZEqn4",
+                  "x": 70.6,
+                  "y": 0,
+                  "name": "Indent guide 1",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "x0SFH",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Q20Df",
+                      "name": "Indentation",
+                      "fill": "$ColorText",
+                      "content": "  ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "XceOV",
+                      "name": "Syntax 4 0",
+                      "fill": "$ColorTextSecondary",
+                      "content": "},",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "E7n37",
+              "x": 0,
+              "y": 128,
+              "name": "Code line 6",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "f9YKU",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 6",
+                  "fill": "$ColorTextSecondary",
+                  "content": "6",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "V3bqiJ",
+                  "x": 70.6,
+                  "y": 0,
+                  "name": "Indent guide 1",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "jmgIl",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XvydX",
+                      "name": "Indentation",
+                      "fill": "$ColorText",
+                      "content": "  ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Vsb0r",
+                      "name": "Syntax 5 0",
+                      "fill": "$ColorSyntaxKey",
+                      "content": "\"ok\"",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xjNxC",
+                      "name": "Syntax 5 1",
+                      "fill": "$ColorTextSecondary",
+                      "content": ": ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "k5jTKH",
+                      "name": "Syntax 5 2",
+                      "fill": "$ColorSyntaxBool",
+                      "content": "true",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "m6yjZ",
+                      "name": "Syntax 5 3",
+                      "fill": "$ColorTextSecondary",
+                      "content": ",",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "McA6P",
+              "x": 0,
+              "y": 152,
+              "name": "Code line 7",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "BYcgo",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 7",
+                  "fill": "$ColorTextSecondary",
+                  "content": "7",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "H7gtrl",
+                  "x": 70.6,
+                  "y": 0,
+                  "name": "Indent guide 1",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$ColorSyntaxIndent",
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "T9nfF3",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SMJBf",
+                      "name": "Indentation",
+                      "fill": "$ColorText",
+                      "content": "  ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rzpTl",
+                      "name": "Syntax 6 0",
+                      "fill": "$ColorSyntaxKey",
+                      "content": "\"none\"",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "avtoL",
+                      "name": "Syntax 6 1",
+                      "fill": "$ColorTextSecondary",
+                      "content": ": ",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Yxpa7",
+                      "name": "Syntax 6 2",
+                      "fill": "$ColorSyntaxNull",
+                      "content": "null",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "b6ed9b",
+              "x": 0,
+              "y": 176,
+              "name": "Code line 8",
+              "width": 500,
+              "height": 24,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Xkh9I",
+                  "x": 12,
+                  "y": 4,
+                  "name": "Line number 8",
+                  "fill": "$ColorTextSecondary",
+                  "content": "8",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "frame",
+                  "id": "OZUPt",
+                  "x": 56,
+                  "y": 4,
+                  "name": "Syntax tokens",
+                  "gap": "$Space0",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "r0jSZw",
+                      "name": "Syntax 7 0",
+                      "fill": "$ColorTextSecondary",
+                      "content": "}",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "DquE1",
+          "x": 500,
+          "y": 44,
+          "name": "Draggable separator",
+          "metadata": {
+            "type": "splitter",
+            "keyboard": "Left/Right",
+            "persisted": true
+          },
+          "width": 7,
+          "height": 432,
+          "fill": "$ColorCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": {
+            "left": "$StrokeHairline"
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "RC6KB",
+          "x": 507,
+          "y": 44,
+          "name": "Right result",
+          "clip": true,
+          "width": 333,
+          "height": 432,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "mir87",
+              "x": 12,
+              "y": 12,
+              "name": "Result line 0",
+              "fill": "$ColorTextSecondary",
+              "content": "[",
+              "fontFamily": "$FontFamilyCode",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "Guc7L",
+              "x": 12,
+              "y": 36,
+              "name": "Result line 1",
+              "fill": "$ColorSyntaxNumber",
+              "content": "  1,",
+              "fontFamily": "$FontFamilyCode",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "itF8b",
+              "x": 12,
+              "y": 60,
+              "name": "Result line 2",
+              "fill": "$ColorSyntaxNumber",
+              "content": "  2",
+              "fontFamily": "$FontFamilyCode",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "type": "text",
+              "id": "coAZ7",
+              "x": 12,
+              "y": 84,
+              "name": "Result line 3",
+              "fill": "$ColorTextSecondary",
+              "content": "]",
+              "fontFamily": "$FontFamilyCode",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "J1B8eB",
+          "x": 0,
+          "y": 476,
+          "name": "Expression and four tools",
+          "width": 840,
+          "height": 44,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "Ao459",
+              "x": 12,
+              "y": 15,
+              "name": "this prefix",
+              "fill": "$ColorText",
+              "content": "this",
+              "fontFamily": "$FontFamilyCode",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightSemibold"
+            },
+            {
+              "type": "frame",
+              "id": "zWYgY",
+              "x": 68,
+              "y": 6,
+              "name": "Expression field",
+              "width": 420,
+              "height": 32,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "layout": "none"
+            },
+            {
+              "type": "text",
+              "id": "k8FsP",
+              "x": 80,
+              "y": 15,
+              "name": "Expression suffix",
+              "fill": "$ColorText",
+              "content": ".data.items",
+              "fontFamily": "$FontFamilyCode",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "$FontWeightRegular"
+            },
+            {
+              "id": "U7JHTp",
+              "type": "ref",
+              "ref": "PByrK",
+              "name": "Tool 0",
+              "x": 700,
+              "y": 8
+            },
+            {
+              "id": "A9bojz",
+              "type": "ref",
+              "ref": "Ng6hD",
+              "name": "Tool 1",
+              "x": 732,
+              "y": 8
+            },
+            {
+              "id": "j9auh",
+              "type": "ref",
+              "ref": "g3HzZW",
+              "name": "Tool 2",
+              "x": 764,
+              "y": 8
+            },
+            {
+              "id": "rLRXh",
+              "type": "ref",
+              "ref": "VnixZ",
+              "name": "Tool 3",
+              "x": 796,
+              "y": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lRq5J",
+      "type": "ref",
+      "ref": "S8d6wZ",
+      "name": "R08 zh-CN light",
+      "x": 960,
+      "y": 7461,
+      "theme": {
+        "language": "zh-CN",
+        "mode": "light"
+      }
+    },
+    {
+      "id": "w9wK6l",
+      "type": "ref",
+      "ref": "S8d6wZ",
+      "name": "R08 zh-CN dark",
+      "x": 1920,
+      "y": 7461,
+      "theme": {
+        "language": "zh-CN",
+        "mode": "dark"
+      }
+    },
+    {
+      "id": "TmaJl",
+      "type": "ref",
+      "ref": "S8d6wZ",
+      "name": "R08 en light",
+      "x": 2880,
+      "y": 7461,
+      "theme": {
+        "language": "en",
+        "mode": "light"
+      }
+    },
+    {
+      "id": "Ndwar",
+      "type": "ref",
+      "ref": "S8d6wZ",
+      "name": "R08 en dark",
+      "x": 3840,
+      "y": 7461,
+      "theme": {
+        "language": "en",
+        "mode": "dark"
+      }
     }
   ],
   "themes": {
@@ -24909,6 +25887,120 @@
           }
         }
       ]
+    },
+    "ColorSyntaxKey": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#A31515",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#FF7B72",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxString": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#0953B7",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#79C0FF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxNumber": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#097335",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#7EE787",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxBool": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#003388",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#6CB6FF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxNull": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#003388",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#6CB6FF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxIndent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#EBEBEB",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#3C3C3C",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "SizeJSONSplitter": {
+      "type": "number",
+      "value": 7
+    },
+    "SizeJSONPaneMinWidth": {
+      "type": "number",
+      "value": 240
+    },
+    "SizeJSONTitleInset": {
+      "type": "number",
+      "value": 76
     }
   },
   "fileToken": "d54ef04c-78c9-405f-bd8d-0848edd09a7a"

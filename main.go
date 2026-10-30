@@ -23,17 +23,15 @@ var assets embed.FS
 //go:embed frontend/dist/*
 var jsonAssets embed.FS
 
-const appVersion = "0.2.0"
+const appVersion = "0.2.1"
 
 type application struct {
 	jsonDocuments     []*jsonDocument
 	jsonNext          int
-	jsonGuard         bool
 	jsonReadClipboard func() string
 	jsonCopy          func(string) error
 	jsonChooseOpen    func(*mygo.Window) (string, error)
 	jsonChooseSave    func(*mygo.Window) (string, error)
-	jsonConfirm       func(*jsonDocument, bool) int
 	jsonShortcutError string
 	shortcutTarget    string
 
@@ -48,6 +46,7 @@ type application struct {
 	shortcutError          string
 	stopAwakeServices      context.CancelFunc
 	notifyBattery          func(string, string)
+	policy                 mygo.ActivationPolicy
 	config                 Config
 	path                   string
 	catalog                *i18n.Catalog
@@ -189,6 +188,13 @@ func (a *application) visibility(visible bool) {
 	if visible {
 		policy = mygo.ActivationPolicyRegular
 	}
+	// MyGo activates the app when the policy becomes regular. Repeating an
+	// unchanged policy would pull the user back out of whatever app or Space
+	// they moved to, so only a real change reaches AppKit.
+	if a.policy == policy {
+		return
+	}
+	a.policy = policy
 	mygo.App.SetActivationPolicy(policy)
 }
 
@@ -350,20 +356,8 @@ func (a *application) ready() {
 	}
 	a.startAwakeServices()
 	a.registerJSONShortcut()
-	mygo.App.OnBeforeQuit(func(e *mygo.QuitEvent) {
-		if !a.quitting && len(a.jsonDocuments) > 0 {
-			e.PreventDefault()
-			a.transitionJSON(false, func() { a.quitting = true; mygo.App.Quit() })
-			return
-		}
-		a.quitting = true
-		if a.stopAwakeServices != nil {
-			a.stopAwakeServices()
-		}
-		a.awake.stop()
-		mygo.GlobalShortcut.UnregisterAll()
-		a.updates.close()
-	})
+	mygo.App.OnWindowAllClosed(func() {})
+	mygo.App.OnBeforeQuit(a.beforeQuit)
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.tray.Destroy() })
 	if os.Getenv("CUBBIX_QA") == "" || !a.qaUpdateState() {
 		a.updates.start(a.config.AutomaticUpdates, updateInterval)
@@ -379,6 +373,18 @@ func (a *application) ready() {
 		log.Printf("status item window: %+v", a.tray.Bounds())
 		a.window.ShowInactive()
 	}
+}
+
+// beforeQuit releases services without guarding tool window contents.
+func (a *application) beforeQuit(*mygo.QuitEvent) {
+	// JSON windows are tools: quitting never asks about unsaved text.
+	a.quitting = true
+	if a.stopAwakeServices != nil {
+		a.stopAwakeServices()
+	}
+	a.awake.stop()
+	mygo.GlobalShortcut.UnregisterAll()
+	a.updates.close()
 }
 
 func icon(name string) *ui.SVG {
