@@ -5,11 +5,43 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pelletier/go-toml/v2"
 )
 
-const configVersion = 1
+const (
+	configVersion      = 1
+	paletteRecentLimit = 5
+	defaultPaletteKey  = "Alt+."
+)
+
+// normalizeCommandIDs drops blanks and duplicates while keeping the order.
+func normalizeCommandIDs(ids []string) []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, id := range ids {
+		id = strings.TrimSpace(id)
+		if id == "" || seen[id] {
+			continue
+		}
+		seen[id] = true
+		out = append(out, id)
+	}
+	return out
+}
+
+func normalizePaletteFavorites(ids []string) []string {
+	return normalizeCommandIDs(ids)
+}
+
+func normalizePaletteRecents(ids []string) []string {
+	out := normalizeCommandIDs(ids)
+	if len(out) > paletteRecentLimit {
+		out = out[:paletteRecentLimit]
+	}
+	return out
+}
 
 type Config struct {
 	JSONEnabled      bool          `toml:"json_enabled"`
@@ -27,6 +59,9 @@ type Config struct {
 	AwakeUntil       string        `toml:"awake_until,omitempty"`
 	AwakeAgents      string        `toml:"awake_agents"`
 	AwakeShortcut    string        `toml:"awake_shortcut"`
+	PaletteShortcut  string        `toml:"palette_shortcut"`
+	PaletteFavorites []string      `toml:"palette_favorites,omitempty"`
+	PaletteRecents   []string      `toml:"palette_recents,omitempty"`
 	AwakeSession     *awakeSession `toml:"awake_session,omitempty"`
 	RestoreAwake     bool          `toml:"restore_awake,omitempty"`
 	WindowWidth      int           `toml:"window_width,omitempty"`
@@ -34,7 +69,7 @@ type Config struct {
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K"}
+	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -62,6 +97,11 @@ func loadConfig(path string) (Config, error) {
 		config.JSONSplit = jsonSplitDefault
 	}
 	config.JSONSplit = clampJSONSplit(config.JSONSplit)
+	if config.PaletteShortcut == "" {
+		config.PaletteShortcut = defaultPaletteKey
+	}
+	config.PaletteFavorites = normalizePaletteFavorites(config.PaletteFavorites)
+	config.PaletteRecents = normalizePaletteRecents(config.PaletteRecents)
 	return config, nil
 }
 

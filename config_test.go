@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -30,15 +31,15 @@ func TestSavedAutomaticUpdatesOffIsPreserved(t *testing.T) {
 func TestConfigRoundTrip(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "cubbix", "config.toml")
 	initial, err := loadConfig(path)
-	if err != nil || initial != defaultConfig() {
+	if err != nil || !reflect.DeepEqual(initial, defaultConfig()) {
 		t.Fatalf("default config = %#v, %v", initial, err)
 	}
-	want := Config{Version: configVersion, Language: "en", OpenAtLogin: true, AutomaticUpdates: true, JSONSplit: jsonSplitDefault}
+	want := Config{Version: configVersion, Language: "en", OpenAtLogin: true, AutomaticUpdates: true, JSONSplit: jsonSplitDefault, PaletteShortcut: defaultPaletteKey}
 	if err := saveConfig(path, want); err != nil {
 		t.Fatal(err)
 	}
 	got, err := loadConfig(path)
-	if err != nil || got != want {
+	if err != nil || !reflect.DeepEqual(got, want) {
 		t.Fatalf("loaded = %#v, %v; want %#v", got, err, want)
 	}
 	info, err := os.Stat(path)
@@ -107,7 +108,7 @@ func TestWindowSizePersistsAndOldConfigStillLoads(t *testing.T) {
 		t.Fatal(err)
 	}
 	got, err := loadConfig(path)
-	if err != nil || got != c {
+	if err != nil || !reflect.DeepEqual(got, c) {
 		t.Fatalf("saved window size: %+v %v", got, err)
 	}
 }
@@ -129,7 +130,7 @@ func TestJSONConfigDefaultsAndPersistence(t *testing.T) {
 		t.Fatal(err)
 	}
 	loaded, err := loadConfig(path)
-	if err != nil || loaded != c {
+	if err != nil || !reflect.DeepEqual(loaded, c) {
 		t.Fatalf("JSON config not persisted: %+v %v", loaded, err)
 	}
 }

@@ -26,14 +26,21 @@ var jsonAssets embed.FS
 const appVersion = "0.2.1"
 
 type application struct {
-	jsonDocuments     []*jsonDocument
-	jsonNext          int
-	jsonReadClipboard func() string
-	jsonCopy          func(string) error
-	jsonChooseOpen    func(*mygo.Window) (string, error)
-	jsonChooseSave    func(*mygo.Window) (string, error)
-	jsonShortcutError string
-	shortcutTarget    string
+	jsonDocuments        []*jsonDocument
+	jsonNext             int
+	jsonReadClipboard    func() string
+	jsonCopy             func(string) error
+	jsonChooseOpen       func(*mygo.Window) (string, error)
+	jsonChooseSave       func(*mygo.Window) (string, error)
+	jsonShortcutError    string
+	shortcutTarget       string
+	palette              *paletteState
+	paletteShortcutError string
+	// paletteOpenJSON and registerURLScheme are seams: tests replace them so
+	// no case creates a native window or changes the system URL handler.
+	paletteOpenJSON   func(string)
+	registerURLScheme func(string) error
+	urlDispatch       func(func())
 
 	registerShortcut       func(string, func()) error
 	shortcutSuspended      bool
@@ -76,7 +83,7 @@ func newApplication(path string) (*application, error) {
 	if err != nil {
 		return nil, err
 	}
-	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister}
+	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
 	a.updates = newUpdateManager(checkMyGoUpdate, newReleaseNotesClient(appVersion).load, nil)
 	for index, language := range []string{"system", "zh-CN", "en"} {
 		if config.Language == language {
@@ -133,6 +140,11 @@ func settingsHeight(t tokenValues, page int, hasError bool) int {
 	content := 2*t.SizeRowHeight + t.StrokeHairline
 	if page == 1 {
 		content = t.FontSizeSmall*t.LineHeightBody + t.Space8 + 3*t.SizeRowHeight + 2*t.StrokeHairline
+	}
+	if page == 3 {
+		// Shortcuts: awake, JSON, command palette, feedback, hint position.
+		rows := float32(5)
+		content = rows*t.SizeRowHeight + (rows-1)*t.StrokeHairline
 	}
 	if hasError {
 		content += t.Space8 + t.SizeIcon
@@ -327,6 +339,11 @@ func (a *application) ready() {
 	a.createSettingsWindow()
 	mygo.App.SetMenu(a.applicationMenu(mygo.App.Locale()))
 	mygo.App.OnActivate(func(visible bool) {
+		// A visible palette is a tool window, not a settings request.
+		if a.paletteVisible() {
+			a.hidePalette()
+			return
+		}
 		if !visible {
 			a.show()
 		}
@@ -356,6 +373,18 @@ func (a *application) ready() {
 	}
 	a.startAwakeServices()
 	a.registerJSONShortcut()
+	a.registerPaletteShortcut()
+	if err := a.registerURLScheme("cubbix"); err != nil {
+		// A missing declaration only disables deep links; it must not block launch.
+		log.Print(err)
+	}
+	mygo.Screen.OnDisplaysChanged(func() {
+		mygo.RunOnMain(func() {
+			if a.paletteVisible() {
+				a.placePalette()
+			}
+		})
+	})
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnBeforeQuit(a.beforeQuit)
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.tray.Destroy() })
@@ -379,6 +408,7 @@ func (a *application) ready() {
 func (a *application) beforeQuit(*mygo.QuitEvent) {
 	// JSON windows are tools: quitting never asks about unsaved text.
 	a.quitting = true
+	a.hidePalette()
 	if a.stopAwakeServices != nil {
 		a.stopAwakeServices()
 	}
@@ -594,6 +624,8 @@ func main() {
 	mygo.App.SetName("Cubbix")
 	mygo.App.SetActivationPolicy(mygo.ActivationPolicyAccessory)
 	a.setupJSON()
+	// Register before Run so the URL that launched the app also arrives.
+	mygo.App.OnOpenURL(a.handleURL)
 	mygo.App.WhenReady(a.ready)
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)

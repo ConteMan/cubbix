@@ -137,3 +137,14 @@ R07 在 R04–R06 基础上新增 47 个 reusable；总计 100 个 reusable、45
 工具 Action 母版持有 tooltipKey 与 focus-visible 约定；引用共享 Lucide 图标。JSON window 组合顶部工具区、CodeMirror 编辑器视觉样例、结果面板、固定 this 输入和 8 个工具；错误与超时清空结果，原因只在 tooltip。设置引用基础窗口／设置行／开关／导航；快捷键引用 R05 独立按键与 Space2 间距。
 
 R08 新增 `S8d6wZ`（R08 JSON split window）母版，保留统一窗口标题、左右编辑／结果区、缩进参考线、this 输入与四个工具，复用 R07 的原生控件与 Action 图标；四个浅深主题实例见 [R08](rounds/R08-2026-10-30-JSON修正/README.md)。上文 R07 的底部结果面板与八工具组合仅作历史归档。
+
+
+## R09 命令面板
+
+新增面板壳层、快捷键页和 Lucide star 三个 reusable，总计 104 个；全部主题、状态与验证边界见 [R09](rounds/R09-2026-10-30-命令面板/README.md)。列表／搜索／参数／动作／空结果／错误状态复用同一壳层，四张评审板按语言与浅深主题设置实例覆盖；历史组件保持原样。
+
+| 组件 | 节点 ID |
+| --- | --- |
+| R09 Palette shell | `MSJBx` |
+| R09 Shortcuts | `I6d8xa` |
+| R09 Icon/star | `wVqfV` |

@@ -1,0 +1,35 @@
+{
+  "cliVersion": "0.3.13",
+  "historicalRootsUnchanged": true,
+  "nativeLayout": {
+    "nodes": 992,
+    "problems": []
+  },
+  "exports": [
+    {
+      "nodeId": "nlay0",
+      "file": "zh-CN-light.png",
+      "scale": 2,
+      "sha256": "9a15fd33982cb656cee99cde84780591870ff6638c17390026696738ee385a47"
+    },
+    {
+      "nodeId": "k6kDcn",
+      "file": "zh-CN-dark.png",
+      "scale": 2,
+      "sha256": "1cb30228823b46241511fbb12f9145eb319fbeb861625a8c530b46060bf738a1"
+    },
+    {
+      "nodeId": "DAmU0",
+      "file": "en-light.png",
+      "scale": 2,
+      "sha256": "c9a189bc4c8a41dc1aec7f26c98e866250dd644bcd952e5820c628368cd2eb1f"
+    },
+    {
+      "nodeId": "SMPUo",
+      "file": "en-dark.png",
+      "scale": 2,
+      "sha256": "77b7200994e35994ad371e89dd70fe3f31d22e5aa7609ac067ec7ec1be5e5a96"
+    }
+  ],
+  "passed": true
+}

@@ -1,6 +1,6 @@
 # Token 与 Go 标识符映射
 
-当前共 104 个样式 Token（颜色 30、数值 68、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+当前共 110 个样式 Token（颜色 30、数值 74、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
@@ -124,4 +124,17 @@ CLI 0.3.13 不保留 width/height 变量绑定，Size Token 解析为几何数�
 
 ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代码内容；布尔值与 null 共用深蓝，其余四类各自成色，浅深主题下均达到 WCAG AA（最低 5.54:1）。ColorSyntaxIndent 是弱化的分隔线色，只用于缩进参考线。SizeJSONTitleInset 让窗口名称避开系统红绿灯，SizeJSONSplitter 是可拖动的竖向分隔条宽度，SizeJSONPaneMinWidth 是左右两栏各自的最小宽度。
 
-菜单与系统通知的半透明表面共用 ColorMenuSurface；设置窗口高 232 来自四项导航的自然高度（上下 24、品牌 20、分组间距 24、四行 32、三处间隔 4）。菜单栏图标的 18pt 与 16pt 是逻辑尺寸，1×／2× 位图分别解析对应像素密度。新增 Token 已通过 scripts/tokens.py 同步到 tokens.go。
+菜单与系统通知的半透明表面共用 ColorMenuSurface；命令面板的宽度、高度、顶部偏移、搜索行、命令行与分组标题高见「R09 追加」。设置窗口高 232 来自四项导航的自然高度（上下 24、品牌 20、分组间距 24、四行 32、三处间隔 4）。菜单栏图标的 18pt 与 16pt 是逻辑尺寸，1×／2× 位图分别解析对应像素密度。新增 Token 已通过 scripts/tokens.py 同步到 tokens.go。
+
+## R09 追加
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `SizePaletteWidth` | number | `640` |
+| `SizePaletteHeight` | number | `400` |
+| `SizePaletteTopOffset` | number | `96` |
+| `SizePaletteSearchHeight` | number | `36` |
+| `SizePaletteRowHeight` | number | `36` |
+| `SizePaletteGroupHeight` | number | `24` |
+
+命令面板固定 640 × 400，避免随结果数改变窗口尺寸与位置。顶部距工作区 96；搜索行与命令行同高 36；分组标题高 24。颜色全部复用既有 Token：表面 ColorMenuSurface、搜索行 ColorControl、选中 ColorAccentSoft、悬停 ColorNavHover、分组标题 ColorTextDisabled。六个 Token 已同步 `design/tokens.json` 与 `tokens.go`；`cubbix.pen` 变量与画板在评审步骤补齐。

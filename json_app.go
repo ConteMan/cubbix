@@ -55,14 +55,13 @@ func (a *application) registerJSONShortcut() {
 	if !a.config.JSONEnabled {
 		return
 	}
-	if sameShortcut(a.config.JSONShortcut, a.config.AwakeShortcut) && a.config.AwakeEnabled {
-		a.jsonShortcutError = "JSONShortcutConflict"
+	a.jsonShortcutError = ""
+	if reason := a.shortcutConflict(a.config.JSONShortcut, "json"); reason != "" {
+		a.jsonShortcutError = reason
 		return
 	}
 	if err := a.registerShortcut(a.config.JSONShortcut, a.newJSONWindow); err != nil {
 		a.jsonShortcutError = "ShortcutUnavailable"
-	} else {
-		a.jsonShortcutError = ""
 	}
 }
 
@@ -131,6 +130,39 @@ func (a *application) newJSONWindow() {
 	d := a.newJSONDocumentFromClipboard()
 	a.showJSON(d)
 	a.refreshAwake()
+}
+
+// newJSONWindowBlank opens an empty document without reading the clipboard.
+func (a *application) newJSONWindowBlank() {
+	if !a.config.JSONEnabled {
+		return
+	}
+	d := a.addJSONDocument("", "", true)
+	a.createJSONWindow(d)
+	a.showJSON(d)
+	a.refreshAwake()
+}
+
+// openJSONText opens a document whose text arrives in a cubbix:// URL. It
+// never reads the clipboard and never evaluates the text.
+func (a *application) openJSONText(text string) {
+	if a.paletteOpenJSON != nil {
+		a.paletteOpenJSON(text)
+		return
+	}
+	d := a.addJSONDocument(text, "", true)
+	a.createJSONWindow(d)
+	a.showJSON(d)
+	a.refreshAwake()
+}
+
+// setJSONPinned shares the pin state between the page bridge and the palette.
+func (a *application) setJSONPinned(d *jsonDocument, pinned bool) {
+	if d == nil || d.window == nil {
+		return
+	}
+	d.pinned = pinned
+	d.window.SetAlwaysOnTop(pinned)
 }
 
 func (a *application) newJSONDocumentFromClipboard() *jsonDocument {
@@ -373,7 +405,7 @@ func (b *jsonBridge) Pin(ctx context.Context) (bool, error) {
 		return false, err
 	}
 	var pinned bool
-	mygo.RunOnMain(func() { d.pinned = !d.pinned; d.window.SetAlwaysOnTop(d.pinned); pinned = d.pinned })
+	mygo.RunOnMain(func() { b.app.setJSONPinned(d, !d.pinned); pinned = d.pinned })
 	return pinned, nil
 }
 func (b *jsonBridge) Open(ctx context.Context) error {

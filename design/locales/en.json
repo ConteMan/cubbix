@@ -198,5 +198,22 @@
   "JSONWorking": "Evaluating",
   "JSONClose": "Close JSON window",
   "JSONShortcutConflict": "This shortcut is used by another tile",
-  "JSONEvaluationError": "Evaluation error"
+  "JSONEvaluationError": "Evaluation error",
+  "PaletteShortcutLabel": "Command palette",
+  "PaletteRecordShortcut": "Record command palette shortcut",
+  "PaletteShortcutSuffix": "opens the command palette",
+  "PaletteSearch": "Type a command",
+  "PaletteFavorites": "Favorites",
+  "PaletteRecent": "Recent",
+  "PaletteAll": "All commands",
+  "PaletteEmpty": "No results",
+  "PaletteActions": "Actions",
+  "PaletteAddFavorite": "Add to favorites",
+  "PaletteRemoveFavorite": "Remove from favorites",
+  "PaletteAwakeStop": "Stop keep awake",
+  "PaletteAwakeUntil": "Until %s",
+  "PaletteMinutes": "%d min",
+  "PaletteJSONBlank": "New empty window",
+  "PaletteJSONClipboard": "New from clipboard",
+  "PaletteSwitchTo": "Switch to"
 }
