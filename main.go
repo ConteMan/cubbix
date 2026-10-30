@@ -20,9 +20,23 @@ import (
 //go:embed design/locales/*.json assets/*.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
 var assets embed.FS
 
+//go:embed frontend/dist/*
+var jsonAssets embed.FS
+
 const appVersion = "0.1.0"
 
 type application struct {
+	jsonDocuments     []*jsonDocument
+	jsonNext          int
+	jsonGuard         bool
+	jsonReadClipboard func() string
+	jsonCopy          func(string) error
+	jsonChooseOpen    func(*mygo.Window) (string, error)
+	jsonChooseSave    func(*mygo.Window) (string, error)
+	jsonConfirm       func(*jsonDocument, bool) int
+	jsonShortcutError string
+	shortcutTarget    string
+
 	registerShortcut       func(string, func()) error
 	shortcutSuspended      bool
 	refreshApplicationMenu func()
@@ -161,6 +175,17 @@ func (a *application) rememberWindowSize() {
 
 func (a *application) visibility(visible bool) {
 	policy := mygo.ActivationPolicyAccessory
+	if !visible {
+		if a.window != nil && a.window.IsVisible() {
+			visible = true
+		}
+		for _, d := range a.jsonDocuments {
+			if d.window != nil && d.window.IsVisible() {
+				visible = true
+				break
+			}
+		}
+	}
 	if visible {
 		policy = mygo.ActivationPolicyRegular
 	}
@@ -195,7 +220,8 @@ func (a *application) menu() *mygo.Menu {
 }
 
 func (a *application) menuForLocale(locale string) *mygo.Menu {
-	items := append(a.awakeMenu(locale), []*mygo.MenuItem{
+	items := append(a.awakeMenu(locale), a.jsonMenu(locale)...)
+	items = append(items, []*mygo.MenuItem{
 		{Label: a.text(locale, "MenuSettings"), Accelerator: "Cmd+,", Click: func(*mygo.MenuItem, *mygo.Window) { a.show() }},
 	}...)
 	if a.updates.snapshot().Phase == updateReady {
@@ -219,12 +245,23 @@ func (a *application) applicationMenu(locale string) *mygo.Menu {
 	if a.shortcutRecording {
 		return mygo.NewMenu([]*mygo.MenuItem{{Label: "Cubbix", Submenu: []*mygo.MenuItem{{Label: text("R05Recording"), Disabled: true}}}})
 	}
-	return mygo.NewMenu([]*mygo.MenuItem{
+	items := []*mygo.MenuItem{
 		{Label: "Cubbix", Submenu: []*mygo.MenuItem{
 			{Label: text("MenuAbout"), Click: func(*mygo.MenuItem, *mygo.Window) { a.page = 1; a.notesPage = false; a.invalidateWindow(); a.show() }},
 			{Label: text("MenuSettings"), Accelerator: "Cmd+,", Click: func(*mygo.MenuItem, *mygo.Window) { a.show() }},
 			mygo.Separator(),
 			{Label: text("Quit"), Role: mygo.RoleQuit, Accelerator: "Cmd+Q"},
+		}},
+		{Label: text("JSONFileMenu"), Submenu: []*mygo.MenuItem{
+			{Label: text("R07NewWindow"), Disabled: !a.config.JSONEnabled, Click: func(*mygo.MenuItem, *mygo.Window) { a.newJSONWindow() }},
+			{Label: text("R07Open"), Accelerator: "Cmd+O", Click: func(_ *mygo.MenuItem, w *mygo.Window) {
+				if d := a.jsonForWindow(w); d != nil {
+					a.openJSONFile(d)
+				}
+			}},
+			{Label: text("JSONSave"), Accelerator: "Cmd+S", Click: func(_ *mygo.MenuItem, w *mygo.Window) { a.jsonPageAction(w, "save(false)") }},
+			{Label: text("JSONSaveAs"), Accelerator: "Cmd+Shift+S", Click: func(_ *mygo.MenuItem, w *mygo.Window) { a.jsonPageAction(w, "save(true)") }},
+			{Label: text("JSONClose"), Role: mygo.RoleClose, Accelerator: "Cmd+W"},
 		}},
 		{Label: text("MenuEdit"), Submenu: []*mygo.MenuItem{
 			{Label: text("MenuUndo"), Role: mygo.RoleUndo},
@@ -235,7 +272,11 @@ func (a *application) applicationMenu(locale string) *mygo.Menu {
 			{Label: text("MenuPaste"), Role: mygo.RolePaste},
 			{Label: text("MenuSelectAll"), Role: mygo.RoleSelectAll},
 		}},
-	})
+	}
+	if !a.config.JSONEnabled {
+		items = append(items[:1], items[2:]...)
+	}
+	return mygo.NewMenu(items)
 }
 
 func (a *application) createSettingsWindow() {
@@ -294,6 +335,7 @@ func (a *application) ready() {
 	}
 	mygo.App.OnLocaleChanged(func(locale string) {
 		a.refreshAwake()
+		a.refreshJSONTitles(locale)
 		mygo.App.SetMenu(a.applicationMenu(locale))
 		a.window.Invalidate()
 	})
@@ -307,7 +349,13 @@ func (a *application) ready() {
 		})
 	}
 	a.startAwakeServices()
-	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) {
+	a.registerJSONShortcut()
+	mygo.App.OnBeforeQuit(func(e *mygo.QuitEvent) {
+		if !a.quitting && len(a.jsonDocuments) > 0 {
+			e.PreventDefault()
+			a.transitionJSON(false, func() { a.quitting = true; mygo.App.Quit() })
+			return
+		}
 		a.quitting = true
 		if a.stopAwakeServices != nil {
 			a.stopAwakeServices()
@@ -539,6 +587,7 @@ func main() {
 	}
 	mygo.App.SetName("Cubbix")
 	mygo.App.SetActivationPolicy(mygo.ActivationPolicyAccessory)
+	a.setupJSON()
 	mygo.App.WhenReady(a.ready)
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)

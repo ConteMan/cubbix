@@ -88,3 +88,25 @@ func TestWindowSizePersistsAndOldConfigStillLoads(t *testing.T) {
 		t.Fatalf("saved window size: %+v %v", got, err)
 	}
 }
+
+func TestJSONConfigDefaultsAndPersistence(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.toml")
+	if err := os.WriteFile(path, []byte("version=1\nlanguage='zh-CN'\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	c, err := loadConfig(path)
+	if err != nil || !c.JSONEnabled || c.JSONShortcut != "Ctrl+Alt+Cmd+J" {
+		t.Fatalf("old config JSON defaults: %+v %v", c, err)
+	}
+	c.JSONEnabled = false
+	c.JSONShortcut = "Ctrl+Alt+Cmd+M"
+	c.JSONWidth = 1000
+	c.JSONHeight = 600
+	if err := saveConfig(path, c); err != nil {
+		t.Fatal(err)
+	}
+	loaded, err := loadConfig(path)
+	if err != nil || loaded != c {
+		t.Fatalf("JSON config not persisted: %+v %v", loaded, err)
+	}
+}

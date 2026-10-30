@@ -2,3 +2,5 @@ build/
 *.app
 .DS_Store
 /scratch/
+
+frontend/node_modules/

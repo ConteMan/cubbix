@@ -304,14 +304,29 @@ func shortcutKey(mods ui.Modifiers, key ui.Key) string {
 	}
 	return strings.Join(append(parts, name), "+")
 }
+func sameShortcut(first, second string) bool {
+	identity := func(acc string) string {
+		parts := strings.Split(acc, "+")
+		sort.Strings(parts[:len(parts)-1])
+		return strings.Join(parts, "+")
+	}
+	return identity(first) == identity(second)
+}
 func knownShortcutConflict(acc string) string {
-	switch acc {
-	case "Cmd+,":
-		return "R05Conflict"
-	case "Cmd+Q", "Cmd+W", "Cmd+Z", "Cmd+Shift+Z", "Cmd+X", "Cmd+C", "Cmd+V", "Cmd+A":
-		return "ShortcutAppConflict"
-	case "Cmd+Space", "Ctrl+Space", "Ctrl+Alt+Space", "Cmd+Alt+Space", "Ctrl+Cmd+Q", "Cmd+Tab", "Cmd+Shift+3", "Cmd+Shift+4", "Cmd+Shift+5", "Ctrl+Up", "Ctrl+Down", "Ctrl+Left", "Ctrl+Right", "F11", "F12":
-		return "ShortcutSystemConflict"
+	groups := []struct {
+		reason    string
+		shortcuts []string
+	}{
+		{"R05Conflict", []string{"Cmd+,"}},
+		{"ShortcutAppConflict", []string{"Cmd+Q", "Cmd+W", "Cmd+Z", "Cmd+Shift+Z", "Cmd+X", "Cmd+C", "Cmd+V", "Cmd+A", "Cmd+O", "Cmd+S", "Cmd+Shift+S", "Cmd+Shift+C", "Alt+Cmd+P"}},
+		{"ShortcutSystemConflict", []string{"Cmd+Space", "Ctrl+Space", "Ctrl+Alt+Space", "Cmd+Alt+Space", "Ctrl+Cmd+Q", "Cmd+Tab", "Cmd+Shift+3", "Cmd+Shift+4", "Cmd+Shift+5", "Ctrl+Up", "Ctrl+Down", "Ctrl+Left", "Ctrl+Right", "F11", "F12"}},
+	}
+	for _, group := range groups {
+		for _, candidate := range group.shortcuts {
+			if sameShortcut(acc, candidate) {
+				return group.reason
+			}
+		}
 	}
 	if !strings.Contains(acc, "+") {
 		return "ShortcutModifierRequired"
@@ -332,9 +347,17 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 		a.shortcutError = reason
 		return
 	}
-	old := a.config.AwakeShortcut
-	if a.config.AwakeEnabled {
-		if err := a.registerShortcut(acc, a.toggleAwake); err != nil {
+	targetJSON := a.shortcutTarget == "json"
+	old, other, enabled, callback := a.config.AwakeShortcut, a.config.JSONShortcut, a.config.AwakeEnabled, a.toggleAwake
+	if targetJSON {
+		old, other, enabled, callback = a.config.JSONShortcut, a.config.AwakeShortcut, a.config.JSONEnabled, a.newJSONWindow
+	}
+	if sameShortcut(acc, other) {
+		a.shortcutError = "JSONShortcutConflict"
+		return
+	}
+	if enabled {
+		if err := a.registerShortcut(acc, callback); err != nil {
 			a.shortcutError = "ShortcutUnavailable"
 			return
 		}
@@ -342,7 +365,14 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 			a.unregisterShortcut(old)
 		}
 	}
-	a.config.AwakeShortcut = acc
+	if targetJSON {
+		a.config.JSONShortcut = acc
+		a.jsonShortcutError = ""
+		a.registerAwakeShortcut()
+	} else {
+		a.config.AwakeShortcut = acc
+		a.registerJSONShortcut()
+	}
 	a.shortcutSuspended = false
 	a.shortcutRecording = false
 	a.shortcutError = ""
@@ -360,66 +390,29 @@ func (a *application) awakeSettings(c *ui.Context, t tokenValues, locale string)
 			a.switchControl(c, t, "awake-enabled", text("Awake"), &a.config.AwakeEnabled, a.changeAwakeEnabled)
 		})
 		ui.Divider(c)
-		ui.Row(c).FillWidth().Height(t.SizeRowHeight).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, text("JSON")).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextDisabled)).Grow(1)
-			off := false
-			ui.SwitchBase(c.Key("json-placeholder"), &off).Disabled(true).Size(t.SizeSwitchWidth, t.SizeSwitchHeight).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Padding(t.Space2).AlignItems(ui.Center).Label(text("JSON")).Children(func() {
-				ui.Box(c).Size(t.SizeSwitchThumb, t.SizeSwitchThumb).Radius(t.SizeSwitchThumb / 2).Background(ui.Hex(t.ColorTextDisabled))
-			})
+		a.row(c, t, text("JSON"), func() {
+			a.switchControl(c, t, "json-enabled", text("JSON"), &a.config.JSONEnabled, a.changeJSONEnabled)
 		})
 	} else {
-		a.row(c, t, text("R05ShortcutLabel"), func() {
-			acc := a.config.AwakeShortcut
-			if a.shortcutDraft != "" {
-				acc = a.shortcutDraft
-			}
-			e := ui.ButtonBase(c.Key("awake-recorder")).Size(t.SizeR05RecorderWidth, t.SizeSegmentHeight).PaddingX(t.Space12).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).FocusRing(true).Label(text("ShortcutRecordAction")).OnClick(a.beginShortcutRecording)
-			e.HandleInput(func(ev ui.InputEvent) bool {
-				if a.shortcutRecording && ev.Kind == ui.InputKeyDown {
-					a.recordShortcut(ev.Mods, ev.Key)
-					return true
-				}
-				return false
-			})
-			e.Children(func() {
-				ui.Row(c).Fill().Gap(t.Space2).AlignItems(ui.Center).Children(func() {
-					if a.shortcutRecording && a.shortcutDraft == "" {
-						ui.Text(c, text("R05Recording")).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
-					} else {
-						for _, symbol := range shortcutSymbols(acc) {
-							ui.Text(c, symbol).FontSize(t.FontSizeBody)
-						}
-					}
-				})
-			})
-			if a.shortcutError != "" {
-				alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(text(a.shortcutError)).Description(text(a.shortcutError))
-				ui.TooltipBase(c, alert, func(tip ui.Element) {
-					tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
-						ui.Row(c).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
-							ui.Row(c).Gap(t.Space2).AlignItems(ui.Center).Children(func() {
-								for _, symbol := range shortcutSymbols(acc) {
-									ui.Text(c, symbol).FontSize(t.FontSizeSmall)
-								}
-							})
-							reason := a.shortcutError
-							if reason == "R05Conflict" {
-								reason = "ShortcutSettingsSuffix"
-							}
-							ui.Text(c, text(reason)).FontSize(t.FontSizeSmall)
-						})
-					})
-				})
-			}
-		})
+		a.shortcutSettingsRow(c, t, locale, "awake")
+		ui.Divider(c)
+		a.shortcutSettingsRow(c, t, locale, "json")
 	}
 }
 
-func (a *application) beginShortcutRecording() {
-	if !a.shortcutRecording && a.config.AwakeEnabled {
-		a.unregisterShortcut(a.config.AwakeShortcut)
-		a.shortcutSuspended = true
+func (a *application) beginShortcutRecording() { a.beginTileShortcutRecording("awake") }
+func (a *application) beginTileShortcutRecording(target string) {
+	if a.shortcutRecording {
+		a.cancelShortcutRecording()
 	}
+	if a.config.AwakeEnabled {
+		a.unregisterShortcut(a.config.AwakeShortcut)
+	}
+	if a.config.JSONEnabled {
+		a.unregisterShortcut(a.config.JSONShortcut)
+	}
+	a.shortcutSuspended = true
+	a.shortcutTarget = target
 	a.shortcutRecording = true
 	a.shortcutDraft = ""
 	a.shortcutError = ""
@@ -434,11 +427,73 @@ func (a *application) cancelShortcutRecording() {
 	a.shortcutRecording = false
 	a.shortcutDraft = ""
 	a.shortcutError = ""
-	if a.shortcutSuspended && a.config.AwakeEnabled {
+	if a.shortcutSuspended {
 		a.registerAwakeShortcut()
+		a.registerJSONShortcut()
 	}
 	a.shortcutSuspended = false
 	if a.refreshApplicationMenu != nil {
 		a.refreshApplicationMenu()
 	}
+}
+
+func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, target string) {
+	text := func(key string) string { return a.text(locale, key) }
+	label, recordKey := "R05ShortcutLabel", "ShortcutRecordAction"
+	acc := a.config.AwakeShortcut
+	if target == "json" {
+		label, recordKey = "JSONShortcutLabel", "JSONRecordShortcut"
+		acc = a.config.JSONShortcut
+	}
+	active := a.shortcutRecording && a.shortcutTarget == target
+	errorKey := ""
+	if a.shortcutTarget == target || a.shortcutTarget == "" && target == "awake" {
+		errorKey = a.shortcutError
+	}
+	if target == "json" && errorKey == "" {
+		errorKey = a.jsonShortcutError
+	}
+	a.row(c, t, text(label), func() {
+		if active && a.shortcutDraft != "" {
+			acc = a.shortcutDraft
+		}
+		e := ui.ButtonBase(c.Key(target+"-recorder")).Size(t.SizeR05RecorderWidth, t.SizeSegmentHeight).PaddingX(t.Space12).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).FocusRing(true).Label(text(recordKey)).OnClick(func() { a.beginTileShortcutRecording(target) })
+		e.HandleInput(func(ev ui.InputEvent) bool {
+			if active && ev.Kind == ui.InputKeyDown {
+				a.recordShortcut(ev.Mods, ev.Key)
+				return true
+			}
+			return false
+		})
+		e.Children(func() {
+			ui.Row(c).Fill().Gap(t.Space2).AlignItems(ui.Center).Children(func() {
+				if active && a.shortcutDraft == "" {
+					ui.Text(c, text("R05Recording")).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
+				} else {
+					for _, symbol := range shortcutSymbols(acc) {
+						ui.Text(c, symbol).FontSize(t.FontSizeBody)
+					}
+				}
+			})
+		})
+		if errorKey != "" {
+			alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(text(errorKey)).Description(text(errorKey))
+			ui.TooltipBase(c, alert, func(tip ui.Element) {
+				tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
+					ui.Row(c).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+						ui.Row(c).Gap(t.Space2).AlignItems(ui.Center).Children(func() {
+							for _, symbol := range shortcutSymbols(acc) {
+								ui.Text(c, symbol).FontSize(t.FontSizeSmall)
+							}
+						})
+						reason := errorKey
+						if reason == "R05Conflict" {
+							reason = "ShortcutSettingsSuffix"
+						}
+						ui.Text(c, text(reason)).FontSize(t.FontSizeSmall)
+					})
+				})
+			})
+		}
+	})
 }

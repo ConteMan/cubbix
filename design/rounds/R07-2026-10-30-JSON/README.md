@@ -2,6 +2,9 @@
 
 本轮为 [M2 / #3](https://github.com/ConteMan/cubbix/issues/3) 提供可评审的静态设计，尚未实现 JSON 功能。事实源为 `design/cubbix.pen`，通过 pen.dev headless CLI 0.3.13 编辑、保存、复开和导出。所有 R07 母版、评审板与标签均位于 R07 轮次带；历史画板保留。
 
+后续实现：维护者已确认的首版规则、性能阈值和真实运行截图见 [M2 运行记录](runtime/README.md)。下文「待决定」保留为本轮设计评审时的原始记录，实现以工作单确认及运行记录为准。
+
+
 ## 目标与预览
 
 粘贴、读入或拖入 JSON 后，立即得到清楚的行号、折叠和高亮；偶尔在底部补一句 `this` 表达式；多个独立窗口用于对照，也能逐个置顶。采用 #1 已确认的 CodeMirror 6、独立 Worker 和 200ms 超时，不引入 Monaco。

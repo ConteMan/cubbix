@@ -1,0 +1,13 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; worker-src blob:; connect-src 'none'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<header id="toolbar"><div id="drag"></div><div id="top-actions"></div></header>
+<main id="editor"><div id="empty" aria-hidden="true"></div></main>
+<section id="result" hidden><div id="splitter" role="separator" tabindex="0" aria-orientation="horizontal"></div><div id="result-content"></div></section>
+<footer><div id="expression"><label for="suffix">this</label><input id="suffix" autocomplete="off" autocapitalize="off" spellcheck="false"><span id="status" tabindex="0" role="status"></span></div><div id="tools"></div></footer>
+<div id="tooltip" role="tooltip" hidden></div>
+<script src="main.js"></script>
+</body></html>
