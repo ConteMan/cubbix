@@ -4,6 +4,7 @@
   "exitCode": 0,
   "checks": [
     "gofmt",
+    "frontend locked rebuild and Node tests",
     "generated tokens match",
     "headless canvas overlap check",
     "menu bar TIFF assets",

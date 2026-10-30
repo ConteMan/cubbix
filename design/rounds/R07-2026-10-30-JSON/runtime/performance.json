@@ -1,12 +1,12 @@
 {
   "bytes": 10494008,
   "editMedianMS": 14,
-  "editP95MS": 17,
+  "editP95MS": 18,
   "large": false,
   "lines": 99003,
-  "openMS": 25,
+  "openMS": 55,
   "selectedFileBytes": 10491391,
-  "selectedFileReadyMS": 196.249,
+  "selectedFileReadyMS": 216.75,
   "singleLines": [
     {
       "editMS": 2,
@@ -30,7 +30,7 @@
       "editMS": 0,
       "large": true,
       "lineLength": 1000014,
-      "openMS": 1
+      "openMS": 0
     }
   ]
 }

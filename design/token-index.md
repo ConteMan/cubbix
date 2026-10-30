@@ -1,6 +1,6 @@
 # Token 与 Go 标识符映射
 
-当前 R05B 共 82 个样式 Token，R04 的 74 项保留。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+当前共 104 个样式 Token（颜色 30、数值 68、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
@@ -107,5 +107,21 @@ CLI 0.3.13 不保留 width/height 变量绑定，Size Token 解析为几何数�
 | `SizeR05FieldWidth` | number | `164` |
 | `SizeMenubar18` | number | `18` |
 | `SizeMenubar16` | number | `16` |
+
+## R07 追加
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `ColorSyntaxKey` | color | `light: #A31515 / dark: #FF7B72` |
+| `ColorSyntaxString` | color | `light: #0953B7 / dark: #79C0FF` |
+| `ColorSyntaxNumber` | color | `light: #097335 / dark: #7EE787` |
+| `ColorSyntaxBool` | color | `light: #003388 / dark: #6CB6FF` |
+| `ColorSyntaxNull` | color | `light: #003388 / dark: #6CB6FF` |
+| `ColorSyntaxIndent` | color | `light: #EBEBEB / dark: #3C3C3C` |
+| `SizeJSONTitleInset` | number | `76` |
+| `SizeJSONSplitter` | number | `7` |
+| `SizeJSONPaneMinWidth` | number | `240` |
+
+ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代码内容；布尔值与 null 共用深蓝，其余四类各自成色，浅深主题下均达到 WCAG AA（最低 5.54:1）。ColorSyntaxIndent 是弱化的分隔线色，只用于缩进参考线。SizeJSONTitleInset 让窗口名称避开系统红绿灯，SizeJSONSplitter 是可拖动的竖向分隔条宽度，SizeJSONPaneMinWidth 是左右两栏各自的最小宽度。
 
 菜单与系统通知的半透明表面共用 ColorMenuSurface；设置窗口高 232 来自四项导航的自然高度（上下 24、品牌 20、分组间距 24、四行 32、三处间隔 4）。菜单栏图标的 18pt 与 16pt 是逻辑尺寸，1×／2× 位图分别解析对应像素密度。新增 Token 已通过 scripts/tokens.py 同步到 tokens.go。

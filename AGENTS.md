@@ -27,6 +27,7 @@ macOS 菜单栏常驻的个人工具箱。每个功能是一个「格子」，�
 - 新画板用 `FindEmptySpace` 或按轮次带放置（同轮从左到右、轮次带间至少 200）；顶层画板及轮次标签之间至少留 80，提交前必须通过 `python3 design/scripts/layout.py` 防重叠检查（已接入 `scripts/selftest.sh`）。
 - 界面设计源是 `design/cubbix.pen`：维护者用 pen.dev 桌面端编辑，Agent 用 pen.dev headless CLI（`interactive --in/--out`）编辑，导出和复开检查均用 CLI。品牌源 `brand/cubbix-logo.pen` 只由维护者在桌面端编辑，CLI 只读取和导出，不改写。每轮评审在 `design/rounds/` 下新建目录，放导出的预览图和 `README.md`（目标、评审意见、定下的规则）。交互原型用 HTML，放在 `design/prototypes/`。
 - 画布上的颜色、字号、圆角、间距一律引用变量，不写死数值。
+- 界面只用黑白灰，唯一例外是代码内容：JSON 编辑区和结果区里键名、字符串、数字、布尔值、null 使用 `ColorSyntaxKey`／`ColorSyntaxString`／`ColorSyntaxNumber`／`ColorSyntaxBool`／`ColorSyntaxNull` 语法色，缩进参考线用 `ColorSyntaxIndent`。工具栏、按钮、状态与标题等界面元素仍只用黑白灰；语法色在浅深主题下各自达到 WCAG AA。
 - 低信息密度：以图标引导为主，不写说明文字；正常状态不打标签，只在异常时提示。
 - 图标统一用 Lucide，固定版本，用到的 SVG 连同许可证放进仓库；纯图标按钮配 tooltip，写法如「开始常亮 (⌃⌥⌘K)」。
 - 窗口默认无系统标题栏，拖动背景空白处移动窗口；需要系统菜单的主窗口保留红绿灯。

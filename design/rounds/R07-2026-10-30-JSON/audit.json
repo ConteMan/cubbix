@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "scope": "All authored canvas children and descendants; variable definitions excluded; geometry x/y/width/height excluded from spacing.",
-  "styleTokens": 82,
+  "styleTokens": 104,
   "styleTokensByType": {
-    "color": 24,
-    "number": 53,
-    "string": 5
+    "color": 30,
+    "number": 68,
+    "string": 6
   },
-  "documentVariables": 238,
-  "copyResourceKeys": 179,
+  "documentVariables": 247,
+  "copyResourceKeys": 200,
   "reusableComponents": [
     {
       "id": "Ectkj",
