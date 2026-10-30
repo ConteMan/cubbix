@@ -355,7 +355,7 @@ type shortcutSlot struct {
 
 func (a *application) shortcutSlots() []shortcutSlot {
 	return []shortcutSlot{
-		{Target: "awake", Acc: a.config.AwakeShortcut, Enabled: a.config.AwakeEnabled, Callback: a.toggleAwake},
+		{Target: "awake", Acc: a.config.AwakeShortcut, Enabled: a.config.AwakeEnabled, Callback: a.shortcutToggleAwake},
 		{Target: "json", Acc: a.config.JSONShortcut, Enabled: a.config.JSONEnabled, Callback: a.newJSONWindow},
 		{Target: "palette", Acc: a.config.PaletteShortcut, Enabled: true, Callback: a.togglePalette},
 	}
@@ -478,7 +478,98 @@ func (a *application) awakeSettings(c *ui.Context, t tokenValues, locale string)
 		a.shortcutSettingsRow(c, t, locale, "json")
 		ui.Divider(c)
 		a.shortcutSettingsRow(c, t, locale, "palette")
+		ui.Divider(c)
+		a.feedbackModeRow(c, t, locale)
+		ui.Divider(c)
+		a.feedbackPositionRow(c, t, locale)
 	}
+}
+
+// feedbackModeRow picks the feedback channel: an on-screen hint, a system
+// notification, or nothing. A refused notification shows an alert beside the
+// notification segment without changing the stored choice.
+func (a *application) feedbackModeRow(c *ui.Context, t tokenValues, locale string) {
+	text := func(key string) string { return a.text(locale, key) }
+	a.row(c, t, text("FeedbackMode"), func() {
+		parts := ui.SegmentedBase(c.Key("feedback-mode"), &a.feedbackMode, 3)
+		parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("FeedbackMode")).OnChange(a.changeFeedbackMode).Children(func() {
+			for index, key := range []string{"FeedbackHint", "FeedbackNotification", "FeedbackOff"} {
+				color, background := t.ColorText, t.ColorTransparent
+				if index == a.feedbackMode {
+					color, background = t.ColorOnAccent, t.ColorAccent
+				}
+				parts.Segment(index).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(background)).FocusRing(true).Label(text(key)).Children(func() {
+					ui.Text(c, text(key)).FontSize(t.FontSizeBody).TextColor(ui.Hex(color)).SingleLine()
+				})
+			}
+		})
+		if a.feedback != nil && a.feedback.denied && a.feedbackModeName() == "notification" {
+			reason := text("FeedbackDenied")
+			alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(reason).Description(reason)
+			ui.TooltipBase(c, alert, func(tip ui.Element) {
+				tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
+					ui.Text(c, reason).FontSize(t.FontSizeSmall)
+				})
+			})
+		}
+	})
+}
+
+// feedbackPositionRow places the hint in one corner of the screen or in its
+// center. It is editable exactly when a hint can still appear; a degraded
+// notification keeps it editable because the user then sees hints.
+func (a *application) feedbackPositionRow(c *ui.Context, t tokenValues, locale string) {
+	text := func(key string) string { return a.text(locale, key) }
+	editable := a.feedbackPositionEditable()
+	row := ui.Row(c).FillWidth().Height(t.SizeRowHeight).AlignItems(ui.Center).Gap(t.Space8)
+	if !editable {
+		row = row.Disabled(true).Opacity(t.OpacityDisabled)
+	}
+	row.Children(func() {
+		ui.Text(c, text("FeedbackPosition")).FontSize(t.FontSizeBody).Grow(1)
+		parts := ui.SegmentedBase(c.Key("feedback-position"), &a.feedbackCorner, 5)
+		track := parts.Track.Size(t.SizeFeedbackPositionWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("FeedbackPosition"))
+		if !editable {
+			track = track.Disabled(true)
+		} else {
+			track = track.OnChange(a.changeFeedbackCorner)
+		}
+		track.Children(func() {
+			for index, key := range []string{"FeedbackTopLeft", "FeedbackTopRight", "FeedbackBottomLeft", "FeedbackBottomRight", "FeedbackCenter"} {
+				color, background := t.ColorText, t.ColorTransparent
+				if index == a.feedbackCorner {
+					color, background = t.ColorOnAccent, t.ColorAccent
+				}
+				parts.Segment(index).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(background)).FocusRing(true).Label(text(key)).Children(func() {
+					a.feedbackPositionGlyph(c, t, index, color)
+				})
+			}
+		})
+	})
+}
+
+// feedbackPositionGlyph draws a 16 × 16 screen with one dot in the corner or
+// the center the segment stands for. It is language independent, so the five
+// narrow segments never wrap a label.
+func (a *application) feedbackPositionGlyph(c *ui.Context, t tokenValues, index int, color string) {
+	horizontal, vertical := ui.Start, ui.Start
+	switch index {
+	case 1, 3:
+		horizontal = ui.End
+	case 4:
+		horizontal = ui.Center
+	}
+	if index >= 2 {
+		vertical = ui.End
+	}
+	if index == 4 {
+		vertical = ui.Center
+	}
+	ui.Box(c).Size(t.SizeIcon, t.SizeIcon).Radius(t.RadiusControl).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Padding(t.StrokeHairline + t.Space2).Children(func() {
+		ui.Row(c).Fill().Justify(horizontal).AlignItems(vertical).Children(func() {
+			ui.Box(c).Size(t.Space4, t.Space4).Radius(t.Space4 / 2).Background(ui.Hex(color))
+		})
+	})
 }
 
 func (a *application) beginShortcutRecording() { a.beginTileShortcutRecording("awake") }

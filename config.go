@@ -52,6 +52,8 @@ type Config struct {
 	Version          int           `toml:"version"`
 	Language         string        `toml:"language"`
 	OpenAtLogin      bool          `toml:"open_at_login"`
+	FeedbackMode     string        `toml:"feedback_mode"`
+	FeedbackCorner   string        `toml:"feedback_corner"`
 	AutomaticUpdates bool          `toml:"automatic_updates"`
 	AwakeEnabled     bool          `toml:"awake_enabled"`
 	AwakeMode        string        `toml:"awake_mode"`
@@ -69,7 +71,7 @@ type Config struct {
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey}
+	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, FeedbackMode: "hint", FeedbackCorner: "top-right"}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -92,6 +94,24 @@ func loadConfig(path string) (Config, error) {
 	case "system", "zh-CN", "en":
 	default:
 		return Config{}, fmt.Errorf("unsupported language: %q", config.Language)
+	}
+	// Older configs lack the feedback keys. Fill them from the defaults, but
+	// reject an edit that names a mode or corner the app cannot draw.
+	if config.FeedbackMode == "" {
+		config.FeedbackMode = "hint"
+	}
+	switch config.FeedbackMode {
+	case "hint", "notification", "off":
+	default:
+		return Config{}, fmt.Errorf("unsupported feedback mode: %q", config.FeedbackMode)
+	}
+	if config.FeedbackCorner == "" {
+		config.FeedbackCorner = "top-right"
+	}
+	switch config.FeedbackCorner {
+	case "top-left", "top-right", "bottom-left", "bottom-right", "center":
+	default:
+		return Config{}, fmt.Errorf("unsupported feedback corner: %q", config.FeedbackCorner)
 	}
 	if config.JSONSplit == 0 {
 		config.JSONSplit = jsonSplitDefault

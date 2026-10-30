@@ -1,6 +1,6 @@
 # Token 与 Go 标识符映射
 
-当前共 113 个样式 Token（颜色 30、数值 77、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+当前共 116 个样式 Token（颜色 30、数值 80、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」，快捷键反馈尺寸见「R11 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
@@ -148,3 +148,13 @@ ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代�
 | `SizeIconSmall` | number | `12` |
 
 菜单栏卡片面板（001）固定宽 320。常亮四颗药丸基准宽 64：`4 × 64 + 3 × 6 = 274`，加卡片内 20 与面板外 24 共 318，余下 2 由 `ui.Grow` 均分。SizeIconSmall 是 JSON 窗口列表置顶标记等紧凑辅助图标尺寸（12）。三者已同步 `design/tokens.json`、`design/cubbix.pen` 变量与 `tokens.go`；R10 画板在评审步骤补齐。
+
+## R11 追加
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `SizeToastSlotWidth` | number | `320` |
+| `SizeToastHeight` | number | `36` |
+| `SizeFeedbackPositionWidth` | number | `144` |
+
+屏幕提示固定 320 × 36 的透明槽：单行文字 13 × 1.5 ≈ 20，上下各 Space8；胶囊宽度随内容，靠固定槽宽把定位化简为只读 Token，超长文案按「…」截断。设置页「提示位置」的五段分段控件宽 144。颜色全部复用既有 Token：胶囊 ColorMenuSurface、文字 ColorText、关闭态图标 ColorTextSecondary、失败图标 ColorDanger。三个 Token 已同步 `design/tokens.json` 与 `tokens.go`；`cubbix.pen` 变量与 R11 画板在评审步骤补齐（同 R09 的做法）。

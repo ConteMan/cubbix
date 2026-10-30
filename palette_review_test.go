@@ -260,14 +260,24 @@ func TestSearchDefaultUsesShorterTitleOnScoreTie(t *testing.T) {
 
 func TestFailedShortcutActionsReportErrors(t *testing.T) {
 	a := awakeTestApp(t)
+	h := testFeedback(a)
 	a.awake.launch = func([]string) (awakeChild, error) { return nil, errors.New("launch failed") }
-	// The global shortcut still reports failures on the settings page; the
-	// card panel keeps its own error instead.
-	a.toggleAwake()
-	if a.settingsError != "AwakeStartError" {
-		t.Fatal("shortcut did not report the launch failure")
+	// The global shortcut reports a failure as a hint (002), never in the
+	// settings error slot; the card panel keeps its own error instead.
+	a.shortcutToggleAwake()
+	if h.presenter.message.Text != a.text(uiLocale(), "ToastAwakeError") || !h.presenter.message.Danger {
+		t.Fatalf("shortcut did not report the launch failure: %+v", h.presenter.message)
+	}
+	if a.settingsError != "" {
+		t.Fatal("shortcut wrote the settings error slot")
 	}
 	if a.config.AwakeMinutes != 60 {
 		t.Fatal("failed start changed duration")
 	}
+	a.panel = &menubarPanelState{}
+	a.panelToggleAwake()
+	if a.panel.errorKey != "AwakeStartError" {
+		t.Fatalf("card panel error = %q", a.panel.errorKey)
+	}
+	a.panel = nil
 }

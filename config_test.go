@@ -34,7 +34,7 @@ func TestConfigRoundTrip(t *testing.T) {
 	if err != nil || !reflect.DeepEqual(initial, defaultConfig()) {
 		t.Fatalf("default config = %#v, %v", initial, err)
 	}
-	want := Config{Version: configVersion, Language: "en", OpenAtLogin: true, AutomaticUpdates: true, JSONSplit: jsonSplitDefault, PaletteShortcut: defaultPaletteKey}
+	want := Config{Version: configVersion, Language: "en", OpenAtLogin: true, FeedbackMode: "hint", FeedbackCorner: "top-right", AutomaticUpdates: true, JSONSplit: jsonSplitDefault, PaletteShortcut: defaultPaletteKey}
 	if err := saveConfig(path, want); err != nil {
 		t.Fatal(err)
 	}
@@ -66,6 +66,41 @@ func TestConfigDefaultsAndClampsSplit(t *testing.T) {
 		config, err := loadConfig(path)
 		if err != nil || config.JSONSplit != expected {
 			t.Fatalf("json_split = %d loaded as %d, %v; want %d", value, config.JSONSplit, err, expected)
+		}
+	}
+}
+
+func TestFeedbackConfigDefaultsAndValidation(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.toml")
+	// A config written before the feedback settings still gets the defaults.
+	if err := os.WriteFile(path, []byte("version = 1\nlanguage = \"zh-CN\"\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	config, err := loadConfig(path)
+	if err != nil || config.FeedbackMode != "hint" || config.FeedbackCorner != "top-right" {
+		t.Fatalf("legacy feedback defaults = %q/%q, %v", config.FeedbackMode, config.FeedbackCorner, err)
+	}
+	for _, mode := range feedbackModes {
+		for _, corner := range feedbackCorners {
+			raw := fmt.Sprintf("version = 1\nlanguage = 'zh-CN'\nfeedback_mode = %q\nfeedback_corner = %q\n", mode, corner)
+			if err := os.WriteFile(path, []byte(raw), 0600); err != nil {
+				t.Fatal(err)
+			}
+			config, err := loadConfig(path)
+			if err != nil || config.FeedbackMode != mode || config.FeedbackCorner != corner {
+				t.Fatalf("feedback %q/%q = %q/%q, %v", mode, corner, config.FeedbackMode, config.FeedbackCorner, err)
+			}
+		}
+	}
+	for _, raw := range []string{
+		"version = 1\nlanguage = 'zh-CN'\nfeedback_mode = 'toast'\n",
+		"version = 1\nlanguage = 'zh-CN'\nfeedback_corner = 'middle'\n",
+	} {
+		if err := os.WriteFile(path, []byte(raw), 0600); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := loadConfig(path); err == nil {
+			t.Fatalf("invalid feedback setting accepted: %q", raw)
 		}
 	}
 }

@@ -24,6 +24,10 @@ func awakeTestApp(t *testing.T) *application {
 	a.unregisterShortcut = func(string) {}
 	a.awake, _ = fakeAwake(time.Now())
 	a.awake.changed = a.awakeChanged
+	// No test opens a hint window or asks for notification permission.
+	a.feedback = newFeedbackPresenter()
+	a.feedback.mode = func() string { return "off" }
+	a.feedback.create = nil
 	t.Cleanup(func() { a.awake.changed = nil; a.awake.stop(); a.updates.close() })
 	return a
 }
