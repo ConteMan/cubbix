@@ -24909,6 +24909,120 @@
           }
         }
       ]
+    },
+    "ColorSyntaxKey": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#A31515",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#FF7B72",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxString": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#0953B7",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#79C0FF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxNumber": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#097335",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#7EE787",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxBool": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#003388",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#6CB6FF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxNull": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#003388",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#6CB6FF",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "ColorSyntaxIndent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#EBEBEB",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#3C3C3C",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "SizeJSONSplitter": {
+      "type": "number",
+      "value": 7
+    },
+    "SizeJSONPaneMinWidth": {
+      "type": "number",
+      "value": 240
+    },
+    "SizeJSONTitleInset": {
+      "type": "number",
+      "value": 76
     }
   },
   "fileToken": "d54ef04c-78c9-405f-bd8d-0848edd09a7a"

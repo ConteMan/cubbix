@@ -16,6 +16,7 @@ type Config struct {
 	JSONShortcut     string        `toml:"json_shortcut"`
 	JSONWidth        int           `toml:"json_width,omitempty"`
 	JSONHeight       int           `toml:"json_height,omitempty"`
+	JSONSplit        int           `toml:"json_split,omitempty"`
 	Version          int           `toml:"version"`
 	Language         string        `toml:"language"`
 	OpenAtLogin      bool          `toml:"open_at_login"`
@@ -33,7 +34,7 @@ type Config struct {
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K"}
+	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K"}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -57,6 +58,10 @@ func loadConfig(path string) (Config, error) {
 	default:
 		return Config{}, fmt.Errorf("unsupported language: %q", config.Language)
 	}
+	if config.JSONSplit == 0 {
+		config.JSONSplit = jsonSplitDefault
+	}
+	config.JSONSplit = clampJSONSplit(config.JSONSplit)
 	return config, nil
 }
 

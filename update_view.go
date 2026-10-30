@@ -16,7 +16,8 @@ func (a *application) restartUpdate() {
 	if a.updates.snapshot().Phase != updateReady || a.relaunch == nil {
 		return
 	}
-	a.transitionJSON(true, a.restartUpdateAfterJSON)
+	// Open JSON windows are tools without unsaved state to protect.
+	a.restartUpdateAfterJSON()
 }
 
 func (a *application) restartUpdateAfterJSON() {

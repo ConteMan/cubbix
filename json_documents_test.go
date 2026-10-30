@@ -17,7 +17,7 @@ func TestJSONDocumentNamesListsAndIsolation(t *testing.T) {
 		t.Fatal("documents share initial state")
 	}
 	for _, locale := range []string{"zh-CN", "en"} {
-		if one.name(a, locale) == "" || two.name(a, locale) != "items.json" {
+		if one.name(a, locale) != "JSON" || two.name(a, locale) != "items.json" {
 			t.Fatal("document names")
 		}
 		menu := a.menuForLocale(locale)
@@ -25,6 +25,14 @@ func TestJSONDocumentNamesListsAndIsolation(t *testing.T) {
 			t.Fatal("window entries missing")
 		}
 	}
+	// The second and later unopened windows count up; a file keeps its own name.
+	third := a.addJSONDocument("", "", true)
+	fourth := a.addJSONDocument("", "", true)
+	if third.name(a, "en") != "JSON 3" || fourth.name(a, "en") != "JSON 4" {
+		t.Fatal("numbered window names")
+	}
+	a.removeJSONDocument(third)
+	a.removeJSONDocument(fourth)
 	one.pinned = true
 	one.changed(3, true)
 	one.changed(2, false)
@@ -39,7 +47,7 @@ func TestJSONDocumentNamesListsAndIsolation(t *testing.T) {
 	}
 	a.removeJSONDocument(one)
 	three := a.addJSONDocument("", "", true)
-	if three.number != 7 || !one.closed || a.menuForLocale("en").ItemByID("json-window-1") != nil {
+	if three.number != 9 || !one.closed || a.menuForLocale("en").ItemByID("json-window-1") != nil {
 		t.Fatal("closed document reused")
 	}
 }

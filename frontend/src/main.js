@@ -1,7 +1,7 @@
 import { EditorState, Compartment, Transaction } from '@codemirror/state';
-import { EditorView, lineNumbers, drawSelection, keymap } from '@codemirror/view';
+import { EditorView, Decoration, ViewPlugin, lineNumbers, drawSelection, keymap } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
-import { foldGutter, foldAll, unfoldAll, syntaxHighlighting, HighlightStyle } from '@codemirror/language';
+import { foldGutter, foldAll, unfoldAll, indentUnit, syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 import { history, defaultKeymap, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { tags } from '@lezer/highlight';
 import { largeDocument, DEBOUNCE_MS } from './limits.js';
@@ -10,14 +10,52 @@ import { startJob } from './evaluator.js';
 const $ = id => document.getElementById(id);
 const bridge = (method, ...args) => window.mygo.call('JSON.' + method, ...args);
 const language = new Compartment();
+// Code content is the one place that may use color; the interface stays neutral.
 const highlight = HighlightStyle.define([
-  { tag: tags.propertyName, color: 'var(--ColorText)', fontWeight: 'var(--FontWeightSemibold)' },
-  { tag: tags.number, color: 'var(--ColorText)' },
-  { tag: [tags.string, tags.bool, tags.null, tags.punctuation], color: 'var(--ColorTextSecondary)' },
+  { tag: tags.propertyName, color: 'var(--ColorSyntaxKey)', fontWeight: 'var(--FontWeightSemibold)' },
+  { tag: tags.string, color: 'var(--ColorSyntaxString)' },
+  { tag: tags.number, color: 'var(--ColorSyntaxNumber)' },
+  { tag: tags.bool, color: 'var(--ColorSyntaxBool)' },
+  { tag: tags.null, color: 'var(--ColorSyntaxNull)' },
+  { tag: [tags.separator, tags.brace, tags.squareBracket, tags.punctuation], color: 'var(--ColorTextSecondary)' },
+  { tag: tags.invalid, color: 'var(--ColorDanger)' },
 ]);
-const syntax = () => [json(), foldGutter(), syntaxHighlighting(highlight)];
+
+// One guide per indentation level, aligned to the monospace advance width.
+function leadingColumns(text, tabSize) {
+  let columns = 0;
+  for (const char of text) {
+    if (char === ' ') columns++;
+    else if (char === '\t') columns += tabSize - (columns % tabSize);
+    else break;
+  }
+  return columns;
+}
+const guides = ViewPlugin.fromClass(class {
+  constructor(view) { this.decorations = indentGuides(view); }
+  update(update) {
+    if (update.docChanged || update.viewportChanged) this.decorations = indentGuides(update.view);
+  }
+}, { decorations: plugin => plugin.decorations });
+function indentGuides(view) {
+  const unit = view.state.facet(indentUnit);
+  const step = unit.startsWith('\t') ? view.state.tabSize : Math.max(1, unit.length);
+  const marks = [];
+  for (const { from, to } of view.visibleRanges) {
+    let position = from;
+    while (position <= to) {
+      const line = view.state.doc.lineAt(position);
+      const levels = Math.floor(leadingColumns(line.text, view.state.tabSize) / step);
+      if (levels > 0) marks.push(Decoration.line({ attributes: { class: 'cm-guide', style: '--indent:' + levels } }).range(line.from));
+      position = line.to + 1;
+    }
+  }
+  return Decoration.set(marks, true);
+}
+const syntax = () => [json(), foldGutter(), guides, syntaxHighlighting(highlight)];
 let config, editor, resultEditor, revision = 0, savedRevision = 0, pinned = false;
 let large = false, generation = 0, job, debounce, spinner, result, status = '', detail = '';
+let split = 60, savedSplit = 60, splitTimer, dragging = false;
 let changeQueue = Promise.resolve();
 const buttons = {};
 const text = key => config.messages[key] ?? key;
@@ -62,7 +100,36 @@ function button(parent, id, glyph, label, action) {
   return element;
 }
 
+// The editor and the this field share one width; the result pane takes the rest.
+function paneMetrics() {
+  const workspace = $('workspace');
+  return { left: workspace.getBoundingClientRect().left, usable: Math.max(1, workspace.clientWidth - $('splitter').offsetWidth) };
+}
+function applySplit(percent) {
+  const { usable } = paneMetrics();
+  const minimum = Math.min(config.light.SizeJSONPaneMinWidth / usable * 100, 45);
+  split = Math.max(minimum, Math.min(100 - minimum, percent));
+  document.body.style.setProperty('--editor-width', Math.max(1, Math.round(usable * split / 100)) + 'px');
+  const separator = $('splitter');
+  separator.setAttribute('aria-valuemin', String(Math.round(minimum)));
+  separator.setAttribute('aria-valuemax', String(Math.round(100 - minimum)));
+  separator.setAttribute('aria-valuenow', String(Math.round(split)));
+}
+function persistSplit(now = false) {
+  clearTimeout(splitTimer);
+  const commit = () => {
+    const value = Math.round(split);
+    if (value === savedSplit) return;
+    savedSplit = value;
+    bridge('Split', value).catch(() => {});
+  };
+  if (now) commit();
+  else splitTimer = setTimeout(commit, 400);
+}
+
 function applyConfig(next) {
+  // Appearance updates describe tokens; the window name belongs to the document.
+  if (next.name === undefined && config?.name !== undefined) next.name = config.name;
   config = next;
   document.documentElement.lang = config.locale;
   const values = matchMedia('(prefers-color-scheme: dark)').matches ? config.dark : config.light;
@@ -70,8 +137,10 @@ function applyConfig(next) {
     document.documentElement.style.setProperty('--' + key,
       typeof value === 'number' && !key.startsWith('Opacity') && !key.startsWith('LineHeight') ? value + 'px' : String(value));
   }
+  $('title').textContent = config.name ?? '';
   $('suffix').setAttribute('aria-label', text('JSONExpression'));
   $('splitter').setAttribute('aria-label', text('JSONResultResize'));
+  $('result').setAttribute('aria-label', text('JSONResult'));
   const labels = { pin: pinned ? 'R07Unpin' : 'R07Pin', open: 'R07Open', copy: 'R07Copy', format: 'R07Format', fold: 'R07Fold', unfold: 'R07Unfold', minify: 'R07Minify' };
   for (const [id, key] of Object.entries(labels)) {
     if (buttons[id]) {
@@ -96,27 +165,24 @@ function setStatus(kind = '', message = '') { status = kind; detail = message; p
 function clearResult() {
   resultEditor?.destroy(); resultEditor = undefined;
   result = undefined;
-  $('result-content').replaceChildren();
-  $('result').hidden = true;
+  $('result').replaceChildren();
 }
 function renderResult(value) {
   clearResult();
   result = value;
+  // No expression, no text: the result pane stays blank unless there is a value.
   if (['empty', 'invalid', 'error', 'timeout', 'canceled'].includes(value.kind)) return;
-  const structured = value.kind === 'array' || value.kind === 'object';
-  $('result').hidden = false;
-  $('result').classList.toggle('structured', structured);
-  if (structured) {
+  if (value.kind === 'array' || value.kind === 'object') {
     // A bounded, read-only CodeMirror shares folding behavior with the editor.
-    resultEditor = new EditorView({ parent: $('result-content'), state: EditorState.create({
+    resultEditor = new EditorView({ parent: $('result'), state: EditorState.create({
       doc: value.text,
-      extensions: [syntax(), EditorState.readOnly.of(true), EditorView.editable.of(false), EditorView.theme({ '&': { background: 'transparent' }, '.cm-scroller': { overflow: 'visible' }, '.cm-content': { padding: '0 !important' } })],
+      extensions: [syntax(), EditorState.readOnly.of(true), EditorView.editable.of(false), EditorView.theme({ '&': { background: 'transparent' } })],
     }) });
   } else {
     const pre = document.createElement('pre');
     pre.textContent = value.text;
     if (value.kind === 'undefined') pre.className = 'muted';
-    $('result-content').append(pre);
+    $('result').append(pre);
   }
 }
 
@@ -262,8 +328,10 @@ async function boot() {
   button('tools', 'fold', 'fold-vertical', 'R07Fold', () => foldAll(editor));
   button('tools', 'unfold', 'unfold-vertical', 'R07Unfold', () => unfoldAll(editor));
   button('tools', 'minify', 'clipboard-copy', 'R07Minify', () => copy(true));
-  const gauge = document.createElement('span'); gauge.id = 'gauge'; gauge.tabIndex = 0; gauge.innerHTML = icon('gauge'); $('tools').append(gauge);
+  const gauge = document.createElement('span'); gauge.id = 'gauge'; gauge.tabIndex = 0; gauge.innerHTML = icon('gauge'); $('tools').prepend(gauge);
   applyConfig(config);
+  split = savedSplit = Number.isFinite(config.split) ? config.split : 60;
+  applySplit(split);
   document.addEventListener('pointerover', event => showTooltip(event.target.closest('[data-tooltip]')));
   document.addEventListener('pointerout', hideTooltip);
   document.addEventListener('focusin', event => { if (event.target.matches(':focus-visible')) showTooltip(event.target.closest('[data-tooltip]')); });
@@ -287,39 +355,42 @@ async function boot() {
     else if (!event.altKey && !event.ctrlKey && key === 'w') action = () => bridge('Close');
     if (action) { event.preventDefault(); event.stopPropagation(); void action(); }
   }, true);
-  let resizeStart;
   $('splitter').addEventListener('pointerdown', event => {
-    if (!$('result').classList.contains('structured')) return;
-    resizeStart = { y: event.clientY, height: $('result').offsetHeight };
+    event.preventDefault();
+    dragging = true;
     $('splitter').setPointerCapture(event.pointerId);
   });
   $('splitter').addEventListener('pointermove', event => {
-    if (!resizeStart) return;
-    const minimum = config.light.SizeJSONResultHeight;
-    $('result').style.setProperty('--result-height', Math.max(minimum, Math.min(innerHeight * .45, resizeStart.height + resizeStart.y - event.clientY)) + 'px');
+    if (!dragging) return;
+    applySplit((event.clientX - paneMetrics().left) / paneMetrics().usable * 100);
   });
-  $('splitter').addEventListener('pointerup', () => { resizeStart = undefined; });
-  $('splitter').addEventListener('pointercancel', () => { resizeStart = undefined; });
+  const stopDrag = () => { if (!dragging) return; dragging = false; persistSplit(true); };
+  $('splitter').addEventListener('pointerup', stopDrag);
+  $('splitter').addEventListener('pointercancel', stopDrag);
   $('splitter').addEventListener('keydown', event => {
-    if (!['ArrowUp', 'ArrowDown'].includes(event.key) || !$('result').classList.contains('structured')) return;
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault();
-    $('result').style.setProperty('--result-height', Math.max(config.light.SizeJSONResultHeight, Math.min(innerHeight * .45, $('result').offsetHeight + (event.key === 'ArrowUp' ? config.light.Space16 : -config.light.Space16))) + 'px');
+    applySplit(split + (event.key === 'ArrowLeft' ? -2 : 2));
+    persistSplit();
   });
+  window.addEventListener('resize', () => applySplit(split));
   window.mygo.on('mygo:locale', async () => applyConfig(await bridge('Appearance')));
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyConfig(config));
   window.addEventListener('pagehide', () => { cancelJob(); editor.destroy(); resultEditor?.destroy(); });
   window.cubbix = {
-    lock: value => { document.body.inert = value; if (value) cancelJob(); else if (status !== 'save') schedule(); },
     snapshot: () => ({ text: editor.state.doc.toString(), revision, dirty: revision !== savedRevision }),
     load: (value, nextRevision, clean) => {
       setDocument(value, nextRevision, clean);
       if (!large && value.trim()) void format();
     },
     save, open, pin, error: kind => setStatus(kind),
+    // The window manager and this title stay the same name (system title in Go).
+    title: name => { if (config) config.name = name; $('title').textContent = name; },
     dispose: () => { cancelJob(); editor.destroy(); },
     // State inspection and direct transactions are used by hidden WebKit checks.
     editor: () => editor,
-    state: () => ({ revision, large, status, result, pinned, generation, pending: !!job || debounce !== undefined }),
+    split: () => ({ percent: split, saved: savedSplit }),
+    state: () => ({ revision, large, status, result, pinned, generation, split, pending: !!job || debounce !== undefined }),
     evaluate: async suffix => { $('suffix').value = suffix; cancelJob(); return run(); },
   };
   if (!large && config.text.trim()) void format();

@@ -76,6 +76,12 @@ type tokenValues struct {
 	SizeLanguageSelectorWidth float32
 	ColorNavHover             string
 	ColorMenuSurface          string
+	ColorSyntaxKey            string
+	ColorSyntaxString         string
+	ColorSyntaxNumber         string
+	ColorSyntaxBool           string
+	ColorSyntaxNull           string
+	ColorSyntaxIndent         string
 	SizeR05MenuWidth          float32
 	SizeR05BoardWidth         float32
 	SizeR05SettingsHeight     float32
@@ -91,9 +97,12 @@ type tokenValues struct {
 	SizeJSONStateWidth        float32
 	SizeJSONStateHeight       float32
 	SizeJSONToolbarHeight     float32
+	SizeJSONTitleInset        float32
 	SizeJSONExpressionHeight  float32
 	SizeJSONResultHeight      float32
 	SizeJSONLineHeight        float32
+	SizeJSONSplitter          float32
+	SizeJSONPaneMinWidth      float32
 	SizeJSONBoardWidth        float32
 	SizeJSONSettingsHeight    float32
 }
@@ -171,6 +180,12 @@ func tokens(dark bool, language string) tokenValues {
 		SizeLanguageSelectorWidth: 318,
 		ColorNavHover:             "#F3F3F3",
 		ColorMenuSurface:          "#FFFFFFEB",
+		ColorSyntaxKey:            "#A31515",
+		ColorSyntaxString:         "#0953B7",
+		ColorSyntaxNumber:         "#097335",
+		ColorSyntaxBool:           "#003388",
+		ColorSyntaxNull:           "#003388",
+		ColorSyntaxIndent:         "#EBEBEB",
 		SizeR05MenuWidth:          352,
 		SizeR05BoardWidth:         1520,
 		SizeR05SettingsHeight:     232,
@@ -186,9 +201,12 @@ func tokens(dark bool, language string) tokenValues {
 		SizeJSONStateWidth:        756,
 		SizeJSONStateHeight:       182,
 		SizeJSONToolbarHeight:     44,
+		SizeJSONTitleInset:        76,
 		SizeJSONExpressionHeight:  44,
 		SizeJSONResultHeight:      56,
 		SizeJSONLineHeight:        24,
+		SizeJSONSplitter:          7,
+		SizeJSONPaneMinWidth:      240,
 		SizeJSONBoardWidth:        1600,
 		SizeJSONSettingsHeight:    340,
 	}
@@ -213,6 +231,12 @@ func tokens(dark bool, language string) tokenValues {
 		t.ColorOverlay = "#00000066"
 		t.ColorNavHover = "#333333"
 		t.ColorMenuSurface = "#2C2C2CEB"
+		t.ColorSyntaxKey = "#FF7B72"
+		t.ColorSyntaxString = "#79C0FF"
+		t.ColorSyntaxNumber = "#7EE787"
+		t.ColorSyntaxBool = "#6CB6FF"
+		t.ColorSyntaxNull = "#6CB6FF"
+		t.ColorSyntaxIndent = "#3C3C3C"
 	}
 	if language == "en" {
 		t.FontFamily = "Inter"
