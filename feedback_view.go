@@ -67,17 +67,17 @@ func (a *application) feedbackView(c *ui.Context) {
 			iconColor = t.ColorTextSecondary
 		}
 		ui.Row(c).Key("feedback-toast").Height(t.SizeToastHeight).MaxWidth(t.SizeToastSlotWidth).PaddingX(t.Space12).Gap(t.Space8).Radius(t.RadiusWindow).AlignItems(ui.Center).Background(ui.Hex(t.ColorMenuSurface)).Transition(ui.ElementTransition{
-			Duration: feedbackExitDuration,
+			Duration: feedbackEnterDuration,
 			Ease:     ui.EaseOut,
 			Enter:    &ui.Motion{Y: entryY, Scale: 0.96},
 			Exit:     &ui.Motion{},
 		}).Children(func() {
 			if message.Icon != "" {
-				ui.Icon(c, icon(message.Icon)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(iconColor))
+				ui.Icon(c, icon(message.Icon)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(iconColor)).ContentTransition(ui.ContentTransition{})
 			}
 			// One line: a longer process name is cut, never wrapped, so the
 			// slot height and the position stay fixed.
-			ui.Text(c, message.Text).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).SingleLine().Ellipsis("…").MaxWidth(t.SizeToastSlotWidth - 2*t.Space12 - t.Space8 - t.SizeIcon)
+			ui.Text(c, message.Text).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).SingleLine().Ellipsis("…").ContentTransition(ui.ContentTransition{}).MaxWidth(t.SizeToastSlotWidth - 2*t.Space12 - t.Space8 - t.SizeIcon)
 		})
 	})
 }

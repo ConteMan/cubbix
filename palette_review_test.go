@@ -115,6 +115,9 @@ func TestURLAwakeErrorsAndToggle(t *testing.T) {
 	if err := a.runURL(paletteURLRequest{Kind: "awake"}); err == nil {
 		t.Fatal("URL swallowed start failure")
 	}
+	if err := a.runURL(paletteURLRequest{Kind: "awake.toggle"}); err == nil {
+		t.Fatal("URL swallowed toggle failure")
+	}
 	if a.settingsError != "" {
 		t.Fatal("URL failure leaked into Settings")
 	}

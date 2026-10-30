@@ -299,12 +299,51 @@ func TestFeedbackMergesOneCapsule(t *testing.T) {
 	}
 }
 
+// Record the native-facing calls too: state flags alone cannot prove that a
+// window was shown without focus, or hidden only after its exit finished.
+type fakeFeedbackWindow struct {
+	shows, hides, invalidations int
+	closed                      bool
+}
+
+func (w *fakeFeedbackWindow) ShowInactive()        { w.shows++ }
+func (w *fakeFeedbackWindow) Hide()                { w.hides++ }
+func (w *fakeFeedbackWindow) Close()               { w.closed = true }
+func (w *fakeFeedbackWindow) SetPosition(int, int) {}
+func (w *fakeFeedbackWindow) Invalidate()          { w.invalidations++ }
+
 func TestFeedbackTimingMatchesSpec(t *testing.T) {
-	if feedbackFirstFrame != 16*time.Millisecond || feedbackDwell != 1200*time.Millisecond || feedbackExitDuration != 150*time.Millisecond {
-		t.Fatal("timing drifted from the spec")
+	h := newFeedbackHarness()
+	w := &fakeFeedbackWindow{}
+	creates := 0
+	h.presenter.create = func(p *feedbackPresenter) { creates++; p.window = w }
+	h.presenter.present(feedbackMessage{Text: "first"})
+	// Five triggers within the first frame must leave the empty root alive.
+	for i := range 5 {
+		h.presenter.present(feedbackMessage{Text: fmt.Sprint(i)})
 	}
-	if total := feedbackFirstFrame + feedbackExitDuration + feedbackDwell + feedbackExitDelay; total > 1600*time.Millisecond {
-		t.Fatalf("total hint takes %v; want about 1.5 s", total)
+	if h.presenter.showing || creates != 1 || w.shows != 1 || h.clock.pending() != 1 {
+		t.Fatal("burst skipped the empty root frame or created another window")
+	}
+	h.clock.fire()
+	if h.clock.now != 16*time.Millisecond || !h.presenter.showing || h.presenter.message.Text != "4" {
+		t.Fatal("entrance did not start at the first frame with the latest message")
+	}
+	h.clock.fire()
+	if h.clock.now != 1366*time.Millisecond || h.presenter.showing || w.hides != 0 {
+		t.Fatalf("exit must follow 150 ms entrance + 1200 ms dwell: now=%v hides=%d", h.clock.now, w.hides)
+	}
+	h.clock.fire()
+	if h.clock.now != 1532*time.Millisecond || w.hides != 1 || h.presenter.visible {
+		t.Fatalf("window must hide after the exit and one frame: now=%v hides=%d", h.clock.now, w.hides)
+	}
+	h.presenter.present(feedbackMessage{Text: "next"})
+	if creates != 1 || w.shows != 2 || h.presenter.showing {
+		t.Fatal("a later hint must reuse its window and prime a new root frame")
+	}
+	h.presenter.close()
+	if !w.closed || h.clock.pending() != 0 {
+		t.Fatal("close leaked a window or timer")
 	}
 }
 
@@ -441,5 +480,53 @@ func TestFeedbackDisplayChanges(t *testing.T) {
 	h.presenter.present(feedbackMessage{Icon: "sun", Text: "on"})
 	if h.presenter.visible || h.clock.pending() != 0 {
 		t.Fatal("hint started without a display")
+	}
+}
+
+func TestFeedbackSettingsApplyToVisibleHint(t *testing.T) {
+	a := awakeTestApp(t)
+	h := testFeedback(a)
+	w := &fakeFeedbackWindow{}
+	h.presenter.window = w
+	a.feedbackMode = feedbackIndex(feedbackModes, "hint")
+	h.presenter.present(feedbackMessage{Text: "on"})
+	h.clock.fire()
+	pendingDwell := h.clock.timers[len(h.clock.timers)-1].run
+	a.feedbackCorner = feedbackIndex(feedbackCorners, "bottom-left")
+	a.changeFeedbackCorner()
+	if h.presenter.position != (mygo.Point{X: 24, Y: 840}) || h.clock.pending() != 1 {
+		t.Fatal("position change did not move the current hint without resetting its dwell")
+	}
+	a.feedbackMode = feedbackIndex(feedbackModes, "off")
+	a.changeFeedbackMode()
+	pendingDwell()
+	if h.presenter.visible || h.presenter.showing || w.hides != 1 || h.clock.pending() != 0 {
+		t.Fatal("off failed to cancel an existing hint or left a live timer")
+	}
+}
+
+func TestFeedbackDisplaySubscriptionIsReleased(t *testing.T) {
+	h := newFeedbackHarness()
+	subscribed, released := 0, 0
+	var changed func()
+	h.presenter.onDisplaysChanged = func(fn func()) func() {
+		subscribed++
+		changed = fn
+		return func() { released++ }
+	}
+	h.presenter.watch()
+	h.presenter.watch()
+	h.presenter.present(feedbackMessage{Text: "on"})
+	initial := h.clock.timers[0].run
+	h.displays = nil
+	changed()
+	initial()
+	if subscribed != 1 || h.presenter.visible || h.presenter.showing || h.clock.pending() != 0 {
+		t.Fatal("unplug during priming failed to cancel the pending entrance")
+	}
+	h.presenter.close()
+	h.presenter.close()
+	if released != 1 {
+		t.Fatal("display subscription was not released exactly once")
 	}
 }

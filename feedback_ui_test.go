@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -23,6 +24,90 @@ func TestFeedbackSettingsRows(t *testing.T) {
 				t.Fatalf("%s: missing %s: %v", locale, key, tt.Texts())
 			}
 		}
+	}
+}
+
+// Exercise the actual segmented control, including disabled event propagation.
+func TestFeedbackPositionControlInteraction(t *testing.T) {
+	a := awakeTestApp(t)
+	h := testFeedback(a)
+	a.page = 3
+	a.feedbackMode = feedbackIndex(feedbackModes, "notification")
+	tt := ui.NewTester(a.view, 720, 340)
+	tt.SetLocale("en")
+	click := func(label string) {
+		t.Helper()
+		if err := tt.Click(label); err != nil {
+			t.Fatal(err)
+		}
+	}
+	click("Bottom left")
+	if a.feedbackCornerName() != "top-right" {
+		t.Fatal("disabled position accepted a pointer event")
+	}
+	h.presenter.denied = true
+	tt.Frame()
+	click("Bottom left")
+	if a.feedbackCornerName() != "bottom-left" {
+		t.Fatal("degraded notification did not unlock position")
+	}
+	loaded, err := loadConfig(a.path)
+	if err != nil || loaded.FeedbackCorner != "bottom-left" {
+		t.Fatalf("position not saved: %+v %v", loaded, err)
+	}
+	click("Off")
+	click("Top left")
+	if a.feedbackCornerName() != "bottom-left" || a.feedbackModeName() != "off" {
+		t.Fatal("off did not lock position")
+	}
+	click("On-screen hint")
+	click("Center")
+	if a.feedbackCornerName() != "center" {
+		t.Fatal("hint mode did not unlock position")
+	}
+}
+
+func TestFeedbackViewAnimationAndTheme(t *testing.T) {
+	a := awakeTestApp(t)
+	h := testFeedback(a)
+	tt := ui.NewTester(a.feedbackView, 320, 36)
+	tt.SetLocale("en")
+	pixels := func() []byte { return bytes.Clone(tt.Image().Pix) }
+	empty := pixels()
+	h.presenter.message = a.awakeFeedbackMessage("en", awakeSession{Minutes: 60})
+	h.presenter.showing = true
+	tt.Frame()
+	tt.Advance(75 * time.Millisecond)
+	entering := pixels()
+	tt.Advance(100 * time.Millisecond)
+	resting := pixels()
+	if bytes.Equal(empty, entering) || bytes.Equal(entering, resting) {
+		t.Fatal("capsule did not animate after the empty root frame")
+	}
+	h.presenter.message = feedbackMessage{Icon: "power", Text: "Keep awake off", Muted: true}
+	tt.Frame()
+	tt.Advance(50 * time.Millisecond)
+	changing := pixels()
+	tt.Advance(500 * time.Millisecond)
+	if bytes.Equal(changing, pixels()) {
+		t.Fatal("content replacement did not animate")
+	}
+	light := pixels()
+	tt.SetDark(true)
+	tt.Advance(500 * time.Millisecond)
+	dark := pixels()
+	if bytes.Equal(light, dark) || !tt.HasText("Keep awake off") {
+		t.Fatal("visible hint did not follow theme changes")
+	}
+	h.presenter.showing = false
+	tt.Frame()
+	tt.Advance(75 * time.Millisecond)
+	if bytes.Equal(empty, pixels()) {
+		t.Fatal("capsule disappeared before its exit finished")
+	}
+	tt.Advance(100 * time.Millisecond)
+	if !bytes.Equal(empty, pixels()) {
+		t.Fatal("exit left content in the transparent slot")
 	}
 }
 

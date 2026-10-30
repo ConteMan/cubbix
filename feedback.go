@@ -14,11 +14,12 @@ import (
 // entrance, the dwell, then the exit; the window hides only after the exit
 // has played, so the next hint starts from a hidden window again.
 const (
-	feedbackFirstFrame   = 16 * time.Millisecond
-	feedbackDwell        = 1200 * time.Millisecond
-	feedbackExitDuration = 150 * time.Millisecond
-	feedbackExitDelay    = feedbackExitDuration + feedbackFirstFrame
-	feedbackMargin       = 24 // Space24
+	feedbackFirstFrame    = 16 * time.Millisecond
+	feedbackEnterDuration = 150 * time.Millisecond
+	feedbackDwell         = 1200 * time.Millisecond
+	feedbackExitDuration  = 150 * time.Millisecond
+	feedbackExitDelay     = feedbackExitDuration + feedbackFirstFrame
+	feedbackMargin        = 24 // Space24
 )
 
 const (
@@ -55,13 +56,23 @@ type realFeedbackTimer struct{ timer *time.Timer }
 
 func (t realFeedbackTimer) stop() { t.timer.Stop() }
 
+// feedbackWindow exposes only operations that cannot request keyboard focus.
+type feedbackWindow interface {
+	ShowInactive()
+	Hide()
+	Close()
+	SetPosition(int, int)
+	Invalidate()
+}
+
 // feedbackPresenter owns the single hint window. Everything runs on the main
 // thread; the window is created on the first hint and kept for the next one.
 type feedbackPresenter struct {
-	window      *mygo.Window
+	window      feedbackWindow
 	message     feedbackMessage
 	showing     bool // the capsule is built; false during the first and last frame
 	visible     bool // the window is on screen
+	priming     bool // the empty root must survive until the entrance frame
 	displayID   int64
 	generation  uint64
 	denied      bool // notifications were refused; hints take over for this run
@@ -140,6 +151,10 @@ func (p *feedbackPresenter) present(message feedbackMessage) {
 // without replaying the entrance.
 func (p *feedbackPresenter) hint(message feedbackMessage) {
 	p.message = message
+	if p.visible && p.priming {
+		// Keep the pending empty-root frame even during a burst of shortcuts.
+		return
+	}
 	p.generation++
 	generation := p.generation
 	p.stopTimers()
@@ -148,7 +163,7 @@ func (p *feedbackPresenter) hint(message feedbackMessage) {
 		// the capsule again and restart the dwell.
 		p.showing = true
 		p.invalidate()
-		p.scheduleDwell(generation)
+		p.scheduleDwell(generation, feedbackDwell)
 		return
 	}
 	display := p.cursorDisplay()
@@ -157,6 +172,7 @@ func (p *feedbackPresenter) hint(message feedbackMessage) {
 	}
 	p.displayID = display.ID
 	p.visible = true
+	p.priming = true
 	p.showing = false
 	p.ensureWindow()
 	p.place(display)
@@ -170,15 +186,16 @@ func (p *feedbackPresenter) hint(message feedbackMessage) {
 		if p.generation != generation {
 			return
 		}
+		p.priming = false
 		p.showing = true
 		p.place(p.currentDisplay())
 		p.invalidate()
-		p.scheduleDwell(generation)
+		p.scheduleDwell(generation, feedbackEnterDuration+feedbackDwell)
 	}))
 }
 
-func (p *feedbackPresenter) scheduleDwell(generation uint64) {
-	p.timers = append(p.timers, p.schedule(feedbackDwell, func() {
+func (p *feedbackPresenter) scheduleDwell(generation uint64, delay time.Duration) {
+	p.timers = append(p.timers, p.schedule(delay, func() {
 		if p.generation != generation {
 			return
 		}
@@ -261,14 +278,14 @@ func (p *feedbackPresenter) cancel() {
 	p.stopTimers()
 	p.generation++
 	p.showing = false
+	p.priming = false
 	p.visible = false
 	if p.window != nil {
 		p.window.Hide()
 	}
 }
 
-// watch subscribes to display changes once, on the first hint path. The
-// settings page and the tests never reach it.
+// watch subscribes to display changes once when application services start.
 func (p *feedbackPresenter) watch() {
 	if p.offDisplays != nil || p.onDisplaysChanged == nil {
 		return
@@ -416,10 +433,17 @@ func (a *application) feedbackPositionEditable() bool {
 
 func (a *application) changeFeedbackMode() {
 	a.config.FeedbackMode = a.feedbackModeName()
+	if a.feedback != nil && a.effectiveFeedbackMode() != "hint" {
+		a.feedback.cancel()
+	}
 	a.save()
 }
 
 func (a *application) changeFeedbackCorner() {
 	a.config.FeedbackCorner = a.feedbackCornerName()
+	if a.feedback != nil && a.feedback.visible {
+		a.feedback.place(a.feedback.currentDisplay())
+		a.feedback.invalidate()
+	}
 	a.save()
 }

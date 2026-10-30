@@ -799,7 +799,9 @@ func (a *application) runURL(req paletteURLRequest) error {
 		a.announceAwake(nil)
 	case "awake.toggle":
 		// Same toggle as the shortcut, and the same hint when it fails.
-		a.announceAwake(a.toggleAwakeResult())
+		err := a.toggleAwakeResult()
+		a.announceAwake(err)
+		return err
 	case "json.new":
 		a.openJSONText(req.Text)
 	case "palette":
