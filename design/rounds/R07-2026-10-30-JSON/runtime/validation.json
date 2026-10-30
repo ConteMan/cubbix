@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-30",
+  "selftest": "passed",
+  "frontendRebuild": "byte-for-byte match",
+  "workerTests": "passed",
+  "goVet": "passed",
+  "goTests": "passed",
+  "designLayout": {
+    "passed": true,
+    "nodeCount": 103,
+    "minimumGap": 85,
+    "requiredGap": 80
+  },
+  "build": "darwin/arm64, CGO disabled, ad hoc signed",
+  "version": "0.1.0 (unchanged)",
+  "screenshots": 45,
+  "capture": "hidden WKWebView page snapshots and ui.Tester renders",
+  "foregroundActivation": false,
+  "nativePanels": "replaced with deterministic callbacks",
+  "testWindowsAndProcesses": "closed",
+  "minimumJSONLayout": "672x220, structured result and toolbar visible",
+  "themePairs": "all 22 light/dark pairs differ",
+  "shortcutModifierOrder": "covered",
+  "relaunchQuitGuard": "covered"
+}

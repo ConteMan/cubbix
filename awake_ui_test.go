@@ -131,8 +131,8 @@ func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 		t.Fatal("escape did not reset recorder")
 	}
 	_ = tt.Click("Record keep awake shortcut")
-	tt.Key(ui.Ctrl|ui.Alt|ui.Cmd, ui.KeyJ)
-	if a.config.AwakeShortcut != "Ctrl+Alt+Cmd+J" || registered != a.config.AwakeShortcut || removed != old {
+	tt.Key(ui.Ctrl|ui.Alt|ui.Cmd, ui.KeyL)
+	if a.config.AwakeShortcut != "Ctrl+Alt+Cmd+L" || registered != a.config.JSONShortcut || removed != a.config.JSONShortcut {
 		t.Fatal("shortcut not replaced")
 	}
 	loaded, err := loadConfig(a.path)
@@ -141,8 +141,8 @@ func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 	}
 	a.registerShortcut = func(string, func()) error { return errors.New("already registered") }
 	_ = tt.Click("Record keep awake shortcut")
-	tt.Key(ui.Ctrl|ui.Alt|ui.Cmd, ui.KeyL)
-	if a.config.AwakeShortcut != "Ctrl+Alt+Cmd+J" || a.shortcutError != "ShortcutUnavailable" {
+	tt.Key(ui.Ctrl|ui.Alt|ui.Cmd, ui.KeyM)
+	if a.config.AwakeShortcut != "Ctrl+Alt+Cmd+L" || a.shortcutError != "ShortcutUnavailable" {
 		t.Fatal("failed registration replaced previous shortcut")
 	}
 	symbols := shortcutSymbols(old)
@@ -162,6 +162,9 @@ func TestRestartSavesRemainingSessionBeforeRelaunch(t *testing.T) {
 	a.updates.state = updateState{Phase: updateReady}
 	var called bool
 	a.relaunch = func() {
+		if !a.quitting {
+			t.Fatal("relaunch would re-enter the JSON guard and cancel restart")
+		}
 		called = true
 		config, err := loadConfig(a.path)
 		if err != nil || !config.RestoreAwake || config.AwakeSession == nil || !config.AwakeSession.End.Equal(end) || config.AwakeSession.PID != 123 {

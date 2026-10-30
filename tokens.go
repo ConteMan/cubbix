@@ -83,6 +83,19 @@ type tokenValues struct {
 	SizeR05FieldWidth         float32
 	SizeMenubar18             float32
 	SizeMenubar16             float32
+	FontFamilyCode            string
+	SizeJSONWindowWidth       float32
+	SizeJSONWindowHeight      float32
+	SizeJSONEmptyWidth        float32
+	SizeJSONEmptyHeight       float32
+	SizeJSONStateWidth        float32
+	SizeJSONStateHeight       float32
+	SizeJSONToolbarHeight     float32
+	SizeJSONExpressionHeight  float32
+	SizeJSONResultHeight      float32
+	SizeJSONLineHeight        float32
+	SizeJSONBoardWidth        float32
+	SizeJSONSettingsHeight    float32
 }
 
 func tokens(dark bool, language string) tokenValues {
@@ -165,6 +178,19 @@ func tokens(dark bool, language string) tokenValues {
 		SizeR05FieldWidth:         164,
 		SizeMenubar18:             18,
 		SizeMenubar16:             16,
+		FontFamilyCode:            "JetBrains Mono",
+		SizeJSONWindowWidth:       840,
+		SizeJSONWindowHeight:      520,
+		SizeJSONEmptyWidth:        672,
+		SizeJSONEmptyHeight:       220,
+		SizeJSONStateWidth:        756,
+		SizeJSONStateHeight:       182,
+		SizeJSONToolbarHeight:     44,
+		SizeJSONExpressionHeight:  44,
+		SizeJSONResultHeight:      56,
+		SizeJSONLineHeight:        24,
+		SizeJSONBoardWidth:        1600,
+		SizeJSONSettingsHeight:    340,
 	}
 	if dark {
 		t.ColorWindow = "#202020"

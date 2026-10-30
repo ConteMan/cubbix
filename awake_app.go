@@ -104,6 +104,10 @@ func (a *application) registerAwakeShortcut() {
 	if !a.config.AwakeEnabled {
 		return
 	}
+	if a.config.JSONEnabled && sameShortcut(a.config.JSONShortcut, a.config.AwakeShortcut) {
+		a.shortcutError = "JSONShortcutConflict"
+		return
+	}
 	if err := a.registerShortcut(a.config.AwakeShortcut, a.toggleAwake); err != nil {
 		a.shortcutError = "ShortcutUnavailable"
 	}

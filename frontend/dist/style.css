@@ -1,0 +1,51 @@
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; overflow: hidden; }
+body { display: flex; flex-direction: column; background: var(--ColorCard); color: var(--ColorText); font: var(--FontSizeBody) var(--FontFamily); }
+button, input { font: inherit; color: inherit; }
+button { display: inline-flex; align-items: center; justify-content: center; width: var(--SizeIconButton); height: var(--SizeIconButton); border: 0; border-radius: var(--RadiusControl); background: transparent; padding: var(--Space4); cursor: default; }
+button:hover { background: var(--ColorControlHover); }
+button[aria-pressed=true] { background: var(--ColorAccentSoft); }
+button:disabled { opacity: var(--OpacityDisabled); }
+button svg, #status svg, #gauge svg { width: var(--SizeIcon); height: var(--SizeIcon); stroke: var(--ColorTextSecondary); }
+button:focus, input:focus, [tabindex]:focus { outline: none; }
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: var(--StrokeHairline) solid var(--ColorTextSecondary); outline-offset: var(--Space2); }
+#toolbar { height: var(--SizeJSONToolbarHeight); min-height: var(--SizeJSONToolbarHeight); display: flex; align-items: center; padding: var(--Space8) var(--Space12); border-bottom: var(--StrokeHairline) solid var(--ColorSeparator); --app-region: drag; }
+#drag { flex: 1; height: 100%; }
+#top-actions { display: flex; align-items: center; gap: var(--Space8); --app-region: no-drag; }
+#editor { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.cm-editor { height: 100%; outline: none !important; }
+.cm-scroller { font: var(--FontSizeBody)/var(--SizeJSONLineHeight) var(--FontFamilyCode), monospace !important; overflow: auto; }
+.cm-content { padding: var(--Space8) 0 !important; caret-color: var(--ColorText); }
+.cm-line { padding: 0 var(--Space12) !important; }
+.cm-gutters { background: transparent !important; border: 0 !important; color: var(--ColorTextSecondary) !important; }
+.cm-lineNumbers .cm-gutterElement { min-width: var(--Space32); padding-left: var(--Space12); }
+.cm-foldGutter .cm-gutterElement { padding: 0 var(--Space4); }
+.cm-foldPlaceholder { color: var(--ColorTextSecondary); background: var(--ColorControl); border: 0; }
+.cm-focused .cm-cursor { border-color: var(--ColorText); }
+.cm-selectionBackground, .cm-focused .cm-selectionBackground { background: var(--ColorAccentSoft) !important; }
+#empty { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+#empty svg { width: var(--SizeIconLarge); height: var(--SizeIconLarge); stroke: var(--ColorTextDisabled); }
+body.empty .cm-gutters { visibility: hidden; }
+#result { min-height: var(--SizeJSONResultHeight); max-height: min(45vh, calc(100vh - var(--SizeJSONToolbarHeight) * 2 - var(--SizeJSONExpressionHeight) - var(--Space32))); height: var(--SizeJSONResultHeight); flex-shrink: 0; background: var(--ColorControl); position: relative; overflow: hidden; }
+#result.structured { height: var(--result-height, calc(var(--SizeJSONResultHeight) * 3)); }
+#splitter { height: var(--Space4); border-top: var(--StrokeHairline) solid var(--ColorSeparator); cursor: row-resize; touch-action: none; }
+#result:not(.structured) #splitter { cursor: default; }
+#result-content { height: calc(100% - var(--Space4)); padding: var(--Space12) var(--Space16); overflow: auto; font: var(--FontSizeBody)/var(--SizeJSONLineHeight) var(--FontFamilyCode), monospace; }
+#result-content pre { margin: 0; white-space: pre; }
+#result-content details summary { cursor: default; }
+#result-content .muted { color: var(--ColorTextSecondary); }
+footer { flex-shrink: 0; }
+#expression { height: var(--SizeJSONExpressionHeight); padding: var(--Space6) var(--Space12); display: flex; align-items: center; gap: var(--Space12); }
+#expression label { font-family: var(--FontFamilyCode), monospace; font-weight: var(--FontWeightSemibold); }
+#suffix { width: 0; flex: 1; min-width: 0; height: var(--SizeNavHeight); background: var(--ColorControl); border: 0; border-radius: var(--RadiusControl); padding: 0 var(--Space12); font-family: var(--FontFamilyCode), monospace; }
+#status:empty { display: none; }
+#status { display: flex; }
+#status.error svg { stroke: var(--ColorDanger); }
+#tools { display: flex; align-items: center; gap: var(--Space4); height: var(--SizeJSONToolbarHeight); padding: 0 var(--Space12) var(--Space8); }
+#gauge { margin-left: auto; display: flex; align-items: center; }
+.loader { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media(prefers-reduced-motion: reduce) { .loader { animation: none; } }
+
+#tooltip { position: fixed; z-index: 10; max-width: calc(100vw - var(--Space24)); padding: var(--Space6) var(--Space8); border-radius: var(--RadiusControl); background: var(--ColorTooltip); color: var(--ColorTooltipText); font: var(--FontSizeSmall)/var(--LineHeightBody) var(--FontFamily); pointer-events: none; }

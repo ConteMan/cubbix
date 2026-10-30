@@ -302,14 +302,14 @@ func TestApplicationMenuLocalesAndRoles(t *testing.T) {
 	defer a.updates.close()
 	for _, locale := range []string{"zh-CN", "en"} {
 		items := a.applicationMenu(locale).Items()
-		if len(items) != 2 || items[0].Submenu[0].Label != a.text(locale, "MenuAbout") || items[1].Label != a.text(locale, "MenuEdit") {
+		if len(items) != 3 || items[0].Submenu[0].Label != a.text(locale, "MenuAbout") || items[2].Label != a.text(locale, "MenuEdit") {
 			t.Fatal("untranslated application menu")
 		}
 		appItems := items[0].Submenu
 		if appItems[1].Accelerator != "Cmd+," || appItems[3].Role != mygo.RoleQuit || appItems[3].Accelerator != "Cmd+Q" {
 			t.Fatal("missing application shortcuts")
 		}
-		edit := items[1].Submenu
+		edit := items[2].Submenu
 		if edit[3].Role != mygo.RoleCut || edit[4].Role != mygo.RoleCopy || edit[5].Role != mygo.RolePaste || edit[6].Role != mygo.RoleSelectAll {
 			t.Fatal("missing standard edit roles")
 		}

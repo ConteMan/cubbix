@@ -1,0 +1,36 @@
+{
+  "bytes": 10494008,
+  "editMedianMS": 14,
+  "editP95MS": 17,
+  "large": false,
+  "lines": 99003,
+  "openMS": 25,
+  "selectedFileBytes": 10491391,
+  "selectedFileReadyMS": 196.249,
+  "singleLines": [
+    {
+      "editMS": 2,
+      "large": false,
+      "lineLength": 64014,
+      "openMS": 3
+    },
+    {
+      "editMS": 1,
+      "large": true,
+      "lineLength": 100014,
+      "openMS": 0
+    },
+    {
+      "editMS": 0,
+      "large": true,
+      "lineLength": 120014,
+      "openMS": 0
+    },
+    {
+      "editMS": 0,
+      "large": true,
+      "lineLength": 1000014,
+      "openMS": 1
+    }
+  ]
+}

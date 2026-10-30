@@ -12,6 +12,10 @@ import (
 const configVersion = 1
 
 type Config struct {
+	JSONEnabled      bool          `toml:"json_enabled"`
+	JSONShortcut     string        `toml:"json_shortcut"`
+	JSONWidth        int           `toml:"json_width,omitempty"`
+	JSONHeight       int           `toml:"json_height,omitempty"`
 	Version          int           `toml:"version"`
 	Language         string        `toml:"language"`
 	OpenAtLogin      bool          `toml:"open_at_login"`
@@ -28,7 +32,7 @@ type Config struct {
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, AwakeMode: "screen", AwakeMinutes: 60, AwakeShortcut: "Ctrl+Alt+Cmd+K"}
+	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeShortcut: "Ctrl+Alt+Cmd+K"}
 }
 
 func loadConfig(path string) (Config, error) {

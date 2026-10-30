@@ -13,6 +13,13 @@ func (a *application) changeAutomaticUpdates() {
 }
 
 func (a *application) restartUpdate() {
+	if a.updates.snapshot().Phase != updateReady || a.relaunch == nil {
+		return
+	}
+	a.transitionJSON(true, a.restartUpdateAfterJSON)
+}
+
+func (a *application) restartUpdateAfterJSON() {
 	if a.updates.snapshot().Phase == updateReady && a.relaunch != nil {
 		s := a.awake.snapshot()
 		a.config.RestoreAwake = s.Active
@@ -26,6 +33,9 @@ func (a *application) restartUpdate() {
 			a.invalidateWindow()
 			return
 		}
+		// Relaunch runs the normal quit sequence. These documents already passed
+		// the async guard; re-entering it would cancel MyGo's pending relaunch.
+		a.quitting = true
 		a.relaunch()
 	}
 }

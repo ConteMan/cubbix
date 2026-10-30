@@ -14,6 +14,7 @@ if [ -n "$unformatted" ]; then
   printf 'gofmt required:\n%s\n' "$unformatted" >&2
   exit 1
 fi
+./scripts/build-frontend.sh --check
 python3 scripts/tokens.py --check
 python3 design/scripts/layout.py
 tiffutil -cathidpicheck brand/dist/menubar-template.png brand/dist/menubar-template@2x.png -out "$tmp_dir/menubar-template.tiff"

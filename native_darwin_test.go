@@ -18,6 +18,9 @@ import (
 // The helper keeps its AppKit window hidden throughout. It never calls the
 // application's show/ready paths, Focus, activation APIs or screen capture.
 func TestMain(m *testing.M) {
+	if os.Getenv("CUBBIX_JSON_NATIVE_HELPER") == "1" {
+		os.Exit(jsonNativeMain())
+	}
 	if os.Getenv("CUBBIX_NATIVE_HELPER") != "1" {
 		os.Exit(m.Run())
 	}
@@ -101,10 +104,10 @@ func nativeWindowChecks(a *application, dir string) error {
 			return err
 		}
 		menu := nsapp.Send(objc.RegisterName("mainMenu"))
-		if objc.Send[int](menu, objc.RegisterName("numberOfItems")) != 2 {
+		if objc.Send[int](menu, objc.RegisterName("numberOfItems")) != 3 {
 			return fmt.Errorf("application menu not installed")
 		}
-		editMenu := menu.Send(objc.RegisterName("itemAtIndex:"), 1).Send(objc.RegisterName("submenu"))
+		editMenu := menu.Send(objc.RegisterName("itemAtIndex:"), 2).Send(objc.RegisterName("submenu"))
 		for _, item := range []struct {
 			index  int
 			action string
