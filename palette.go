@@ -1,11 +1,13 @@
 package main
 
 import (
+	"log"
 	"net/url"
 	"slices"
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -51,6 +53,7 @@ type paletteState struct {
 	lastQuery       string
 	mode            paletteMode
 	errorKey        string
+	runError        string
 	rows            []paletteRow
 	selected        int
 	selectionKey    string
@@ -58,6 +61,7 @@ type paletteState struct {
 	actionsCommand  *command
 	actionsRequest  request
 	actionSelection string
+	scrollSelection bool
 	list            ui.ListState
 }
 
@@ -94,6 +98,7 @@ func (a *application) showPalette() {
 	a.palette.lastQuery = ""
 	a.palette.mode = paletteCommandMode
 	a.palette.errorKey = ""
+	a.palette.runError = ""
 	a.palette.selectionKey = ""
 	a.palette.actionsCommand = nil
 	a.palette.actionSelection = ""
@@ -197,6 +202,7 @@ func (a *application) paletteEscape() {
 		p.mode = paletteCommandMode
 		p.actionsCommand = nil
 		p.actionSelection = ""
+		p.scrollSelection = true
 		a.invalidatePalette()
 		return
 	}
@@ -212,6 +218,7 @@ func (a *application) togglePaletteActions() {
 		p.mode = paletteCommandMode
 		p.actionsCommand = nil
 		p.actionSelection = ""
+		p.scrollSelection = true
 		a.invalidatePalette()
 		return
 	}
@@ -223,6 +230,7 @@ func (a *application) togglePaletteActions() {
 	p.actionsRequest = p.request
 	p.mode = paletteActionMode
 	p.actionSelection = ""
+	p.list.ScrollTo(0, ui.Start)
 	a.invalidatePalette()
 }
 
@@ -254,6 +262,7 @@ func (a *application) movePaletteSelection(delta int) {
 			continue
 		}
 		p.selected = index
+		p.runError = ""
 		if p.mode == paletteActionMode {
 			p.actionSelection = row.Key
 		} else {
@@ -272,6 +281,7 @@ func (a *application) runPalette() {
 	if p == nil {
 		return
 	}
+	p.runError = ""
 	if p.mode == paletteActionMode {
 		action := p.selectedAction()
 		if action == nil || action.Run == nil {
@@ -283,16 +293,22 @@ func (a *application) runPalette() {
 		// Favorites stay open: the user usually files several commands.
 		if action.ID == "palette.favorite" {
 			if err := action.Run(a); err != nil {
-				p.errorKey = paletteErrorKey(err)
+				p.runError = paletteErrorKey(err)
+				p.errorKey = p.runError
 			}
 			a.invalidatePalette()
 			return
 		}
-		a.hidePalette()
 		if err := action.Run(a); err != nil {
-			p.errorKey = paletteErrorKey(err)
-			a.presentPalette()
+			p.runError = paletteErrorKey(err)
+			p.errorKey = p.runError
+			a.invalidatePalette()
+			return
 		}
+		if p.actionsCommand != nil {
+			a.recordRecent(p.actionsCommand.ID)
+		}
+		a.hidePalette()
 		return
 	}
 	cmd := p.selectedCommand()
@@ -309,13 +325,14 @@ func (a *application) runPalette() {
 		a.invalidatePalette()
 		return
 	}
-	a.hidePalette()
 	if err := cmd.Run(a, req); err != nil {
-		p.errorKey = paletteErrorKey(err)
-		a.presentPalette()
+		p.runError = paletteErrorKey(err)
+		p.errorKey = p.runError
+		a.invalidatePalette()
 		return
 	}
 	a.recordRecent(cmd.ID)
+	a.hidePalette()
 }
 
 // paletteErrorKey maps a command error to the key shown in place. Parameter
@@ -379,12 +396,14 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		return
 	}
 	commands := a.commands()
+	previousSelection := p.selectionKey
 	query := normalizeQuery(p.query)
 	if query != p.lastQuery {
 		// A new query chooses its own default; arrows keep a choice until the
 		// text changes again.
 		p.lastQuery = query
 		p.selectionKey = ""
+		p.runError = ""
 	}
 	prefix, matchedPrefix := splitCommandQuery(a, locale, query, commands)
 	forced := matchedPrefix && prefix.Command.Param != paramNone && prefix.Arg != ""
@@ -505,7 +524,7 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 	}
 	p.selected = selected
 	p.request = request{}
-	p.errorKey = ""
+	p.errorKey = p.runError
 	if selected >= 0 && selected < len(rows) {
 		cmd := rows[selected].Command
 		if cmd != nil {
@@ -519,8 +538,14 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 				}
 			}
 			p.request = request{Command: cmd, Arg: rawArg, Awake: arg}
-			p.errorKey = arg.Error
+			if arg.Error != "" {
+				p.errorKey = arg.Error
+			}
 		}
+	}
+	if selected >= 0 && (p.scrollSelection || p.selectionKey != previousSelection) {
+		p.list.ScrollIntoView(selected)
+		p.scrollSelection = false
 	}
 }
 
@@ -535,6 +560,7 @@ func findCommand(commands []*command, id string) *command {
 
 // refreshPaletteActions lists the actions of the command chosen before ⌘K.
 func (a *application) refreshPaletteActions(p *paletteState, locale string) {
+	p.errorKey = p.runError
 	cmd := p.actionsCommand
 	if cmd == nil {
 		p.mode = paletteCommandMode
@@ -546,6 +572,9 @@ func (a *application) refreshPaletteActions(p *paletteState, locale string) {
 	}
 	if req.Command != cmd {
 		req = request{Command: cmd, Awake: awakeArg{Kind: awakeArgDefault}}
+	}
+	if p.errorKey == "" {
+		p.errorKey = req.Awake.Error
 	}
 	var actions []paletteAction
 	if cmd.Actions != nil {
@@ -618,16 +647,26 @@ type paletteURLRequest struct {
 // and stripped of leading and trailing slashes before the whitelist check;
 // query values are untrusted input.
 func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) (paletteURLRequest, bool) {
+	// A percent-encoded byte takes at most three bytes. Bound work before
+	// parsing, including ignored query fields, and reject invalid text.
+	if jsonLimit < 0 || len(raw) > 3*jsonLimit+4096 || !utf8.ValidString(raw) {
+		return paletteURLRequest{}, false
+	}
 	target, err := url.Parse(raw)
 	if err != nil {
 		return paletteURLRequest{}, false
 	}
-	if !strings.EqualFold(target.Scheme, "cubbix") {
+	if !strings.EqualFold(target.Scheme, "cubbix") || target.Opaque != "" || target.User != nil || target.Fragment != "" || strings.Contains(target.Host, ":") {
 		return paletteURLRequest{}, false
 	}
 	host := strings.ToLower(strings.Trim(target.Host, "/"))
 	path := strings.ToLower(strings.Trim(target.Path, "/"))
-	query := target.Query()
+	// URL.Query silently discards malformed pairs; never partially execute a
+	// request whose query could not be decoded in full. First values still win.
+	query, err := url.ParseQuery(target.RawQuery)
+	if err != nil {
+		return paletteURLRequest{}, false
+	}
 	switch host {
 	case "awake":
 		if path != "" && path != "stop" && path != "toggle" {
@@ -663,11 +702,14 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 			return paletteURLRequest{}, false
 		}
 		text := query.Get("text")
-		if len(text) > jsonLimit {
+		if len(text) > jsonLimit || !utf8.ValidString(text) {
+			return paletteURLRequest{}, false
+		}
+		if values, ok := query["blank"]; ok && values[0] != "1" {
 			return paletteURLRequest{}, false
 		}
 		request := paletteURLRequest{Kind: "json.new", Text: text, Blank: query.Get("blank") == "1"}
-		if text != "" {
+		if _, present := query["text"]; present {
 			// text wins over blank when both are present.
 			request.Blank = false
 		}
@@ -695,17 +737,31 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 	return paletteURLRequest{}, false
 }
 
-// handleURL receives cubbix:// links from the system. The callback reaches
-// the main thread first: the palette state is main-thread only.
+// handleURL decodes potentially large text on a worker, then dispatches only
+// the validated intent to the UI thread. Availability is checked at delivery,
+// since a tile may have been disabled while decoding.
 func (a *application) handleURL(raw string) {
-	request, ok := parsePaletteURL(raw, a.config.AwakeEnabled, a.config.JSONEnabled, jsonFileLimit)
-	if !ok {
+	if len(raw) > 3*jsonFileLimit+4096 {
 		return
 	}
-	a.runURL(request)
+	go func() {
+		request, ok := parsePaletteURL(raw, true, true, jsonFileLimit)
+		if !ok {
+			return
+		}
+		a.urlDispatch(func() {
+			if a.quitting || strings.HasPrefix(request.Kind, "awake") && !a.config.AwakeEnabled || request.Kind == "json.new" && !a.config.JSONEnabled {
+				return
+			}
+			if err := a.runURL(request); err != nil {
+				// Never log URL text or leak external input into Settings.
+				log.Print("Cubbix URL action failed")
+			}
+		})
+	}()
 }
 
-func (a *application) runURL(req paletteURLRequest) {
+func (a *application) runURL(req paletteURLRequest) error {
 	switch req.Kind {
 	case "awake":
 		session := a.selectedSession()
@@ -719,7 +775,7 @@ func (a *application) runURL(req paletteURLRequest) {
 			}
 		}
 		// The request never writes the remembered duration or deadline.
-		_ = a.startAwake(session)
+		return a.startAwake(session)
 	case "awake.stop":
 		a.awake.stop()
 	case "awake.toggle":
@@ -727,7 +783,7 @@ func (a *application) runURL(req paletteURLRequest) {
 		if a.awake.snapshot().Active {
 			a.awake.stop()
 		} else {
-			_ = a.startAwake(a.selectedSession())
+			return a.startAwake(a.selectedSession())
 		}
 	case "json.new":
 		a.openJSONText(req.Text)
@@ -738,4 +794,5 @@ func (a *application) runURL(req paletteURLRequest) {
 		a.invalidateWindow()
 		a.show()
 	}
+	return nil
 }

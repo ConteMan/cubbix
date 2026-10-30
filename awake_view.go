@@ -80,6 +80,7 @@ func (a *application) confirmAwakeDialog() {
 		return
 	}
 	var s awakeSession
+	var minutes int
 	switch d.kind {
 	case "custom":
 		duration, err := customDuration(d.hours, d.minutes)
@@ -87,16 +88,14 @@ func (a *application) confirmAwakeDialog() {
 			d.errorKey = "DurationError"
 			return
 		}
-		a.config.AwakeMinutes = int(duration / time.Minute)
-		a.config.AwakeUntil = ""
-		s = a.selectedSession()
+		minutes = int(duration / time.Minute)
+		s = awakeSession{Mode: a.config.AwakeMode, End: time.Now().Add(duration)}
 	case "until":
 		end, err := untilTime(d.until, time.Now())
 		if err != nil {
 			d.errorKey = "TimeError"
 			return
 		}
-		a.config.AwakeUntil = d.until
 		s = awakeSession{Mode: a.config.AwakeMode, End: end}
 	case "follow":
 		if d.loading || d.errorKey == "ProcessListError" {
@@ -116,9 +115,14 @@ func (a *application) confirmAwakeDialog() {
 			return
 		}
 	}
-	if err := a.awake.start(s); err != nil {
+	if err := a.startAwake(s); err != nil {
 		d.errorKey = "AwakeStartError"
 		return
+	}
+	if d.kind == "custom" {
+		a.config.AwakeMinutes, a.config.AwakeUntil = minutes, ""
+	} else if d.kind == "until" {
+		a.config.AwakeUntil = d.until
 	}
 	a.save()
 	a.closeAwakeDialog()
@@ -299,9 +303,40 @@ func shortcutKey(mods ui.Modifiers, key ui.Key) string {
 }
 func sameShortcut(first, second string) bool {
 	identity := func(acc string) string {
-		parts := strings.Split(acc, "+")
-		sort.Strings(parts[:len(parts)-1])
-		return strings.Join(parts, "+")
+		parts := strings.Split(strings.ToLower(strings.TrimSpace(acc)), "+")
+		if strings.HasSuffix(acc, "++") {
+			parts = append(parts[:len(parts)-2], "plus")
+		}
+		modifiers := map[string]bool{}
+		for _, part := range parts[:len(parts)-1] {
+			part = strings.TrimSpace(part)
+			switch part {
+			case "command", "super", "meta", "win", "commandorcontrol", "cmdorctrl":
+				part = "cmd"
+			case "control":
+				part = "ctrl"
+			case "option", "altgr":
+				part = "alt"
+			}
+			modifiers[part] = true
+		}
+		ordered := make([]string, 0, len(modifiers)+1)
+		for modifier := range modifiers {
+			ordered = append(ordered, modifier)
+		}
+		sort.Strings(ordered)
+		key := strings.TrimSpace(parts[len(parts)-1])
+		switch key {
+		case "return":
+			key = "enter"
+		case "esc":
+			key = "escape"
+		case "del":
+			key = "delete"
+		case "ins":
+			key = "insert"
+		}
+		return strings.Join(append(ordered, key), "+")
 	}
 	return identity(first) == identity(second)
 }

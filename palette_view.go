@@ -30,6 +30,7 @@ func (a *application) paletteView(c *ui.Context) {
 				p.actionsCommand = nil
 				p.actionSelection = ""
 				p.errorKey = ""
+				p.runError = ""
 			})
 			input.OnSubmit(a.runPalette)
 			input.OnShortcut(0, ui.KeyDown, func() { a.movePaletteSelection(1) })

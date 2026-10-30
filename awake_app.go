@@ -37,7 +37,7 @@ func (a *application) refreshAwake() {
 }
 func (a *application) startAwake(s awakeSession) error {
 	if !a.config.AwakeEnabled {
-		return nil
+		return fmt.Errorf("keep awake disabled")
 	}
 	return a.awake.start(s)
 }
@@ -53,6 +53,9 @@ func (a *application) reportAwakeError(err error) {
 }
 func (a *application) selectedSession() awakeSession {
 	s := awakeSession{Mode: a.config.AwakeMode}
+	if s.Mode == "" {
+		s.Mode = "screen"
+	}
 	if s.Mode == "" {
 		s.Mode = "screen"
 	}
@@ -83,24 +86,34 @@ func (a *application) setMode(mode string) error {
 	if mode != "screen" && mode != "tasks" {
 		return fmt.Errorf("invalid mode: %q", mode)
 	}
-	a.config.AwakeMode = mode
 	s := a.awake.snapshot()
-	var err error
 	if s.Active {
 		s.Session.Mode = mode
-		err = a.startAwake(s.Session)
+		if err := a.startAwake(s.Session); err != nil {
+			return err
+		}
 	}
+	a.config.AwakeMode = mode
 	a.save()
 	a.refreshAwake()
-	return err
+	return nil
 }
 func (a *application) setDuration(minutes int) error {
+	if minutes < 0 || minutes > awakeMinutesMaximum {
+		return fmt.Errorf("DurationError")
+	}
+	s := awakeSession{Mode: a.config.AwakeMode}
+	if minutes > 0 {
+		s.End = time.Now().Add(time.Duration(minutes) * time.Minute)
+	}
+	if err := a.startAwake(s); err != nil {
+		return err
+	}
 	a.config.AwakeMinutes = minutes
 	a.config.AwakeUntil = ""
 	a.save()
-	err := a.startAwake(a.selectedSession())
 	a.refreshAwake()
-	return err
+	return nil
 }
 func (a *application) changeAwakeEnabled() {
 	if !a.config.AwakeEnabled {
@@ -256,6 +269,6 @@ func (a *application) restoreAwakeAfterLaunch() {
 	a.config.AwakeSession = nil
 	a.save()
 	if restore && session != nil {
-		_ = a.startAwake(*session)
+		a.reportAwakeError(a.startAwake(*session))
 	}
 }

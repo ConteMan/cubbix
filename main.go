@@ -40,6 +40,7 @@ type application struct {
 	// no case creates a native window or changes the system URL handler.
 	paletteOpenJSON   func(string)
 	registerURLScheme func(string) error
+	urlDispatch       func(func())
 
 	registerShortcut       func(string, func()) error
 	shortcutSuspended      bool
@@ -82,7 +83,7 @@ func newApplication(path string) (*application, error) {
 	if err != nil {
 		return nil, err
 	}
-	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme}
+	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
 	a.updates = newUpdateManager(checkMyGoUpdate, newReleaseNotesClient(appVersion).load, nil)
 	for index, language := range []string{"system", "zh-CN", "en"} {
 		if config.Language == language {
@@ -624,9 +625,7 @@ func main() {
 	mygo.App.SetActivationPolicy(mygo.ActivationPolicyAccessory)
 	a.setupJSON()
 	// Register before Run so the URL that launched the app also arrives.
-	mygo.App.OnOpenURL(func(raw string) {
-		mygo.RunOnMain(func() { a.handleURL(raw) })
-	})
+	mygo.App.OnOpenURL(a.handleURL)
 	mygo.App.WhenReady(a.ready)
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)

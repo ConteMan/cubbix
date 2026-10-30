@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -382,9 +383,12 @@ func (a *application) runAwakeStart(req request) error {
 		if err != nil {
 			return err
 		}
+		if err := a.startAwake(awakeSession{Mode: a.config.AwakeMode, End: end}); err != nil {
+			return err
+		}
 		a.config.AwakeUntil = req.Awake.Until
 		a.save()
-		return a.startAwake(awakeSession{Mode: a.config.AwakeMode, End: end})
+		return nil
 	case awakeArgUnlimited:
 		return a.setDuration(0)
 	default:
@@ -401,18 +405,6 @@ func (a *application) startAwakeWith(arg awakeArg, mode string) error {
 		// The action keeps the typed parameter, so an invalid one stays an error.
 		return errors.New(arg.Error)
 	}
-	a.config.AwakeMode = mode
-	switch arg.Kind {
-	case awakeArgMinutes:
-		a.config.AwakeMinutes = arg.Minutes
-		a.config.AwakeUntil = ""
-	case awakeArgUnlimited:
-		a.config.AwakeMinutes = 0
-		a.config.AwakeUntil = ""
-	case awakeArgUntil:
-		a.config.AwakeUntil = arg.Until
-	}
-	a.save()
 	var session awakeSession
 	switch arg.Kind {
 	case awakeArgUntil:
@@ -422,12 +414,31 @@ func (a *application) startAwakeWith(arg awakeArg, mode string) error {
 		}
 		session = awakeSession{Mode: mode, End: end}
 	case awakeArgMinutes:
+		if arg.Minutes < awakeMinutesMinimum || arg.Minutes > awakeMinutesMaximum {
+			return errors.New("DurationError")
+		}
 		session = awakeSession{Mode: mode, End: time.Now().Add(time.Duration(arg.Minutes) * time.Minute)}
 	default:
 		session = a.selectedSession()
 		session.Mode = mode
 	}
-	return a.startAwake(session)
+	if arg.Kind == awakeArgUnlimited {
+		session.End = time.Time{}
+	}
+	if err := a.startAwake(session); err != nil {
+		return err
+	}
+	a.config.AwakeMode = mode
+	switch arg.Kind {
+	case awakeArgMinutes:
+		a.config.AwakeMinutes, a.config.AwakeUntil = arg.Minutes, ""
+	case awakeArgUnlimited:
+		a.config.AwakeMinutes, a.config.AwakeUntil = 0, ""
+	case awakeArgUntil:
+		a.config.AwakeUntil = arg.Until
+	}
+	a.save()
+	return nil
 }
 
 func awakeStartActions(a *application, req request) []paletteAction {
@@ -764,14 +775,14 @@ func bestCommand(a *application, locale, query string, commands []*command) (*co
 		return prefix.Command, prefix
 	}
 	var best *command
-	bestScore := 0
-	for _, cmd := range commands {
+	for _, cmd := range sortedCommands(a, locale, query, commands) {
 		if cmd.Available != nil && !cmd.Available(a) {
 			continue
 		}
 		score := matchScore(query, cmd.Title(a, locale), cmd.Keywords)
-		if score > bestScore {
-			best, bestScore = cmd, score
+		if score > 0 {
+			best = cmd
+			break
 		}
 	}
 	if best == nil {
@@ -849,57 +860,30 @@ func awakeUntilArg(value string) (string, bool) {
 
 // parseAwakeMinutes parses 45, 45m, 2h, 1h30m, 1h 30m and the Chinese forms,
 // returning minutes.
+var (
+	awakeHoursPattern   = regexp.MustCompile(`^([0-9]+)\s*(?:h|小时|hours?|hrs?)(?:\s*([0-9]+)\s*(?:m|mins?|分钟|分)?)?$`)
+	awakeMinutesPattern = regexp.MustCompile(`^([0-9]+)\s*(?:m|mins?|分钟|分)?$`)
+)
+
 func parseAwakeMinutes(value string) (int, bool) {
-	normalized := strings.ToLower(strings.TrimSpace(value))
-	normalized = strings.ReplaceAll(normalized, " ", "")
-	normalized = strings.NewReplacer(
-		"小时", "h",
-		"分钟", "m",
-		"hours", "h",
-		"hour", "h",
-		"hrs", "h",
-		"hr", "h",
-		"mins", "m",
-		"min", "m",
-		"分", "m",
-	).Replace(normalized)
-	digits := func(at int) (int, int, bool) {
-		start := at
-		for at < len(normalized) && normalized[at] >= '0' && normalized[at] <= '9' {
-			at++
-		}
-		if at == start {
-			return 0, at, false
-		}
-		number, err := strconv.Atoi(normalized[start:at])
-		return number, at, err == nil
-	}
-	first, index, ok := digits(0)
-	if !ok {
-		return 0, false
-	}
-	if index == len(normalized) {
-		return first, true // bare digits are minutes
-	}
-	switch normalized[index] {
-	case 'h':
-		index++
-		if index == len(normalized) {
-			return first * 60, true
-		}
-		minutes, end, ok := digits(index)
-		if !ok || minutes > 59 {
+	value = strings.ToLower(strings.TrimSpace(value))
+	if match := awakeHoursPattern.FindStringSubmatch(value); match != nil {
+		hours, err := strconv.Atoi(match[1])
+		if err != nil || hours > awakeMinutesMaximum/60 {
 			return 0, false
 		}
-		if end == len(normalized) || end+1 == len(normalized) && normalized[end] == 'm' {
-			return first*60 + minutes, true
+		minutes := 0
+		if match[2] != "" {
+			minutes, err = strconv.Atoi(match[2])
+			if err != nil || minutes > 59 {
+				return 0, false
+			}
 		}
-		return 0, false
-	case 'm':
-		if index+1 != len(normalized) {
-			return 0, false
-		}
-		return first, true
+		return hours*60 + minutes, true
+	}
+	if match := awakeMinutesPattern.FindStringSubmatch(value); match != nil {
+		minutes, err := strconv.Atoi(match[1])
+		return minutes, err == nil
 	}
 	return 0, false
 }
