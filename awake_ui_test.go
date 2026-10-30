@@ -113,9 +113,17 @@ func TestAwakeDialogInputsAndSelection(t *testing.T) {
 func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 	a := awakeTestApp(t)
 	a.page = 3
-	var registered, removed string
-	a.registerShortcut = func(acc string, _ func()) error { registered = acc; return nil }
-	a.unregisterShortcut = func(acc string) { removed = acc }
+	var registered, removed []string
+	a.registerShortcut = func(acc string, _ func()) error { registered = append(registered, acc); return nil }
+	a.unregisterShortcut = func(acc string) { removed = append(removed, acc) }
+	contains := func(list []string, value string) bool {
+		for _, candidate := range list {
+			if candidate == value {
+				return true
+			}
+		}
+		return false
+	}
 	old := a.config.AwakeShortcut
 	tt := ui.NewTester(a.view, 720, 340)
 	tt.SetLocale("en")
@@ -132,7 +140,7 @@ func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 	}
 	_ = tt.Click("Record keep awake shortcut")
 	tt.Key(ui.Ctrl|ui.Alt|ui.Cmd, ui.KeyL)
-	if a.config.AwakeShortcut != "Ctrl+Alt+Cmd+L" || registered != a.config.JSONShortcut || removed != a.config.JSONShortcut {
+	if a.config.AwakeShortcut != "Ctrl+Alt+Cmd+L" || !contains(registered, a.config.JSONShortcut) || !contains(removed, a.config.JSONShortcut) {
 		t.Fatal("shortcut not replaced")
 	}
 	loaded, err := loadConfig(a.path)

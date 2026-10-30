@@ -105,6 +105,12 @@ type tokenValues struct {
 	SizeJSONPaneMinWidth      float32
 	SizeJSONBoardWidth        float32
 	SizeJSONSettingsHeight    float32
+	SizePaletteWidth          float32
+	SizePaletteHeight         float32
+	SizePaletteTopOffset      float32
+	SizePaletteSearchHeight   float32
+	SizePaletteRowHeight      float32
+	SizePaletteGroupHeight    float32
 }
 
 func tokens(dark bool, language string) tokenValues {
@@ -209,6 +215,12 @@ func tokens(dark bool, language string) tokenValues {
 		SizeJSONPaneMinWidth:      240,
 		SizeJSONBoardWidth:        1600,
 		SizeJSONSettingsHeight:    340,
+		SizePaletteWidth:          640,
+		SizePaletteHeight:         400,
+		SizePaletteTopOffset:      96,
+		SizePaletteSearchHeight:   36,
+		SizePaletteRowHeight:      36,
+		SizePaletteGroupHeight:    24,
 	}
 	if dark {
 		t.ColorWindow = "#202020"

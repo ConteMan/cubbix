@@ -198,5 +198,22 @@
   "JSONWorking": "正在求值",
   "JSONClose": "关闭 JSON 窗口",
   "JSONShortcutConflict": "此快捷键已被其他格子使用",
-  "JSONEvaluationError": "求值出错"
+  "JSONEvaluationError": "求值出错",
+  "PaletteShortcutLabel": "命令面板",
+  "PaletteRecordShortcut": "录制命令面板快捷键",
+  "PaletteShortcutSuffix": "已用于命令面板",
+  "PaletteSearch": "输入命令",
+  "PaletteFavorites": "收藏",
+  "PaletteRecent": "最近使用",
+  "PaletteAll": "全部命令",
+  "PaletteEmpty": "无结果",
+  "PaletteActions": "操作",
+  "PaletteAddFavorite": "加入收藏",
+  "PaletteRemoveFavorite": "移出收藏",
+  "PaletteAwakeStop": "停止常亮",
+  "PaletteAwakeUntil": "直到 %s",
+  "PaletteMinutes": "%d 分钟",
+  "PaletteJSONBlank": "新建空白窗口",
+  "PaletteJSONClipboard": "从剪贴板新建",
+  "PaletteSwitchTo": "切过去"
 }

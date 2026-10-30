@@ -35,11 +35,18 @@ func (a *application) refreshAwake() {
 	a.tray.SetToolTip(a.awakeStatus(mygo.App.Locale(), time.Now()))
 	a.invalidateWindow()
 }
-func (a *application) startAwake(s awakeSession) {
+func (a *application) startAwake(s awakeSession) error {
 	if !a.config.AwakeEnabled {
-		return
+		return nil
 	}
-	if err := a.awake.start(s); err != nil {
+	return a.awake.start(s)
+}
+
+// reportAwakeError keeps the settings error slot for the entries that still
+// report there, such as menu items. The palette and URL paths read the error
+// they get back instead of writing it here.
+func (a *application) reportAwakeError(err error) {
+	if err != nil {
 		a.settingsError = "AwakeStartError"
 		a.invalidateWindow()
 	}
@@ -69,25 +76,31 @@ func (a *application) toggleAwake() {
 	if a.awake.snapshot().Active {
 		a.awake.stop()
 	} else {
-		a.startAwake(a.selectedSession())
+		a.reportAwakeError(a.startAwake(a.selectedSession()))
 	}
 }
-func (a *application) setMode(mode string) {
+func (a *application) setMode(mode string) error {
+	if mode != "screen" && mode != "tasks" {
+		return fmt.Errorf("invalid mode: %q", mode)
+	}
 	a.config.AwakeMode = mode
 	s := a.awake.snapshot()
+	var err error
 	if s.Active {
 		s.Session.Mode = mode
-		a.startAwake(s.Session)
+		err = a.startAwake(s.Session)
 	}
 	a.save()
 	a.refreshAwake()
+	return err
 }
-func (a *application) setDuration(minutes int) {
+func (a *application) setDuration(minutes int) error {
 	a.config.AwakeMinutes = minutes
 	a.config.AwakeUntil = ""
 	a.save()
-	a.startAwake(a.selectedSession())
+	err := a.startAwake(a.selectedSession())
 	a.refreshAwake()
+	return err
 }
 func (a *application) changeAwakeEnabled() {
 	if !a.config.AwakeEnabled {
@@ -103,8 +116,9 @@ func (a *application) registerAwakeShortcut() {
 	if !a.config.AwakeEnabled {
 		return
 	}
-	if a.config.JSONEnabled && sameShortcut(a.config.JSONShortcut, a.config.AwakeShortcut) {
-		a.shortcutError = "JSONShortcutConflict"
+	a.shortcutError = ""
+	if reason := a.shortcutConflict(a.config.AwakeShortcut, "awake"); reason != "" {
+		a.shortcutError = reason
 		return
 	}
 	if err := a.registerShortcut(a.config.AwakeShortcut, a.toggleAwake); err != nil {
@@ -144,16 +158,16 @@ func (a *application) awakeMenu(locale string) []*mygo.MenuItem {
 	}
 	modes := []*mygo.MenuItem{}
 	for _, m := range []struct{ value, key string }{{"screen", "R05Screen"}, {"tasks", "R05Tasks"}} {
-		modes = append(modes, &mygo.MenuItem{Label: text(m.key), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMode == m.value, Click: func(*mygo.MenuItem, *mygo.Window) { a.setMode(m.value) }})
+		modes = append(modes, &mygo.MenuItem{Label: text(m.key), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMode == m.value, Click: func(*mygo.MenuItem, *mygo.Window) { a.reportAwakeError(a.setMode(m.value)) }})
 	}
 	durations := []*mygo.MenuItem{}
 	for _, d := range []struct {
 		minutes int
 		key     string
 	}{{30, "R05Half"}, {60, "R05Hour"}, {120, "R05Two"}, {240, "R05Four"}} {
-		durations = append(durations, &mygo.MenuItem{Label: text(d.key), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMinutes == d.minutes && a.config.AwakeUntil == "", Click: func(*mygo.MenuItem, *mygo.Window) { a.setDuration(d.minutes) }})
+		durations = append(durations, &mygo.MenuItem{Label: text(d.key), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMinutes == d.minutes && a.config.AwakeUntil == "", Click: func(*mygo.MenuItem, *mygo.Window) { a.reportAwakeError(a.setDuration(d.minutes)) }})
 	}
-	durations = append(durations, mygo.Separator(), &mygo.MenuItem{Label: text("R05Custom"), Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("custom") }}, &mygo.MenuItem{Label: text("R05Until"), Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("until") }}, &mygo.MenuItem{Label: text("R05Unlimited"), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMinutes == 0 && a.config.AwakeUntil == "", Click: func(*mygo.MenuItem, *mygo.Window) { a.setDuration(0) }})
+	durations = append(durations, mygo.Separator(), &mygo.MenuItem{Label: text("R05Custom"), Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("custom") }}, &mygo.MenuItem{Label: text("R05Until"), Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("until") }}, &mygo.MenuItem{Label: text("R05Unlimited"), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMinutes == 0 && a.config.AwakeUntil == "", Click: func(*mygo.MenuItem, *mygo.Window) { a.reportAwakeError(a.setDuration(0)) }})
 	items = append(items, mygo.Separator(), &mygo.MenuItem{Label: text("R05Mode"), Disabled: !a.config.AwakeEnabled, Submenu: modes}, &mygo.MenuItem{Label: text("R05Duration"), Disabled: !a.config.AwakeEnabled, Submenu: durations}, &mygo.MenuItem{Label: text("R05Follow"), Disabled: !a.config.AwakeEnabled, Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("follow") }})
 	if active {
 		items = append(items, &mygo.MenuItem{ID: "awake-stop", Label: text("R05Stop"), Accelerator: a.config.AwakeShortcut, Click: func(*mygo.MenuItem, *mygo.Window) { a.awake.stop() }})
@@ -242,6 +256,6 @@ func (a *application) restoreAwakeAfterLaunch() {
 	a.config.AwakeSession = nil
 	a.save()
 	if restore && session != nil {
-		a.startAwake(*session)
+		_ = a.startAwake(*session)
 	}
 }

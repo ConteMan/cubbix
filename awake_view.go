@@ -305,6 +305,46 @@ func sameShortcut(first, second string) bool {
 	}
 	return identity(first) == identity(second)
 }
+
+// shortcutSlot describes one global shortcut and what it runs. The three
+// slots are mutually exclusive: the same combination never registers twice.
+type shortcutSlot struct {
+	Target   string // "awake" / "json" / "palette"
+	Acc      string
+	Enabled  bool
+	Callback func()
+}
+
+func (a *application) shortcutSlots() []shortcutSlot {
+	return []shortcutSlot{
+		{Target: "awake", Acc: a.config.AwakeShortcut, Enabled: a.config.AwakeEnabled, Callback: a.toggleAwake},
+		{Target: "json", Acc: a.config.JSONShortcut, Enabled: a.config.JSONEnabled, Callback: a.newJSONWindow},
+		{Target: "palette", Acc: a.config.PaletteShortcut, Enabled: true, Callback: a.togglePalette},
+	}
+}
+
+func (a *application) shortcutSlotFor(target string) shortcutSlot {
+	for _, slot := range a.shortcutSlots() {
+		if slot.Target == target {
+			return slot
+		}
+	}
+	return shortcutSlot{Target: target}
+}
+
+// shortcutConflict returns the error key for a combination used by another
+// enabled slot, or "" when it is free. Recording and registration both use it.
+func (a *application) shortcutConflict(acc, target string) string {
+	for _, slot := range a.shortcutSlots() {
+		if slot.Target == target || !slot.Enabled {
+			continue
+		}
+		if sameShortcut(acc, slot.Acc) {
+			return "JSONShortcutConflict"
+		}
+	}
+	return ""
+}
 func knownShortcutConflict(acc string) string {
 	groups := []struct {
 		reason    string
@@ -340,31 +380,39 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 		a.shortcutError = reason
 		return
 	}
-	targetJSON := a.shortcutTarget == "json"
-	old, other, enabled, callback := a.config.AwakeShortcut, a.config.JSONShortcut, a.config.AwakeEnabled, a.toggleAwake
-	if targetJSON {
-		old, other, enabled, callback = a.config.JSONShortcut, a.config.AwakeShortcut, a.config.JSONEnabled, a.newJSONWindow
-	}
-	if sameShortcut(acc, other) {
-		a.shortcutError = "JSONShortcutConflict"
+	slot := a.shortcutSlotFor(a.shortcutTarget)
+	if reason := a.shortcutConflict(acc, slot.Target); reason != "" {
+		a.shortcutError = reason
 		return
 	}
-	if enabled {
-		if err := a.registerShortcut(acc, callback); err != nil {
+	if slot.Enabled {
+		if err := a.registerShortcut(acc, slot.Callback); err != nil {
 			a.shortcutError = "ShortcutUnavailable"
 			return
 		}
-		if acc != old && !a.shortcutSuspended {
-			a.unregisterShortcut(old)
+		if acc != slot.Acc && !a.shortcutSuspended {
+			a.unregisterShortcut(slot.Acc)
 		}
 	}
-	if targetJSON {
+	switch slot.Target {
+	case "json":
 		a.config.JSONShortcut = acc
 		a.jsonShortcutError = ""
-		a.registerAwakeShortcut()
-	} else {
+	case "palette":
+		a.config.PaletteShortcut = acc
+		a.paletteShortcutError = ""
+	default:
 		a.config.AwakeShortcut = acc
+		a.shortcutError = ""
+	}
+	if slot.Target != "awake" {
+		a.registerAwakeShortcut()
+	}
+	if slot.Target != "json" {
 		a.registerJSONShortcut()
+	}
+	if slot.Target != "palette" {
+		a.registerPaletteShortcut()
 	}
 	a.shortcutSuspended = false
 	a.shortcutRecording = false
@@ -390,6 +438,8 @@ func (a *application) awakeSettings(c *ui.Context, t tokenValues, locale string)
 		a.shortcutSettingsRow(c, t, locale, "awake")
 		ui.Divider(c)
 		a.shortcutSettingsRow(c, t, locale, "json")
+		ui.Divider(c)
+		a.shortcutSettingsRow(c, t, locale, "palette")
 	}
 }
 
@@ -398,11 +448,11 @@ func (a *application) beginTileShortcutRecording(target string) {
 	if a.shortcutRecording {
 		a.cancelShortcutRecording()
 	}
-	if a.config.AwakeEnabled {
-		a.unregisterShortcut(a.config.AwakeShortcut)
-	}
-	if a.config.JSONEnabled {
-		a.unregisterShortcut(a.config.JSONShortcut)
+	// Recording listens for any combination, so every slot must let go first.
+	for _, slot := range a.shortcutSlots() {
+		if slot.Enabled {
+			a.unregisterShortcut(slot.Acc)
+		}
 	}
 	a.shortcutSuspended = true
 	a.shortcutTarget = target
@@ -423,6 +473,7 @@ func (a *application) cancelShortcutRecording() {
 	if a.shortcutSuspended {
 		a.registerAwakeShortcut()
 		a.registerJSONShortcut()
+		a.registerPaletteShortcut()
 	}
 	a.shortcutSuspended = false
 	if a.refreshApplicationMenu != nil {
@@ -438,6 +489,10 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 		label, recordKey = "JSONShortcutLabel", "JSONRecordShortcut"
 		acc = a.config.JSONShortcut
 	}
+	if target == "palette" {
+		label, recordKey = "PaletteShortcutLabel", "PaletteRecordShortcut"
+		acc = a.config.PaletteShortcut
+	}
 	active := a.shortcutRecording && a.shortcutTarget == target
 	errorKey := ""
 	if a.shortcutTarget == target || a.shortcutTarget == "" && target == "awake" {
@@ -445,6 +500,9 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 	}
 	if target == "json" && errorKey == "" {
 		errorKey = a.jsonShortcutError
+	}
+	if target == "palette" && errorKey == "" {
+		errorKey = a.paletteShortcutError
 	}
 	a.row(c, t, text(label), func() {
 		if active && a.shortcutDraft != "" {
@@ -482,6 +540,9 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 						reason := errorKey
 						if reason == "R05Conflict" {
 							reason = "ShortcutSettingsSuffix"
+						}
+						if reason == "JSONShortcutConflict" && target != "palette" && sameShortcut(acc, a.config.PaletteShortcut) {
+							reason = "PaletteShortcutSuffix"
 						}
 						ui.Text(c, text(reason)).FontSize(t.FontSizeSmall)
 					})

@@ -2,6 +2,7 @@
   "name": "Cubbix",
   "identifier": "com.conteman.cubbix",
   "version": "0.2.1",
+  "urlSchemes": ["cubbix"],
   "icon": "brand/dist/app-icon-1024.png",
   "out": "build",
   "macos": {
