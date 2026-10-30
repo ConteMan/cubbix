@@ -142,14 +142,25 @@ func (k *awakeController) start(s awakeSession) error {
 }
 
 // Poll also checks wall-clock deadlines after wake and guards against PID reuse.
+// A deadline that passes ends normally; a target that went away is an error
+// the panel shows, so the two are never folded into one branch.
 func (k *awakeController) poll() {
 	k.mu.Lock()
 	s := k.state
-	if s.Active && ((!s.Session.End.IsZero() && !k.now().Before(s.Session.End)) || (s.Session.PID > 0 && !k.alive(s.Session.PID, s.Session.Identity))) {
-		k.stopLocked()
-		k.state.Error = ""
+	changed := false
+	if s.Active {
+		expired := !s.Session.End.IsZero() && !k.now().Before(s.Session.End)
+		targetGone := s.Session.PID > 0 && !k.alive(s.Session.PID, s.Session.Identity)
+		if expired || targetGone {
+			k.stopLocked()
+			if expired {
+				k.state.Error = ""
+			} else {
+				k.state.Error = "ProcessEnded"
+			}
+			changed = true
+		}
 	}
-	changed := s.Active != k.state.Active
 	k.mu.Unlock()
 	if changed {
 		k.notify()

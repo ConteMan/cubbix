@@ -49,6 +49,7 @@ type paletteRow struct {
 // awakeDialog and jsonDocument.
 type paletteState struct {
 	window          *mygo.Window
+	visible         bool
 	query           string
 	lastQuery       string
 	mode            paletteMode
@@ -77,13 +78,21 @@ func (a *application) togglePalette() {
 	a.showPalette()
 }
 
-// hideMenubarPanel closes the menu bar card panel. That panel is implemented
-// in step 2 (001); this no-op keeps the two-panel mutex explicit until then,
-// so showing the palette never stacks on a panel that does not exist yet.
-func (a *application) hideMenubarPanel() {}
+// hideMenubarPanel closes the menu bar card panel (001). Showing either panel
+// closes the other, so the two never stack.
+func (a *application) hideMenubarPanel() {
+	if a.panel == nil {
+		return
+	}
+	p := a.panel
+	a.panel = nil
+	if p.window != nil {
+		p.window.Close()
+	}
+}
 
 func (a *application) paletteVisible() bool {
-	return a.palette != nil && a.palette.window != nil && a.palette.window.IsVisible()
+	return a.palette != nil && a.palette.visible
 }
 
 func (a *application) showPalette() {
@@ -92,7 +101,7 @@ func (a *application) showPalette() {
 		a.palette = &paletteState{}
 	}
 	if a.palette.window == nil {
-		a.createPaletteWindow()
+		a.createPaletteWindow(a.palette)
 	}
 	a.palette.query = ""
 	a.palette.lastQuery = ""
@@ -107,19 +116,25 @@ func (a *application) showPalette() {
 }
 
 func (a *application) presentPalette() {
-	if a.palette == nil || a.palette.window == nil {
+	if a.palette == nil {
 		return
 	}
 	a.placePalette()
-	a.palette.window.Show()
-	a.palette.window.Invalidate()
+	a.palette.visible = true
+	if a.palette.window != nil {
+		a.palette.window.Show()
+		a.palette.window.Invalidate()
+	}
 }
 
 func (a *application) hidePalette() {
-	if a.palette == nil || a.palette.window == nil {
+	if a.palette == nil {
 		return
 	}
-	a.palette.window.Hide()
+	a.palette.visible = false
+	if a.palette.window != nil {
+		a.palette.window.Hide()
+	}
 }
 
 func (a *application) invalidatePalette() {
@@ -128,9 +143,9 @@ func (a *application) invalidatePalette() {
 	}
 }
 
-// createPaletteWindow builds the nonactivating panel. It is created on the
+// buildPaletteWindow builds the nonactivating panel. It is created on the
 // first use so the app never opens a hidden window at launch.
-func (a *application) createPaletteWindow() {
+func (a *application) buildPaletteWindow(p *paletteState) {
 	t := tokens(false, "zh-CN")
 	window := mygo.NewWindow(mygo.WindowOptions{
 		Title:             "Cubbix",
@@ -152,7 +167,7 @@ func (a *application) createPaletteWindow() {
 		a.hidePalette()
 	})
 	window.OnBlur(a.hidePalette)
-	a.palette.window = window
+	p.window = window
 }
 
 // placePalette centers the panel on the display under the pointer, near the

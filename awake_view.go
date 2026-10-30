@@ -123,6 +123,9 @@ func (a *application) confirmAwakeDialog() {
 		a.config.AwakeMinutes, a.config.AwakeUntil = minutes, ""
 	} else if d.kind == "until" {
 		a.config.AwakeUntil = d.until
+	} else if d.kind == "follow" {
+		// A deadline remembered from an earlier session must not shadow it.
+		a.config.AwakeUntil = ""
 	}
 	a.save()
 	a.closeAwakeDialog()

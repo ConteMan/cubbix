@@ -69,23 +69,6 @@ func (a *application) jsonForWindow(w *mygo.Window) *jsonDocument {
 	return nil
 }
 
-func (a *application) jsonMenu(locale string) []*mygo.MenuItem {
-	if !a.config.JSONEnabled {
-		return nil
-	}
-	items := []*mygo.MenuItem{{ID: "json-new", Label: a.text(locale, "R07NewWindow"), Accelerator: a.config.JSONShortcut, Click: func(*mygo.MenuItem, *mygo.Window) { a.newJSONWindow() }}}
-	windows := []*mygo.MenuItem{}
-	for _, d := range a.jsonDocuments {
-		windows = append(windows, &mygo.MenuItem{ID: fmt.Sprintf("json-window-%d", d.number), Label: d.name(a, locale), Click: func(*mygo.MenuItem, *mygo.Window) { a.showJSON(d) }})
-	}
-	if len(windows) >= jsonWindowSubmenuAt {
-		items = append(items, &mygo.MenuItem{ID: "json-windows", Label: a.text(locale, "JSONWindows"), Submenu: windows})
-	} else {
-		items = append(items, windows...)
-	}
-	return append(items, mygo.Separator())
-}
-
 func readJSONFile(path string) (string, error) {
 	file, err := os.Open(path)
 	if err != nil {

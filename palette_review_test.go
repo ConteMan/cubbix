@@ -258,23 +258,16 @@ func TestSearchDefaultUsesShorterTitleOnScoreTie(t *testing.T) {
 	}
 }
 
-func TestFailedAwakeMenuActionsReportErrors(t *testing.T) {
+func TestFailedShortcutActionsReportErrors(t *testing.T) {
 	a := awakeTestApp(t)
 	a.awake.launch = func([]string) (awakeChild, error) { return nil, errors.New("launch failed") }
-	for _, item := range a.awakeMenu("zh-CN") {
-		if item.ID == "awake-start" {
-			item.Click(nil, nil)
-		}
-		for _, child := range item.Submenu {
-			if child.Label == a.text("zh-CN", "R05Half") {
-				child.Click(nil, nil)
-			}
-		}
-	}
+	// The global shortcut still reports failures on the settings page; the
+	// card panel keeps its own error instead.
+	a.toggleAwake()
 	if a.settingsError != "AwakeStartError" {
-		t.Fatal("native menu did not report launch failure")
+		t.Fatal("shortcut did not report the launch failure")
 	}
 	if a.config.AwakeMinutes != 60 {
-		t.Fatal("failed menu changed duration")
+		t.Fatal("failed start changed duration")
 	}
 }

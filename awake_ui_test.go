@@ -4,10 +4,10 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -27,31 +27,30 @@ func awakeTestApp(t *testing.T) *application {
 	t.Cleanup(func() { a.awake.changed = nil; a.awake.stop(); a.updates.close() })
 	return a
 }
-func TestAwakeMenuAndTileToggle(t *testing.T) {
+func TestAwakeTileToggle(t *testing.T) {
 	a := awakeTestApp(t)
-	for _, locale := range []string{"zh-CN", "en"} {
-		menu := a.menuForLocale(locale)
-		if menu.ItemByID("awake-start") == nil || menu.Items()[0].Label != a.text(locale, "R05Off") {
-			t.Fatal("off menu missing")
-		}
-		menu.ItemByID("awake-start").Click(nil, nil)
-		if !a.awake.snapshot().Active || a.config.AwakeSession == nil {
-			t.Fatal("start not persisted")
-		}
-		menu = a.menuForLocale(locale)
-		if menu.ItemByID("awake-start") != nil || menu.ItemByID("awake-stop") == nil {
-			t.Fatal("running menu missing")
-		}
-		a.config.AwakeEnabled = false
-		a.changeAwakeEnabled()
-		if a.awake.snapshot().Active {
-			t.Fatal("disabled tile is still active")
-		}
-		if !a.menuForLocale(locale).ItemByID("awake-start").Disabled {
-			t.Fatal("disabled tile can start")
-		}
-		a.config.AwakeEnabled = true
+	// The shortcut and the card switch share toggleAwake; the tray tooltip
+	// names the state both of them change.
+	if a.awakeStatus("en", time.Now()) != a.text("en", "R05Off") {
+		t.Fatal("off status")
 	}
+	a.toggleAwake()
+	if !a.awake.snapshot().Active || a.config.AwakeSession == nil {
+		t.Fatal("start not persisted")
+	}
+	if !strings.HasPrefix(a.awakeStatus("zh-CN", time.Now()), a.text("zh-CN", "R05Screen")) {
+		t.Fatalf("running status = %q", a.awakeStatus("zh-CN", time.Now()))
+	}
+	a.config.AwakeEnabled = false
+	a.changeAwakeEnabled()
+	if a.awake.snapshot().Active {
+		t.Fatal("disabled tile is still active")
+	}
+	a.toggleAwake()
+	if a.awake.snapshot().Active {
+		t.Fatal("disabled tile started from the shortcut")
+	}
+	a.config.AwakeEnabled = true
 }
 func TestAwakeDialogInputsAndSelection(t *testing.T) {
 	for _, locale := range []string{"zh-CN", "en"} {
@@ -195,35 +194,6 @@ func TestRestartSavesRemainingSessionBeforeRelaunch(t *testing.T) {
 	if called || !a.awake.snapshot().Active || a.settingsError != "ConfigError" {
 		t.Fatal("restarted without session persistence")
 	}
-}
-
-// A test-only rendering of the exact native menu model. AppKit still draws
-// the real menu; these snapshots do not claim native menu appearance/focus.
-func (a *application) menuEvidenceView(c *ui.Context) {
-	locale, t := applyTheme(c)
-	ui.Column(c).Fill().Padding(t.Space8).Radius(t.RadiusWindow).Background(ui.Hex(t.ColorMenuSurface)).Children(func() {
-		for _, item := range a.menuForLocale(locale).Items() {
-			if item.Type == mygo.MenuItemSeparator {
-				ui.Divider(c)
-				continue
-			}
-			color := t.ColorText
-			if item.Disabled {
-				color = t.ColorTextSecondary
-			}
-			ui.Row(c).FillWidth().Height(t.SizeMenuRowHeight).PaddingX(t.Space12).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
-				ui.Text(c, item.Label).FontSize(t.FontSizeBody).TextColor(ui.Hex(color)).Grow(1)
-				if item.Accelerator != "" {
-					for _, symbol := range shortcutSymbols(item.Accelerator) {
-						ui.Text(c, symbol).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
-					}
-				}
-				if len(item.Submenu) > 0 {
-					ui.Icon(c, icon("chevron-right")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-				}
-			})
-		}
-	})
 }
 
 func TestLaunchRestorePolicy(t *testing.T) {

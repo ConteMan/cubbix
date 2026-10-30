@@ -33282,6 +33282,18 @@
       "type": "number",
       "value": 24
     },
+    "SizeMenubarPanelWidth": {
+      "type": "number",
+      "value": 320
+    },
+    "SizePillButtonWidth": {
+      "type": "number",
+      "value": 64
+    },
+    "SizeIconSmall": {
+      "type": "number",
+      "value": 12
+    },
     "DurationError": {
       "type": "string",
       "value": [

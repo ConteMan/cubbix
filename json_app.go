@@ -179,6 +179,9 @@ func (a *application) showJSON(d *jsonDocument) {
 	if d.closed || d.window == nil {
 		return
 	}
+	// A JSON window takes the focus and activates the app, so the card panel
+	// closes first instead of lingering behind it.
+	a.hideMenubarPanel()
 	a.visibility(true)
 	d.window.Show()
 	d.window.Focus()

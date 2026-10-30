@@ -164,7 +164,9 @@ func nativeWindowChecks(a *application, dir string) error {
 			}
 		}
 		data, _ := assets.ReadFile("assets/menubar-template.tiff")
-		tray, err := mygo.NewTray(mygo.TrayOptions{Icon: data, IconIsTemplate: true, Menu: a.menuForLocale("en")})
+		// No menu is bound: left clicks have to reach OnClick for the card
+		// panel, and the right-click menu is built for its popup only.
+		tray, err := mygo.NewTray(mygo.TrayOptions{Icon: data, IconIsTemplate: true})
 		if err != nil {
 			return err
 		}
@@ -173,10 +175,34 @@ func nativeWindowChecks(a *application, dir string) error {
 		if err := tray.SetIcon(active, true); err != nil {
 			return err
 		}
-		tray.SetMenu(a.menuForLocale("zh-CN"))
 		if err := tray.SetIcon(data, true); err != nil {
 			return err
 		}
+		// The card panel is a flyout anchored to the icon. It is created hidden
+		// and never shown, so this checks its construction, content size and
+		// its all-workspaces flag without putting anything on screen.
+		a.tray = tray
+		a.panel = &menubarPanelState{}
+		a.createMenubarPanel(a.panel)
+		p := a.panel
+		if p == nil || p.window == nil {
+			return fmt.Errorf("card panel flyout was not created")
+		}
+		panel := p.window
+		panel.SetVisibleOnAllWorkspaces(true)
+		if !panel.IsFlyout() || panel.IsVisible() || panel.IsFocused() || objc.Send[bool](nsapp, objc.RegisterName("isActive")) {
+			return fmt.Errorf("card panel flyout is not hidden and inactive")
+		}
+		token := tokens(false, "zh-CN")
+		if width, height := panel.Size(); width != int(token.SizeMenubarPanelWidth) || height != a.menubarPanelHeight(token) {
+			return fmt.Errorf("card panel size = %dx%d", width, height)
+		}
+		panel.SetContentSize(int(token.SizeMenubarPanelWidth), 313)
+		if _, height := panel.Size(); height != 313 {
+			return fmt.Errorf("card panel did not follow SetContentSize")
+		}
+		panel.Close()
+		a.panel, a.tray = nil, nil
 		const shortcut = "Ctrl+Alt+Cmd+Shift+F10"
 		if err := mygo.GlobalShortcut.Register(shortcut, func() {}); err != nil {
 			return fmt.Errorf("native global shortcut registration: %w", err)
@@ -188,11 +214,11 @@ func nativeWindowChecks(a *application, dir string) error {
 		if mygo.GlobalShortcut.IsRegistered(shortcut) {
 			return fmt.Errorf("global shortcut not released")
 		}
-		fmt.Println("PASS: three hidden frameless dialogs; native template icon swapping and translated tray menus; global shortcut registered and released")
+		fmt.Println("PASS: three hidden frameless dialogs; a hidden card panel flyout anchored to the tray with a content-driven size; native template icon swapping with no bound tray menu; global shortcut registered and released")
 		a.window.Close()
 		return policy(1)
 	}); err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(dir, "native-result.txt"), []byte("PASS: hidden NSApplication policies 1→0→1; native resizable style, minimum 720×340; saved 1000×600; application/edit menu actions and close button present. Window stayed hidden and inactive. No native screenshots or foreground requests.\n"), 0600)
+	return os.WriteFile(filepath.Join(dir, "native-result.txt"), []byte("PASS: hidden NSApplication policies 1→0→1; native resizable style, minimum 720×340; saved 1000×600; application/edit menu actions and close button present; a hidden card panel flyout anchored to the tray with a content-driven size. Windows stayed hidden and inactive. No native screenshots or foreground requests.\n"), 0600)
 }

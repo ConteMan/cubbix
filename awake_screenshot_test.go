@@ -95,17 +95,6 @@ func TestAwakeScreenshots(t *testing.T) {
 				}
 				capture(kind+suffix, locale, dark, a.awakeDialogView, 440, height)
 			}
-			a.awake.mu.Lock()
-			a.awake.state = awakeState{}
-			a.awake.mu.Unlock()
-			capture("menu-off"+suffix, locale, dark, a.menuEvidenceView, 352, 292)
-			a.awake.mu.Lock()
-			a.awake.state = awakeState{Active: true, Session: awakeSession{Mode: "screen", End: time.Now().Add(84 * time.Minute)}}
-			a.awake.mu.Unlock()
-			capture("menu-on"+suffix, locale, dark, a.menuEvidenceView, 352, 292)
-			a.awake.mu.Lock()
-			a.awake.state = awakeState{}
-			a.awake.mu.Unlock()
 		}
 	}
 }
