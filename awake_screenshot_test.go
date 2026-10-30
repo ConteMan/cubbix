@@ -88,7 +88,7 @@ func TestAwakeScreenshots(t *testing.T) {
 			a.shortcutDraft = ""
 			a.shortcutError = ""
 			for _, kind := range []string{"custom", "until", "follow"} {
-				a.dialog = &awakeDialog{kind: kind, hours: "1", minutes: "30", until: "02:30", selected: 1842, icons: icons, processes: []runningProcess{{1842, "codex", "sample"}, {2087, "claude", "sample"}, {936, "Terminal", "sample"}, {724, "Safari", "sample"}}}
+				a.dialog = &awakeDialog{kind: kind, hours: "1", minutes: "30", until: "02:30", selected: 1842, icons: icons, processes: []runningProcess{{PID: 1842, Name: "codex", Identity: "sample"}, {PID: 2087, Name: "claude", Identity: "sample"}, {PID: 936, Name: "Terminal", Identity: "sample"}, {PID: 724, Name: "Safari", Identity: "sample"}}}
 				height := 108
 				if kind == "follow" {
 					height = 280

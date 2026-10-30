@@ -24,6 +24,7 @@ type Config struct {
 	AwakeMode        string        `toml:"awake_mode"`
 	AwakeMinutes     int           `toml:"awake_minutes"`
 	AwakeUntil       string        `toml:"awake_until,omitempty"`
+	AwakeAgents      string        `toml:"awake_agents"`
 	AwakeShortcut    string        `toml:"awake_shortcut"`
 	AwakeSession     *awakeSession `toml:"awake_session,omitempty"`
 	RestoreAwake     bool          `toml:"restore_awake,omitempty"`
@@ -32,7 +33,7 @@ type Config struct {
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeShortcut: "Ctrl+Alt+Cmd+K"}
+	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K"}
 }
 
 func loadConfig(path string) (Config, error) {

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -21,58 +19,30 @@ type awakeDialog struct {
 	selected                      int
 	errorKey                      string
 	loading                       bool
+	filtered                      []runningProcess
+	filteredQuery                 string
+	filterReady                   bool
+	searchDue                     time.Time
+	list                          ui.ListState
+	results                       chan processListResult
+	cancelLoad                    func()
+	iconCache                     *processIconCache
 }
 
 func (a *application) openAwakeDialog(kind string) {
-	if a.dialog != nil && a.dialog.window != nil {
-		a.dialog.window.Close()
-	}
+	a.closeAwakeDialog()
 	d := &awakeDialog{kind: kind, hours: "1", minutes: "30", until: "02:30", icons: map[int]*ui.Bitmap{}}
 	a.dialog = d
 	a.createAwakeDialogWindow(d)
+	if kind == "follow" {
+		d.iconCache = pickerIcons
+		d.loadProcesses(listProcesses, strings.Split(a.config.AwakeAgents, ","), d.window.Invalidate)
+	}
 	// This is reached only by an explicit user action, never by tests or startup.
 	d.window.Show()
 	d.window.Focus()
-	if kind == "follow" {
-		go func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-			defer cancel()
-			processes, err := listProcesses(ctx)
-			sort.SliceStable(processes, func(i, j int) bool {
-				rank := func(name string) int {
-					if strings.Contains(strings.ToLower(name), "codex") || strings.Contains(strings.ToLower(name), "claude") {
-						return 0
-					}
-					return 1
-				}
-				if rank(processes[i].Name) != rank(processes[j].Name) {
-					return rank(processes[i].Name) < rank(processes[j].Name)
-				}
-				return strings.ToLower(processes[i].Name) < strings.ToLower(processes[j].Name)
-			})
-			mygo.RunOnMain(func() {
-				if a.dialog != d {
-					return
-				}
-				d.loading = false
-				if err != nil {
-					d.errorKey = "ProcessListError"
-				} else {
-					d.processes = processes
-					for _, p := range processes {
-						if icon := runningAppIcon(p.PID); icon != nil {
-							d.icons[p.PID] = icon
-						}
-					}
-					if len(processes) > 0 {
-						d.selected = processes[0].PID
-					}
-				}
-				d.window.Invalidate()
-			})
-		}()
-	}
 }
+
 func (a *application) createAwakeDialogWindow(d *awakeDialog) {
 	t := tokens(false, "zh-CN")
 	height := int(t.SizeRowHeight + 2*t.Space16 + t.FontSizeSmall*t.LineHeightBody + t.Space8)
@@ -82,6 +52,9 @@ func (a *application) createAwakeDialogWindow(d *awakeDialog) {
 	}
 	d.window = mygo.NewWindow(mygo.WindowOptions{Title: "Cubbix", Width: int(t.SizeDialogWidth), Height: height, Hidden: true, Frameless: true, DisableResize: true, DisableMinimize: true, DisableMaximize: true, DisableFullScreen: true, Content: ui.View(a.awakeDialogView)})
 	d.window.OnClosed(func() {
+		if d.cancelLoad != nil {
+			d.cancelLoad()
+		}
 		if a.dialog == d {
 			a.dialog = nil
 		}
@@ -92,6 +65,9 @@ func (a *application) closeAwakeDialog() {
 	if a.dialog != nil {
 		d := a.dialog
 		a.dialog = nil
+		if d.cancelLoad != nil {
+			d.cancelLoad()
+		}
 		if d.window != nil {
 			d.window.Close()
 		}
@@ -125,8 +101,11 @@ func (a *application) confirmAwakeDialog() {
 		if d.loading || d.errorKey == "ProcessListError" {
 			return
 		}
-		for _, p := range d.processes {
-			if p.PID == d.selected && matchesProcess(p, d.search) {
+		if !d.filterReady || d.filteredQuery != d.search {
+			d.filterProcesses()
+		}
+		for _, p := range d.filtered {
+			if p.PID == d.selected {
 				s = awakeSession{Mode: a.config.AwakeMode, PID: p.PID, Identity: p.Identity, Name: p.Name}
 				break
 			}
@@ -143,15 +122,30 @@ func (a *application) confirmAwakeDialog() {
 	a.save()
 	a.closeAwakeDialog()
 }
-func matchesProcess(p runningProcess, query string) bool {
-	return strings.Contains(strings.ToLower(p.Name+" "+strconv.Itoa(p.PID)), strings.ToLower(query))
-}
-
 func (a *application) awakeDialogView(c *ui.Context) {
 	locale, t := applyTheme(c)
 	d := a.dialog
 	if d == nil {
 		return
+	}
+	if d.kind == "follow" {
+		d.receiveProcesses()
+		if !d.filterReady || (d.search != d.filteredQuery && !c.Now().Before(d.searchDue)) {
+			selected := d.selected
+			initial := !d.filterReady
+			d.filterProcesses()
+			if initial && selected != 0 {
+				for _, p := range d.filtered {
+					if p.PID == selected {
+						d.selected = selected
+						break
+					}
+				}
+			}
+		}
+		if d.search != d.filteredQuery {
+			c.After(d.searchDue.Sub(c.Now()))
+		}
 	}
 	text := func(key string) string { return a.text(locale, key) }
 	c.OnShortcut(0, ui.KeyEscape, a.closeAwakeDialog)
@@ -184,43 +178,41 @@ func (a *application) awakeDialogView(c *ui.Context) {
 			ui.Row(c).FillWidth().Height(t.SizeNavHeight).PaddingX(t.Space8).Gap(t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center).Children(func() {
 				ui.Icon(c, icon("search")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 				ui.TextInput(c.Key("process-search"), &d.search).Grow(1).FillHeight().Padding(0).Border(0, ui.Hex(t.ColorTransparent)).Background(ui.Hex(t.ColorTransparent)).Placeholder(text("R05Search")).Label(text("R05Search")).AutoFocus().OnChange(func() {
-					d.selected = 0
-					for _, p := range d.processes {
-						if matchesProcess(p, d.search) {
-							d.selected = p.PID
-							break
-						}
-					}
-				}).OnSubmit(a.confirmAwakeDialog)
+					d.searchDue = c.Now().Add(100 * time.Millisecond)
+				}).OnShortcut(0, ui.KeyDown, func() { d.moveProcessSelection(1) }).OnShortcut(0, ui.KeyUp, func() { d.moveProcessSelection(-1) }).OnSubmit(a.confirmAwakeDialog)
 				ui.Text(c, text("R05Return")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
 			})
 			if d.loading {
 				ui.Spinner(c).Size(t.SizeIcon, t.SizeIcon)
 			}
-			ui.Scroll(c.Key("process-list")).FillWidth().Grow(1).Children(func() {
-				ui.Column(c).FillWidth().Gap(t.Space4).Children(func() {
-					for _, p := range d.processes {
-						if !matchesProcess(p, d.search) {
-							continue
-						}
-						background := t.ColorTransparent
-						if p.PID == d.selected {
-							background = t.ColorAccentSoft
-						}
-						ui.ButtonBase(c.Key(strconv.Itoa(p.PID))).FillWidth().Height(t.SizeRowHeight-t.Space8).Radius(t.RadiusCard).Background(ui.Hex(background)).FocusRing(true).Label(p.Name+" "+strconv.Itoa(p.PID)).OnClick(func() { d.selected = p.PID }).OnShortcut(0, ui.KeyEnter, func() { d.selected = p.PID; a.confirmAwakeDialog() }).Children(func() {
-							ui.Row(c).Fill().PaddingX(t.Space8).Gap(t.Space12).AlignItems(ui.Center).Children(func() {
-								if bitmap := d.icons[p.PID]; bitmap != nil {
-									ui.Image(c, bitmap).Size(t.SizeIconLarge, t.SizeIconLarge)
-								} else {
-									ui.Icon(c, icon("terminal")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-								}
-								ui.Text(c, p.Name).FontSize(t.FontSizeBody).Grow(1)
-								ui.Text(c, strconv.Itoa(p.PID)).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
-							})
-						})
+			d.list.Key = func(i int) any { return d.filtered[i].PID }
+			first, last := d.list.Visible()
+			ui.List(c.Key("process-list"), &d.list, len(d.filtered), func(i int) {
+				p := d.filtered[i]
+				bitmap := d.icons[p.PID]
+				if bitmap == nil && d.iconCache != nil && p.BundlePath != "" && i >= first && i <= last {
+					var pending bool
+					bitmap, pending = d.iconCache.request(p.BundlePath, c.Services().Invalidate)
+					if pending {
+						c.After(30 * time.Millisecond)
 					}
+				}
+				background := t.ColorTransparent
+				if p.PID == d.selected {
+					background = t.ColorAccentSoft
+				}
+				ui.ButtonBase(c.Key(strconv.Itoa(p.PID))).FillWidth().Height(t.SizeRowHeight-t.Space8).Radius(t.RadiusCard).Background(ui.Hex(background)).FocusRing(true).Label(p.Name+" "+strconv.Itoa(p.PID)).OnClick(func() { d.selected = p.PID }).OnShortcut(0, ui.KeyEnter, func() { d.selected = p.PID; a.confirmAwakeDialog() }).OnShortcut(0, ui.KeyDown, func() { d.moveProcessSelection(1) }).OnShortcut(0, ui.KeyUp, func() { d.moveProcessSelection(-1) }).Children(func() {
+					ui.Row(c).Fill().PaddingX(t.Space8).Gap(t.Space12).AlignItems(ui.Center).Children(func() {
+						if bitmap != nil {
+							ui.Image(c, bitmap).Size(t.SizeIconLarge, t.SizeIconLarge)
+						} else {
+							ui.Icon(c, icon("terminal")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
+						}
+						ui.Text(c, p.Name).FontSize(t.FontSizeBody).Grow(1)
+						ui.Text(c, strconv.Itoa(p.PID)).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
+					})
 				})
-			})
+			}).FillWidth().Grow(1).Gap(t.Space4)
 		}
 		if d.errorKey != "" {
 			ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(d.errorKey))
