@@ -29,6 +29,8 @@ type application struct {
 	jsonDocuments        []*jsonDocument
 	jsonNext             int
 	jsonReadClipboard    func() string
+	createJSONWindow     func(*jsonDocument)
+	presentJSONWindow    func(*jsonDocument)
 	jsonCopy             func(string) error
 	jsonChooseOpen       func(*mygo.Window) (string, error)
 	jsonChooseSave       func(*mygo.Window) (string, error)
@@ -36,6 +38,11 @@ type application struct {
 	shortcutTarget       string
 	palette              *paletteState
 	paletteShortcutError string
+	panel                *menubarPanelState
+	// createPaletteWindow and createMenubarPanel are seams: tests replace
+	// them so no case creates a native window.
+	createPaletteWindow func(*paletteState)
+	createMenubarPanel  func(*menubarPanelState)
 	// paletteOpenJSON and registerURLScheme are seams: tests replace them so
 	// no case creates a native window or changes the system URL handler.
 	paletteOpenJSON   func(string)
@@ -84,6 +91,10 @@ func newApplication(path string) (*application, error) {
 		return nil, err
 	}
 	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
+	a.createPaletteWindow = a.buildPaletteWindow
+	a.createMenubarPanel = a.buildMenubarPanel
+	a.createJSONWindow = a.buildJSONWindow
+	a.presentJSONWindow = a.focusJSONWindow
 	a.updates = newUpdateManager(checkMyGoUpdate, newReleaseNotesClient(appVersion).load, nil)
 	for index, language := range []string{"system", "zh-CN", "en"} {
 		if config.Language == language {
@@ -233,20 +244,29 @@ func (a *application) escape() {
 	a.hide()
 }
 
-func (a *application) menu() *mygo.Menu {
-	return a.menuForLocale(mygo.App.Locale())
-}
-
-func (a *application) menuForLocale(locale string) *mygo.Menu {
-	items := append(a.awakeMenu(locale), a.jsonMenu(locale)...)
-	items = append(items, []*mygo.MenuItem{
-		{Label: a.text(locale, "MenuSettings"), Accelerator: "Cmd+,", Click: func(*mygo.MenuItem, *mygo.Window) { a.show() }},
-	}...)
+// contextMenu is the tray's right-click menu: the system actions that stay
+// outside the card panel. Left clicks open the panel instead.
+func (a *application) contextMenu(locale string) *mygo.Menu {
+	items := []*mygo.MenuItem{
+		{ID: "settings", Label: a.text(locale, "MenuSettings"), Accelerator: "Cmd+,", Click: func(*mygo.MenuItem, *mygo.Window) { a.show() }},
+	}
 	if a.updates.snapshot().Phase == updateReady {
 		items = append(items, &mygo.MenuItem{ID: "restart-update", Label: a.text(locale, "MenuRestartUpdate"), Click: func(*mygo.MenuItem, *mygo.Window) { a.restartUpdate() }})
 	}
-	items = append(items, &mygo.MenuItem{Label: a.text(locale, "Quit"), Accelerator: "Cmd+Q", Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }})
+	items = append(items, &mygo.MenuItem{ID: "quit", Label: a.text(locale, "Quit"), Accelerator: "Cmd+Q", Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }})
 	return mygo.NewMenu(items)
+}
+
+// showContextMenu opens the right-click menu from the tray icon. The menu is
+// bound for the popup only, so left clicks keep reaching OnClick.
+func (a *application) showContextMenu() {
+	if a.tray == nil {
+		return
+	}
+	a.hideMenubarPanel()
+	a.tray.SetMenu(a.contextMenu(mygo.App.Locale()))
+	defer a.tray.SetMenu(nil)
+	a.tray.PopUpMenu()
 }
 
 func (a *application) show() {
@@ -352,10 +372,14 @@ func (a *application) ready() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	a.tray, err = mygo.NewTray(mygo.TrayOptions{ID: "com.conteman.cubbix.tray", Icon: icon, IconIsTemplate: true, Menu: a.menu()})
+	a.tray, err = mygo.NewTray(mygo.TrayOptions{ID: "com.conteman.cubbix.tray", Icon: icon, IconIsTemplate: true})
 	if err != nil {
 		log.Fatal(err)
 	}
+	// No menu is bound: left clicks open the card panel, and the right-click
+	// menu is built for its popup only.
+	a.tray.OnClick(a.toggleMenubarPanel)
+	a.tray.OnRightClick(a.showContextMenu)
 	mygo.App.OnLocaleChanged(func(locale string) {
 		a.refreshAwake()
 		a.refreshJSONTitles(locale)
@@ -368,7 +392,6 @@ func (a *application) ready() {
 				return
 			}
 			a.invalidateWindow()
-			a.tray.SetMenu(a.menu())
 		})
 	}
 	a.startAwakeServices()
@@ -409,6 +432,7 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	// JSON windows are tools: quitting never asks about unsaved text.
 	a.quitting = true
 	a.hidePalette()
+	a.hideMenubarPanel()
 	if a.stopAwakeServices != nil {
 		a.stopAwakeServices()
 	}

@@ -20,9 +20,9 @@ func TestJSONDocumentNamesListsAndIsolation(t *testing.T) {
 		if one.name(a, locale) != "JSON" || two.name(a, locale) != "items.json" {
 			t.Fatal("document names")
 		}
-		menu := a.menuForLocale(locale)
-		if menu.ItemByID("json-new") == nil || menu.ItemByID("json-window-1").Label != one.name(a, locale) {
-			t.Fatal("window entries missing")
+		rows := a.menubarPanelRows()
+		if len(rows.documents) != 2 || rows.documents[1].name(a, locale) != two.name(a, locale) {
+			t.Fatal("panel window entries missing")
 		}
 	}
 	// The second and later unopened windows count up; a file keeps its own name.
@@ -42,13 +42,24 @@ func TestJSONDocumentNamesListsAndIsolation(t *testing.T) {
 	for range 4 {
 		a.addJSONDocument("", "", true)
 	}
-	if item := a.menuForLocale("en").ItemByID("json-windows"); item == nil || len(item.Submenu) != 6 {
-		t.Fatal("large list must use a submenu")
+	// Six open windows fold into one count row until the list is expanded.
+	a.panel = &menubarPanelState{}
+	if rows := a.menubarPanelRows(); !rows.folded || rows.listRows != 1 {
+		t.Fatalf("large list must fold: %+v", rows)
+	}
+	a.panel.expanded = true
+	if rows := a.menubarPanelRows(); rows.folded || rows.listRows != 7 {
+		t.Fatalf("expanded list rows = %+v", rows)
 	}
 	a.removeJSONDocument(one)
 	three := a.addJSONDocument("", "", true)
-	if three.number != 9 || !one.closed || a.menuForLocale("en").ItemByID("json-window-1") != nil {
+	if three.number != 9 || !one.closed {
 		t.Fatal("closed document reused")
+	}
+	for _, d := range a.menubarPanelRows().documents {
+		if d == one {
+			t.Fatal("closed document listed in the panel")
+		}
 	}
 }
 func TestJSONFilePreservesRawInvalidInputAndAtomicSave(t *testing.T) {
@@ -101,7 +112,7 @@ func TestJSONToggleAndShortcutRecorder(t *testing.T) {
 	a.registerJSONShortcut()
 	a.config.JSONEnabled = false
 	a.changeJSONEnabled()
-	if registry[a.config.JSONShortcut] || a.menuForLocale("en").ItemByID("json-new") != nil || len(a.applicationMenu("en").Items()) != 2 {
+	if registry[a.config.JSONShortcut] || len(a.applicationMenu("en").Items()) != 2 {
 		t.Fatal("disabled tile kept entry or shortcut")
 	}
 	if !registry[a.config.AwakeShortcut] {

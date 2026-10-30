@@ -690,16 +690,12 @@ func TestJSONSettingsAndMenuScreenshots(t *testing.T) {
 			if dark {
 				mode = "dark"
 			}
-			for _, kind := range []string{"tiles", "shortcuts", "menu"} {
+			for _, kind := range []string{"tiles", "shortcuts"} {
 				a.page = 2
 				view := a.view
 				w, h := 720, 340
 				if kind == "shortcuts" {
 					a.page = 3
-				}
-				if kind == "menu" {
-					view = a.menuEvidenceView
-					w, h = 352, 400
 				}
 				tt := ui.NewTester(view, w, h)
 				tt.SetScale(2)

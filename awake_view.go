@@ -89,14 +89,14 @@ func (a *application) confirmAwakeDialog() {
 			return
 		}
 		minutes = int(duration / time.Minute)
-		s = awakeSession{Mode: a.config.AwakeMode, End: time.Now().Add(duration)}
+		s = awakeSession{Mode: a.config.AwakeMode, Minutes: minutes, End: time.Now().Add(duration)}
 	case "until":
 		end, err := untilTime(d.until, time.Now())
 		if err != nil {
 			d.errorKey = "TimeError"
 			return
 		}
-		s = awakeSession{Mode: a.config.AwakeMode, End: end}
+		s = awakeSession{Mode: a.config.AwakeMode, End: end, Until: d.until}
 	case "follow":
 		if d.loading || d.errorKey == "ProcessListError" {
 			return
@@ -123,6 +123,9 @@ func (a *application) confirmAwakeDialog() {
 		a.config.AwakeMinutes, a.config.AwakeUntil = minutes, ""
 	} else if d.kind == "until" {
 		a.config.AwakeUntil = d.until
+	} else if d.kind == "follow" {
+		// A deadline remembered from an earlier session must not shadow it.
+		a.config.AwakeUntil = ""
 	}
 	a.save()
 	a.closeAwakeDialog()

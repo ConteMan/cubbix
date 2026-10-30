@@ -100,7 +100,9 @@ func TestAwakeDeadlineFollowAndCrash(t *testing.T) {
 		}
 		k.alive = func(int, string) bool { return false }
 		k.poll()
-		if s := k.snapshot(); s.Active || s.Error != "" {
+		// A target that went away is an error the panel shows; a deadline
+		// that passed is not.
+		if s := k.snapshot(); s.Active || s.Error != "ProcessEnded" {
 			t.Fatal(s)
 		}
 	})

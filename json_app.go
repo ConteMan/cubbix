@@ -87,7 +87,7 @@ func (a *application) changeJSONEnabled() {
 	a.refreshAwake()
 }
 
-func (a *application) createJSONWindow(d *jsonDocument) {
+func (a *application) buildJSONWindow(d *jsonDocument) {
 	t := tokens(mygo.Theme.IsDark(), mygo.App.Locale())
 	width, height := int(t.SizeJSONWindowWidth), int(t.SizeJSONWindowHeight)
 	if a.config.JSONWidth >= int(t.SizeJSONEmptyWidth) {
@@ -176,7 +176,17 @@ func (a *application) newJSONDocumentFromClipboard() *jsonDocument {
 }
 
 func (a *application) showJSON(d *jsonDocument) {
-	if d.closed || d.window == nil {
+	if d.closed {
+		return
+	}
+	// A JSON window takes the focus and activates the app, so the card panel
+	// closes first instead of lingering behind it.
+	a.hideMenubarPanel()
+	a.presentJSONWindow(d)
+}
+
+func (a *application) focusJSONWindow(d *jsonDocument) {
+	if d.window == nil {
 		return
 	}
 	a.visibility(true)

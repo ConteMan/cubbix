@@ -6,6 +6,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -93,9 +94,11 @@ func TestReadyUIRequiresExplicitRestart(t *testing.T) {
 	if restarts != 2 {
 		t.Fatalf("explicit restart count = %d", restarts)
 	}
-	menu := app.menuForLocale("en")
-	if menu.ItemByID("restart-update") == nil || menu.ItemByID("restart-update").Label != app.text("en", "MenuRestartUpdate") {
-		t.Fatalf("ready menu: %#v", menu.Items())
+	// The right-click menu keeps only the system actions, and gains the
+	// restart entry once an update is ready to install.
+	menu := app.contextMenu("en")
+	if labels := menuLabels(menu); !slices.Equal(labels, []string{"Settings…", "Restart to finish updating", "Quit Cubbix"}) {
+		t.Fatalf("ready menu: %#v", labels)
 	}
 	menu.ItemByID("restart-update").Click(nil, nil)
 	if restarts != 3 {

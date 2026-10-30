@@ -13,6 +13,9 @@ import (
 
 func (a *application) awakeChanged() {
 	s := a.awake.snapshot()
+	if a.panel != nil {
+		a.panel.errorKey = ""
+	}
 	a.config.AwakeSession = nil
 	if s.Active {
 		copy := s.Session
@@ -22,18 +25,17 @@ func (a *application) awakeChanged() {
 	a.refreshAwake()
 }
 func (a *application) refreshAwake() {
-	if a.tray == nil {
-		return
+	if a.tray != nil {
+		name := "assets/menubar-template.tiff"
+		if a.awake.snapshot().Active {
+			name = "assets/menubar-template-active.tiff"
+		}
+		data, _ := assets.ReadFile(name)
+		_ = a.tray.SetIcon(data, true)
+		a.tray.SetToolTip(a.awakeStatus(mygo.App.Locale(), time.Now()))
 	}
-	name := "assets/menubar-template.tiff"
-	if a.awake.snapshot().Active {
-		name = "assets/menubar-template-active.tiff"
-	}
-	data, _ := assets.ReadFile(name)
-	_ = a.tray.SetIcon(data, true)
-	a.tray.SetMenu(a.menu())
-	a.tray.SetToolTip(a.awakeStatus(mygo.App.Locale(), time.Now()))
 	a.invalidateWindow()
+	a.refreshMenubarPanel()
 }
 func (a *application) startAwake(s awakeSession) error {
 	if !a.config.AwakeEnabled {
@@ -42,9 +44,8 @@ func (a *application) startAwake(s awakeSession) error {
 	return a.awake.start(s)
 }
 
-// reportAwakeError keeps the settings error slot for the entries that still
-// report there, such as menu items. The palette and URL paths read the error
-// they get back instead of writing it here.
+// reportAwakeError serves the global shortcut and launch restoration. Panels
+// and URL actions consume their returned errors without writing Settings.
 func (a *application) reportAwakeError(err error) {
 	if err != nil {
 		a.settingsError = "AwakeStartError"
@@ -52,10 +53,7 @@ func (a *application) reportAwakeError(err error) {
 	}
 }
 func (a *application) selectedSession() awakeSession {
-	s := awakeSession{Mode: a.config.AwakeMode}
-	if s.Mode == "" {
-		s.Mode = "screen"
-	}
+	s := awakeSession{Mode: a.config.AwakeMode, Minutes: a.config.AwakeMinutes, Until: a.config.AwakeUntil}
 	if s.Mode == "" {
 		s.Mode = "screen"
 	}
@@ -102,7 +100,7 @@ func (a *application) setDuration(minutes int) error {
 	if minutes < 0 || minutes > awakeMinutesMaximum {
 		return fmt.Errorf("DurationError")
 	}
-	s := awakeSession{Mode: a.config.AwakeMode}
+	s := awakeSession{Mode: a.config.AwakeMode, Minutes: minutes}
 	if minutes > 0 {
 		s.End = time.Now().Add(time.Duration(minutes) * time.Minute)
 	}
@@ -139,6 +137,32 @@ func (a *application) registerAwakeShortcut() {
 	}
 }
 
+// awakeMode names the mode a session runs in.
+func (a *application) awakeMode(locale string, session awakeSession) string {
+	if session.Mode == "tasks" {
+		return a.text(locale, "R05Tasks")
+	}
+	return a.text(locale, "R05Screen")
+}
+
+// awakeSuffix is the tail of a status line: the followed process, a deadline,
+// no deadline, or the time left. A followed process and a deadline are read
+// before the countdown so neither is hidden by it.
+func (a *application) awakeSuffix(locale string, session awakeSession, now time.Time) string {
+	text := func(key string) string { return a.text(locale, key) }
+	if session.PID > 0 {
+		return fmt.Sprintf(text("AwakeFollowing"), session.Name)
+	}
+	if session.Until != "" {
+		return fmt.Sprintf(text("AwakeUntil"), session.Until)
+	}
+	if session.End.IsZero() {
+		return text("R05Unlimited")
+	}
+	minutes := max(0, int(math.Ceil(session.End.Sub(now).Minutes())))
+	return fmt.Sprintf(text("AwakeRemaining"), minutes/60, minutes%60)
+}
+
 func (a *application) awakeStatus(locale string, now time.Time) string {
 	text := func(key string) string { return a.text(locale, key) }
 	s := a.awake.snapshot()
@@ -148,44 +172,7 @@ func (a *application) awakeStatus(locale string, now time.Time) string {
 		}
 		return text("R05Off")
 	}
-	mode := "R05Screen"
-	if s.Session.Mode == "tasks" {
-		mode = "R05Tasks"
-	}
-	suffix := text("R05Unlimited")
-	if !s.Session.End.IsZero() {
-		minutes := max(0, int(math.Ceil(s.Session.End.Sub(now).Minutes())))
-		suffix = fmt.Sprintf(text("AwakeRemaining"), minutes/60, minutes%60)
-	}
-	if s.Session.PID > 0 {
-		suffix = fmt.Sprintf(text("AwakeFollowing"), s.Session.Name)
-	}
-	return text(mode) + " · " + suffix
-}
-func (a *application) awakeMenu(locale string) []*mygo.MenuItem {
-	text := func(key string) string { return a.text(locale, key) }
-	active := a.awake.snapshot().Active
-	items := []*mygo.MenuItem{{ID: "awake-status", Label: a.awakeStatus(locale, time.Now()), Disabled: true}}
-	if !active {
-		items = append(items, &mygo.MenuItem{ID: "awake-start", Label: text("R05Start"), Disabled: !a.config.AwakeEnabled, Accelerator: a.config.AwakeShortcut, Click: func(*mygo.MenuItem, *mygo.Window) { a.toggleAwake() }})
-	}
-	modes := []*mygo.MenuItem{}
-	for _, m := range []struct{ value, key string }{{"screen", "R05Screen"}, {"tasks", "R05Tasks"}} {
-		modes = append(modes, &mygo.MenuItem{Label: text(m.key), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMode == m.value, Click: func(*mygo.MenuItem, *mygo.Window) { a.reportAwakeError(a.setMode(m.value)) }})
-	}
-	durations := []*mygo.MenuItem{}
-	for _, d := range []struct {
-		minutes int
-		key     string
-	}{{30, "R05Half"}, {60, "R05Hour"}, {120, "R05Two"}, {240, "R05Four"}} {
-		durations = append(durations, &mygo.MenuItem{Label: text(d.key), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMinutes == d.minutes && a.config.AwakeUntil == "", Click: func(*mygo.MenuItem, *mygo.Window) { a.reportAwakeError(a.setDuration(d.minutes)) }})
-	}
-	durations = append(durations, mygo.Separator(), &mygo.MenuItem{Label: text("R05Custom"), Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("custom") }}, &mygo.MenuItem{Label: text("R05Until"), Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("until") }}, &mygo.MenuItem{Label: text("R05Unlimited"), Type: mygo.MenuItemRadio, Checked: a.config.AwakeMinutes == 0 && a.config.AwakeUntil == "", Click: func(*mygo.MenuItem, *mygo.Window) { a.reportAwakeError(a.setDuration(0)) }})
-	items = append(items, mygo.Separator(), &mygo.MenuItem{Label: text("R05Mode"), Disabled: !a.config.AwakeEnabled, Submenu: modes}, &mygo.MenuItem{Label: text("R05Duration"), Disabled: !a.config.AwakeEnabled, Submenu: durations}, &mygo.MenuItem{Label: text("R05Follow"), Disabled: !a.config.AwakeEnabled, Click: func(*mygo.MenuItem, *mygo.Window) { a.openAwakeDialog("follow") }})
-	if active {
-		items = append(items, &mygo.MenuItem{ID: "awake-stop", Label: text("R05Stop"), Accelerator: a.config.AwakeShortcut, Click: func(*mygo.MenuItem, *mygo.Window) { a.awake.stop() }})
-	}
-	return append(items, mygo.Separator())
+	return a.awakeMode(locale, s.Session) + " · " + a.awakeSuffix(locale, s.Session, now)
 }
 
 type powerMonitor struct {

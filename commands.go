@@ -383,7 +383,7 @@ func (a *application) runAwakeStart(req request) error {
 		if err != nil {
 			return err
 		}
-		if err := a.startAwake(awakeSession{Mode: a.config.AwakeMode, End: end}); err != nil {
+		if err := a.startAwake(awakeSession{Mode: a.config.AwakeMode, End: end, Until: req.Awake.Until}); err != nil {
 			return err
 		}
 		a.config.AwakeUntil = req.Awake.Until
@@ -412,18 +412,19 @@ func (a *application) startAwakeWith(arg awakeArg, mode string) error {
 		if err != nil {
 			return err
 		}
-		session = awakeSession{Mode: mode, End: end}
+		session = awakeSession{Mode: mode, End: end, Until: arg.Until}
 	case awakeArgMinutes:
 		if arg.Minutes < awakeMinutesMinimum || arg.Minutes > awakeMinutesMaximum {
 			return errors.New("DurationError")
 		}
-		session = awakeSession{Mode: mode, End: time.Now().Add(time.Duration(arg.Minutes) * time.Minute)}
+		session = awakeSession{Mode: mode, Minutes: arg.Minutes, End: time.Now().Add(time.Duration(arg.Minutes) * time.Minute)}
 	default:
 		session = a.selectedSession()
 		session.Mode = mode
 	}
 	if arg.Kind == awakeArgUnlimited {
 		session.End = time.Time{}
+		session.Minutes, session.Until = 0, ""
 	}
 	if err := a.startAwake(session); err != nil {
 		return err
