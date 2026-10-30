@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 — 2026-10-30
+
+- Say hello to the second cubby, JSON. Press ⌃ ⌥ ⌘ J for a new window, and any JSON on your clipboard shows up neatly formatted, with highlighting, line numbers and folding.
+- Type a quick expression in the this bar, like .data.items.length, and see the answer right away. Typos and slow expressions won't freeze anything.
+- Open a few windows side by side, and press ⌥ ⌘ P to keep one on top.
+- Picking a process to follow no longer stalls. The list now shows only apps and programs running in your terminals.
+
 ## 0.1.0 — 2026-10-30
 
 - Meet the first cubby, Keep Awake: tell your Mac to stay up, with the screen on or just your tasks running.
