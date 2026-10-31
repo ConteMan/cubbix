@@ -1,0 +1,54 @@
+{
+  "cliVersion": "0.3.13",
+  "historicalRootsUnchanged": true,
+  "nativeLayout": {
+    "nodes": 1769,
+    "problemCount": 0,
+    "problems": []
+  },
+  "exports": [
+    {
+      "nodeId": "qS715",
+      "name": "R12 zh-CN light",
+      "file": "zh-CN-light.png",
+      "scale": 2,
+      "sha256": "2a82ef240fcb9cf0579bb45180392d52f506ed5f1353362b423f2a1b37c31f57"
+    },
+    {
+      "nodeId": "qtkGv",
+      "name": "R12 zh-CN dark",
+      "file": "zh-CN-dark.png",
+      "scale": 2,
+      "sha256": "b4d8e76ba4aa0cca1d341ac3cf0362b87ac86c6352c9a8e0a238eb761abacf6f"
+    },
+    {
+      "nodeId": "f0PzD",
+      "name": "R12 en light",
+      "file": "en-light.png",
+      "scale": 2,
+      "sha256": "dd29bbad8bbd6a2cc8f2706ce267126ea9305e37c036fa1347cb02816aa51a13"
+    },
+    {
+      "nodeId": "WmAMb",
+      "name": "R12 en dark",
+      "file": "en-dark.png",
+      "scale": 2,
+      "sha256": "ea1e6e004675cf018b7fb325958be34aff337a63f971bbcbea21a63b91e94008"
+    },
+    {
+      "nodeId": "O2atCp",
+      "name": "R12 title states",
+      "file": "title-states.png",
+      "scale": 2,
+      "sha256": "c971a4a240c7872acd4ffef8c67c02121dbef5e33607a66ed218b0718b129c83"
+    },
+    {
+      "nodeId": "pzz6R",
+      "name": "R12 preview states",
+      "file": "preview-states.png",
+      "scale": 2,
+      "sha256": "16f8741ee1139349b0dba95e928482542ae9636f3e898aab43b14ef39ca3bd51"
+    }
+  ],
+  "passed": true
+}
