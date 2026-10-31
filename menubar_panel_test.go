@@ -435,9 +435,9 @@ func TestMenubarPanelHeight(t *testing.T) {
 		awake, json bool
 		want        int
 	}{
-		{"both tiles, no windows", true, true, 285},
+		{"both tiles, no windows", true, true, 249},
 		{"awake only", true, false, 189},
-		{"json only", false, true, 153},
+		{"json only", false, true, 117},
 		{"all tiles off", false, false, 97},
 	}
 	for _, c := range cases {
@@ -453,8 +453,8 @@ func TestMenubarPanelHeight(t *testing.T) {
 		t.Fatal(err)
 	}
 	withStatus := a.menubarPanelHeight(tt)
-	if withStatus != 313 {
-		t.Fatalf("height with status = %d, want 313", withStatus)
+	if withStatus != 277 {
+		t.Fatalf("height with status = %d, want 277", withStatus)
 	}
 	a.awake.stop()
 	withoutStatus := a.menubarPanelHeight(tt)
@@ -462,7 +462,7 @@ func TestMenubarPanelHeight(t *testing.T) {
 		t.Fatalf("status row = %d", withStatus-withoutStatus)
 	}
 	// Each JSON window adds a row and one small gap.
-	three := 285 + 3*int(tt.SizeNavHeight) + 2*int(tt.Space2) + int(tt.Space8)
+	three := 249 + 3*int(tt.SizeNavHeight) + 2*int(tt.Space2) + int(tt.Space8)
 	for index := range 3 {
 		a.addJSONDocument("", fmt.Sprintf("row-%d.json", index), true)
 	}
@@ -473,12 +473,12 @@ func TestMenubarPanelHeight(t *testing.T) {
 	for index := range 4 {
 		a.addJSONDocument("", fmt.Sprintf("more-%d.json", index), true)
 	}
-	folded := 285 + int(tt.SizeNavHeight+tt.Space8)
+	folded := 249 + int(tt.SizeNavHeight+tt.Space8)
 	if got := a.menubarPanelHeight(tt); got != folded {
 		t.Fatalf("folded height = %d, want %d", got, folded)
 	}
 	a.panel = &menubarPanelState{expanded: true}
-	expanded := 285 + 7*int(tt.SizeNavHeight) + 6*int(tt.Space2) + int(tt.Space8) + int(tt.SizeNavHeight+tt.Space2)
+	expanded := 249 + 7*int(tt.SizeNavHeight) + 6*int(tt.Space2) + int(tt.Space8) + int(tt.SizeNavHeight+tt.Space2)
 	if got := a.menubarPanelHeight(tt); got != expanded {
 		t.Fatalf("expanded height = %d, want %d", got, expanded)
 	}

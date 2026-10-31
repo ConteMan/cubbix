@@ -139,8 +139,22 @@ func nativeWindowChecks(a *application, dir string) error {
 		if style&8 == 0 {
 			return fmt.Errorf("native window is not resizable")
 		}
-		if win.Send(objc.RegisterName("standardWindowButton:"), 0) == 0 {
-			return fmt.Errorf("native close button missing")
+		// Close, minimize and zoom all stay; full screen stays off. The app
+		// draws no button of its own.
+		if !a.window.IsMinimizable() || !a.window.IsMaximizable() || !a.window.IsClosable() {
+			return fmt.Errorf("native window lost a standard button")
+		}
+		if behavior := objc.Send[uint](win, objc.RegisterName("collectionBehavior")); behavior&(1<<7) != 0 {
+			return fmt.Errorf("native window can still go full screen")
+		}
+		for button := 0; button < 3; button++ {
+			item := win.Send(objc.RegisterName("standardWindowButton:"), button)
+			if item == 0 {
+				return fmt.Errorf("native window button %d missing", button)
+			}
+			if objc.Send[bool](item, objc.RegisterName("isHidden")) {
+				return fmt.Errorf("native window button %d hidden", button)
+			}
 		}
 		minimum := objc.Send[struct{ Width, Height float64 }](win, objc.RegisterName("minSize"))
 		mw, mh := settingsMinimumSize()

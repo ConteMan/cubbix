@@ -118,7 +118,7 @@ CLI 0.3.13 不保留 width/height 变量绑定，Size Token 解析为几何数�
 | `ColorSyntaxBool` | color | `light: #003388 / dark: #6CB6FF` |
 | `ColorSyntaxNull` | color | `light: #003388 / dark: #6CB6FF` |
 | `ColorSyntaxIndent` | color | `light: #EBEBEB / dark: #3C3C3C` |
-| `SizeJSONTitleInset` | number | `76` |
+| `SizeJSONTitleInset` | number | `80` |
 | `SizeJSONSplitter` | number | `7` |
 | `SizeJSONPaneMinWidth` | number | `240` |
 

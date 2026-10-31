@@ -108,6 +108,8 @@ func jsonNativeMain() int {
 
 func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) error {
 	page := d.window.Page()
+	space12 := int(tokens(false, "zh-CN").Space12)
+	space16 := int(tokens(false, "zh-CN").Space16)
 	eval := func(code string) (any, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
@@ -136,6 +138,18 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 		return fmt.Errorf("hidden page did not settle: %s; %+v (%v)", code, v, err)
 	}
 	if err := wait("!!window.cubbix && window.cubbix.state().status === ''"); err != nil {
+		return err
+	}
+	// A fresh window has no this result: no preview, no separator, and the
+	// editor owns the whole workspace row.
+	if err := want(`(()=>{
+	  const box = id => document.getElementById(id).getBoundingClientRect();
+	  const state = window.cubbix.state();
+	  return !state.preview && state.status === '' &&
+	    getComputedStyle(document.getElementById('result')).display === 'none' &&
+	    getComputedStyle(document.getElementById('splitter')).display === 'none' &&
+	    Math.abs(box('editor').width - box('workspace').width) < 1;
+	})()`); err != nil {
 		return err
 	}
 	checkHidden := func() error {
@@ -245,6 +259,14 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 			}
 			time.Sleep(480 * time.Millisecond)
 			if err := capture("json-error-" + locale + "-" + mode); err != nil {
+				return err
+			}
+			// The error is one alert icon in the preview; its reason stays in the tooltip.
+			if err := want(`(()=>{
+			  const pane = document.getElementById('result'), status = document.getElementById('status');
+			  return window.cubbix.state().preview && getComputedStyle(pane).display !== 'none' &&
+			    status.classList.contains('error') && !!status.querySelector('svg') && pane.textContent.trim() === '';
+			})()`); err != nil {
 				return err
 			}
 			if err := want("await window.cubbix.evaluate(' && (()=>{while(true){}})()').then(v=>v.kind==='timeout')"); err != nil {
@@ -362,6 +384,15 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 			if _, err := eval("window.cubbix.evaluate('')"); err != nil {
 				return err
 			}
+			// An emptied document drops the preview again; the editor fills the row.
+			if err := want(`(()=>{
+			  const box = id => document.getElementById(id).getBoundingClientRect();
+			  return !window.cubbix.state().preview &&
+			    getComputedStyle(document.getElementById('result')).display === 'none' &&
+			    Math.abs(box('editor').width - box('workspace').width) < 1;
+			})()`); err != nil {
+				return err
+			}
 			if err := capture("json-empty-" + locale + "-" + mode); err != nil {
 				return err
 			}
@@ -418,21 +449,69 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 		return err
 	}
 
-	// Editor on the left, result on the right, this field under the editor.
-	if err := want(`(()=>{
+	// A result brings the separator and the preview.
+	if err := want("await window.cubbix.evaluate('.data.items.length').then(v=>v.kind==='number')"); err != nil {
+		return err
+	}
+	// Editor left, preview right; one full-width footer stops both at its top.
+	if err := want(fmt.Sprintf(`(()=>{
 	  const box = id => document.getElementById(id).getBoundingClientRect();
-	  const editor = box('editor'), splitter = box('splitter'), result = box('result'), input = box('expression'), tools = box('tools');
-	  return editor.width > 0 && result.width > 0 && Math.abs(splitter.left - editor.right) < 1 &&
-	    Math.abs(result.left - splitter.right) < 1 && Math.abs(input.width - editor.width) < 1 &&
-	    input.right <= splitter.right + 1 && tools.right <= innerWidth + 1 && tools.width > 0 &&
+	  const centre = r => (r.top + r.bottom) / 2;
+	  const editor = box('editor'), splitter = box('splitter'), result = box('result');
+	  const workspace = box('workspace'), expression = box('expression'), input = box('suffix'), tools = box('tools');
+	  const footer = document.querySelector('footer').getBoundingClientRect();
+	  return window.cubbix.state().preview && editor.width > 0 && result.width > 0 &&
+	    Math.abs(splitter.left - editor.right) < 1 && Math.abs(result.left - splitter.right) < 1 &&
+	    Math.abs(splitter.bottom - footer.top) < 1 && Math.abs(editor.bottom - footer.top) < 1 &&
+	    Math.abs(result.bottom - footer.top) < 1 && Math.abs(workspace.bottom - footer.top) < 1 &&
+	    footer.left <= 0.5 && footer.right >= innerWidth - 0.5 && Math.abs(footer.bottom - innerHeight) < 1 &&
+	    Math.abs(expression.left - footer.left - %d) < 1 && Math.abs(input.left - expression.left) > 1 &&
+	    input.width > editor.width / 2 && Math.abs(tools.left - input.right - %d) < 1 &&
+	    Math.abs(innerWidth - tools.right - %d) < 1 && Math.abs(centre(input) - centre(tools)) < 1 &&
 	    document.querySelectorAll('#tools button').length === 4 &&
-	    document.getElementById('splitter').getAttribute('aria-orientation') === 'vertical' &&
-	    document.getElementById('result').childElementCount === 0;
-	})()`); err != nil {
+	    document.getElementById('splitter').getAttribute('aria-orientation') === 'vertical';
+	})()`, space12, space12, space12)); err != nil {
 		return err
 	}
 	if err := want("Math.abs(document.getElementById('editor').getBoundingClientRect().width / document.getElementById('workspace').clientWidth - 0.6) < 0.02"); err != nil {
 		return err
+	}
+	// The line number (44) and the fold arrow (24) share one row and its centre.
+	gutter, err := eval(`(()=>{
+	  const centre = r => (r.top + r.bottom) / 2;
+	  const element = (selector, text) => [...document.querySelectorAll(selector)]
+	    .find(candidate => getComputedStyle(candidate).visibility !== 'hidden' && (!text || candidate.textContent === text));
+	  const number = element('#editor .cm-lineNumbers .cm-gutterElement', '1');
+	  const fold = element('#editor .cm-foldGutter .cm-gutterElement', '');
+	  const glyph = target => {
+	    const range = document.createRange();
+	    range.selectNodeContents(target);
+	    return range.getBoundingClientRect();
+	  };
+	  const numberBox = number.getBoundingClientRect(), foldBox = fold.getBoundingClientRect();
+	  const numberGlyph = glyph(number), foldGlyph = glyph(fold.firstElementChild || fold);
+	  return {
+	    number: {width: numberBox.width, align: getComputedStyle(number).alignItems, display: getComputedStyle(number).display, centre: centre(numberGlyph)},
+	    fold: {width: foldBox.width, align: getComputedStyle(fold).alignItems, display: getComputedStyle(fold).display, centre: centre(foldGlyph)},
+	    rows: Math.abs(centre(numberBox) - centre(foldBox)),
+	  };
+	})()`)
+	if err != nil {
+		return err
+	}
+	measured := gutter.(map[string]any)
+	number := measured["number"].(map[string]any)
+	fold := measured["fold"].(map[string]any)
+	within := func(rect map[string]any, key string, want float64) bool {
+		got := rect[key].(float64)
+		return got >= want-1 && got <= want+1
+	}
+	centred := func(rect map[string]any) bool {
+		return rect["align"] == "center" && rect["display"] == "flex"
+	}
+	if !within(number, "width", 44) || !within(fold, "width", 24) || !centred(number) || !centred(fold) ||
+		!within(fold, "centre", number["centre"].(float64)) || measured["rows"].(float64) > 1 {
+		return fmt.Errorf("gutter geometry: %+v", measured)
 	}
 	// Keys, strings, numbers and booleans read in their own tokens.
 	if err := want(`(()=>{
@@ -540,7 +619,7 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 			}
 		}
 	}
-	// Both windows are named for the app switcher; a new one never says "Untitled".
+	// A window without a file shows the fixed name, never a number.
 	var titles [3]string
 	var extra *jsonDocument
 	mygo.RunOnMain(func() {
@@ -548,16 +627,83 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 		a.createJSONWindow(extra)
 		titles = [3]string{d.window.Title(), other.window.Title(), extra.window.Title()}
 	})
-	if titles[0] != "10mb.json" || titles[1] != "items.json" || titles[2] != "JSON 3" {
+	if titles[0] != "10mb.json" || titles[1] != "items.json" || titles[2] != "JSON" {
 		return fmt.Errorf("window titles: %q", titles)
 	}
-	// The page draws the same name next to the traffic lights.
-	if err := want(`(()=>{
+	// The page draws the same name, centred on the 44-high bar and inset past
+	// the traffic lights by 12 + 52 + Space16.
+	if err := want(fmt.Sprintf(`(()=>{
 	  const title = document.getElementById('title');
 	  const box = title.getBoundingClientRect(), toolbar = document.getElementById('toolbar').getBoundingClientRect();
-	  return title.textContent === '10mb.json' && box.left >= 76 && box.left < toolbar.right && getComputedStyle(title).overflow === 'hidden';
+	  const centre = r => (r.top + r.bottom) / 2;
+	  return title.textContent === '10mb.json' && Math.abs(box.left - %d) < 1 && box.left < toolbar.right &&
+	    Math.abs(centre(box) - centre(toolbar)) < 1 && Math.abs(centre(box) - 22) < 1 &&
+	    getComputedStyle(title).overflow === 'hidden';
+	})()`, space12+52+space16)); err != nil {
+		return err
+	}
+	// One click edits the name in place: Enter confirms through the bridge.
+	if err := want(`(async()=>{
+	  const click = () => document.getElementById('title').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+	  const field = () => document.getElementById('title-edit');
+	  const key = (target, name) => target.dispatchEvent(new KeyboardEvent('keydown',{key:name,bubbles:true}));
+	  click();
+	  const fieldBox = field().getBoundingClientRect(), fieldStyle = getComputedStyle(field());
+	  const opened = !field().hidden && window.cubbix.state().editing && document.getElementById('title').hidden &&
+	    document.activeElement === field() && Math.abs(fieldBox.height - 24) < 1 &&
+	    fieldStyle.borderTopWidth === '1px' && fieldBox.top > 0;
+	  field().value = 'orders view';
+	  key(field(), 'Enter');
+	  await new Promise(resolve => setTimeout(resolve, 200));
+	  return opened && field().hidden && !document.getElementById('title').hidden &&
+	    document.getElementById('title').textContent === 'orders view' && window.cubbix.state().name === 'orders view';
 	})()`); err != nil {
 		return err
+	}
+	// The window, the card list and the palette command share the new name.
+	var renamed string
+	mygo.RunOnMain(func() { renamed = d.window.Title() })
+	if renamed != "orders view" {
+		return fmt.Errorf("renamed window title %q", renamed)
+	}
+	if rows := a.menubarPanelRows(); rows.documents[0] != d || d.name(a, "en") != "orders view" {
+		return fmt.Errorf("card list kept the old name")
+	}
+	for _, command := range a.commands() {
+		if command.ID == fmt.Sprintf("json.window.%d", d.number) && command.Title(a, "en") != "orders view" {
+			return fmt.Errorf("palette command kept the old name")
+		}
+	}
+	// Esc cancels, an empty name restores the default, another file brings its
+	// own name.
+	if err := want(`(async()=>{
+	  const click = () => document.getElementById('title').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+	  const field = () => document.getElementById('title-edit');
+	  const key = (target, name) => target.dispatchEvent(new KeyboardEvent('keydown',{key:name,bubbles:true}));
+	  click();
+	  field().value = 'discarded';
+	  key(field(), 'Escape');
+	  const cancelled = field().hidden && document.getElementById('title').textContent === 'orders view';
+	  click();
+	  field().value = '   ';
+	  key(field(), 'Enter');
+	  await new Promise(resolve => setTimeout(resolve, 200));
+	  return cancelled && document.getElementById('title').textContent === '10mb.json';
+	})()`); err != nil {
+		return err
+	}
+	otherPath := filepath.Join(dir, "opened.json")
+	if err := os.WriteFile(otherPath, []byte(`{"another":true}`), 0600); err != nil {
+		return err
+	}
+	mygo.RunOnMain(func() { a.replaceJSONFile(d, otherPath) })
+	if err := wait(`document.getElementById('title').textContent === 'opened.json' && !window.cubbix.state().pending`); err != nil {
+		return err
+	}
+	var opened string
+	mygo.RunOnMain(func() { opened = d.window.Title() })
+	if opened != "opened.json" {
+		return fmt.Errorf("new file title %q", opened)
 	}
 	mygo.RunOnMain(func() {
 		// The traffic-light close action reaches the same native close path.

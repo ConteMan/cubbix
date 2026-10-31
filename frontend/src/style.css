@@ -11,39 +11,51 @@ button svg, #status svg, #gauge svg { width: var(--SizeIcon); height: var(--Size
 button:focus, input:focus, [tabindex]:focus { outline: none; }
 button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: var(--StrokeHairline) solid var(--ColorTextSecondary); outline-offset: var(--Space2); }
 #toolbar { height: var(--SizeJSONToolbarHeight); min-height: var(--SizeJSONToolbarHeight); display: flex; align-items: center; padding: var(--Space8) var(--Space12) var(--Space8) var(--SizeJSONTitleInset); border-bottom: var(--StrokeHairline) solid var(--ColorSeparator); --app-region: drag; }
-#title { flex: 0 1 auto; max-width: 50%; margin-right: var(--Space12); overflow: hidden; font-weight: var(--FontWeightMedium); text-overflow: ellipsis; white-space: nowrap; user-select: none; }
+/* One click edits the name in place; the bar stays draggable around it. */
+#title { flex: 0 1 auto; max-width: 50%; margin-right: var(--Space8); overflow: hidden; font-weight: var(--FontWeightMedium); text-overflow: ellipsis; white-space: nowrap; user-select: none; --app-region: no-drag; }
+#title-edit { flex: 0 1 auto; max-width: 50%; height: var(--Space24); min-width: 0; margin-right: var(--Space8); padding: 0 var(--Space8); border: var(--StrokeHairline) solid var(--ColorText); border-radius: var(--RadiusControl); background: var(--ColorControl); color: var(--ColorText); font-size: var(--FontSizeBody); font-weight: var(--FontWeightMedium); --app-region: no-drag; }
+#title-edit:focus-visible { outline: none; }
 #drag { flex: 1; height: 100%; }
 #top-actions { display: flex; align-items: center; gap: var(--Space8); --app-region: no-drag; }
 #workspace { flex: 1; min-height: 0; display: flex; }
 #editor { flex: 0 0 var(--editor-width, 60%); min-width: 0; position: relative; overflow: hidden; }
 #splitter { flex: 0 0 var(--SizeJSONSplitter); background: var(--ColorCard); border-left: var(--StrokeHairline) solid var(--ColorSeparator); cursor: col-resize; touch-action: none; }
 #splitter:hover, #splitter:active { background: var(--ColorControlHover); }
-#result { flex: 1 1 0; min-width: 0; overflow: hidden; }
+#result { flex: 1 1 0; min-width: 0; overflow: hidden; position: relative; padding: var(--Space8) var(--Space12); }
+/* Without a result there is no preview and no separator: the editor owns the row. */
+body:not(.preview) #splitter, body:not(.preview) #result { display: none; }
+body:not(.preview) #editor { flex: 1 1 auto; }
 .cm-editor { height: 100%; outline: none !important; }
 .cm-scroller { font: var(--FontSizeBody)/var(--SizeJSONLineHeight) var(--FontFamilyCode), monospace !important; overflow: auto; }
 .cm-content { padding: var(--Space8) 0 !important; caret-color: var(--ColorText); }
 .cm-line { padding: 0 var(--Space12) !important; }
 /* Structural guides only: weak separator gray, one line per indentation level. */
 .cm-line.cm-guide { background-image: repeating-linear-gradient(to right, transparent 0 calc(var(--indent-step) - var(--StrokeHairline)), var(--ColorSyntaxIndent) calc(var(--indent-step) - var(--StrokeHairline)) var(--indent-step)); background-repeat: no-repeat; background-size: calc(var(--indent) * var(--indent-step)) 100%; background-position-x: var(--Space12); }
+/* The line number (44) and the fold arrow (24) share one row and its centre. */
 .cm-gutters { background: transparent !important; border: 0 !important; color: var(--ColorTextSecondary) !important; }
-.cm-lineNumbers .cm-gutterElement { min-width: var(--Space32); padding-left: var(--Space12); }
-.cm-foldGutter .cm-gutterElement { padding: 0 var(--Space4); }
+.cm-gutters .cm-gutterElement { display: flex; align-items: center; }
+.cm-gutters .cm-lineNumbers .cm-gutterElement { min-width: calc(var(--Space32) + var(--Space12)); padding: 0; padding-left: var(--Space12); text-align: left; white-space: nowrap; }
+.cm-gutters .cm-foldGutter .cm-gutterElement { width: var(--Space24); padding: 0 var(--Space4); justify-content: center; }
 .cm-foldPlaceholder { color: var(--ColorTextSecondary); background: var(--ColorControl); border: 0; }
 .cm-focused .cm-cursor { border-color: var(--ColorText); }
 .cm-selectionBackground, .cm-focused .cm-selectionBackground { background: var(--ColorAccentSoft) !important; }
 #empty { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
 #empty svg { width: var(--SizeIconLarge); height: var(--SizeIconLarge); stroke: var(--ColorTextDisabled); }
 body.empty .cm-gutters { visibility: hidden; }
-#result pre { height: 100%; margin: 0; padding: var(--Space8) var(--Space12); overflow: auto; font: var(--FontSizeBody)/var(--SizeJSONLineHeight) var(--FontFamilyCode), monospace; }
-#result pre.muted { color: var(--ColorTextSecondary); }
-footer { flex-shrink: 0; display: flex; align-items: center; }
-#expression { flex: 0 0 var(--editor-width, 60%); min-width: 0; height: var(--SizeJSONExpressionHeight); padding: var(--Space6) var(--Space12); display: flex; align-items: center; gap: var(--Space12); }
-#expression label { font-family: var(--FontFamilyCode), monospace; font-weight: var(--FontWeightSemibold); }
-#suffix { width: 0; flex: 1; min-width: 0; height: var(--SizeNavHeight); background: var(--ColorControl); border: 0; border-radius: var(--RadiusControl); padding: 0 var(--Space12); font-family: var(--FontFamilyCode), monospace; }
+/* Status owns the preview area while it lasts; the footer stays unchanged. */
+#status { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 #status:empty { display: none; }
-#status { display: flex; }
+#status svg { width: var(--SizeIconLarge); height: var(--SizeIconLarge); }
 #status.error svg { stroke: var(--ColorDanger); }
-#tools { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: var(--Space4); height: var(--SizeJSONExpressionHeight); padding: 0 var(--Space12); }
+#result .cm-content { padding: 0 !important; }
+#result pre { height: 100%; margin: 0; padding: 0; overflow: auto; font: var(--FontSizeBody)/var(--SizeJSONLineHeight) var(--FontFamilyCode), monospace; }
+#result pre.muted { color: var(--ColorTextSecondary); }
+/* The footer is one full-width row under the editor, the separator and the preview. */
+footer { flex-shrink: 0; display: flex; align-items: center; gap: var(--Space12); padding: var(--Space6) var(--Space12); border-top: var(--StrokeHairline) solid var(--ColorSeparator); }
+#expression { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: var(--Space12); }
+#expression label { font-family: var(--FontFamilyCode), monospace; font-weight: var(--FontWeightSemibold); }
+#suffix { width: 0; flex: 1 1 auto; min-width: 0; height: var(--SizeNavHeight); background: var(--ColorControl); border: 0; border-radius: var(--RadiusControl); padding: 0 var(--Space12); font-family: var(--FontFamilyCode), monospace; }
+#tools { flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-end; gap: var(--Space4); height: var(--SizeNavHeight); }
 #gauge { margin-right: var(--Space4); display: flex; align-items: center; }
 .loader { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

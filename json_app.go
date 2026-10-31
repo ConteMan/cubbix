@@ -263,6 +263,11 @@ func (a *application) replaceJSONFile(d *jsonDocument, path string) {
 			if d.closed {
 				return
 			}
+			// A different file brings its own name; a rename belongs to the
+			// document, not to the path.
+			if path != d.path {
+				d.custom = ""
+			}
 			d.path = path
 			d.text = data
 			d.revision++
@@ -313,7 +318,11 @@ func (a *application) saveJSON(d *jsonDocument, snapshot jsonSnapshot, as bool) 
 		if d.closed {
 			return
 		}
-		d.path = filepath.Clean(path)
+		cleaned := filepath.Clean(path)
+		if cleaned != d.path {
+			d.custom = ""
+		}
+		d.path = cleaned
 		if snapshot.Revision >= d.revision {
 			d.changed(snapshot.Revision, false)
 		}
@@ -385,6 +394,29 @@ func (b *jsonBridge) Changed(ctx context.Context, revision uint64, dirty bool) e
 	}
 	mygo.RunOnMain(func() { d.changed(revision, dirty) })
 	return nil
+}
+
+// Rename applies an inline title edit and answers with the name now in effect,
+// so the page never has to guess whether the default came back.
+func (b *jsonBridge) Rename(ctx context.Context, name string) (string, error) {
+	d, err := b.document(ctx)
+	if err != nil {
+		return "", err
+	}
+	var applied string
+	mygo.RunOnMain(func() {
+		locale := mygo.App.Locale()
+		d.rename(b.app, locale, name)
+		applied = d.name(b.app, locale)
+		// The window, the system title, the window menu and the card list
+		// all show this one name.
+		b.app.refreshJSONTitles(locale)
+		if b.app.refreshApplicationMenu != nil {
+			b.app.refreshApplicationMenu()
+		}
+		b.app.refreshMenubarPanel()
+	})
+	return applied, nil
 }
 func (b *jsonBridge) Split(ctx context.Context, percent int) error {
 	if _, err := b.document(ctx); err != nil {

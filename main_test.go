@@ -35,6 +35,35 @@ func TestLoginFailureRollsBack(t *testing.T) {
 	}
 }
 
+func TestSidebarBrandLockup(t *testing.T) {
+	app, err := newApplication(filepath.Join(t.TempDir(), "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer app.updates.close()
+	for _, locale := range []string{"zh-CN", "en"} {
+		tk := tokens(false, locale)
+		tester := ui.NewTester(app.view, 720, 340)
+		tester.SetLocale(locale)
+		name, ok := tester.Find("Cubbix")
+		if !ok {
+			t.Fatalf("%s: missing the brand name: %v", locale, tester.Texts())
+		}
+		// The mark sits left of the name: 12 inset + 20 mark + Space8.
+		left := tk.Space12 + tk.SizeBrandMark + tk.Space8
+		if name.X < left-0.5 || name.X > left+0.5 {
+			t.Fatalf("%s: brand name starts at %v, want %v", locale, name.X, left)
+		}
+		// One 20-high line under the traffic lights: the centre is at y=50.
+		if centre := name.Y + name.H/2; centre < 49.5 || centre > 50.5 {
+			t.Fatalf("%s: brand name centre at %v", locale, centre)
+		}
+		if name.H > tk.Space20 {
+			t.Fatalf("%s: brand name line box = %v", locale, name.H)
+		}
+	}
+}
+
 func TestSettingsNavigationAndLocale(t *testing.T) {
 	app, err := newApplication(filepath.Join(t.TempDir(), "config.toml"))
 	if err != nil {

@@ -213,7 +213,7 @@ func tokens(dark bool, language string) tokenValues {
 		SizeJSONStateWidth:        756,
 		SizeJSONStateHeight:       182,
 		SizeJSONToolbarHeight:     44,
-		SizeJSONTitleInset:        76,
+		SizeJSONTitleInset:        80,
 		SizeJSONExpressionHeight:  44,
 		SizeJSONResultHeight:      56,
 		SizeJSONLineHeight:        24,
