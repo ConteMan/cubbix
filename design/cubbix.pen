@@ -72632,10 +72632,10 @@
           "width": "fill_container",
           "height": 20,
           "content": "Cubbix",
-          "lineHeight": "$LineHeightTitle",
+          "lineHeight": "$LineHeightBody",
           "textAlignVertical": "middle",
           "fontFamily": "$FontFamily",
-          "fontSize": "$FontSizeTitle",
+          "fontSize": "$FontSizeBody",
           "fontWeight": "$FontWeightSemibold"
         }
       ]

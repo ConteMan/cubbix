@@ -78,7 +78,7 @@ Update(controls,{placeholder:false});
 // 02 sidebar brand: the mark sits above the name as one vertical lockup.
 const brand=add(document,frame('R12 Brand lockup',{reusable:true,x:160,y:y+112,width:G.sidebar-G.edge*2,height:S('SizeBrandMark')+8+Math.round(S('FontSizeTitle')*S('LineHeightTitle')),layout:'vertical',gap:'$Space8',alignItems:'start',placeholder:true}));
 add(brand,{type:'ref',ref:'r2xEJ',name:'Brand mark',width:S('SizeBrandMark'),height:S('SizeBrandMark')});
-add(brand,txt('Cubbix',{name:'Brand name',fontSize:'$FontSizeTitle',fontWeight:'$FontWeightSemibold',lineHeight:'$LineHeightTitle'}));
+add(brand,txt('Cubbix',{name:'Brand name',fontSize:'$FontSizeBody',fontWeight:'$FontWeightSemibold',lineHeight:'$LineHeightBody'}));
 Update(brand,{placeholder:false});
 // Title inset: edge 12 + controls 52 + Space16, so the name never touches the controls.
 function windowBar(parent,width,state,lang){
