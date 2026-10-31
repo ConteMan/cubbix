@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.1 — 2026-10-31
+
+- Minimize and zoom are back on the main window, drawn by the system. Full screen stays off.
+- In the sidebar the mark sits on the left and Cubbix on the right, at the same height, with the name a little smaller.
+- The JSON card in the menu bar keeps only the plus beside the title for a new window. The shortcut stays in the tooltip.
+- Untitled windows are just called JSON, with no automatic numbers. Click the title to rename it, press Return to keep the name, or Esc to cancel. An opened file uses its filename, and a different file follows the new name.
+- Until you run a this expression, the preview on the right stays hidden. The input along the bottom always spans the whole window, with a hairline above it. A mistake shows up only as an icon.
+- Fold arrows line up with the line numbers, and the indent guides are still there.
+
 ## 0.3.0 — 2026-10-31
 
 - Click the cat and a small card pops up. Keep Awake's switch, mode and durations are right there, so tap 1h and you're set. New JSON windows and the ones you have open live here too.

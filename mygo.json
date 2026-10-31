@@ -1,7 +1,7 @@
 {
   "name": "Cubbix",
   "identifier": "com.conteman.cubbix",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "urlSchemes": ["cubbix"],
   "icon": "brand/dist/app-icon-1024.png",
   "out": "build",

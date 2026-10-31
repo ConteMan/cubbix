@@ -23,7 +23,7 @@ var assets embed.FS
 //go:embed frontend/dist/*
 var jsonAssets embed.FS
 
-const appVersion = "0.3.0"
+const appVersion = "0.3.1"
 
 type application struct {
 	jsonDocuments        []*jsonDocument
