@@ -56,6 +56,7 @@ const syntax = () => [json(), foldGutter(), guides, syntaxHighlighting(highlight
 let config, editor, resultEditor, revision = 0, savedRevision = 0, pinned = false;
 let large = false, generation = 0, job, debounce, spinner, result, status = '', detail = '';
 let split = 60, savedSplit = 60, splitTimer, dragging = false;
+let editingTitle = false, presented = false;
 let changeQueue = Promise.resolve();
 const buttons = {};
 const text = key => config.messages[key] ?? key;
@@ -137,7 +138,9 @@ function applyConfig(next) {
     document.documentElement.style.setProperty('--' + key,
       typeof value === 'number' && !key.startsWith('Opacity') && !key.startsWith('LineHeight') ? value + 'px' : String(value));
   }
-  $('title').textContent = config.name ?? '';
+  $('title').textContent = editingTitle ? $('title').textContent : config.name ?? '';
+  $('title').setAttribute('aria-label', text('JSONWindowTitle'));
+  $('title-edit').setAttribute('aria-label', text('JSONWindowTitle'));
   $('suffix').setAttribute('aria-label', text('JSONExpression'));
   $('splitter').setAttribute('aria-label', text('JSONResultResize'));
   $('result').setAttribute('aria-label', text('JSONResult'));
@@ -159,13 +162,27 @@ function paintStatus() {
   const key = { working: 'JSONWorking', invalid: 'JSONInvalid', timeout: 'R07TimeoutTip', error: 'JSONEvaluationError', read: 'JSONReadError', copy: 'JSONCopyError', save: 'JSONWriteError', fileLimit: 'JSONFileLimit', resultLimit: 'JSONResultLimit', unsupported: 'JSONUnsupported', worker: 'JSONWorkerError' }[status];
   const label = key ? text(key) + (detail ? ': ' + detail : '') : '';
   setTooltip(element, label);
+  updatePane();
+}
+
+// The preview and its separator appear with the first result or error and then
+// stay, so evaluating never resizes the editor mid-edit. An emptied document
+// goes back to the single full-width editor. The footer never changes.
+function updatePane() {
+  if (result !== undefined || (status !== '' && status !== 'working')) presented = true;
+  const show = presented && !!editor?.state.doc.length;
+  document.body.classList.toggle('preview', show);
+  if (!show) return;
+  applySplit(split);
+  resultEditor?.requestMeasure();
 }
 
 function setStatus(kind = '', message = '') { status = kind; detail = message; paintStatus(); }
 function clearResult() {
   resultEditor?.destroy(); resultEditor = undefined;
   result = undefined;
-  $('result').replaceChildren();
+  // The status icon lives in the preview area and survives a cleared result.
+  $('result').replaceChildren($('status'));
 }
 function renderResult(value) {
   clearResult();
@@ -186,6 +203,7 @@ function renderResult(value) {
     if (token) pre.style.color = 'var(--' + token + ')';
     $('result').append(pre);
   }
+  updatePane();
 }
 
 function cancelJob() {
@@ -317,6 +335,47 @@ async function pin() {
   applyConfig(config);
 }
 
+// The window name is data, not a label: one click edits it in place.
+function titleFieldWidth(value) {
+  return Math.min(320, Math.max(120, value.length * 9 + 24)) + 'px';
+}
+function beginTitleEdit() {
+  if (editingTitle || !config) return;
+  editingTitle = true;
+  hideTooltip();
+  const input = $('title-edit');
+  input.value = config.name ?? '';
+  input.style.width = titleFieldWidth(input.value);
+  $('title').hidden = true;
+  input.hidden = false;
+  input.focus();
+  input.select();
+}
+async function commitTitle(refocus = true) {
+  if (!editingTitle) return;
+  editingTitle = false;
+  const input = $('title-edit');
+  const name = input.value;
+  input.hidden = true;
+  $('title').hidden = false;
+  if (refocus) $('title').focus();
+  try {
+    // Go answers with the name now in effect: the default may have come back.
+    const applied = await bridge('Rename', name);
+    if (config && typeof applied === 'string') {
+      config.name = applied;
+      $('title').textContent = applied;
+    }
+  } catch { setStatus('save'); }
+}
+function cancelTitle() {
+  if (!editingTitle) return;
+  editingTitle = false;
+  $('title-edit').hidden = true;
+  $('title').hidden = false;
+  $('title').focus();
+}
+
 async function boot() {
   config = await bridge('Boot');
   revision = config.revision;
@@ -346,6 +405,21 @@ async function boot() {
   $('editor').append($('empty'));
   updateControls();
   $('suffix').addEventListener('input', schedule);
+  $('title').addEventListener('click', beginTitleEdit);
+  $('title').addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    beginTitleEdit();
+  });
+  const titleInput = $('title-edit');
+  titleInput.addEventListener('input', () => { titleInput.style.width = titleFieldWidth(titleInput.value); });
+  titleInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') { event.preventDefault(); void commitTitle(); }
+    else if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); cancelTitle(); }
+  });
+  // Leaving the field accepts the text, like any other inline rename.
+  titleInput.addEventListener('blur', () => { void commitTitle(false); });
+  titleInput.addEventListener('pointerdown', event => event.stopPropagation());
   document.addEventListener('keydown', event => {
     if (event.isComposing || !event.metaKey) return;
     const key = event.key.toLowerCase();
@@ -388,12 +462,12 @@ async function boot() {
     },
     save, open, pin, error: kind => setStatus(kind),
     // The window manager and this title stay the same name (system title in Go).
-    title: name => { if (config) config.name = name; $('title').textContent = name; },
+    title: name => { if (config) config.name = name; if (!editingTitle) $('title').textContent = name; },
     dispose: () => { cancelJob(); editor.destroy(); },
     // State inspection and direct transactions are used by hidden WebKit checks.
     editor: () => editor,
     split: () => ({ percent: split, saved: savedSplit }),
-    state: () => ({ revision, large, status, result, pinned, generation, split, pending: !!job || debounce !== undefined }),
+    state: () => ({ revision, large, status, result, pinned, generation, split, pending: !!job || debounce !== undefined, preview: document.body.classList.contains('preview'), editing: editingTitle, name: config?.name ?? '' }),
     evaluate: async suffix => { $('suffix').value = suffix; cancelJob(); return run(); },
   };
   if (!large && config.text.trim()) void format();

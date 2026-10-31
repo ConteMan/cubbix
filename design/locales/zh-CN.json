@@ -182,6 +182,7 @@
   "R07PanelRule": "结果独立面板，数字与结构数据使用同一位置。",
   "JSONWindowName": "JSON",
   "JSONWindowNameNumbered": "JSON %d",
+  "JSONWindowTitle": "窗口标题",
   "JSONShortcutLabel": "新建 JSON 窗口",
   "JSONRecordShortcut": "录制 JSON 快捷键",
   "JSONFileMenu": "文件",

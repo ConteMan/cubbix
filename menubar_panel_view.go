@@ -156,8 +156,9 @@ func (a *application) panelStatus(c *ui.Context, t tokenValues, locale string) {
 	})
 }
 
-// panelJSONCard is the JSON tile: a quick new window, the open windows, and
-// the main action. Six windows fold into one count row.
+// panelJSONCard is the JSON tile: a quick new window and the open windows.
+// Six windows fold into one count row. The title row's plus is the only way
+// to open a window from the card.
 func (a *application) panelJSONCard(c *ui.Context, t tokenValues, locale string, rows menubarPanelRows) {
 	text := func(key string) string { return a.text(locale, key) }
 	newTip := a.menubarPanelTooltip(locale, "JSONShortcutLabel", a.config.JSONShortcut)
@@ -185,16 +186,6 @@ func (a *application) panelJSONCard(c *ui.Context, t tokenValues, locale string,
 				}
 			})
 		}
-		button := ui.ButtonBase(c.Key("panel-json-button")).FillWidth().Height(t.SizeButtonHeight).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).FocusRing(true).Label(text("JSONShortcutLabel")).Tooltip(newTip).OnClick(a.panelNewJSON)
-		if button.Hovered() {
-			button.Background(ui.Hex(t.ColorControlHover))
-		}
-		button.Children(func() {
-			ui.Row(c).Fill().Gap(t.Space6).AlignItems(ui.Center).Justify(ui.Center).Children(func() {
-				ui.Icon(c, icon("plus")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorText))
-				ui.Text(c, text("JSONShortcutLabel")).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).SingleLine()
-			})
-		})
 	})
 }
 

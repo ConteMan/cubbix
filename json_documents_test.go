@@ -25,12 +25,34 @@ func TestJSONDocumentNamesListsAndIsolation(t *testing.T) {
 			t.Fatal("panel window entries missing")
 		}
 	}
-	// The second and later unopened windows count up; a file keeps its own name.
+	// The second and later unopened windows show the fixed name; no numbering.
 	third := a.addJSONDocument("", "", true)
 	fourth := a.addJSONDocument("", "", true)
-	if third.name(a, "en") != "JSON 3" || fourth.name(a, "en") != "JSON 4" {
-		t.Fatal("numbered window names")
+	if third.name(a, "en") != "JSON" || fourth.name(a, "en") != "JSON" {
+		t.Fatal("unopened windows must keep the fixed name")
 	}
+	// A rename is the name in the window, the menu and the card list; an empty
+	// name or the default name goes back to the default.
+	one.rename(a, "en", "  orders  ")
+	if one.name(a, "en") != "orders" || one.name(a, "zh-CN") != "orders" {
+		t.Fatal("rename did not apply to every locale")
+	}
+	if rows := a.menubarPanelRows(); rows.documents[0].name(a, "en") != "orders" {
+		t.Fatal("card list kept the old name")
+	}
+	one.rename(a, "en", "")
+	if one.name(a, "en") != "JSON" {
+		t.Fatal("empty rename did not restore the default")
+	}
+	one.rename(a, "en", "JSON")
+	if one.custom != "" {
+		t.Fatal("the default name was stored as a rename")
+	}
+	one.rename(a, "en", strings.Repeat("x", jsonWindowNameLimit+10))
+	if len([]rune(one.name(a, "en"))) != jsonWindowNameLimit {
+		t.Fatal("rename is not bounded")
+	}
+	one.rename(a, "en", "")
 	a.removeJSONDocument(third)
 	a.removeJSONDocument(fourth)
 	one.pinned = true

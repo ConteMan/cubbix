@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/egoist/mygo"
 )
@@ -14,10 +15,14 @@ import (
 const jsonFileLimit = 64 * 1024 * 1024
 const jsonWindowSubmenuAt = 6
 
+// jsonWindowNameLimit keeps an inline rename readable in the title bar and the
+// card list.
+const jsonWindowNameLimit = 64
+
 type jsonDocument struct {
 	number                       int
 	window                       *mygo.Window
-	text, path                   string
+	text, path, custom           string
 	revision                     uint64
 	dirty, pinned, ready, closed bool
 }
@@ -27,14 +32,36 @@ type jsonSnapshot struct {
 	Revision uint64 `json:"revision"`
 }
 
-func (d *jsonDocument) name(a *application, locale string) string {
+// defaultName is the name the document has without a rename: the open file's
+// name, or the fixed JSON name for a window that never opened a file.
+func (d *jsonDocument) defaultName(a *application, locale string) string {
 	if d.path != "" {
 		return filepath.Base(d.path)
 	}
-	if d.number <= 1 {
-		return a.text(locale, "JSONWindowName")
+	return a.text(locale, "JSONWindowName")
+}
+
+// name is the one name used by the window title, the system title, the menu and
+// the card list: a rename while it applies, otherwise the default name.
+func (d *jsonDocument) name(a *application, locale string) string {
+	if d.custom != "" {
+		return d.custom
 	}
-	return fmt.Sprintf(a.text(locale, "JSONWindowNameNumbered"), d.number)
+	return d.defaultName(a, locale)
+}
+
+// rename applies an inline title edit. An empty name, or the default name,
+// restores the default instead of pinning a copy of it.
+func (d *jsonDocument) rename(a *application, locale, name string) {
+	name = strings.TrimSpace(name)
+	if utf8.RuneCountInString(name) > jsonWindowNameLimit {
+		name = strings.TrimSpace(string([]rune(name)[:jsonWindowNameLimit]))
+	}
+	if name == "" || name == d.defaultName(a, locale) {
+		d.custom = ""
+		return
+	}
+	d.custom = name
 }
 
 func (d *jsonDocument) changed(revision uint64, dirty bool) {

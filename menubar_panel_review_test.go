@@ -121,47 +121,42 @@ func TestPanelKeyboardNavigation(t *testing.T) {
 }
 
 func TestPanelJSONButtonsAndWindowTarget(t *testing.T) {
-	for _, label := range []string{"panel-json-new", "panel-json-button"} {
-		t.Run(label, func(t *testing.T) {
-			a := panelTestApp(t)
-			a.config.AwakeEnabled = false
-			a.showMenubarPanel()
-			var created, shown *jsonDocument
-			a.jsonReadClipboard = func() string {
-				if a.menubarPanelVisible() {
-					t.Fatal("clipboard read before closing panel")
-				}
-				return `{"sample":true}`
-			}
-			a.createJSONWindow = func(d *jsonDocument) { created = d }
-			a.presentJSONWindow = func(d *jsonDocument) {
-				if a.menubarPanelVisible() {
-					t.Fatal("window shown before closing panel")
-				}
-				shown = d
-			}
-			tt := panelView(a, "en")
-			tt.Key(0, ui.KeyTab)
-			if label == "panel-json-button" {
-				tt.Key(0, ui.KeyTab)
-			}
-			if !tt.Focused(a.text("en", "JSONShortcutLabel")) {
-				t.Fatal("missing focused new-window button")
-			}
-			tt.Key(0, ui.KeyEnter)
-			if created == nil || shown != created || created.text != `{"sample":true}` {
-				t.Fatalf("new-window chain: created=%v shown=%v", created, shown)
-			}
-			other := a.addJSONDocument("", "other.json", true)
-			a.showMenubarPanel()
-			tt = panelView(a, "en")
-			if err := tt.Click("other.json"); err != nil {
-				t.Fatal(err)
-			}
-			if shown != other || a.menubarPanelVisible() {
-				t.Fatal("window row did not dispatch its own document")
-			}
-		})
+	a := panelTestApp(t)
+	a.config.AwakeEnabled = false
+	a.showMenubarPanel()
+	var created, shown *jsonDocument
+	a.jsonReadClipboard = func() string {
+		if a.menubarPanelVisible() {
+			t.Fatal("clipboard read before closing panel")
+		}
+		return `{"sample":true}`
+	}
+	a.createJSONWindow = func(d *jsonDocument) { created = d }
+	a.presentJSONWindow = func(d *jsonDocument) {
+		if a.menubarPanelVisible() {
+			t.Fatal("window shown before closing panel")
+		}
+		shown = d
+	}
+	tt := panelView(a, "en")
+	// The unsigned title-row plus is the first stop and the only new-window
+	// control left in the card.
+	tt.Key(0, ui.KeyTab)
+	if !tt.Focused(a.text("en", "JSONShortcutLabel")) {
+		t.Fatal("missing focused new-window button")
+	}
+	tt.Key(0, ui.KeyEnter)
+	if created == nil || shown != created || created.text != `{"sample":true}` {
+		t.Fatalf("new-window chain: created=%v shown=%v", created, shown)
+	}
+	other := a.addJSONDocument("", "other.json", true)
+	a.showMenubarPanel()
+	tt = panelView(a, "en")
+	if err := tt.Click("other.json"); err != nil {
+		t.Fatal(err)
+	}
+	if shown != other || a.menubarPanelVisible() {
+		t.Fatal("window row did not dispatch its own document")
 	}
 }
 

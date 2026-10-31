@@ -331,7 +331,8 @@ func (a *application) createSettingsWindow() {
 	t := tokens(false, "zh-CN")
 	width, height := settingsSize(a.config.WindowWidth, a.config.WindowHeight)
 	minWidth, minHeight := settingsMinimumSize()
-	a.window = mygo.NewWindow(mygo.WindowOptions{Title: "Cubbix", Width: width, Height: height, MinWidth: minWidth, MinHeight: minHeight, Hidden: true, TitleBarStyle: mygo.TitleBarHidden, TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space12)}, DisableMinimize: true, DisableMaximize: true, DisableFullScreen: true, Content: ui.View(a.view)})
+	// Close, minimize and zoom keep their system symbols; full screen stays off.
+	a.window = mygo.NewWindow(mygo.WindowOptions{Title: "Cubbix", Width: width, Height: height, MinWidth: minWidth, MinHeight: minHeight, Hidden: true, TitleBarStyle: mygo.TitleBarHidden, TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space12)}, DisableFullScreen: true, Content: ui.View(a.view)})
 	a.window.OnShow(func() { a.visibility(true) })
 	a.window.OnHide(func() { a.cancelShortcutRecording(); a.visibility(false) })
 	a.window.OnClosed(func() { a.visibility(false) })
@@ -520,10 +521,13 @@ func (a *application) view(c *ui.Context) {
 	}
 	ui.Row(c).Fill().Background(ui.Hex(t.ColorWindow)).Children(func() {
 		ui.Column(c).Width(t.SizeSidebarWidth).FillHeight().Padding(t.Space12).Gap(t.Space16).Background(ui.Hex(t.ColorSidebar)).DragWindow().Children(func() {
-			ui.Box(c).Height(t.Space24)
-			ui.Row(c).Height(t.SizeRowHeight).AlignItems(ui.Center).PaddingX(t.Space8).Gap(t.Space8).Children(func() {
+			// The native traffic lights own the first 12 high slot inside the
+			// sidebar padding; the brand follows one Space16 below them.
+			ui.Box(c).Height(t.Space12)
+			// The mark sits left of the name, both on one 20-high line.
+			ui.Row(c).Height(t.Space20).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
 				ui.Icon(c, brand(t.ColorText)).Size(t.SizeBrandMark, t.SizeBrandMark).TextColor(ui.Hex(t.ColorText))
-				ui.Text(c, "Cubbix").FontSize(t.FontSizeBody).Bold()
+				ui.Text(c, "Cubbix").FontSize(t.FontSizeBody).FontWeight(fontWeight(t.FontWeightSemibold)).LineHeight(t.LineHeightBody)
 			})
 			ui.Column(c).FillWidth().Gap(t.Space4).Children(func() {
 				for _, navIndex := range []int{0, 2, 3, 1} {

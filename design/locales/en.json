@@ -182,6 +182,7 @@
   "R07PanelRule": "A separate panel keeps scalar and structured results in one place.",
   "JSONWindowName": "JSON",
   "JSONWindowNameNumbered": "JSON %d",
+  "JSONWindowTitle": "Window title",
   "JSONShortcutLabel": "New JSON window",
   "JSONRecordShortcut": "Record JSON shortcut",
   "JSONFileMenu": "File",

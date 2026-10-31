@@ -165,9 +165,9 @@ func awakeCardHeight(t tokenValues, status bool) float32 {
 }
 
 func jsonCardHeight(t tokenValues, listRows int) float32 {
-	height := 2*t.Space10 + t.SizeNavHeight + t.Space8 + t.SizeButtonHeight
+	height := 2*t.Space10 + t.SizeNavHeight
 	if listRows > 0 {
-		height += float32(listRows)*t.SizeNavHeight + float32(listRows-1)*t.Space2 + t.Space8
+		height += t.Space8 + float32(listRows)*t.SizeNavHeight + float32(listRows-1)*t.Space2
 	}
 	return height
 }
