@@ -2,7 +2,7 @@
   "cliVersion": "0.3.13",
   "historicalRootsUnchanged": true,
   "nativeLayout": {
-    "nodes": 1769,
+    "nodes": 1833,
     "problemCount": 0,
     "problems": []
   },
@@ -12,28 +12,28 @@
       "name": "R12 zh-CN light",
       "file": "zh-CN-light.png",
       "scale": 2,
-      "sha256": "2a82ef240fcb9cf0579bb45180392d52f506ed5f1353362b423f2a1b37c31f57"
+      "sha256": "0e173071023a80e8fac650280b12dbe9913f7d79dcb6c31152d6d788621c8c7c"
     },
     {
       "nodeId": "qtkGv",
       "name": "R12 zh-CN dark",
       "file": "zh-CN-dark.png",
       "scale": 2,
-      "sha256": "b4d8e76ba4aa0cca1d341ac3cf0362b87ac86c6352c9a8e0a238eb761abacf6f"
+      "sha256": "79a14f104d46a88ada87d136dd6e08ec589dbfa0a920f4a9468b246a1aeac3f3"
     },
     {
       "nodeId": "f0PzD",
       "name": "R12 en light",
       "file": "en-light.png",
       "scale": 2,
-      "sha256": "dd29bbad8bbd6a2cc8f2706ce267126ea9305e37c036fa1347cb02816aa51a13"
+      "sha256": "e4dae07776bc3b8ae5e6112310ff8d38c9443d2f300b13ab46a0f503aa32718e"
     },
     {
       "nodeId": "WmAMb",
       "name": "R12 en dark",
       "file": "en-dark.png",
       "scale": 2,
-      "sha256": "ea1e6e004675cf018b7fb325958be34aff337a63f971bbcbea21a63b91e94008"
+      "sha256": "5f168a5d7b2353dfa894297ee7acb28befbe75e09adfda21d9d0db76b2ef1622"
     },
     {
       "nodeId": "O2atCp",
@@ -47,7 +47,7 @@
       "name": "R12 preview states",
       "file": "preview-states.png",
       "scale": 2,
-      "sha256": "16f8741ee1139349b0dba95e928482542ae9636f3e898aab43b14ef39ca3bd51"
+      "sha256": "f466115b7fbc86c02808192412609439cc59e64ca62e7b242bbfc0c4e4759480"
     }
   ],
   "passed": true

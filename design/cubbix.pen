@@ -72611,9 +72611,9 @@
       "name": "R12 Brand lockup",
       "reusable": true,
       "width": 120,
-      "height": 54,
-      "layout": "vertical",
+      "height": 20,
       "gap": "$Space8",
+      "alignItems": "center",
       "children": [
         {
           "id": "jyfF7",
@@ -72628,8 +72628,12 @@
           "id": "R9TPeE",
           "name": "Brand name",
           "fill": "$ColorText",
+          "textGrowth": "fixed-width-height",
+          "width": "fill_container",
+          "height": 20,
           "content": "Cubbix",
           "lineHeight": "$LineHeightTitle",
+          "textAlignVertical": "middle",
           "fontFamily": "$FontFamily",
           "fontSize": "$FontSizeTitle",
           "fontWeight": "$FontWeightSemibold"
@@ -73775,6 +73779,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "V85MW",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -73888,6 +73903,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "mxVww",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -73980,6 +74006,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "sqB7f",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "HTPKO",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -74061,6 +74109,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "kDMBh",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "j4sfc",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -74142,6 +74212,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "o4GD9",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -74267,6 +74348,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "GmaAU",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -74381,6 +74473,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "aIYXX",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -74471,83 +74574,45 @@
             },
             {
               "type": "frame",
-              "id": "J9QaM",
+              "id": "YIUvn",
+              "name": "Footer boundary",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator"
+            },
+            {
+              "type": "frame",
+              "id": "B8Iim",
               "name": "this input",
               "width": "fill_container",
               "height": 44,
-              "gap": "$Space0",
+              "gap": "$Space12",
+              "padding": [
+                "$Space6",
+                "$Space12"
+              ],
               "alignItems": "center",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "NmX04",
-                  "name": "this group",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "gap": "$Space12",
-                  "padding": [
-                    "$Space6",
-                    "$Space12"
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "lJA9g",
-                      "name": "this prefix",
-                      "fill": "$ColorText",
-                      "content": "this",
-                      "lineHeight": "$LineHeightBody",
-                      "fontFamily": "$FontFamilyCode",
-                      "fontSize": "$FontSizeBody",
-                      "fontWeight": "$FontWeightSemibold"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "I8qte",
-                      "name": "Expression field",
-                      "width": "fill_container",
-                      "height": 32,
-                      "fill": "$ColorControl",
-                      "cornerRadius": "$RadiusControl",
-                      "gap": "$Space0",
-                      "padding": [
-                        "$Space0",
-                        "$Space12"
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "YTEkV",
-                          "name": "Expression suffix",
-                          "fill": "$ColorText",
-                          "content": ".tabs",
-                          "lineHeight": "$LineHeightBody",
-                          "fontFamily": "$FontFamilyCode",
-                          "fontSize": "$FontSizeBody",
-                          "fontWeight": "$FontWeightRegular"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "bGGZC",
-                          "name": "Caret",
-                          "width": 1,
-                          "height": 16,
-                          "fill": "$ColorText",
-                          "layout": "vertical",
-                          "gap": "$Space0"
-                        }
-                      ]
-                    }
-                  ]
+                  "type": "text",
+                  "id": "ZyVjq",
+                  "name": "this prefix",
+                  "fill": "$ColorText",
+                  "content": "this",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
                 },
                 {
                   "type": "frame",
-                  "id": "A41xY",
-                  "name": "Tools",
-                  "height": "fill_container",
-                  "gap": "$Space4",
+                  "id": "H0KIsY",
+                  "name": "Expression field",
+                  "width": "fill_container",
+                  "height": 32,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space0",
                   "padding": [
                     "$Space0",
                     "$Space12"
@@ -74555,7 +74620,37 @@
                   "alignItems": "center",
                   "children": [
                     {
-                      "id": "A5PjU",
+                      "type": "text",
+                      "id": "gRlvv",
+                      "name": "Expression suffix",
+                      "fill": "$ColorText",
+                      "content": ".tabs",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jutXU",
+                      "name": "Caret",
+                      "width": 1,
+                      "height": 16,
+                      "fill": "$ColorText"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "djd5c",
+                  "name": "Tools",
+                  "height": 32,
+                  "gap": "$Space4",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "FoeB2",
                       "type": "ref",
                       "ref": "PByrK",
                       "name": "Tool",
@@ -74563,7 +74658,7 @@
                       "height": 28
                     },
                     {
-                      "id": "gE4WA",
+                      "id": "bmNk0",
                       "type": "ref",
                       "ref": "Ng6hD",
                       "name": "Tool",
@@ -74571,7 +74666,7 @@
                       "height": 28
                     },
                     {
-                      "id": "Uttfp",
+                      "id": "xhvnQ",
                       "type": "ref",
                       "ref": "g3HzZW",
                       "name": "Tool",
@@ -74579,7 +74674,7 @@
                       "height": 28
                     },
                     {
-                      "id": "RTsJX",
+                      "id": "zm98f",
                       "type": "ref",
                       "ref": "VnixZ",
                       "name": "Tool",
@@ -75709,6 +75804,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "WCgGX",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -75822,6 +75928,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "bzByZ",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -75914,6 +76031,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Kw28j",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "RWyW7",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -75995,6 +76134,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "yosBW",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "S3MVwV",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -76076,6 +76237,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "v6Mj2",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -76201,6 +76373,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "vMqfv",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -76315,6 +76498,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "O8BtX",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -76405,83 +76599,45 @@
             },
             {
               "type": "frame",
-              "id": "h9agO5",
+              "id": "kSXVf",
+              "name": "Footer boundary",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator"
+            },
+            {
+              "type": "frame",
+              "id": "isZyF",
               "name": "this input",
               "width": "fill_container",
               "height": 44,
-              "gap": "$Space0",
+              "gap": "$Space12",
+              "padding": [
+                "$Space6",
+                "$Space12"
+              ],
               "alignItems": "center",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "QAroo",
-                  "name": "this group",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "gap": "$Space12",
-                  "padding": [
-                    "$Space6",
-                    "$Space12"
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "idMrx",
-                      "name": "this prefix",
-                      "fill": "$ColorText",
-                      "content": "this",
-                      "lineHeight": "$LineHeightBody",
-                      "fontFamily": "$FontFamilyCode",
-                      "fontSize": "$FontSizeBody",
-                      "fontWeight": "$FontWeightSemibold"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "m3J6e",
-                      "name": "Expression field",
-                      "width": "fill_container",
-                      "height": 32,
-                      "fill": "$ColorControl",
-                      "cornerRadius": "$RadiusControl",
-                      "gap": "$Space0",
-                      "padding": [
-                        "$Space0",
-                        "$Space12"
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "tHVZI",
-                          "name": "Expression suffix",
-                          "fill": "$ColorText",
-                          "content": ".tabs",
-                          "lineHeight": "$LineHeightBody",
-                          "fontFamily": "$FontFamilyCode",
-                          "fontSize": "$FontSizeBody",
-                          "fontWeight": "$FontWeightRegular"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "F1gUL",
-                          "name": "Caret",
-                          "width": 1,
-                          "height": 16,
-                          "fill": "$ColorText",
-                          "layout": "vertical",
-                          "gap": "$Space0"
-                        }
-                      ]
-                    }
-                  ]
+                  "type": "text",
+                  "id": "arqLQ",
+                  "name": "this prefix",
+                  "fill": "$ColorText",
+                  "content": "this",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
                 },
                 {
                   "type": "frame",
-                  "id": "o8TS4",
-                  "name": "Tools",
-                  "height": "fill_container",
-                  "gap": "$Space4",
+                  "id": "IOaP1",
+                  "name": "Expression field",
+                  "width": "fill_container",
+                  "height": 32,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space0",
                   "padding": [
                     "$Space0",
                     "$Space12"
@@ -76489,7 +76645,37 @@
                   "alignItems": "center",
                   "children": [
                     {
-                      "id": "JzDoy",
+                      "type": "text",
+                      "id": "jbRAu",
+                      "name": "Expression suffix",
+                      "fill": "$ColorText",
+                      "content": ".tabs",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xHULi",
+                      "name": "Caret",
+                      "width": 1,
+                      "height": 16,
+                      "fill": "$ColorText"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UMKvd",
+                  "name": "Tools",
+                  "height": 32,
+                  "gap": "$Space4",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "Uk3oL",
                       "type": "ref",
                       "ref": "PByrK",
                       "name": "Tool",
@@ -76497,7 +76683,7 @@
                       "height": 28
                     },
                     {
-                      "id": "Q9IAI",
+                      "id": "wXlur",
                       "type": "ref",
                       "ref": "Ng6hD",
                       "name": "Tool",
@@ -76505,7 +76691,7 @@
                       "height": 28
                     },
                     {
-                      "id": "BNyyv",
+                      "id": "M7qBch",
                       "type": "ref",
                       "ref": "g3HzZW",
                       "name": "Tool",
@@ -76513,7 +76699,7 @@
                       "height": 28
                     },
                     {
-                      "id": "Aizsq",
+                      "id": "y1ECJ",
                       "type": "ref",
                       "ref": "VnixZ",
                       "name": "Tool",
@@ -77660,6 +77846,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ttrQa",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -77773,6 +77970,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "lRI2B",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -77865,6 +78073,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "K5zcuW",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "O4Chok",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -77946,6 +78176,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "jRJeJ",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "XiApw",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -78027,6 +78279,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "p25diM",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -78152,6 +78415,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "WefWD",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -78266,6 +78540,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "J5pUqM",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -78356,83 +78641,45 @@
             },
             {
               "type": "frame",
-              "id": "T8hVoX",
+              "id": "qxTFy",
+              "name": "Footer boundary",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator"
+            },
+            {
+              "type": "frame",
+              "id": "ulXgl",
               "name": "this input",
               "width": "fill_container",
               "height": 44,
-              "gap": "$Space0",
+              "gap": "$Space12",
+              "padding": [
+                "$Space6",
+                "$Space12"
+              ],
               "alignItems": "center",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "NToG3",
-                  "name": "this group",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "gap": "$Space12",
-                  "padding": [
-                    "$Space6",
-                    "$Space12"
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "x1JzMR",
-                      "name": "this prefix",
-                      "fill": "$ColorText",
-                      "content": "this",
-                      "lineHeight": "$LineHeightBody",
-                      "fontFamily": "$FontFamilyCode",
-                      "fontSize": "$FontSizeBody",
-                      "fontWeight": "$FontWeightSemibold"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "GTrv1",
-                      "name": "Expression field",
-                      "width": "fill_container",
-                      "height": 32,
-                      "fill": "$ColorControl",
-                      "cornerRadius": "$RadiusControl",
-                      "gap": "$Space0",
-                      "padding": [
-                        "$Space0",
-                        "$Space12"
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "df7kf",
-                          "name": "Expression suffix",
-                          "fill": "$ColorText",
-                          "content": ".tabs",
-                          "lineHeight": "$LineHeightBody",
-                          "fontFamily": "$FontFamilyCode",
-                          "fontSize": "$FontSizeBody",
-                          "fontWeight": "$FontWeightRegular"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "erzPd",
-                          "name": "Caret",
-                          "width": 1,
-                          "height": 16,
-                          "fill": "$ColorText",
-                          "layout": "vertical",
-                          "gap": "$Space0"
-                        }
-                      ]
-                    }
-                  ]
+                  "type": "text",
+                  "id": "fuDoi",
+                  "name": "this prefix",
+                  "fill": "$ColorText",
+                  "content": "this",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
                 },
                 {
                   "type": "frame",
-                  "id": "E9DIp",
-                  "name": "Tools",
-                  "height": "fill_container",
-                  "gap": "$Space4",
+                  "id": "pHxmz",
+                  "name": "Expression field",
+                  "width": "fill_container",
+                  "height": 32,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space0",
                   "padding": [
                     "$Space0",
                     "$Space12"
@@ -78440,7 +78687,37 @@
                   "alignItems": "center",
                   "children": [
                     {
-                      "id": "eG919",
+                      "type": "text",
+                      "id": "b7kotY",
+                      "name": "Expression suffix",
+                      "fill": "$ColorText",
+                      "content": ".tabs",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "oJVsd",
+                      "name": "Caret",
+                      "width": 1,
+                      "height": 16,
+                      "fill": "$ColorText"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "R9U8k",
+                  "name": "Tools",
+                  "height": 32,
+                  "gap": "$Space4",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "r9x3le",
                       "type": "ref",
                       "ref": "PByrK",
                       "name": "Tool",
@@ -78448,7 +78725,7 @@
                       "height": 28
                     },
                     {
-                      "id": "bRJR2",
+                      "id": "MQTnj",
                       "type": "ref",
                       "ref": "Ng6hD",
                       "name": "Tool",
@@ -78456,7 +78733,7 @@
                       "height": 28
                     },
                     {
-                      "id": "TqvMy",
+                      "id": "LW3r4",
                       "type": "ref",
                       "ref": "g3HzZW",
                       "name": "Tool",
@@ -78464,7 +78741,7 @@
                       "height": 28
                     },
                     {
-                      "id": "KQF4y",
+                      "id": "YY1Mv",
                       "type": "ref",
                       "ref": "VnixZ",
                       "name": "Tool",
@@ -79611,6 +79888,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Sb14P",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -79724,6 +80012,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "b5e7e",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -79816,6 +80115,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "uc6ay",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "nx4Qh",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -79897,6 +80218,28 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "gOrRI",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "eL2fe",
+                          "layoutPosition": "absolute",
+                          "x": 110.2,
+                          "y": 0,
+                          "name": "Indent guide 2",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -79978,6 +80321,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "F96xY",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -80103,6 +80457,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "H7qzh4",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -80217,6 +80582,17 @@
                               "fontWeight": "$FontWeightRegular"
                             }
                           ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "vXvx1",
+                          "layoutPosition": "absolute",
+                          "x": 94.6,
+                          "y": 0,
+                          "name": "Indent guide 1",
+                          "width": 1,
+                          "height": 24,
+                          "fill": "$ColorSyntaxIndent"
                         }
                       ]
                     },
@@ -80307,83 +80683,45 @@
             },
             {
               "type": "frame",
-              "id": "ApyYz",
+              "id": "TarnV",
+              "name": "Footer boundary",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator"
+            },
+            {
+              "type": "frame",
+              "id": "cpuUr",
               "name": "this input",
               "width": "fill_container",
               "height": 44,
-              "gap": "$Space0",
+              "gap": "$Space12",
+              "padding": [
+                "$Space6",
+                "$Space12"
+              ],
               "alignItems": "center",
               "children": [
                 {
-                  "type": "frame",
-                  "id": "pDY4H",
-                  "name": "this group",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "gap": "$Space12",
-                  "padding": [
-                    "$Space6",
-                    "$Space12"
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "d4JIdt",
-                      "name": "this prefix",
-                      "fill": "$ColorText",
-                      "content": "this",
-                      "lineHeight": "$LineHeightBody",
-                      "fontFamily": "$FontFamilyCode",
-                      "fontSize": "$FontSizeBody",
-                      "fontWeight": "$FontWeightSemibold"
-                    },
-                    {
-                      "type": "frame",
-                      "id": "cMa66",
-                      "name": "Expression field",
-                      "width": "fill_container",
-                      "height": 32,
-                      "fill": "$ColorControl",
-                      "cornerRadius": "$RadiusControl",
-                      "gap": "$Space0",
-                      "padding": [
-                        "$Space0",
-                        "$Space12"
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "bpslL",
-                          "name": "Expression suffix",
-                          "fill": "$ColorText",
-                          "content": ".tabs",
-                          "lineHeight": "$LineHeightBody",
-                          "fontFamily": "$FontFamilyCode",
-                          "fontSize": "$FontSizeBody",
-                          "fontWeight": "$FontWeightRegular"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "gDbO1",
-                          "name": "Caret",
-                          "width": 1,
-                          "height": 16,
-                          "fill": "$ColorText",
-                          "layout": "vertical",
-                          "gap": "$Space0"
-                        }
-                      ]
-                    }
-                  ]
+                  "type": "text",
+                  "id": "yQAyj",
+                  "name": "this prefix",
+                  "fill": "$ColorText",
+                  "content": "this",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamilyCode",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
                 },
                 {
                   "type": "frame",
-                  "id": "TJCaY",
-                  "name": "Tools",
-                  "height": "fill_container",
-                  "gap": "$Space4",
+                  "id": "tZFVC",
+                  "name": "Expression field",
+                  "width": "fill_container",
+                  "height": 32,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space0",
                   "padding": [
                     "$Space0",
                     "$Space12"
@@ -80391,7 +80729,37 @@
                   "alignItems": "center",
                   "children": [
                     {
-                      "id": "QZPF7",
+                      "type": "text",
+                      "id": "zuniu",
+                      "name": "Expression suffix",
+                      "fill": "$ColorText",
+                      "content": ".tabs",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "kjrrh",
+                      "name": "Caret",
+                      "width": 1,
+                      "height": 16,
+                      "fill": "$ColorText"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gGz6y",
+                  "name": "Tools",
+                  "height": 32,
+                  "gap": "$Space4",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "i0AW39",
                       "type": "ref",
                       "ref": "PByrK",
                       "name": "Tool",
@@ -80399,7 +80767,7 @@
                       "height": 28
                     },
                     {
-                      "id": "YFzao",
+                      "id": "k0pPAe",
                       "type": "ref",
                       "ref": "Ng6hD",
                       "name": "Tool",
@@ -80407,7 +80775,7 @@
                       "height": 28
                     },
                     {
-                      "id": "fndLH",
+                      "id": "z1B2Ea",
                       "type": "ref",
                       "ref": "g3HzZW",
                       "name": "Tool",
@@ -80415,7 +80783,7 @@
                       "height": 28
                     },
                     {
-                      "id": "uQlvc",
+                      "id": "MNFtf",
                       "type": "ref",
                       "ref": "VnixZ",
                       "name": "Tool",
@@ -82324,6 +82692,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "AA4tY",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -82437,6 +82816,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "nUM8d",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -82529,6 +82919,28 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "pBb1B",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "QRRAA",
+                              "layoutPosition": "absolute",
+                              "x": 110.2,
+                              "y": 0,
+                              "name": "Indent guide 2",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -82610,6 +83022,28 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "m6yyiS",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "tKwl6",
+                              "layoutPosition": "absolute",
+                              "x": 110.2,
+                              "y": 0,
+                              "name": "Indent guide 2",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -82691,6 +83125,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "MfxaP",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -82816,6 +83261,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "h3W88",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -82930,6 +83386,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "rpU78",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -83020,83 +83487,45 @@
                 },
                 {
                   "type": "frame",
-                  "id": "O0oVi",
+                  "id": "phFY2",
+                  "name": "Footer boundary",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$ColorSeparator"
+                },
+                {
+                  "type": "frame",
+                  "id": "G22xC",
                   "name": "this input",
                   "width": "fill_container",
                   "height": 44,
-                  "gap": "$Space0",
+                  "gap": "$Space12",
+                  "padding": [
+                    "$Space6",
+                    "$Space12"
+                  ],
                   "alignItems": "center",
                   "children": [
                     {
-                      "type": "frame",
-                      "id": "h2kSBh",
-                      "name": "this group",
-                      "width": "fill_container",
-                      "height": "fill_container",
-                      "gap": "$Space12",
-                      "padding": [
-                        "$Space6",
-                        "$Space12"
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "oSiBQ",
-                          "name": "this prefix",
-                          "fill": "$ColorText",
-                          "content": "this",
-                          "lineHeight": "$LineHeightBody",
-                          "fontFamily": "$FontFamilyCode",
-                          "fontSize": "$FontSizeBody",
-                          "fontWeight": "$FontWeightSemibold"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "E9fQr",
-                          "name": "Expression field",
-                          "width": "fill_container",
-                          "height": 32,
-                          "fill": "$ColorControl",
-                          "cornerRadius": "$RadiusControl",
-                          "gap": "$Space0",
-                          "padding": [
-                            "$Space0",
-                            "$Space12"
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "OwVEm",
-                              "name": "Expression suffix",
-                              "fill": "$ColorText",
-                              "content": ".tabs",
-                              "lineHeight": "$LineHeightBody",
-                              "fontFamily": "$FontFamilyCode",
-                              "fontSize": "$FontSizeBody",
-                              "fontWeight": "$FontWeightRegular"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "zOPPz",
-                              "name": "Caret",
-                              "width": 1,
-                              "height": 16,
-                              "fill": "$ColorText",
-                              "layout": "vertical",
-                              "gap": "$Space0"
-                            }
-                          ]
-                        }
-                      ]
+                      "type": "text",
+                      "id": "AjsVK",
+                      "name": "this prefix",
+                      "fill": "$ColorText",
+                      "content": "this",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightSemibold"
                     },
                     {
                       "type": "frame",
-                      "id": "djieO",
-                      "name": "Tools",
-                      "height": "fill_container",
-                      "gap": "$Space4",
+                      "id": "N4vqlb",
+                      "name": "Expression field",
+                      "width": "fill_container",
+                      "height": 32,
+                      "fill": "$ColorControl",
+                      "cornerRadius": "$RadiusControl",
+                      "gap": "$Space0",
                       "padding": [
                         "$Space0",
                         "$Space12"
@@ -83104,7 +83533,37 @@
                       "alignItems": "center",
                       "children": [
                         {
-                          "id": "GtcDT",
+                          "type": "text",
+                          "id": "TEBbI",
+                          "name": "Expression suffix",
+                          "fill": "$ColorText",
+                          "content": ".tabs",
+                          "lineHeight": "$LineHeightBody",
+                          "fontFamily": "$FontFamilyCode",
+                          "fontSize": "$FontSizeBody",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "roUuo",
+                          "name": "Caret",
+                          "width": 1,
+                          "height": 16,
+                          "fill": "$ColorText"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CASfu",
+                      "name": "Tools",
+                      "height": 32,
+                      "gap": "$Space4",
+                      "justifyContent": "end",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "OdYyF",
                           "type": "ref",
                           "ref": "PByrK",
                           "name": "Tool",
@@ -83112,7 +83571,7 @@
                           "height": 28
                         },
                         {
-                          "id": "Jewxr",
+                          "id": "i9c2Rd",
                           "type": "ref",
                           "ref": "Ng6hD",
                           "name": "Tool",
@@ -83120,7 +83579,7 @@
                           "height": 28
                         },
                         {
-                          "id": "u3FIg",
+                          "id": "rCyC6",
                           "type": "ref",
                           "ref": "g3HzZW",
                           "name": "Tool",
@@ -83128,7 +83587,7 @@
                           "height": 28
                         },
                         {
-                          "id": "H14Wky",
+                          "id": "phCuK",
                           "type": "ref",
                           "ref": "VnixZ",
                           "name": "Tool",
@@ -83522,6 +83981,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "e5ndOq",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -83635,6 +84105,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "tFay0",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -83727,6 +84208,28 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "evXEO",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "u88BD",
+                              "layoutPosition": "absolute",
+                              "x": 110.2,
+                              "y": 0,
+                              "name": "Indent guide 2",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -83808,6 +84311,28 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "BPlgL",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Jb4Zz",
+                              "layoutPosition": "absolute",
+                              "x": 110.2,
+                              "y": 0,
+                              "name": "Indent guide 2",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -83889,6 +84414,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "yd2Ot",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -84014,6 +84550,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Ntlne",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -84128,6 +84675,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "vZqgW",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -84335,93 +84893,83 @@
                 },
                 {
                   "type": "frame",
-                  "id": "kHbWG",
+                  "id": "nRTrI",
+                  "name": "Footer boundary",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$ColorSeparator"
+                },
+                {
+                  "type": "frame",
+                  "id": "FK143",
                   "name": "this input",
                   "width": "fill_container",
                   "height": 44,
-                  "gap": "$Space0",
+                  "gap": "$Space12",
+                  "padding": [
+                    "$Space6",
+                    "$Space12"
+                  ],
                   "alignItems": "center",
                   "children": [
                     {
+                      "type": "text",
+                      "id": "b9a2at",
+                      "name": "this prefix",
+                      "fill": "$ColorText",
+                      "content": "this",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightSemibold"
+                    },
+                    {
                       "type": "frame",
-                      "id": "J68R2",
-                      "name": "this group",
-                      "width": 504,
-                      "height": "fill_container",
-                      "gap": "$Space12",
+                      "id": "hahXC",
+                      "name": "Expression field",
+                      "width": "fill_container",
+                      "height": 32,
+                      "fill": "$ColorControl",
+                      "cornerRadius": "$RadiusControl",
+                      "gap": "$Space0",
                       "padding": [
-                        "$Space6",
+                        "$Space0",
                         "$Space12"
                       ],
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "lDvGT",
-                          "name": "this prefix",
+                          "id": "EQy0s",
+                          "name": "Expression suffix",
                           "fill": "$ColorText",
-                          "content": "this",
+                          "content": ".tabs",
                           "lineHeight": "$LineHeightBody",
                           "fontFamily": "$FontFamilyCode",
                           "fontSize": "$FontSizeBody",
-                          "fontWeight": "$FontWeightSemibold"
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "frame",
-                          "id": "Gv8q5",
-                          "name": "Expression field",
-                          "width": "fill_container",
-                          "height": 32,
-                          "fill": "$ColorControl",
-                          "cornerRadius": "$RadiusControl",
-                          "gap": "$Space0",
-                          "padding": [
-                            "$Space0",
-                            "$Space12"
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "Dwob9",
-                              "name": "Expression suffix",
-                              "fill": "$ColorText",
-                              "content": ".tabs",
-                              "lineHeight": "$LineHeightBody",
-                              "fontFamily": "$FontFamilyCode",
-                              "fontSize": "$FontSizeBody",
-                              "fontWeight": "$FontWeightRegular"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "BLANi",
-                              "name": "Caret",
-                              "width": 1,
-                              "height": 16,
-                              "fill": "$ColorText",
-                              "layout": "vertical",
-                              "gap": "$Space0"
-                            }
-                          ]
+                          "id": "PG4mU",
+                          "name": "Caret",
+                          "width": 1,
+                          "height": 16,
+                          "fill": "$ColorText"
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "J753c",
+                      "id": "J0XxPS",
                       "name": "Tools",
-                      "width": "fill_container",
-                      "height": "fill_container",
+                      "height": 32,
                       "gap": "$Space4",
-                      "padding": [
-                        "$Space0",
-                        "$Space12"
-                      ],
                       "justifyContent": "end",
                       "alignItems": "center",
                       "children": [
                         {
-                          "id": "tDGKO",
+                          "id": "CkI4g",
                           "type": "ref",
                           "ref": "PByrK",
                           "name": "Tool",
@@ -84429,7 +84977,7 @@
                           "height": 28
                         },
                         {
-                          "id": "vH0xw",
+                          "id": "R306g",
                           "type": "ref",
                           "ref": "Ng6hD",
                           "name": "Tool",
@@ -84437,7 +84985,7 @@
                           "height": 28
                         },
                         {
-                          "id": "M1Wat",
+                          "id": "aAu9G",
                           "type": "ref",
                           "ref": "g3HzZW",
                           "name": "Tool",
@@ -84445,7 +84993,7 @@
                           "height": 28
                         },
                         {
-                          "id": "trYSO",
+                          "id": "AQPGj",
                           "type": "ref",
                           "ref": "VnixZ",
                           "name": "Tool",
@@ -84839,6 +85387,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "MEfnA",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -84952,6 +85511,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "zzgv1",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -85044,6 +85614,28 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "CcV07",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Cm8Bx",
+                              "layoutPosition": "absolute",
+                              "x": 110.2,
+                              "y": 0,
+                              "name": "Indent guide 2",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -85125,6 +85717,28 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "aODf6",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Q2WcU",
+                              "layoutPosition": "absolute",
+                              "x": 110.2,
+                              "y": 0,
+                              "name": "Indent guide 2",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -85206,6 +85820,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "L6AVT",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -85331,6 +85956,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "vCweW",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -85445,6 +86081,17 @@
                                   "fontWeight": "$FontWeightRegular"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "B1Flk",
+                              "layoutPosition": "absolute",
+                              "x": 94.6,
+                              "y": 0,
+                              "name": "Indent guide 1",
+                              "width": 1,
+                              "height": 24,
+                              "fill": "$ColorSyntaxIndent"
                             }
                           ]
                         },
@@ -85585,93 +86232,83 @@
                 },
                 {
                   "type": "frame",
-                  "id": "e0jiY2",
+                  "id": "RSAtr",
+                  "name": "Footer boundary",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$ColorSeparator"
+                },
+                {
+                  "type": "frame",
+                  "id": "yAL6k",
                   "name": "this input",
                   "width": "fill_container",
                   "height": 44,
-                  "gap": "$Space0",
+                  "gap": "$Space12",
+                  "padding": [
+                    "$Space6",
+                    "$Space12"
+                  ],
                   "alignItems": "center",
                   "children": [
                     {
+                      "type": "text",
+                      "id": "XahJp",
+                      "name": "this prefix",
+                      "fill": "$ColorText",
+                      "content": "this",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamilyCode",
+                      "fontSize": "$FontSizeBody",
+                      "fontWeight": "$FontWeightSemibold"
+                    },
+                    {
                       "type": "frame",
-                      "id": "b9MSt",
-                      "name": "this group",
-                      "width": 504,
-                      "height": "fill_container",
-                      "gap": "$Space12",
+                      "id": "OPWbO",
+                      "name": "Expression field",
+                      "width": "fill_container",
+                      "height": 32,
+                      "fill": "$ColorControl",
+                      "cornerRadius": "$RadiusControl",
+                      "gap": "$Space0",
                       "padding": [
-                        "$Space6",
+                        "$Space0",
                         "$Space12"
                       ],
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "CZBnO",
-                          "name": "this prefix",
+                          "id": "o1sdTZ",
+                          "name": "Expression suffix",
                           "fill": "$ColorText",
-                          "content": "this",
+                          "content": ".missing",
                           "lineHeight": "$LineHeightBody",
                           "fontFamily": "$FontFamilyCode",
                           "fontSize": "$FontSizeBody",
-                          "fontWeight": "$FontWeightSemibold"
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "frame",
-                          "id": "QCNfo",
-                          "name": "Expression field",
-                          "width": "fill_container",
-                          "height": 32,
-                          "fill": "$ColorControl",
-                          "cornerRadius": "$RadiusControl",
-                          "gap": "$Space0",
-                          "padding": [
-                            "$Space0",
-                            "$Space12"
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "qTc29",
-                              "name": "Expression suffix",
-                              "fill": "$ColorText",
-                              "content": ".missing",
-                              "lineHeight": "$LineHeightBody",
-                              "fontFamily": "$FontFamilyCode",
-                              "fontSize": "$FontSizeBody",
-                              "fontWeight": "$FontWeightRegular"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "I1qDNu",
-                              "name": "Caret",
-                              "width": 1,
-                              "height": 16,
-                              "fill": "$ColorText",
-                              "layout": "vertical",
-                              "gap": "$Space0"
-                            }
-                          ]
+                          "id": "HhdnB",
+                          "name": "Caret",
+                          "width": 1,
+                          "height": 16,
+                          "fill": "$ColorText"
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "osFp3",
+                      "id": "w9g3Ny",
                       "name": "Tools",
-                      "width": "fill_container",
-                      "height": "fill_container",
+                      "height": 32,
                       "gap": "$Space4",
-                      "padding": [
-                        "$Space0",
-                        "$Space12"
-                      ],
                       "justifyContent": "end",
                       "alignItems": "center",
                       "children": [
                         {
-                          "id": "lMNIw",
+                          "id": "r0BvmS",
                           "type": "ref",
                           "ref": "PByrK",
                           "name": "Tool",
@@ -85679,7 +86316,7 @@
                           "height": 28
                         },
                         {
-                          "id": "j8XjO",
+                          "id": "xmu6R",
                           "type": "ref",
                           "ref": "Ng6hD",
                           "name": "Tool",
@@ -85687,7 +86324,7 @@
                           "height": 28
                         },
                         {
-                          "id": "N8WzSF",
+                          "id": "kVHdI",
                           "type": "ref",
                           "ref": "g3HzZW",
                           "name": "Tool",
@@ -85695,7 +86332,7 @@
                           "height": 28
                         },
                         {
-                          "id": "n8sd2",
+                          "id": "Qy72d",
                           "type": "ref",
                           "ref": "VnixZ",
                           "name": "Tool",
@@ -85723,7 +86360,7 @@
               "id": "odFSk",
               "name": "Zoom box",
               "clip": true,
-              "width": 620,
+              "width": 660,
               "height": 96,
               "fill": "$ColorCard",
               "cornerRadius": "$RadiusCard",
@@ -85768,7 +86405,7 @@
                 {
                   "type": "text",
                   "id": "JZxR3",
-                  "x": 284,
+                  "x": 346.4,
                   "y": 9,
                   "name": "Zoomed code",
                   "fill": "$ColorText",
@@ -85784,11 +86421,21 @@
                   "x": 0,
                   "y": 48,
                   "name": "Centre line",
-                  "width": 620,
+                  "width": 660,
                   "height": 1,
                   "fill": "$ColorSeparator",
                   "layout": "vertical",
                   "gap": "$Space0"
+                },
+                {
+                  "type": "frame",
+                  "id": "KZvIO",
+                  "x": 342.4,
+                  "y": 0,
+                  "name": "Zoomed indent guide",
+                  "width": 4,
+                  "height": 96,
+                  "fill": "$ColorSyntaxIndent"
                 }
               ]
             },
