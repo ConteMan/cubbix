@@ -522,3 +522,96 @@ func TestLidHelperVersionUpdateReplacesConnection(t *testing.T) {
 		t.Fatal("updated helper did not reconnect")
 	}
 }
+
+// A new request owns its Lid choice, including an explicit off selection.
+func TestLidNewRequestWithoutLidRestoresBeforeRestart(t *testing.T) {
+	for _, locale := range []string{"zh-CN", "en"} {
+		t.Run(locale, func(t *testing.T) {
+			a, s, _, _, _ := lidTestApp(t)
+			session := a.selectedSession()
+			session.Lid = true
+			if err := a.startAwake(session); err != nil {
+				t.Fatal(err)
+			}
+			launch := a.awake.launch
+			a.awake.launch = func(args []string) (awakeChild, error) {
+				if s.value != 0 || a.lid.markerExists() || a.lid.snapshot().state != lidOff {
+					t.Fatal("new assertion launched before confirmed lid recovery")
+				}
+				return launch(args)
+			}
+			off := false
+			a.lidPending = &off
+			if err := a.startAwakeWith(awakeArg{Kind: awakeArgMinutes, Minutes: 120}, "tasks"); err != nil {
+				t.Fatal(err)
+			}
+			state := a.awake.snapshot()
+			if !state.Active || state.Session.Lid || state.Session.Mode != "tasks" || state.Session.Minutes != 120 || a.config.AwakeSession == nil || a.config.AwakeSession.Lid {
+				t.Fatal("new ordinary session inherited the old lid lease", state)
+			}
+			if s.value != 0 || a.lid.snapshot().state != lidOff || a.lid.markerExists() {
+				t.Fatal("lid lease survived explicit off")
+			}
+			if strings.Contains(a.menubarPanelStatusLine(locale, time.Now()), a.text(locale, "R05Lid")) {
+				t.Fatal("card status still advertises lid mode")
+			}
+			tt := panelView(a, locale)
+			if !tt.HasText(a.text(locale, "R05LidHint")) {
+				t.Fatal("card did not return to the ordinary-session hint")
+			}
+		})
+	}
+}
+
+type lidIgnoreRestore struct{ *lidTestSleep }
+
+func (s lidIgnoreRestore) Set(value int) error {
+	if value == 0 {
+		s.writes = append(s.writes, value)
+		return nil
+	}
+	return s.lidTestSleep.Set(value)
+}
+func TestLidNewOrdinaryRequestRequiresConfirmedRecovery(t *testing.T) {
+	for _, failure := range []string{"write", "readback"} {
+		t.Run(failure, func(t *testing.T) {
+			a, s, _, _, conn := lidTestApp(t)
+			session := a.selectedSession()
+			session.Lid = true
+			if err := a.startAwake(session); err != nil {
+				t.Fatal(err)
+			}
+			if failure == "write" {
+				s.failZero = true
+			} else {
+				conn.engine.Sleep = lidIgnoreRestore{s}
+			}
+			before := a.awake.snapshot()
+			launches := 0
+			a.awake.launch = func([]string) (awakeChild, error) { launches++; return nil, errors.New("must not launch") }
+			off := false
+			a.lidPending = &off
+			if err := a.startAwakeWith(awakeArg{Kind: awakeArgMinutes, Minutes: 120}, "tasks"); err == nil {
+				t.Fatal("unconfirmed recovery accepted")
+			}
+			after := a.awake.snapshot()
+			if launches != 0 || !after.Active || after.Session != before.Session || a.config.AwakeMode != before.Session.Mode {
+				t.Fatal("failed recovery replaced the existing session")
+			}
+			if s.value != 1 || !a.lid.markerExists() || a.lid.snapshot().state != lidRestoreFailed {
+				t.Fatal("recovery liability was lost")
+			}
+		})
+	}
+}
+func TestLidOrdinaryRequestLeavesForeignSettingAlone(t *testing.T) {
+	a, s, _, _, _ := lidTestApp(t)
+	s.value = 1
+	a.lid.Inspect()
+	if err := a.startAwake(awakeSession{Mode: "tasks", Minutes: 60, End: time.Now().Add(time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+	if !a.awake.snapshot().Active || a.awake.snapshot().Session.Lid || len(s.writes) != 0 || s.value != 1 {
+		t.Fatal("ordinary request changed a foreign setting")
+	}
+}

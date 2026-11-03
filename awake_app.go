@@ -50,7 +50,18 @@ func (a *application) startAwake(s awakeSession) error {
 	if wanted && (a.lid == nil || !a.lid.Available()) {
 		return fmt.Errorf("LidUnsupported")
 	}
-	s.Lid = current.Active && current.Session.Lid
+	if !wanted && a.lid != nil {
+		state := a.lid.snapshot()
+		if current.Session.Lid || state.state == lidOn || state.state == lidRestoreFailed || !state.online && state.ours {
+			if err := a.lid.stop(); err != nil {
+				a.notifyLid("LidRestoreFailed")
+				a.refreshAwake()
+				return err
+			}
+			a.setSessionLid(false)
+		}
+	}
+	s.Lid = wanted && current.Active && current.Session.Lid
 	if err := a.awake.start(s); err != nil {
 		return err
 	}

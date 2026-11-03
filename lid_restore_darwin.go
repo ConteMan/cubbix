@@ -50,7 +50,18 @@ func (a *application) prepareLid() {
 		if err := exec.CommandContext(ctx, "/usr/bin/codesign", "-v", "-R", lid.ClientRequirement, "/Applications/Cubbix.app").Run(); err != nil {
 			return errors.New("LidDevBuild")
 		}
-		_, err := exec.Command("/usr/bin/osascript", "-e", program).Output()
+		var command *exec.Cmd
+		switch program {
+		case lidInstallScriptApple:
+			command = exec.Command("/usr/bin/osascript", "-e", lidInstallScriptApple)
+		case lidUninstallScriptApple:
+			command = exec.Command("/usr/bin/osascript", "-e", lidUninstallScriptApple)
+		case lidForceScriptApple:
+			command = exec.Command("/usr/bin/osascript", "-e", lidForceScriptApple)
+		default:
+			return errors.New("LidServiceBroken")
+		}
+		_, err := command.Output()
 		if err == nil {
 			return nil
 		}
