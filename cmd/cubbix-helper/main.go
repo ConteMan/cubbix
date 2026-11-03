@@ -1,0 +1,37 @@
+package main
+
+import (
+	"context"
+	"github.com/ConteMan/cubbix/internal/lid"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+	"os/signal"
+	"syscall"
+)
+
+func main() {
+	if os.Geteuid() != 0 || len(os.Args) != 1 {
+		log.Fatal("helper requires system launch")
+	}
+	// Production write capability is constructed here only. Tests inject a fake.
+	sleep := lid.PMSet{Run: func(ctx context.Context, name string, args ...string) ([]byte, error) {
+		return exec.CommandContext(ctx, name, args...).Output()
+	}}
+	engine := lid.NewEngine(sleep, lid.SystemPower{}, lid.FileJournal{Path: lid.JournalPath})
+	if err := engine.Start(); err != nil {
+		log.Fatal("recovery initialization failed")
+	}
+	listener, err := lid.Listen(lid.SocketPath)
+	if err != nil {
+		log.Fatal("listener unavailable")
+	}
+	defer listener.Close()
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer cancel()
+	server := lid.Server{Engine: engine, Verify: func(c *net.UnixConn) error { return lid.VerifyPeer(c, lid.ClientRequirement) }}
+	if err = server.Serve(ctx, listener); err != nil {
+		log.Print("listener stopped")
+	}
+}

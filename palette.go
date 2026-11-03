@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 	"slices"
@@ -128,6 +129,7 @@ func (a *application) presentPalette() {
 }
 
 func (a *application) hidePalette() {
+	a.lidPending = nil
 	if a.palette == nil {
 		return
 	}
@@ -306,7 +308,7 @@ func (a *application) runPalette() {
 			return
 		}
 		// Favorites stay open: the user usually files several commands.
-		if action.ID == "palette.favorite" {
+		if action.ID == "palette.favorite" || action.ID == "awake.start.lid" {
 			if err := action.Run(a); err != nil {
 				p.runError = paletteErrorKey(err)
 				p.errorKey = p.runError
@@ -355,6 +357,9 @@ func (a *application) runPalette() {
 func paletteErrorKey(err error) string {
 	if err == nil {
 		return ""
+	}
+	if strings.HasPrefix(err.Error(), "Lid") {
+		return err.Error()
 	}
 	switch err.Error() {
 	case "DurationError", "TimeError":
@@ -649,13 +654,14 @@ func (a *application) refreshPaletteActions(p *paletteState, locale string) {
 // paletteURLRequest is the validated intent of a deep link. Nothing here has
 // run yet; parsing only drops malformed or unavailable requests.
 type paletteURLRequest struct {
-	Kind       string // awake, awake.stop, awake.toggle, json.new, palette, settings
-	Minutes    int
-	HasMinutes bool
-	Mode       string
-	Text       string
-	Blank      bool
-	Page       int
+	Lid, HasLid bool
+	Kind        string // awake, awake.stop, awake.toggle, json.new, palette, settings
+	Minutes     int
+	HasMinutes  bool
+	Mode        string
+	Text        string
+	Blank       bool
+	Page        int
 }
 
 // parsePaletteURL validates a cubbix:// URL. Host and path are case-folded
@@ -690,13 +696,17 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 		if !awakeEnabled {
 			return paletteURLRequest{}, false
 		}
-		switch path {
-		case "stop":
-			return paletteURLRequest{Kind: "awake.stop"}, true
-		case "toggle":
-			return paletteURLRequest{Kind: "awake.toggle"}, true
-		}
 		request := paletteURLRequest{Kind: "awake"}
+		if path != "" {
+			request.Kind += "." + path
+		}
+		if values, ok := query["lid"]; ok && len(values) > 0 {
+			if values[0] != "0" && values[0] != "1" {
+				return paletteURLRequest{}, false
+			}
+			request.HasLid = true
+			request.Lid = values[0] == "1"
+		}
 		if values, ok := query["minutes"]; ok && len(values) > 0 {
 			minutes, err := strconv.Atoi(values[0])
 			if err != nil || minutes < 0 || minutes > awakeMinutesMaximum {
@@ -710,6 +720,9 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 				return paletteURLRequest{}, false
 			}
 			request.Mode = mode
+		}
+		if request.Lid && (!request.HasMinutes || request.Minutes < 1 || request.Minutes > 480) {
+			return paletteURLRequest{}, false
 		}
 		return request, true
 	case "json":
@@ -789,19 +802,40 @@ func (a *application) runURL(req paletteURLRequest) error {
 				session.End = time.Now().Add(time.Duration(req.Minutes) * time.Minute)
 			}
 		}
+		wanted := a.config.AwakeLid
+		if req.HasLid {
+			wanted = req.Lid
+		}
+		if wanted && (a.lid == nil || !a.lid.Available() || a.lid.service.Status() != svcEnabled || !req.HasMinutes || req.Minutes < 1 || req.Minutes > 480) {
+			return fmt.Errorf("LidAuthNeeded")
+		}
+		if !wanted && a.awake.snapshot().Session.Lid {
+			if err := a.lid.stop(); err != nil {
+				return err
+			}
+			a.setSessionLid(false)
+		}
+		session.Lid = wanted
+		a.lidURL = true
+		defer func() { a.lidURL = false }()
 		// The request never writes the remembered duration or deadline.
 		err := a.startAwake(session)
 		// A deep link has no other visible result, so it reports like a shortcut.
-		a.announceAwake(err)
+		if !wanted || err != nil {
+			a.announceAwake(err)
+		}
 		return err
 	case "awake.stop":
-		a.awake.stop()
-		a.announceAwake(nil)
-	case "awake.toggle":
-		// Same toggle as the shortcut, and the same hint when it fails.
-		err := a.toggleAwakeResult()
+		err := a.stopAwake()
 		a.announceAwake(err)
 		return err
+	case "awake.toggle":
+		// Same toggle as the shortcut, and the same hint when it fails.
+		if a.awake.snapshot().Active {
+			return a.runURL(paletteURLRequest{Kind: "awake.stop"})
+		}
+		req.Kind = "awake"
+		return a.runURL(req)
 	case "json.new":
 		a.openJSONText(req.Text)
 	case "palette":

@@ -26,6 +26,15 @@ var jsonAssets embed.FS
 const appVersion = "0.3.1"
 
 type application struct {
+	lidMessage   string
+	lidAuthorize bool
+	lidPolling   bool
+
+	lid                       *lidController
+	lidBusy, lidAsync, lidURL bool
+	lidNotice                 string
+	lidPending                *bool
+
 	jsonDocuments        []*jsonDocument
 	jsonNext             int
 	jsonReadClipboard    func() string
@@ -161,6 +170,9 @@ func settingsHeight(t tokenValues, page int, hasError bool) int {
 	content := 2*t.SizeRowHeight + t.StrokeHairline
 	if page == 1 {
 		content = t.FontSizeSmall*t.LineHeightBody + t.Space8 + 3*t.SizeRowHeight + 2*t.StrokeHairline
+	}
+	if page == 2 {
+		content = 3*t.SizeRowHeight + 2*t.StrokeHairline
 	}
 	if page == 3 {
 		// Shortcuts: awake, JSON, command palette, feedback, hint position.
@@ -405,6 +417,7 @@ func (a *application) ready() {
 			a.invalidateWindow()
 		})
 	}
+	a.prepareLid()
 	a.startAwakeServices()
 	a.registerJSONShortcut()
 	a.registerPaletteShortcut()
@@ -449,6 +462,11 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	if a.stopAwakeServices != nil {
 		a.stopAwakeServices()
 	}
+	// Do not wait past the quit budget if the helper is unreachable.
+	if a.lid != nil {
+		a.lid.stopForQuit()
+	}
+	a.awake.setBeforeStop(nil)
 	a.awake.stop()
 	mygo.GlobalShortcut.UnregisterAll()
 	a.updates.close()

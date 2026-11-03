@@ -34,7 +34,7 @@ func TestConfigRoundTrip(t *testing.T) {
 	if err != nil || !reflect.DeepEqual(initial, defaultConfig()) {
 		t.Fatalf("default config = %#v, %v", initial, err)
 	}
-	want := Config{Version: configVersion, Language: "en", OpenAtLogin: true, FeedbackMode: "hint", FeedbackCorner: "top-right", AutomaticUpdates: true, JSONSplit: jsonSplitDefault, PaletteShortcut: defaultPaletteKey}
+	want := Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "en", OpenAtLogin: true, FeedbackMode: "hint", FeedbackCorner: "top-right", AutomaticUpdates: true, JSONSplit: jsonSplitDefault, PaletteShortcut: defaultPaletteKey}
 	if err := saveConfig(path, want); err != nil {
 		t.Fatal(err)
 	}

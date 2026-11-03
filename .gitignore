@@ -4,3 +4,5 @@ build/
 /scratch/
 
 frontend/node_modules/
+
+/resources/darwin-*/bin/

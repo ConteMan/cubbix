@@ -12,6 +12,7 @@ import (
 )
 
 type awakeDialog struct {
+	lid                           bool
 	kind                          string
 	window                        *mygo.Window
 	hours, minutes, until, search string
@@ -32,7 +33,7 @@ type awakeDialog struct {
 
 func (a *application) openAwakeDialog(kind string) {
 	a.closeAwakeDialog()
-	d := &awakeDialog{kind: kind, hours: "1", minutes: "30", until: "02:30", icons: map[int]*ui.Bitmap{}}
+	d := &awakeDialog{lid: a.lidPreference(), kind: kind, hours: "1", minutes: "30", until: "02:30", icons: map[int]*ui.Bitmap{}}
 	a.dialog = d
 	a.createAwakeDialogWindow(d)
 	if kind == "follow" {
@@ -75,6 +76,9 @@ func (a *application) closeAwakeDialog() {
 	}
 }
 func (a *application) confirmAwakeDialog() {
+	previous := a.lidAuthorize
+	a.lidAuthorize = true
+	defer func() { a.lidAuthorize = previous }()
 	d := a.dialog
 	if d == nil {
 		return
@@ -115,6 +119,7 @@ func (a *application) confirmAwakeDialog() {
 			return
 		}
 	}
+	s.Lid = d.lid
 	if err := a.startAwake(s); err != nil {
 		d.errorKey = "AwakeStartError"
 		return
@@ -468,6 +473,8 @@ func (a *application) awakeSettings(c *ui.Context, t tokenValues, locale string)
 		a.row(c, t, text("Awake"), func() {
 			a.switchControl(c, t, "awake-enabled", text("Awake"), &a.config.AwakeEnabled, a.changeAwakeEnabled)
 		})
+		ui.Divider(c)
+		a.lidBatteryRow(c, t, locale)
 		ui.Divider(c)
 		a.row(c, t, text("JSON"), func() {
 			a.switchControl(c, t, "json-enabled", text("JSON"), &a.config.JSONEnabled, a.changeJSONEnabled)

@@ -2,7 +2,9 @@
   "name": "Cubbix",
   "identifier": "com.conteman.cubbix",
   "version": "0.3.1",
-  "urlSchemes": ["cubbix"],
+  "urlSchemes": [
+    "cubbix"
+  ],
   "icon": "brand/dist/app-icon-1024.png",
   "out": "build",
   "macos": {
@@ -18,5 +20,6 @@
     "publicKey": "TxYEVmjZVSVQ2Pg8DiSSZDWHkBTDhB6HKnt2kV1boUQ=",
     "github": "ConteMan/cubbix"
   },
-  "bindings": "build/mygo.ts"
+  "bindings": "build/mygo.ts",
+  "buildCommand": "./scripts/build-helper.sh"
 }

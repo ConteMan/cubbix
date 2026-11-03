@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add optional lid sessions (pending maintainer hardware acceptance). They change a system power setting and may increase heat and battery use. The helper enforces battery and 12-hour limits; use Restore sleep now in the app after a recovery failure.
+
 ## 0.3.1 — 2026-10-31
 
 - Minimize and zoom are back on the main window, drawn by the system. Full screen stays off.

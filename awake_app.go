@@ -12,6 +12,7 @@ import (
 )
 
 func (a *application) awakeChanged() {
+	a.syncLid()
 	s := a.awake.snapshot()
 	if a.panel != nil {
 		a.panel.errorKey = ""
@@ -38,10 +39,39 @@ func (a *application) refreshAwake() {
 	a.refreshMenubarPanel()
 }
 func (a *application) startAwake(s awakeSession) error {
+	if a.lidBusy {
+		return fmt.Errorf("LidEnableFailed")
+	}
 	if !a.config.AwakeEnabled {
 		return fmt.Errorf("keep awake disabled")
 	}
-	return a.awake.start(s)
+	wanted := s.Lid
+	current := a.awake.snapshot()
+	if wanted && (a.lid == nil || !a.lid.Available()) {
+		return fmt.Errorf("LidUnsupported")
+	}
+	if !wanted && a.lid != nil {
+		state := a.lid.snapshot()
+		if current.Session.Lid || state.state == lidOn || state.state == lidRestoreFailed || !state.online && state.ours {
+			if err := a.lid.stop(); err != nil {
+				a.notifyLid("LidRestoreFailed")
+				a.refreshAwake()
+				return err
+			}
+			a.setSessionLid(false)
+		}
+	}
+	s.Lid = wanted && current.Active && current.Session.Lid
+	if err := a.awake.start(s); err != nil {
+		return err
+	}
+	if wanted {
+		if a.lid.snapshot().state == lidOn && (s.End.Equal(a.lid.deadline) || !s.End.IsZero() && !a.lid.deadline.IsZero() && s.End.Before(a.lid.deadline)) {
+			return nil
+		}
+		return a.enableLid(s.End, a.lidAuthorize && !a.lidURL)
+	}
+	return nil
 }
 
 // reportAwakeError serves launch restoration, which still reports in
@@ -53,7 +83,7 @@ func (a *application) reportAwakeError(err error) {
 	}
 }
 func (a *application) selectedSession() awakeSession {
-	s := awakeSession{Mode: a.config.AwakeMode, Minutes: a.config.AwakeMinutes, Until: a.config.AwakeUntil}
+	s := awakeSession{Lid: a.savedLidPreference(), Mode: a.config.AwakeMode, Minutes: a.config.AwakeMinutes, Until: a.config.AwakeUntil}
 	if s.Mode == "" {
 		s.Mode = "screen"
 	}
@@ -85,8 +115,7 @@ func (a *application) toggleAwakeResult() error {
 		return nil
 	}
 	if a.awake.snapshot().Active {
-		a.awake.stop()
-		return nil
+		return a.stopAwake()
 	}
 	return a.startAwake(a.selectedSession())
 }
@@ -110,7 +139,7 @@ func (a *application) setDuration(minutes int) error {
 	if minutes < 0 || minutes > awakeMinutesMaximum {
 		return fmt.Errorf("DurationError")
 	}
-	s := awakeSession{Mode: a.config.AwakeMode, Minutes: minutes}
+	s := awakeSession{Lid: a.savedLidPreference(), Mode: a.config.AwakeMode, Minutes: minutes}
 	if minutes > 0 {
 		s.End = time.Now().Add(time.Duration(minutes) * time.Minute)
 	}
@@ -125,7 +154,18 @@ func (a *application) setDuration(minutes int) error {
 }
 func (a *application) changeAwakeEnabled() {
 	if !a.config.AwakeEnabled {
-		a.awake.stop()
+		if err := a.stopAwake(); err != nil {
+			a.config.AwakeEnabled = true
+			a.settingsError = "LidRestoreFailed"
+			return
+		}
+		if a.lid != nil && a.lid.Available() && a.lid.service.Status() != svcNotRegistered {
+			if err := a.lid.service.Unregister(); err != nil {
+				a.config.AwakeEnabled = true
+				a.settingsError = "LidRestoreFailed"
+				return
+			}
+		}
 		a.unregisterShortcut(a.config.AwakeShortcut)
 	} else {
 		a.registerAwakeShortcut()
@@ -176,13 +216,27 @@ func (a *application) awakeSuffix(locale string, session awakeSession, now time.
 func (a *application) awakeStatus(locale string, now time.Time) string {
 	text := func(key string) string { return a.text(locale, key) }
 	s := a.awake.snapshot()
+	if a.lid != nil {
+		lid := a.lid.snapshot()
+		if lid.reason != "" {
+			prefix := text("R05Off")
+			if s.Active {
+				prefix = a.awakeMode(locale, s.Session) + " · " + a.awakeSuffix(locale, s.Session, now)
+			}
+			return prefix + " · " + text(lid.reason)
+		}
+	}
 	if !s.Active {
 		if s.Error != "" {
 			return text("R05Off") + " · ⚠ " + text(s.Error)
 		}
 		return text("R05Off")
 	}
-	return a.awakeMode(locale, s.Session) + " · " + a.awakeSuffix(locale, s.Session, now)
+	mode := a.awakeMode(locale, s.Session)
+	if s.Session.Lid {
+		mode += " · " + text("R05Lid")
+	}
+	return mode + " · " + a.awakeSuffix(locale, s.Session, now)
 }
 
 type powerMonitor struct {
@@ -210,6 +264,12 @@ func batteryPower(ctx context.Context) (bool, error) {
 	return false, fmt.Errorf("unknown power source")
 }
 func (a *application) startAwakeServices() {
+	a.awake.setBeforeStop(func() {
+		if a.lid != nil {
+			_ = a.lid.stop()
+		}
+	})
+	a.pollLid()
 	a.awake.changed = func() {
 		mygo.RunOnMain(func() {
 			if !a.quitting {
@@ -234,6 +294,11 @@ func (a *application) startAwakeServices() {
 		minute := 0
 		for {
 			if minute%5 == 0 {
+				mygo.RunOnMain(func() {
+					if !a.quitting {
+						a.pollLid()
+					}
+				})
 				sampleCtx, stop := context.WithTimeout(ctx, 2*time.Second)
 				battery, err := batteryPower(sampleCtx)
 				stop()
@@ -266,6 +331,12 @@ func (a *application) restoreAwakeAfterLaunch() {
 	a.config.AwakeSession = nil
 	a.save()
 	if restore && session != nil {
+		if session.Lid {
+			session.Lid = false
+			if a.lid != nil {
+				a.lidMessage = "R05LidRestored"
+			}
+		}
 		a.reportAwakeError(a.startAwake(*session))
 	}
 }

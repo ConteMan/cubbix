@@ -35,6 +35,7 @@ const (
 )
 
 type awakeArg struct {
+	Lid     bool
 	Kind    awakeArgKind
 	Minutes int    // awakeArgMinutes
 	Until   string // awakeArgUntil, "18:30"
@@ -118,8 +119,7 @@ func (a *application) awakeCommands() []*command {
 			Icon:      "power",
 			Available: active,
 			Run: func(a *application, req request) error {
-				a.awake.stop()
-				return nil
+				return a.stopAwake()
 			},
 			Actions: func(a *application, req request) []paletteAction {
 				return favoriteActions(a, req.Command.ID)
@@ -162,6 +162,9 @@ func (a *application) awakeCommands() []*command {
 			Available: available,
 			Run: func(a *application, req request) error {
 				a.openAwakeDialog("until")
+				if a.dialog != nil {
+					a.dialog.lid = req.Awake.Lid || a.lidPreference()
+				}
 				return nil
 			},
 			Actions: func(a *application, req request) []paletteAction {
@@ -177,6 +180,9 @@ func (a *application) awakeCommands() []*command {
 			Available: available,
 			Run: func(a *application, req request) error {
 				a.openAwakeDialog("custom")
+				if a.dialog != nil {
+					a.dialog.lid = req.Awake.Lid || a.lidPreference()
+				}
 				return nil
 			},
 			Actions: func(a *application, req request) []paletteAction {
@@ -192,6 +198,9 @@ func (a *application) awakeCommands() []*command {
 			Available: available,
 			Run: func(a *application, req request) error {
 				a.openAwakeDialog("follow")
+				if a.dialog != nil {
+					a.dialog.lid = req.Awake.Lid || a.lidPreference()
+				}
 				return nil
 			},
 			Actions: func(a *application, req request) []paletteAction {
@@ -375,25 +384,7 @@ func (a *application) systemCommands() []*command {
 // panel and the menu: a remembered session, a fixed duration, until a time,
 // or no deadline.
 func (a *application) runAwakeStart(req request) error {
-	switch req.Awake.Kind {
-	case awakeArgMinutes:
-		return a.setDuration(req.Awake.Minutes)
-	case awakeArgUntil:
-		end, err := untilTime(req.Awake.Until, time.Now())
-		if err != nil {
-			return err
-		}
-		if err := a.startAwake(awakeSession{Mode: a.config.AwakeMode, End: end, Until: req.Awake.Until}); err != nil {
-			return err
-		}
-		a.config.AwakeUntil = req.Awake.Until
-		a.save()
-		return nil
-	case awakeArgUnlimited:
-		return a.setDuration(0)
-	default:
-		return a.startAwake(a.selectedSession())
-	}
+	return a.startAwakeWith(req.Awake, a.config.AwakeMode)
 }
 
 // startAwakeWith starts keep awake with the given parsed argument and mode.
@@ -401,6 +392,9 @@ func (a *application) runAwakeStart(req request) error {
 // remembered one, while the duration comes from the input unless the action
 // itself chose a preset.
 func (a *application) startAwakeWith(arg awakeArg, mode string) error {
+	previous := a.lidAuthorize
+	a.lidAuthorize = true
+	defer func() { a.lidAuthorize = previous }()
 	if arg.Error != "" {
 		// The action keeps the typed parameter, so an invalid one stays an error.
 		return errors.New(arg.Error)
@@ -426,6 +420,7 @@ func (a *application) startAwakeWith(arg awakeArg, mode string) error {
 		session.End = time.Time{}
 		session.Minutes, session.Until = 0, ""
 	}
+	session.Lid = arg.Lid || a.lidPreference()
 	if err := a.startAwake(session); err != nil {
 		return err
 	}
@@ -460,6 +455,10 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Run:     func(a *application) error { return a.startAwakeWith(arg, "tasks") },
 		},
 	}
+	if a.lidCapable() {
+		actions = append(actions, paletteAction{ID: "awake.start.lid", Title: localizedTitle("R05Lid"), Icon: "laptop", Group: 1, Checked: func(a *application) bool { return a.lidPreference() }, Available: func(a *application) bool { return a.lid != nil && a.lid.Available() }, Run: func(a *application) error { value := !a.lidPreference(); a.lidPending = &value; return nil }})
+	}
+
 	for _, preset := range []struct {
 		minutes int
 		key     string
@@ -471,7 +470,9 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Icon:    "clock-3",
 			Group:   1,
 			Checked: func(a *application) bool { return arg.Kind == awakeArgMinutes && arg.Minutes == minutes },
-			Run:     func(a *application) error { return a.setDuration(minutes) },
+			Run: func(a *application) error {
+				return a.startAwakeWith(awakeArg{Kind: awakeArgMinutes, Minutes: minutes, Lid: arg.Lid}, a.config.AwakeMode)
+			},
 		})
 	}
 	actions = append(actions,
@@ -481,7 +482,9 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Icon:    "clock-3",
 			Group:   1,
 			Checked: func(a *application) bool { return arg.Kind == awakeArgUnlimited },
-			Run:     func(a *application) error { return a.setDuration(0) },
+			Run: func(a *application) error {
+				return a.startAwakeWith(awakeArg{Kind: awakeArgUnlimited, Lid: arg.Lid}, a.config.AwakeMode)
+			},
 		},
 		paletteAction{
 			ID:    "awake.start.until",
@@ -490,6 +493,9 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Group: 1,
 			Run: func(a *application) error {
 				a.openAwakeDialog("until")
+				if a.dialog != nil {
+					a.dialog.lid = arg.Lid || a.lidPreference()
+				}
 				return nil
 			},
 		},
@@ -500,6 +506,9 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Group: 1,
 			Run: func(a *application) error {
 				a.openAwakeDialog("custom")
+				if a.dialog != nil {
+					a.dialog.lid = arg.Lid || a.lidPreference()
+				}
 				return nil
 			},
 		},
@@ -510,6 +519,9 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Group: 1,
 			Run: func(a *application) error {
 				a.openAwakeDialog("follow")
+				if a.dialog != nil {
+					a.dialog.lid = arg.Lid || a.lidPreference()
+				}
 				return nil
 			},
 		},
@@ -821,7 +833,25 @@ const (
 
 // parseAwakeArg parses the whole argument; every grammar in the table must
 // match end to end. Combined forms come before a lone hour or minute.
-func parseAwakeArg(arg string, now time.Time) awakeArg {
+func parseAwakeArg(arg string, now time.Time) (result awakeArg) {
+	value, lidOn := stripLidModifier(arg)
+	defer func() { result.Lid = lidOn }()
+	return parseAwakeDuration(value, now)
+}
+func stripLidModifier(arg string) (string, bool) {
+	value := strings.TrimSpace(arg)
+	lower := strings.ToLower(value)
+	for _, word := range []string{"合盖", "lid1", "lid", "盖"} {
+		if strings.HasPrefix(lower, word) {
+			return strings.TrimSpace(value[len(word):]), true
+		}
+		if strings.HasSuffix(lower, word) {
+			return strings.TrimSpace(value[:len(value)-len(word)]), true
+		}
+	}
+	return value, false
+}
+func parseAwakeDuration(arg string, now time.Time) awakeArg {
 	value := strings.TrimSpace(arg)
 	if value == "" {
 		return awakeArg{Kind: awakeArgDefault}

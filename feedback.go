@@ -375,6 +375,9 @@ func (a *application) awakeFeedbackMessage(locale string, session awakeSession) 
 	default:
 		message.Text = text("ToastAwakeOnUnlimited")
 	}
+	if session.Lid {
+		message.Text += " · " + text("R05Lid")
+	}
 	return message
 }
 
