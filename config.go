@@ -44,34 +44,36 @@ func normalizePaletteRecents(ids []string) []string {
 }
 
 type Config struct {
-	JSONEnabled      bool          `toml:"json_enabled"`
-	JSONShortcut     string        `toml:"json_shortcut"`
-	JSONWidth        int           `toml:"json_width,omitempty"`
-	JSONHeight       int           `toml:"json_height,omitempty"`
-	JSONSplit        int           `toml:"json_split,omitempty"`
-	Version          int           `toml:"version"`
-	Language         string        `toml:"language"`
-	OpenAtLogin      bool          `toml:"open_at_login"`
-	FeedbackMode     string        `toml:"feedback_mode"`
-	FeedbackCorner   string        `toml:"feedback_corner"`
-	AutomaticUpdates bool          `toml:"automatic_updates"`
-	AwakeEnabled     bool          `toml:"awake_enabled"`
-	AwakeMode        string        `toml:"awake_mode"`
-	AwakeMinutes     int           `toml:"awake_minutes"`
-	AwakeUntil       string        `toml:"awake_until,omitempty"`
-	AwakeAgents      string        `toml:"awake_agents"`
-	AwakeShortcut    string        `toml:"awake_shortcut"`
-	PaletteShortcut  string        `toml:"palette_shortcut"`
-	PaletteFavorites []string      `toml:"palette_favorites,omitempty"`
-	PaletteRecents   []string      `toml:"palette_recents,omitempty"`
-	AwakeSession     *awakeSession `toml:"awake_session,omitempty"`
-	RestoreAwake     bool          `toml:"restore_awake,omitempty"`
-	WindowWidth      int           `toml:"window_width,omitempty"`
-	WindowHeight     int           `toml:"window_height,omitempty"`
+	AwakeLid           bool          `toml:"awake_lid"`
+	AwakeLidBatteryMin int           `toml:"awake_lid_battery_min"`
+	JSONEnabled        bool          `toml:"json_enabled"`
+	JSONShortcut       string        `toml:"json_shortcut"`
+	JSONWidth          int           `toml:"json_width,omitempty"`
+	JSONHeight         int           `toml:"json_height,omitempty"`
+	JSONSplit          int           `toml:"json_split,omitempty"`
+	Version            int           `toml:"version"`
+	Language           string        `toml:"language"`
+	OpenAtLogin        bool          `toml:"open_at_login"`
+	FeedbackMode       string        `toml:"feedback_mode"`
+	FeedbackCorner     string        `toml:"feedback_corner"`
+	AutomaticUpdates   bool          `toml:"automatic_updates"`
+	AwakeEnabled       bool          `toml:"awake_enabled"`
+	AwakeMode          string        `toml:"awake_mode"`
+	AwakeMinutes       int           `toml:"awake_minutes"`
+	AwakeUntil         string        `toml:"awake_until,omitempty"`
+	AwakeAgents        string        `toml:"awake_agents"`
+	AwakeShortcut      string        `toml:"awake_shortcut"`
+	PaletteShortcut    string        `toml:"palette_shortcut"`
+	PaletteFavorites   []string      `toml:"palette_favorites,omitempty"`
+	PaletteRecents     []string      `toml:"palette_recents,omitempty"`
+	AwakeSession       *awakeSession `toml:"awake_session,omitempty"`
+	RestoreAwake       bool          `toml:"restore_awake,omitempty"`
+	WindowWidth        int           `toml:"window_width,omitempty"`
+	WindowHeight       int           `toml:"window_height,omitempty"`
 }
 
 func defaultConfig() Config {
-	return Config{Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, FeedbackMode: "hint", FeedbackCorner: "top-right"}
+	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, FeedbackMode: "hint", FeedbackCorner: "top-right"}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -119,6 +121,9 @@ func loadConfig(path string) (Config, error) {
 	config.JSONSplit = clampJSONSplit(config.JSONSplit)
 	if config.PaletteShortcut == "" {
 		config.PaletteShortcut = defaultPaletteKey
+	}
+	if config.AwakeLidBatteryMin != 10 && config.AwakeLidBatteryMin != 20 && config.AwakeLidBatteryMin != 30 {
+		config.AwakeLidBatteryMin = 20
 	}
 	config.PaletteFavorites = normalizePaletteFavorites(config.PaletteFavorites)
 	config.PaletteRecents = normalizePaletteRecents(config.PaletteRecents)

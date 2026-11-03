@@ -141,8 +141,9 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 		return err
 	}
 	// A fresh window has no this result: no preview, no separator, and the
-	// editor owns the whole workspace row.
-	if err := want(`(()=>{
+	// editor owns the whole workspace row. The initial bridge response can
+	// precede WebKit layout; wait for the same geometry assertion to settle.
+	if err := wait(`(()=>{
 	  const box = id => document.getElementById(id).getBoundingClientRect();
 	  const state = window.cubbix.state();
 	  return !state.preview && state.status === '' &&

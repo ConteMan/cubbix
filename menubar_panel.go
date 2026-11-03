@@ -13,15 +13,17 @@ import (
 // and the one thing the user can fold open, the JSON window list. A closed
 // panel drops the state with its window, so every open starts from config.
 type menubarPanelState struct {
-	window   *mygo.Window
-	expanded bool
-	errorKey string
+	window     *mygo.Window
+	expanded   bool
+	errorKey   string
+	lidDetails bool
 }
 
 // menubarPanelRows is what the panel draws. The height calculation and the
 // view read the same answer, so the flyout is exactly as tall as its content.
 type menubarPanelRows struct {
 	awake, json, empty bool
+	lid                bool
 	status             bool // the awake card's status line
 	documents          []*jsonDocument
 	folded             bool // the JSON windows hide behind one count row
@@ -48,6 +50,7 @@ func (a *application) showMenubarPanel() {
 		return
 	}
 	a.hidePalette()
+	a.pollLid()
 	if a.panel == nil {
 		a.panel = &menubarPanelState{}
 	}
@@ -112,6 +115,7 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 	rows := menubarPanelRows{}
 	if a.config.AwakeEnabled {
 		rows.awake = true
+		rows.lid = a.lidCapable()
 		state := a.awake.snapshot()
 		rows.status = state.Active || state.Error != "" || a.menubarPanelErrorKey() != ""
 	}
@@ -150,14 +154,20 @@ func (a *application) openJSONDocuments() []*jsonDocument {
 // menubarPanelErrorKey is the failure the awake card reports: the last action's
 // error, or the one the controller recorded, such as a target process ending.
 func (a *application) menubarPanelErrorKey() string {
+	if key := a.lidReason(); key != "" && a.lidCapable() {
+		return key
+	}
 	if a.panel != nil && a.panel.errorKey != "" {
 		return a.panel.errorKey
 	}
 	return a.awake.snapshot().Error
 }
 
-func awakeCardHeight(t tokenValues, status bool) float32 {
+func awakeCardHeight(t tokenValues, status bool, lidRow ...bool) float32 {
 	height := 2*t.Space10 + t.SizeNavHeight + t.Space8 + t.SizeSegmentHeight + t.Space8 + t.SizeButtonHeight
+	if len(lidRow) > 0 && lidRow[0] {
+		height += t.Space8 + t.SizeNavHeight
+	}
 	if status {
 		height += t.Space8 + t.Space20
 	}
@@ -179,7 +189,7 @@ func (a *application) menubarPanelHeight(t tokenValues) int {
 	height := 2 * t.Space12
 	cards := 0
 	if rows.awake {
-		height += awakeCardHeight(t, rows.status)
+		height += awakeCardHeight(t, rows.status, rows.lid)
 		cards++
 	}
 	if rows.json {
@@ -216,15 +226,20 @@ func (a *application) panelResult(err error) {
 // panelToggleAwake is the card switch: stop when it runs, otherwise start the
 // remembered mode and duration.
 func (a *application) panelToggleAwake() {
+	previous := a.lidAuthorize
+	a.lidAuthorize = true
+	defer func() { a.lidAuthorize = previous }()
 	if a.awake.snapshot().Active {
-		a.awake.stop()
-		a.panelResult(nil)
+		a.panelResult(a.stopAwake())
 		return
 	}
 	a.panelResult(a.startAwake(a.selectedSession()))
 }
 
 func (a *application) panelSetMode(mode int) {
+	previous := a.lidAuthorize
+	a.lidAuthorize = true
+	defer func() { a.lidAuthorize = previous }()
 	modes := []string{"screen", "tasks"}
 	if mode < 0 || mode >= len(modes) {
 		return
@@ -235,6 +250,9 @@ func (a *application) panelSetMode(mode int) {
 // panelSetDuration starts keep awake at a preset, or resets a running one to
 // it. Choosing the preset that already runs changes nothing.
 func (a *application) panelSetDuration(minutes int) {
+	previous := a.lidAuthorize
+	a.lidAuthorize = true
+	defer func() { a.lidAuthorize = previous }()
 	if preset, ok := a.panelPreset(time.Now()); ok && preset == minutes && a.awake.snapshot().Active {
 		return
 	}
@@ -300,7 +318,7 @@ func (a *application) menubarPanelStatusLine(locale string, now time.Time) strin
 	if !state.Active || a.menubarPanelErrorKey() != "" {
 		return ""
 	}
-	return a.awakeMode(locale, state.Session) + " · " + a.awakeSuffix(locale, state.Session, now)
+	return a.awakeStatus(locale, now)
 }
 
 // menubarPanelTooltip is the tooltip of a button that also has a shortcut.

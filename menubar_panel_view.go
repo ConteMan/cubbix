@@ -71,6 +71,9 @@ func (a *application) panelAwakeCard(c *ui.Context, t tokenValues, locale string
 		})
 		a.panelModeSwitch(c, t, locale)
 		a.panelPills(c, t, locale)
+		if rows.lid {
+			a.panelLid(c, t, locale)
+		}
 		if rows.status {
 			a.panelStatus(c, t, locale)
 		}
@@ -144,15 +147,26 @@ func (a *application) panelStatus(c *ui.Context, t tokenValues, locale string) {
 	ui.Row(c).FillWidth().Height(t.Space20).Gap(t.Space6).AlignItems(ui.Center).Children(func() {
 		if errorKey := a.menubarPanelErrorKey(); errorKey != "" {
 			label := a.text(locale, errorKey)
+			if a.lid != nil && (a.lid.canForce() || a.lid.snapshot().service == svcRequiresApproval) {
+				a.panelLidAlert(c, t, locale, label)
+				return
+			}
 			alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(label).Description(label)
 			ui.TooltipBase(c, alert, func(tip ui.Element) {
-				tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
-					ui.Text(c, label).FontSize(t.FontSizeSmall)
+				tip.Width(t.SizeMenubarPanelWidth-2*t.Space12).Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
+					ui.Column(c).FillWidth().Gap(t.Space8).Children(func() {
+						ui.Text(c, label).FillWidth().FontSize(t.FontSizeSmall).MaxWidth(t.SizeMenubarPanelWidth - 2*t.Space12 - 2*t.Space8)
+					})
 				})
 			})
 			return
 		}
-		ui.Text(c, a.menubarPanelStatusLine(locale, time.Now())).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).Grow(1).SingleLine().Ellipsis("…")
+		ui.Text(c, a.menubarPanelStatusLine(locale, time.Now())).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).Grow(1).MinWidth(0).SingleLine().Ellipsis("…")
+		if a.lidCapable() && a.awake.snapshot().Active && !a.awake.snapshot().Session.Lid {
+			ui.ButtonBase(c.Key("lid-hint")).Size(t.SizeIcon, t.SizeIcon).Label(a.text(locale, "R05LidHint")).Tooltip(a.text(locale, "R05LidHint")).FocusRing(true).OnClick(a.toggleLid).Children(func() {
+				ui.Icon(c, icon("laptop")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
+			})
+		}
 	})
 }
 

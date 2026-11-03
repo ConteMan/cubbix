@@ -17,6 +17,13 @@ func (a *application) restartUpdate() {
 		return
 	}
 	s := a.awake.snapshot()
+	if a.lid != nil {
+		if err := a.lid.stop(); err != nil {
+			a.settingsError = "LidRestoreFailed"
+			a.notifyLid("LidRestoreFailed")
+			return
+		}
+	}
 	a.config.RestoreAwake = s.Active
 	a.config.AwakeSession = nil
 	if s.Active {

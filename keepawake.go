@@ -14,6 +14,7 @@ import (
 )
 
 type awakeSession struct {
+	Lid      bool      `toml:"lid,omitempty"`
 	Mode     string    `toml:"mode"`
 	End      time.Time `toml:"end"`
 	Minutes  int       `toml:"minutes,omitempty"`
@@ -46,6 +47,7 @@ type awakeController struct {
 	alive      func(int, string) bool
 	now        func() time.Time
 	changed    func()
+	beforeStop func()
 }
 
 func newAwakeController() *awakeController {
@@ -95,7 +97,14 @@ func (k *awakeController) stopLocked() {
 	}
 	k.state.Active = false
 }
+func (k *awakeController) setBeforeStop(fn func()) { k.mu.Lock(); k.beforeStop = fn; k.mu.Unlock() }
 func (k *awakeController) stop() {
+	k.mu.Lock()
+	before := k.beforeStop
+	k.mu.Unlock()
+	if before != nil {
+		before()
+	}
 	k.mu.Lock()
 	k.stopLocked()
 	k.state.Error = ""
@@ -154,6 +163,11 @@ func (k *awakeController) poll() {
 		expired := !s.Session.End.IsZero() && !k.now().Before(s.Session.End)
 		targetGone := s.Session.PID > 0 && !k.alive(s.Session.PID, s.Session.Identity)
 		if expired || targetGone {
+			if before := k.beforeStop; before != nil {
+				k.mu.Unlock()
+				before()
+				k.mu.Lock()
+			}
 			k.stopLocked()
 			if expired {
 				k.state.Error = ""

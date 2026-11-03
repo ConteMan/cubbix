@@ -86453,6 +86453,4154 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "kQK78",
+      "x": 0,
+      "y": 16882,
+      "name": "R13 zh-CN light",
+      "theme": {
+        "language": "zh-CN",
+        "mode": "light"
+      },
+      "clip": true,
+      "width": 600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "B9uDwy",
+          "name": "合盖也保持",
+          "fill": "$ColorText",
+          "content": "合盖也保持",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "zK1LS",
+          "name": "Awake card / off",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "aPJIp",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "iBx5h",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "RMzfs",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "K7XjX",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "DCd6Y",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "j66YVq",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "BRiWU",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XxRku",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "O4YRP8",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "e8uRC",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "zovL9",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "vGa7h",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bt0QZ",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "W0n5s",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "IgQhF",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Mpwdw",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "rsFvO",
+          "name": "Awake card / on",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "a1t0dm",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "texmz",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "VjCGU",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "egEQJ",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "g93ZE",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "A0Jh8R",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "i6eG6",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GPuX6",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Ezsnz",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "e0xEot",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "v04Wz9",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "vrdRX",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JXHNT",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "MEZob",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "SSCTB",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "y09YL",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "N81FJq",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "jHeHF",
+                  "name": "仅保持任务 · 合盖也保持 · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "仅保持任务 · 合盖也保持 · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "o6FDt",
+          "name": "Awake card / hint",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "X0gSU8",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "FmYLp",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "OEzuk",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "DR6H7",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tCWe0",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "wpbLf",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "CW4v2",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hKFQG",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Qfuy4",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "LAhSv",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "yMTbA",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "ulJ6H",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wXlE6",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "XHZCK",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "wMzSJ",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "mCIWb",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ueX23",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "v4rTVS",
+                  "name": "仅保持任务 · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "仅保持任务 · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "U0CJz",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "d6x1O",
+          "name": "Awake card / alert",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "M5pdU",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pCHX6",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "bCYL4",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "l2r3Nn",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "b8DIQB",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "U6EHxR",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "t0cxp",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "QRINy",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "iFMbe",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "V0aOBl",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "G0Juw",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "H9uMoB",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "vtl5e",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "NRTLO",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "rolet",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "P36kqj",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bI9kQ",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "eVsse",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "triangle-alert",
+                  "library": "lucide",
+                  "fill": "$ColorDanger"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GUw2F",
+          "name": "Battery setting",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space16",
+          "children": [
+            {
+              "type": "frame",
+              "id": "e4SD9j",
+              "name": "Low battery limit",
+              "width": "fill_container",
+              "height": 48,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "lJgpo",
+                  "name": "低电量下限",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "低电量下限",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "JTtPj",
+                  "name": "10%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "10%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "NgZfT",
+                  "name": "20%",
+                  "fill": "$ColorText",
+                  "content": "20%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "j254w",
+                  "name": "30%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "30%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Q0uaI4",
+          "name": "Recovery popover",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusControl",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space8",
+          "children": [
+            {
+              "type": "text",
+              "id": "OCO6k",
+              "name": "合盖睡眠设置没能恢复",
+              "fill": "$ColorText",
+              "content": "合盖睡眠设置没能恢复",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "p50RuD",
+              "name": "强制恢复睡眠",
+              "fill": "$ColorDanger",
+              "content": "强制恢复睡眠",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "qe5pW",
+              "name": "需要管理员密码，只把合盖睡眠改回开启",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "需要管理员密码，只把合盖睡眠改回开启",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ziWJp",
+      "x": 720,
+      "y": 16882,
+      "name": "R13 zh-CN dark",
+      "theme": {
+        "language": "zh-CN",
+        "mode": "dark"
+      },
+      "clip": true,
+      "width": 600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "OAqQN",
+          "name": "合盖也保持",
+          "fill": "$ColorText",
+          "content": "合盖也保持",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "bxnZP",
+          "name": "Awake card / off",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "PSCLC",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Kg2UZ",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "M2CZHV",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "mukmA",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "D7GA2",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "KWL1F",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "LqygV",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "veSHk",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "q94jU",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "C1K6ca",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "yqrT2",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Of7Fa",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "e1Tk1",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "xUFCn",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "DtpNv",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "tpgRI",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "zL616",
+          "name": "Awake card / on",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "OYDK4",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "gPKK5",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "ZWOrg",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "SfQYS",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Q6dU7S",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "sURcG",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "U7CnxD",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "BIzbW",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "VZ1jG",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "U6DrL",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "qkygg",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "rv2cY",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sEHxT",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "SCce2",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "pg3cR",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "xPd1M",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "rIAUE",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "o1FGN",
+                  "name": "仅保持任务 · 合盖也保持 · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "仅保持任务 · 合盖也保持 · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "SLGfb",
+          "name": "Awake card / hint",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "BRfK0",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "rMrE5",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "vMMaB",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "LHEc7",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "TPMWq",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "eTsUV",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "exFEt",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Uk999",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "C5FTOX",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "C5ungg",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "mmTDV",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Ww8ss",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "qcamR",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "lkAiH",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "jwKky",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "iGJVz",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "D7aE3",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ZMM6h",
+                  "name": "仅保持任务 · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "仅保持任务 · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "VDOZz",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "TgeAH",
+          "name": "Awake card / alert",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "wjZTB",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "s4DK9s",
+                  "name": "常亮",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "aVfBD",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "pwdzI",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hHK1r",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "FOY1S",
+                  "name": "保持屏幕常亮",
+                  "fill": "$ColorText",
+                  "content": "保持屏幕常亮",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "RhNGu",
+                  "name": "仅保持任务",
+                  "fill": "$ColorText",
+                  "content": "仅保持任务",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JvbbH",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "E67IHJ",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "POjnk",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "hrAZg",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "JYMF6",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "u2S1n",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "GdiX8",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "wrxOm",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Wlh0B",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VR4Ld",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "gmwqq",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "triangle-alert",
+                  "library": "lucide",
+                  "fill": "$ColorDanger"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ABWAa",
+          "name": "Battery setting",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space16",
+          "children": [
+            {
+              "type": "frame",
+              "id": "k9sGnZ",
+              "name": "Low battery limit",
+              "width": "fill_container",
+              "height": 48,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "yUOGS",
+                  "name": "低电量下限",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "低电量下限",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "R87Xr",
+                  "name": "10%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "10%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "YkI3J",
+                  "name": "20%",
+                  "fill": "$ColorText",
+                  "content": "20%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "rBBuk",
+                  "name": "30%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "30%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "UqlDR",
+          "name": "Recovery popover",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusControl",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space8",
+          "children": [
+            {
+              "type": "text",
+              "id": "D0V3p",
+              "name": "合盖睡眠设置没能恢复",
+              "fill": "$ColorText",
+              "content": "合盖睡眠设置没能恢复",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "c2u8g",
+              "name": "强制恢复睡眠",
+              "fill": "$ColorDanger",
+              "content": "强制恢复睡眠",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "OjliA",
+              "name": "需要管理员密码，只把合盖睡眠改回开启",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "需要管理员密码，只把合盖睡眠改回开启",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "PgBSw",
+      "x": 1440,
+      "y": 16882,
+      "name": "R13 en light",
+      "theme": {
+        "language": "en",
+        "mode": "light"
+      },
+      "clip": true,
+      "width": 600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "WSscP",
+          "name": "Awake with lid closed",
+          "fill": "$ColorText",
+          "content": "Awake with lid closed",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "OkTMd",
+          "name": "Awake card / off",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "PnPoV",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "JZUmu",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "Gbbvu",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ur38v",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "PCvMq",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "q6yK1M",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "OjxfJ",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "S8LMW",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "XsVp9",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "mnuzs",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "gIdv4",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "vCJf2",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fJfKv",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "WWqvA",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "ByHh5",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "G5yzcJ",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VXG1v",
+          "name": "Awake card / on",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "pexYG",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "cp4Td",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "pl4F2",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "LFOb6",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "xKMx8",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "SEQeH",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "AZxtQ",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sO5RB",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "OquYu",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "mO4n6",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "fHBOU",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "t0CB1a",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "m7uDIh",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "b9oq7",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "giCT9",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "GCfqY",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "N4qwWb",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "S24KCO",
+                  "name": "Keep tasks awake · Awake with lid closed · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep tasks awake · Awake with lid closed · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "k2LdrG",
+          "name": "Awake card / hint",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "tQI0L",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ODa79",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "E4H03L",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "fnCYP",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "q4Odh",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "AmrdG",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "m09F0",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Z8lBu",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "wT1K5",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "K5qyB",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "eLFsW",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "NNSl9",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "e96Iz",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "Z1pZQ",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "jibj2",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "SqH5F",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FB656",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "N5LAzu",
+                  "name": "Keep tasks awake · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep tasks awake · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "PUvRN",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "cd8Bj",
+          "name": "Awake card / alert",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "q3MYyy",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "q889bi",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "lMujV",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "t0Imy",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "TWi8m",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "hwet6",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "dRxHo",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "W1MfsS",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "AzdJH",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "v9UBXp",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "I61mS",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "pLQjz",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "rsenM",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "TxnVY",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "AmqaK",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "q7fp2",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "c0XUt",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "a0Wx3",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "triangle-alert",
+                  "library": "lucide",
+                  "fill": "$ColorDanger"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "K5ryNj",
+          "name": "Battery setting",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space16",
+          "children": [
+            {
+              "type": "frame",
+              "id": "J28at0",
+              "name": "Low battery limit",
+              "width": "fill_container",
+              "height": 48,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "B2OdMZ",
+                  "name": "Low battery limit",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Low battery limit",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "C3TzRI",
+                  "name": "10%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "10%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "QIfQF",
+                  "name": "20%",
+                  "fill": "$ColorText",
+                  "content": "20%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "ZqDQX",
+                  "name": "30%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "30%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "xgpNL",
+          "name": "Recovery popover",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusControl",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space8",
+          "children": [
+            {
+              "type": "text",
+              "id": "WVEaX",
+              "name": "Sleep on lid close was not restored.",
+              "fill": "$ColorText",
+              "content": "Sleep on lid close was not restored.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "GujYB",
+              "name": "Restore sleep now",
+              "fill": "$ColorDanger",
+              "content": "Restore sleep now",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "i3VqUA",
+              "name": "Needs an admin password. Only turns sleep on lid close back on.",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Needs an admin password. Only turns sleep on lid close back on.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "hrg6H",
+      "x": 2160,
+      "y": 16882,
+      "name": "R13 en dark",
+      "theme": {
+        "language": "en",
+        "mode": "dark"
+      },
+      "clip": true,
+      "width": 600,
+      "fill": "$ColorWindow",
+      "layout": "vertical",
+      "gap": "$Space24",
+      "padding": "$Space24",
+      "children": [
+        {
+          "type": "text",
+          "id": "S6UYJs",
+          "name": "Awake with lid closed",
+          "fill": "$ColorText",
+          "content": "Awake with lid closed",
+          "lineHeight": "$LineHeightBody",
+          "fontFamily": "$FontFamily",
+          "fontSize": "$FontSizeTitle",
+          "fontWeight": "$FontWeightSemibold"
+        },
+        {
+          "type": "frame",
+          "id": "uJbUp",
+          "name": "Awake card / off",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Rj2L3",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "tZata",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "tF8Zk",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "nSd15",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Sm4tS",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "vl3TP",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Qneen",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "BeU6b",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "qUFgE",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "WN6kQ",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "MOokA",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "t1lcx7",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "vCU6i",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "eTSne",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "e4ZNRY",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "N5evx",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "uYfGS",
+          "name": "Awake card / on",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "F32CFw",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "fXznP",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "Ev5fL",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "mMHv9",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Nhtct",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "M2KLhq",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "rnRIm",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nNzMH",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "d477D",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Q2JZHQ",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "UobT3",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "f15RdP",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "yyt9F",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "WuPdL",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "A3BkUm",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "d1I6n",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "o7QwQo",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "XCQly",
+                  "name": "Keep tasks awake · Awake with lid closed · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep tasks awake · Awake with lid closed · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "U3JTg",
+          "name": "Awake card / hint",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Vf5tl",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "CKCDU",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "mqZFp",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "W85h0F",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "C2cVjg",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "UkRX9",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "iPjMo",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hQ2dX",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zInOq",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "ffvOi",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "sby6O",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "j2j6F",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "CkSpB",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "eBHWw",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "EwpSk",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ZW0De",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "da6F8",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "YkBBA",
+                  "name": "Keep tasks awake · 1:24",
+                  "fill": "$ColorTextSecondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep tasks awake · 1:24",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "r3aLGW",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qrTS2",
+          "name": "Awake card / alert",
+          "width": 296,
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space10",
+          "children": [
+            {
+              "type": "frame",
+              "id": "vFEs6",
+              "name": "Header",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Ep0qD",
+                  "name": "Keep awake",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Keep awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "$FontWeightSemibold"
+                },
+                {
+                  "type": "frame",
+                  "id": "PP7QL",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorAccent",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "justifyContent": "end",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "h0h9cV",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorThumb",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "WFri9",
+              "name": "Modes",
+              "width": "fill_container",
+              "height": 28,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "gap": "$Space8",
+              "padding": "$Space2",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "L8nuff",
+                  "name": "Keep display awake",
+                  "fill": "$ColorText",
+                  "content": "Keep display awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "X08uG",
+                  "name": "Keep tasks awake",
+                  "fill": "$ColorText",
+                  "content": "Keep tasks awake",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Tb1s7",
+              "name": "Duration",
+              "width": "fill_container",
+              "height": 28,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ccvvc",
+                  "name": "30m",
+                  "fill": "$ColorText",
+                  "content": "30m",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "vsFSw",
+                  "name": "1h",
+                  "fill": "$ColorText",
+                  "content": "1h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "p0h9J",
+                  "name": "2h",
+                  "fill": "$ColorText",
+                  "content": "2h",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "FYD4T",
+                  "name": "∞",
+                  "fill": "$ColorText",
+                  "content": "∞",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "vyE8T",
+              "name": "Lid row",
+              "width": "fill_container",
+              "height": 32,
+              "gap": "$Space8",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "GVSAS",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "laptop",
+                  "library": "lucide",
+                  "fill": "$ColorTextSecondary"
+                },
+                {
+                  "type": "frame",
+                  "id": "QGlHH",
+                  "name": "Lid switch",
+                  "width": 34,
+                  "height": 20,
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusControl",
+                  "gap": "$Space8",
+                  "padding": "$Space2",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "R38rFB",
+                      "name": "Thumb",
+                      "width": 14,
+                      "height": 14,
+                      "fill": "$ColorTextSecondary",
+                      "cornerRadius": "$RadiusControl",
+                      "layout": "vertical",
+                      "gap": "$Space8"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "zubgQ",
+              "name": "Status",
+              "width": "fill_container",
+              "height": 20,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "HuxyD",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "triangle-alert",
+                  "library": "lucide",
+                  "fill": "$ColorDanger"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "WXZTo",
+          "name": "Battery setting",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusCard",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space16",
+          "children": [
+            {
+              "type": "frame",
+              "id": "bOo2v",
+              "name": "Low battery limit",
+              "width": "fill_container",
+              "height": 48,
+              "gap": "$Space8",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "YfPly",
+                  "name": "Low battery limit",
+                  "fill": "$ColorText",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Low battery limit",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "B0BsU",
+                  "name": "10%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "10%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "IXHQI",
+                  "name": "20%",
+                  "fill": "$ColorText",
+                  "content": "20%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "zNpCV",
+                  "name": "30%",
+                  "fill": "$ColorTextSecondary",
+                  "content": "30%",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bktHz",
+          "name": "Recovery popover",
+          "width": "fill_container",
+          "fill": "$ColorCard",
+          "cornerRadius": "$RadiusControl",
+          "stroke": "$ColorSeparator",
+          "strokeWidth": "$StrokeHairline",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space8",
+          "children": [
+            {
+              "type": "text",
+              "id": "sJXlC",
+              "name": "Sleep on lid close was not restored.",
+              "fill": "$ColorText",
+              "content": "Sleep on lid close was not restored.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "Afzjf",
+              "name": "Restore sleep now",
+              "fill": "$ColorDanger",
+              "content": "Restore sleep now",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "q5ykHU",
+              "name": "Needs an admin password. Only turns sleep on lid close back on.",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Needs an admin password. Only turns sleep on lid close back on.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
     }
   ],
   "themes": {

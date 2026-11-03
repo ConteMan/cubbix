@@ -1,0 +1,80 @@
+package main
+
+import (
+	"context"
+	"errors"
+	"github.com/ConteMan/cubbix/internal/lid"
+	"github.com/egoist/mygo"
+	"net"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
+)
+
+type commandSleepForcer struct{ admin func(string) error }
+
+func (f commandSleepForcer) Force() error { return f.admin(lidForceScriptApple) }
+
+// Production authorization is wired only here. Construction does not execute it.
+func (a *application) prepareLid() {
+	c := &lidController{now: time.Now, marker: filepath.Join(filepath.Dir(a.path), "lid-restore-required"), snapshotValue: lidSnapshot{value: -1}}
+	c.capable = !mygo.IsDev() && mygo.App.IsPackaged() && lidPackagedHelper() && lidBuiltinDisplay()
+	if !c.capable {
+		a.lid = c
+		return
+	}
+	c.supported = lidOSSupported() && lidBundlePath() == "/Applications/Cubbix.app"
+	c.unavailable = "LidUnsupported"
+	if c.supported {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		err := exec.CommandContext(ctx, "/usr/bin/codesign", "-v", "-R", lid.ClientRequirement, "/Applications/Cubbix.app").Run()
+		cancel()
+		if err != nil {
+			c.supported = false
+			c.unavailable = "LidDevBuild"
+		}
+	}
+	allowed := func() bool { return c.Available() }
+	// Every manual action checks our Developer ID signature again; ad-hoc QA
+	// bundles can render the UI but can never execute an authorization script.
+	admin := func(program string) error {
+		if !allowed() {
+			return errors.New("LidUnsupported")
+		}
+		if program != lidInstallScriptApple && program != lidUninstallScriptApple && program != lidForceScriptApple {
+			return errors.New("LidServiceBroken")
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		if err := exec.CommandContext(ctx, "/usr/bin/codesign", "-v", "-R", lid.ClientRequirement, "/Applications/Cubbix.app").Run(); err != nil {
+			return errors.New("LidDevBuild")
+		}
+		_, err := exec.Command("/usr/bin/osascript", "-e", program).Output()
+		if err == nil {
+			return nil
+		}
+		var failure *exec.ExitError
+		if errors.As(err, &failure) && strings.Contains(string(failure.Stderr), "(-128)") {
+			return errLidDenied
+		}
+		return errors.New("LidServiceBroken")
+	}
+	c.read = func() (int, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		b, err := exec.CommandContext(ctx, "/usr/bin/pmset", "-g").Output()
+		if err != nil {
+			return -1, err
+		}
+		return lid.ParseSleep(b)
+	}
+	c.power = lid.SystemPower{}
+	c.dial = func() (lidConnection, error) {
+		return lid.Dial(lid.SocketPath, func(peer *net.UnixConn) error { return lid.VerifyPeer(peer, lid.HelperRequirement) })
+	}
+	c.service = &legacyLidService{admin: admin, allowed: allowed, restored: func() bool { v, err := c.read(); return err == nil && v == 0 && !c.markerExists() }}
+	c.forcer = commandSleepForcer{admin: admin}
+	a.lid = c
+	a.lidAsync = true
+}
