@@ -1,8 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 — 2026-11-03
 
-- Add optional lid sessions (pending maintainer hardware acceptance). They change a system power setting and may increase heat and battery use. The helper enforces battery and 12-hour limits; use Restore sleep now in the app after a recovery failure.
+- Close the lid and your tasks keep running! Turn on the Lid switch when you start Keep Awake, and agents, downloads and builds won't stop when the lid closes. The first time, you'll enter an admin password once, and Cubbix needs to live in the Applications folder.
+- Works on battery too. So your Mac won't drain in your bag, Cubbix lets it sleep normally again once the battery drops to 20% (adjustable in Settings) or after 12 hours.
+- When time's up, when you stop it, when you quit Cubbix, even if Cubbix quits unexpectedly, sleep comes back on its own. If it ever doesn't, click the hint in the status row to restore it in one step.
+- Your Mac runs a bit warmer with the lid closed, so keep that in mind before packing it away.
 
 ## 0.3.1 — 2026-10-31
 
