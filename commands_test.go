@@ -347,12 +347,14 @@ func TestCommandTitlesUseLocalizedText(t *testing.T) {
 	}
 }
 
-func TestSettingsHeightShortcutsPageIsFiveRows(t *testing.T) {
+func TestSettingsHeightShortcutsPageIsSixRows(t *testing.T) {
 	tokens := tokens(false, "zh-CN")
-	if got := settingsHeight(tokens, 3, false); got != 292 {
-		t.Fatalf("shortcuts page height = %d; want 292", got)
+	if got := settingsHeight(tokens, 3, false); got != 344 {
+		t.Fatalf("shortcuts page height = %d; want 344", got)
 	}
-	if _, minHeight := settingsMinimumSize(); minHeight != 340 {
+	// Six rows and an error icon are taller than the about page: the minimum
+	// window follows them, or the alert beside a recorder would be cut off.
+	if _, minHeight := settingsMinimumSize(); minHeight != 368 {
 		t.Fatalf("minimum height = %d", minHeight)
 	}
 }

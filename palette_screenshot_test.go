@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -54,29 +55,29 @@ func TestPaletteScreenshots(t *testing.T) {
 				mode = "dark"
 			}
 			suffix := "-" + locale + "-" + mode
-			capture("palette-empty"+suffix, locale, dark, a.paletteView, 640, 400, func(tt *ui.Tester) {})
-			capture("palette-search"+suffix, locale, dark, a.paletteView, 640, 400, func(tt *ui.Tester) {
+			capture("palette-empty"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {})
+			capture("palette-search"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {
 					tt.Type("awake")
 				} else {
 					tt.Type("常亮")
 				}
 			})
-			capture("palette-params"+suffix, locale, dark, a.paletteView, 640, 400, func(tt *ui.Tester) {
+			capture("palette-params"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {
 					tt.Type("Start keep awake 45m")
 				} else {
 					tt.Type("常亮 45m")
 				}
 			})
-			capture("palette-invalid"+suffix, locale, dark, a.paletteView, 640, 400, func(tt *ui.Tester) {
+			capture("palette-invalid"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {
 					tt.Type("Start keep awake 45x")
 				} else {
 					tt.Type("常亮 45x")
 				}
 			})
-			capture("palette-actions"+suffix, locale, dark, a.paletteView, 640, 400, func(tt *ui.Tester) {
+			capture("palette-actions"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {
 					tt.Type("awake")
 				} else {
@@ -85,8 +86,19 @@ func TestPaletteScreenshots(t *testing.T) {
 				tt.Key(ui.Cmd, ui.KeyK)
 			})
 			a.page = 3
-			capture("shortcuts"+suffix, locale, dark, a.view, 720, 340, nil)
+			capture("shortcuts"+suffix, locale, dark, a.view, 720, 368, nil)
 			a.page = 0
+			// The guide overlay: three lines over the display's work area, the
+			// one the drag would snap to drawn solid and thicker.
+			work := mygo.Rectangle{X: 0, Y: 25, Width: 1440, Height: 875}
+			guides := paletteGuidesFor(work, 96)
+			capture("palette-guides"+suffix, locale, dark, a.paletteGuideView, work.Width, work.Height, func(tt *ui.Tester) {
+				a.guide = &paletteGuideState{guides: guides, work: work, snap: paletteSnap{}, visible: true}
+			})
+			capture("palette-guides-snap"+suffix, locale, dark, a.paletteGuideView, work.Width, work.Height, func(tt *ui.Tester) {
+				a.guide = &paletteGuideState{guides: guides, work: work, snap: paletteSnap{X: true, Y: paletteSnapTop}, visible: true}
+			})
+			a.guide = nil
 		}
 	}
 }

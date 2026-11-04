@@ -337,6 +337,16 @@ func (a *application) systemCommands() []*command {
 			},
 		},
 		{
+			ID:       "palette.position.reset",
+			Title:    localizedTitle("PaletteResetPosition"),
+			Keywords: []string{"位置", "归位", "居中", "position", "weizhi", "wz", "center", "reset"},
+			Icon:     "move",
+			Run: func(a *application, req request) error {
+				a.resetPalettePosition()
+				return nil
+			},
+		},
+		{
 			ID:        "update.check",
 			Title:     localizedTitle("CheckAction"),
 			Keywords:  []string{"更新", "检查更新", "update", "gengxin", "gx"},

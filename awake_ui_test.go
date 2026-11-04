@@ -28,6 +28,9 @@ func awakeTestApp(t *testing.T) *application {
 	a.feedback = newFeedbackPresenter()
 	a.feedback.mode = func() string { return "off" }
 	a.feedback.create = nil
+	// The panel places and drags itself against fake displays and a fake
+	// window position, so no test needs an app, a screen or a native window.
+	paletteTestScreens(a)
 	t.Cleanup(func() { a.awake.changed = nil; a.awake.stop(); a.updates.close() })
 	return a
 }
@@ -128,7 +131,7 @@ func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 		return false
 	}
 	old := a.config.AwakeShortcut
-	tt := ui.NewTester(a.view, 720, 340)
+	tt := ui.NewTester(a.view, 720, 368)
 	tt.SetLocale("en")
 	if err := tt.Click("Record keep awake shortcut"); err != nil {
 		t.Fatal(err)

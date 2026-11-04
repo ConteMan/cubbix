@@ -89,7 +89,7 @@ func TestLidScreenshots(t *testing.T) {
 					}
 					a.refreshPalette(a.palette, locale)
 					a.togglePaletteActions()
-					width, height = 640, 400
+					width, height = paletteWindowWidth(), paletteWindowHeight()
 					view = a.paletteView
 				}
 				tt := ui.NewTester(view, width, height)

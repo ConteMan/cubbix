@@ -349,10 +349,10 @@ func sameShortcut(first, second string) bool {
 	return identity(first) == identity(second)
 }
 
-// shortcutSlot describes one global shortcut and what it runs. The three
+// shortcutSlot describes one global shortcut and what it runs. The four
 // slots are mutually exclusive: the same combination never registers twice.
 type shortcutSlot struct {
-	Target   string // "awake" / "json" / "palette"
+	Target   string // "awake" / "json" / "palette" / "panel"
 	Acc      string
 	Enabled  bool
 	Callback func()
@@ -363,6 +363,7 @@ func (a *application) shortcutSlots() []shortcutSlot {
 		{Target: "awake", Acc: a.config.AwakeShortcut, Enabled: a.config.AwakeEnabled, Callback: a.shortcutToggleAwake},
 		{Target: "json", Acc: a.config.JSONShortcut, Enabled: a.config.JSONEnabled, Callback: a.newJSONWindow},
 		{Target: "palette", Acc: a.config.PaletteShortcut, Enabled: true, Callback: a.togglePalette},
+		{Target: "panel", Acc: a.config.PanelShortcut, Enabled: true, Callback: a.toggleMenubarPanel},
 	}
 }
 
@@ -444,6 +445,9 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 	case "palette":
 		a.config.PaletteShortcut = acc
 		a.paletteShortcutError = ""
+	case "panel":
+		a.config.PanelShortcut = acc
+		a.panelShortcutError = ""
 	default:
 		a.config.AwakeShortcut = acc
 		a.shortcutError = ""
@@ -456,6 +460,9 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 	}
 	if slot.Target != "palette" {
 		a.registerPaletteShortcut()
+	}
+	if slot.Target != "panel" {
+		a.registerPanelShortcut()
 	}
 	a.shortcutSuspended = false
 	a.shortcutRecording = false
@@ -485,6 +492,8 @@ func (a *application) awakeSettings(c *ui.Context, t tokenValues, locale string)
 		a.shortcutSettingsRow(c, t, locale, "json")
 		ui.Divider(c)
 		a.shortcutSettingsRow(c, t, locale, "palette")
+		ui.Divider(c)
+		a.shortcutSettingsRow(c, t, locale, "panel")
 		ui.Divider(c)
 		a.feedbackModeRow(c, t, locale)
 		ui.Divider(c)
@@ -610,11 +619,30 @@ func (a *application) cancelShortcutRecording() {
 		a.registerAwakeShortcut()
 		a.registerJSONShortcut()
 		a.registerPaletteShortcut()
+		a.registerPanelShortcut()
 	}
 	a.shortcutSuspended = false
 	if a.refreshApplicationMenu != nil {
 		a.refreshApplicationMenu()
 	}
+}
+
+// shortcutReasonKey names the cause shown in a recorder's tooltip. A clash
+// with another slot names that slot, so every slot has to check every other
+// one, not just the palette.
+func (a *application) shortcutReasonKey(errorKey, target, acc string) string {
+	if errorKey == "R05Conflict" {
+		return "ShortcutSettingsSuffix"
+	}
+	if errorKey == "JSONShortcutConflict" {
+		if target != "palette" && sameShortcut(acc, a.config.PaletteShortcut) {
+			return "PaletteShortcutSuffix"
+		}
+		if target != "panel" && sameShortcut(acc, a.config.PanelShortcut) {
+			return "PanelShortcutSuffix"
+		}
+	}
+	return errorKey
 }
 
 func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, target string) {
@@ -629,6 +657,10 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 		label, recordKey = "PaletteShortcutLabel", "PaletteRecordShortcut"
 		acc = a.config.PaletteShortcut
 	}
+	if target == "panel" {
+		label, recordKey = "PanelShortcutLabel", "PanelRecordShortcut"
+		acc = a.config.PanelShortcut
+	}
 	active := a.shortcutRecording && a.shortcutTarget == target
 	errorKey := ""
 	if a.shortcutTarget == target || a.shortcutTarget == "" && target == "awake" {
@@ -639,6 +671,9 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 	}
 	if target == "palette" && errorKey == "" {
 		errorKey = a.paletteShortcutError
+	}
+	if target == "panel" && errorKey == "" {
+		errorKey = a.panelShortcutError
 	}
 	a.row(c, t, text(label), func() {
 		if active && a.shortcutDraft != "" {
@@ -673,14 +708,7 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 								ui.Text(c, symbol).FontSize(t.FontSizeSmall)
 							}
 						})
-						reason := errorKey
-						if reason == "R05Conflict" {
-							reason = "ShortcutSettingsSuffix"
-						}
-						if reason == "JSONShortcutConflict" && target != "palette" && sameShortcut(acc, a.config.PaletteShortcut) {
-							reason = "PaletteShortcutSuffix"
-						}
-						ui.Text(c, text(reason)).FontSize(t.FontSizeSmall)
+						ui.Text(c, text(a.shortcutReasonKey(errorKey, target, acc))).FontSize(t.FontSizeSmall)
 					})
 				})
 			})
