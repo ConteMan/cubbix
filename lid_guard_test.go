@@ -95,6 +95,14 @@ func lidHelperBridge(literal *ast.CompositeLit) (*ast.FuncLit, bool) {
 	expected, err := parser.ParseExpr(`func(ctx context.Context,name string,args ...string)([]byte,error){return exec.CommandContext(ctx,name,args...).Output()}`)
 	return runner, err == nil && lidASTText(runner) == lidASTText(expected)
 }
+
+// This one fixed waiter can only wait for a PID and open an app in the
+// background. No caller-supplied text is evaluated as shell code.
+func lidQuitRelaunchBridge(call *ast.CallExpr) bool {
+	expected, err := parser.ParseExpr("exec.Command(\"/bin/sh\", \"-c\", `while /bin/kill -0 \"$1\" 2>/dev/null; do /bin/sleep 0.1; done\nexec /usr/bin/open -g -n \"$2\"`, \"cubbix-relaunch\", fmt.Sprint(pid), bundle)")
+	return err == nil && lidASTText(call) == lidASTText(expected)
+}
+
 func lidSourceViolations(path string, source []byte) []string {
 	path = filepath.ToSlash(path)
 	file, err := parser.ParseFile(token.NewFileSet(), path, source, 0)
@@ -283,6 +291,9 @@ func lidSourceViolations(path string, source []byte) []string {
 			if bridges[n] {
 				break
 			}
+			if path == "quit.go" && functionName == "relaunchAfterExit" && lidQuitRelaunchBridge(n) {
+				break
+			}
 			method := n.Fun.(*ast.SelectorExpr)
 			offset := 0
 			if method.Sel.Name == "CommandContext" {
@@ -335,6 +346,27 @@ func lidSourceViolations(path string, source []byte) []string {
 	})
 	return violations
 }
+
+func TestLidQuitWaiterBoundary(t *testing.T) {
+	source, err := os.ReadFile("quit.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if violations := lidSourceViolations("quit.go", source); len(violations) != 0 {
+		t.Fatal(violations)
+	}
+	for _, source := range []string{
+		strings.Replace(string(source), "do /bin/sleep 0.1", "do arbitrary-command", 1),
+		strings.Replace(string(source), "func relaunchAfterExit(exe", "func otherFunction(exe", 1),
+		strings.Replace(string(source), `exec.Command("/bin/sh"`, `exec.Command(exe`, 1),
+		strings.Replace(string(source), "fmt.Sprint(pid), bundle)", "bundle, bundle)", 1),
+	} {
+		if len(lidSourceViolations("quit.go", []byte(source))) == 0 {
+			t.Fatal("modified waiter escaped command checks")
+		}
+	}
+}
+
 func TestLidSourceSafetyGuard(t *testing.T) {
 	forbidden := []string{"-a " + "disablesleep", "osa" + "script", "/" + "Library/"}
 	err := filepath.WalkDir(".", func(path string, d os.DirEntry, err error) error {

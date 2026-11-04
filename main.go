@@ -101,6 +101,7 @@ type application struct {
 	relaunch               func()
 	settingsError          string
 	quitting               bool
+	quitGuard              *quitWatchdog
 	setLogin               func(bool) error
 	setLocale              func(string)
 }
@@ -399,7 +400,7 @@ func (a *application) ready() {
 	mygo.App.SetLanguages("zh-CN", "en")
 	a.setLocale = mygo.App.SetLocale
 	a.setLogin = mygo.App.SetOpenAtLogin
-	a.relaunch = mygo.App.Relaunch
+	a.installQuitWatchdog()
 	a.refreshApplicationMenu = func() { mygo.App.SetMenu(a.applicationMenu(mygo.App.Locale())) }
 	a.updates.notes = newReleaseNotesClient(runningVersion()).load
 	if os.Getenv("CUBBIX_QA") != "" {
@@ -489,6 +490,10 @@ func (a *application) ready() {
 
 // beforeQuit releases services without guarding tool window contents.
 func (a *application) beforeQuit(*mygo.QuitEvent) {
+	// Arm before cleanup: even a blocked main thread must have a deadline.
+	if a.quitGuard != nil {
+		a.quitGuard.arm(false)
+	}
 	// JSON windows are tools: quitting never asks about unsaved text.
 	a.quitting = true
 	a.cli.stop()

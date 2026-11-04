@@ -11,7 +11,9 @@ func TestLidNativeReadOnly(t *testing.T) {
 		t.Skip("read-only native probe not requested")
 	}
 	_ = lidOSSupported()
-	_ = lidBuiltinDisplay()
+	if !(lid.SystemPower{}).HasInternalBattery() {
+		t.Fatal("internal battery not detected")
+	}
 	kind, p, err := (lid.SystemPower{}).Source()
 	if err != nil {
 		t.Fatal(err)

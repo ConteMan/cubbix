@@ -2,13 +2,10 @@ package main
 
 import (
 	"errors"
-	"github.com/ebitengine/purego"
 	"github.com/ebitengine/purego/objc"
 	"github.com/egoist/mygo"
 	"os"
 	"path/filepath"
-	"sync"
-	"unsafe"
 )
 
 const lidInstalledPath = "/Library/PrivilegedHelperTools/com.conteman.cubbix.helper"
@@ -77,33 +74,6 @@ func (s *legacyLidService) HelperPath() (string, bool) {
 	return lidInstalledPath, err == nil && info.Mode().IsRegular()
 }
 
-var displayOnce sync.Once
-var displayBuiltin func(uint32) uint32
-var displayList func(uint32, unsafe.Pointer, *uint32) int32
-
-func lidBuiltinDisplay() bool {
-	displayOnce.Do(func() {
-		lib, err := purego.Dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", purego.RTLD_NOW|purego.RTLD_LOCAL)
-		if err == nil {
-			purego.RegisterLibFunc(&displayBuiltin, lib, "CGDisplayIsBuiltin")
-			purego.RegisterLibFunc(&displayList, lib, "CGGetOnlineDisplayList")
-		}
-	})
-	if displayList == nil {
-		return false
-	}
-	var displays [32]uint32
-	var count uint32
-	if displayList(32, unsafe.Pointer(&displays[0]), &count) != 0 {
-		return false
-	}
-	for _, id := range displays[:min(count, 32)] {
-		if displayBuiltin(id) != 0 {
-			return true
-		}
-	}
-	return false
-}
 func lidOSSupported() bool {
 	defer nativeProcessPool()()
 	info := objc.ID(objc.GetClass("NSProcessInfo")).Send(objc.RegisterName("processInfo"))

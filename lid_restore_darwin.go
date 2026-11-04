@@ -26,7 +26,7 @@ func lidBundleCheckArgs() []string {
 // Production authorization is wired only here. Construction does not execute it.
 func (a *application) prepareLid() {
 	c := &lidController{now: time.Now, marker: filepath.Join(filepath.Dir(a.path), "lid-restore-required"), snapshotValue: lidSnapshot{value: -1}}
-	c.capable = !mygo.IsDev() && mygo.App.IsPackaged() && lidPackagedHelper() && lidBuiltinDisplay()
+	c.capable = !mygo.IsDev() && mygo.App.IsPackaged() && lidPackagedHelper() && (lid.SystemPower{}).HasInternalBattery()
 	if !c.capable {
 		a.lid = c
 		return
