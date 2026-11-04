@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 — 2026-11-04
+
+- Fixed "Keep awake with the lid closed" always saying development builds aren't supported in the released app. The Lid switch on the card works now.
+
 ## 0.5.0 — 2026-11-04
 
 - You can drag the command palette now! Grab an empty spot and move it wherever feels right. Guides appear while you drag and the palette snaps to them, so centering takes one move. Hold ⌥ to place it freely. Each display remembers its own spot, and a double-click on an empty area puts it back.
