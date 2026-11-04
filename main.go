@@ -47,10 +47,21 @@ type application struct {
 	shortcutTarget       string
 	palette              *paletteState
 	paletteShortcutError string
-	feedback             *feedbackPresenter
-	feedbackMode         int // index into feedbackModes
-	feedbackCorner       int // index into feedbackCorners
-	panel                *menubarPanelState
+	panelShortcutError   string
+	// paletteDisplays, paletteCursor, paletteWindowPosition and
+	// setPaletteWindowPosition are seams: tests place and drag the panel
+	// without an app, a real screen or a native window.
+	paletteDisplays          func() []mygo.Display
+	paletteCursor            func() mygo.Point
+	paletteWindowPosition    func() palettePoint
+	setPaletteWindowPosition func(palettePoint)
+	// createPaletteGuide is a seam too: tests never open the overlay.
+	createPaletteGuide func(*paletteGuideState)
+	guide              *paletteGuideState
+	feedback           *feedbackPresenter
+	feedbackMode       int // index into feedbackModes
+	feedbackCorner     int // index into feedbackCorners
+	panel              *menubarPanelState
 	// createPaletteWindow and createMenubarPanel are seams: tests replace
 	// them so no case creates a native window.
 	createPaletteWindow func(*paletteState)
@@ -104,6 +115,22 @@ func newApplication(path string) (*application, error) {
 	}
 	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
 	a.createPaletteWindow = a.buildPaletteWindow
+	a.createPaletteGuide = a.buildPaletteGuideWindow
+	a.paletteDisplays = mygo.Screen.Displays
+	a.paletteCursor = mygo.Screen.CursorScreenPoint
+	a.paletteWindowPosition = func() palettePoint {
+		if a.palette == nil || a.palette.window == nil {
+			return palettePoint{}
+		}
+		x, y := a.palette.window.Position()
+		return palettePoint{X: x, Y: y}
+	}
+	a.setPaletteWindowPosition = func(p palettePoint) {
+		if a.palette == nil || a.palette.window == nil {
+			return
+		}
+		a.palette.window.SetPosition(p.X, p.Y)
+	}
 	a.createMenubarPanel = a.buildMenubarPanel
 	a.createJSONWindow = a.buildJSONWindow
 	a.presentJSONWindow = a.focusJSONWindow
@@ -175,8 +202,9 @@ func settingsHeight(t tokenValues, page int, hasError bool) int {
 		content = 3*t.SizeRowHeight + 2*t.StrokeHairline
 	}
 	if page == 3 {
-		// Shortcuts: awake, JSON, command palette, feedback, hint position.
-		rows := float32(5)
+		// Shortcuts: awake, JSON, command palette, menu bar panel, feedback,
+		// hint position.
+		rows := float32(6)
 		content = rows*t.SizeRowHeight + (rows-1)*t.StrokeHairline
 	}
 	if hasError {
@@ -186,10 +214,14 @@ func settingsHeight(t tokenValues, page int, hasError bool) int {
 	return int(math.Ceil(float64(height/t.Space4)) * float64(t.Space4))
 }
 
-// The ready card and a settings error are the tallest non-scrolling page.
+// The ready card and a settings error are the tallest non-scrolling page,
+// unless the six-row shortcuts page with an error icon is taller: that one is
+// wider than the window may get, so the minimum follows it.
 func settingsMinimumSize() (int, int) {
 	t := tokens(false, "zh-CN")
-	return int(t.SizeWindowWidth), settingsHeight(t, 1, true) + int(2*t.Space24+t.SizeRowHeight)
+	height := settingsHeight(t, 3, true)
+	height = max(height, settingsHeight(t, 1, true)+int(2*t.Space24+t.SizeRowHeight))
+	return int(t.SizeWindowWidth), height
 }
 
 func settingsSize(width, height int) (int, int) {
@@ -421,17 +453,14 @@ func (a *application) ready() {
 	a.startAwakeServices()
 	a.registerJSONShortcut()
 	a.registerPaletteShortcut()
+	a.registerPanelShortcut()
 	a.feedback.watch()
 	if err := a.registerURLScheme("cubbix"); err != nil {
 		// A missing declaration only disables deep links; it must not block launch.
 		log.Print(err)
 	}
 	mygo.Screen.OnDisplaysChanged(func() {
-		mygo.RunOnMain(func() {
-			if a.paletteVisible() {
-				a.placePalette()
-			}
-		})
+		mygo.RunOnMain(a.paletteDisplaysChanged)
 	})
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnBeforeQuit(a.beforeQuit)
@@ -457,6 +486,7 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	// JSON windows are tools: quitting never asks about unsaved text.
 	a.quitting = true
 	a.hidePalette()
+	a.hidePaletteGuides()
 	a.hideMenubarPanel()
 	a.feedback.close()
 	if a.stopAwakeServices != nil {

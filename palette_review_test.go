@@ -134,7 +134,7 @@ func TestPaletteLaunchErrorSurvivesFramesAndRetry(t *testing.T) {
 		}
 		return &fakeAwakeChild{done: make(chan error, 1)}, nil
 	}
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.Type("常亮 30m")
 	tt.Key(0, ui.KeyEnter)
 	tt.Frame()
@@ -155,7 +155,7 @@ func TestPaletteLaunchErrorSurvivesFramesAndRetry(t *testing.T) {
 
 func TestPaletteActionsRecordOnlySuccessfulExecutions(t *testing.T) {
 	a := paletteTestApp(t)
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.Type("常亮 45m")
 	tt.Key(ui.Cmd, ui.KeyK)
 	a.awake.launch = func([]string) (awakeChild, error) { return nil, errors.New("launch failed") }
@@ -196,7 +196,7 @@ func TestAwakeMinutesRejectOverflowAndSplitDigits(t *testing.T) {
 	}
 }
 
-func TestShortcutRecordingOwnsAllThreeSlots(t *testing.T) {
+func TestShortcutRecordingOwnsAllFourSlots(t *testing.T) {
 	a := awakeTestApp(t)
 	registered := map[string]func(){}
 	a.registerShortcut = func(acc string, fn func()) error {
@@ -210,6 +210,7 @@ func TestShortcutRecordingOwnsAllThreeSlots(t *testing.T) {
 	a.registerAwakeShortcut()
 	a.registerJSONShortcut()
 	a.registerPaletteShortcut()
+	a.registerPanelShortcut()
 	a.beginTileShortcutRecording("palette")
 	if len(registered) != 0 {
 		t.Fatalf("shortcuts not suspended: %v", registered)
@@ -223,12 +224,12 @@ func TestShortcutRecordingOwnsAllThreeSlots(t *testing.T) {
 		t.Fatal("conflicting shortcut committed")
 	}
 	a.recordShortcut(ui.Alt, ui.KeyComma)
-	if a.shortcutRecording || a.config.PaletteShortcut != "Alt+," || len(registered) != 3 {
+	if a.shortcutRecording || a.config.PaletteShortcut != "Alt+," || len(registered) != 4 {
 		t.Fatal("new shortcut not immediately restored")
 	}
 	a.beginTileShortcutRecording("palette")
 	a.cancelShortcutRecording()
-	if len(registered) != 3 {
+	if len(registered) != 4 {
 		t.Fatal("cancel did not restore all slots")
 	}
 	config, err := loadConfig(a.path)

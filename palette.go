@@ -65,6 +65,19 @@ type paletteState struct {
 	actionSelection string
 	scrollSelection bool
 	list            ui.ListState
+	// drag is the pointer drag in progress, if any.
+	drag paletteDrag
+	// rootBounds, panelBounds and grabBounds are the last frame's boxes of the
+	// three drag areas, in window DIPs. A handler cannot read its element once
+	// the frame that built it is over, so the boxes are kept.
+	rootBounds  ui.Rect
+	panelBounds ui.Rect
+	grabBounds  ui.Rect
+	// searchBounds and listBounds are the last frame's boxes of the search row
+	// and the list, in window DIPs. A press inside either of them belongs to
+	// them, not to the drag.
+	searchBounds ui.Rect
+	listBounds   ui.Rect
 }
 
 // togglePalette is the ⌥. entry and the card panel's palette button target.
@@ -134,6 +147,8 @@ func (a *application) hidePalette() {
 		return
 	}
 	a.palette.visible = false
+	a.palette.drag = paletteDrag{}
+	a.hidePaletteGuides()
 	if a.palette.window != nil {
 		a.palette.window.Hide()
 	}
@@ -146,16 +161,21 @@ func (a *application) invalidatePalette() {
 }
 
 // buildPaletteWindow builds the nonactivating panel. It is created on the
-// first use so the app never opens a hidden window at launch.
+// first use so the app never opens a hidden window at launch. The window is
+// the panel plus the shadow margin on every side: the shadow is drawn by the
+// panel, and what falls outside the window would be cut off, so the system's
+// own shadow stays off.
 func (a *application) buildPaletteWindow(p *paletteState) {
 	t := tokens(false, "zh-CN")
+	margin := int(t.SizePaletteShadowMargin)
 	window := mygo.NewWindow(mygo.WindowOptions{
 		Title:             "Cubbix",
-		Width:             int(t.SizePaletteWidth),
-		Height:            int(t.SizePaletteHeight),
+		Width:             int(t.SizePaletteWidth) + 2*margin,
+		Height:            int(t.SizePaletteHeight) + 2*margin,
 		Hidden:            true,
 		Frameless:         true,
 		Transparent:       true,
+		DisableShadow:     true,
 		DisableResize:     true,
 		DisableMove:       true,
 		DisableMinimize:   true,
@@ -172,16 +192,28 @@ func (a *application) buildPaletteWindow(p *paletteState) {
 	p.window = window
 }
 
-// placePalette centers the panel on the display under the pointer, near the
-// top of its work area.
+// placePalette opens the panel where the display under the pointer remembers
+// it, in the default position when it remembers nothing, and always fully
+// inside that display's work area.
 func (a *application) placePalette() {
-	if a.palette == nil || a.palette.window == nil {
+	p := a.palette
+	if p == nil {
 		return
 	}
-	display := mygo.Screen.DisplayNearestPoint(mygo.Screen.CursorScreenPoint())
-	windowWidth, windowHeight := a.palette.window.Size()
-	x, y := palettePosition(display, windowWidth, windowHeight, tokens(false, "zh-CN").SizePaletteTopOffset)
-	a.palette.window.SetPosition(x, y)
+	display := paletteDisplayNearest(a.paletteDisplaysNow(), a.paletteCursorPoint())
+	position := a.paletteDefaultPoint(display)
+	if seat, ok := a.config.PalettePositions[paletteSeatKeyFor(display)]; ok {
+		remembered := palettePanelFromSeat(seat, display.WorkArea)
+		// Clamp cannot fit an oversized panel. Keep the default fallback on
+		// those axes so a formerly valid offset cannot leave it off-screen.
+		if display.WorkArea.Width >= a.paletteSize().Width {
+			position.X = remembered.X
+		}
+		if display.WorkArea.Height >= a.paletteSize().Height {
+			position.Y = remembered.Y
+		}
+	}
+	a.movePalettePanelTo(paletteClamp(position, a.paletteSize(), display.WorkArea))
 }
 
 // palettePosition centers the panel on a display's work area, near its top,
@@ -196,7 +228,7 @@ func palettePosition(display mygo.Display, width, height int, topOffset float32)
 }
 
 // registerPaletteShortcut registers ⌥. and reports conflicts with the other
-// two slots in the settings row.
+// three slots in the settings row.
 func (a *application) registerPaletteShortcut() {
 	a.paletteShortcutError = ""
 	if reason := a.shortcutConflict(a.config.PaletteShortcut, "palette"); reason != "" {
@@ -205,6 +237,18 @@ func (a *application) registerPaletteShortcut() {
 	}
 	if err := a.registerShortcut(a.config.PaletteShortcut, a.togglePalette); err != nil {
 		a.paletteShortcutError = "ShortcutUnavailable"
+	}
+}
+
+// registerPanelShortcut registers ⌃⌥⌘P, the menu bar card panel's toggle.
+func (a *application) registerPanelShortcut() {
+	a.panelShortcutError = ""
+	if reason := a.shortcutConflict(a.config.PanelShortcut, "panel"); reason != "" {
+		a.panelShortcutError = reason
+		return
+	}
+	if err := a.registerShortcut(a.config.PanelShortcut, a.toggleMenubarPanel); err != nil {
+		a.panelShortcutError = "ShortcutUnavailable"
 	}
 }
 

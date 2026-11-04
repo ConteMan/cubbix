@@ -17,7 +17,7 @@ func paletteTestApp(t *testing.T) *application {
 func TestPaletteViewSearchesAndRuns(t *testing.T) {
 	for _, locale := range []string{"zh-CN", "en"} {
 		a := paletteTestApp(t)
-		tt := ui.NewTester(a.paletteView, 640, 400)
+		tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 		tt.SetLocale(locale)
 		if !tt.HasText(a.text(locale, "PaletteAll")) || !tt.HasText(a.text(locale, "R05Start")) {
 			t.Fatalf("%s: empty palette misses groups or commands: %v", locale, tt.Texts())
@@ -36,7 +36,7 @@ func TestPaletteViewQueryResetsSelection(t *testing.T) {
 	if err := a.awake.start(awakeSession{Mode: "screen"}); err != nil {
 		t.Fatal(err)
 	}
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetLocale("zh-CN")
 	if a.palette.selectionKey != "awake.stop" {
 		t.Fatalf("initial selection = %q", a.palette.selectionKey)
@@ -49,7 +49,7 @@ func TestPaletteViewQueryResetsSelection(t *testing.T) {
 
 func TestPaletteViewParameterHintAndError(t *testing.T) {
 	a := paletteTestApp(t)
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetLocale("zh-CN")
 	tt.Type("常亮 45m")
 	if a.palette.errorKey != "" {
@@ -80,7 +80,7 @@ func TestPaletteViewParameterHintAndError(t *testing.T) {
 
 func TestPaletteViewRunsAndActions(t *testing.T) {
 	a := paletteTestApp(t)
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetLocale("zh-CN")
 	tt.Type("常亮 30m")
 	tt.Key(ui.Cmd, ui.KeyK)
@@ -115,7 +115,7 @@ func TestPaletteViewArrowKeysSkipHeaders(t *testing.T) {
 	a := paletteTestApp(t)
 	a.addJSONDocument("", "", true)
 	a.addJSONDocument("", "", true)
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetLocale("zh-CN")
 	tt.Type("json")
 	// json.new is selected even though a document named JSON has a better
@@ -140,7 +140,7 @@ func TestPaletteViewArrowKeysSkipHeaders(t *testing.T) {
 
 func TestPaletteViewFavoritesStayOpen(t *testing.T) {
 	a := paletteTestApp(t)
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetLocale("zh-CN")
 	tt.Type("常亮")
 	tt.Key(ui.Cmd, ui.KeyK)
@@ -166,7 +166,7 @@ func TestPaletteViewFavoritesStayOpen(t *testing.T) {
 
 func TestPaletteEmptyState(t *testing.T) {
 	a := paletteTestApp(t)
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetLocale("en")
 	tt.Type("zzzzzz")
 	if !tt.HasText(a.text("en", "PaletteEmpty")) {
@@ -181,7 +181,7 @@ func TestPaletteEnterRunsOnce(t *testing.T) {
 		launches++
 		return &fakeAwakeChild{done: make(chan error, 1)}, nil
 	}
-	tt := ui.NewTester(a.paletteView, 640, 400)
+	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetLocale("zh-CN")
 	tt.Type("常亮 30m")
 	tt.Key(0, ui.KeyEnter)

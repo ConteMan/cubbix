@@ -284,10 +284,10 @@ func TestNotesStayInSettingsAndReturn(t *testing.T) {
 
 func TestSettingsMinimumAndWideContent(t *testing.T) {
 	minW, minH := settingsMinimumSize()
-	if minW != 720 || minH != 340 {
+	if minW != 720 || minH != 368 {
 		t.Fatalf("minimum=%dx%d", minW, minH)
 	}
-	for _, size := range [][2]int{{0, 0}, {-1, -1}, {719, 339}, {1000, 600}} {
+	for _, size := range [][2]int{{0, 0}, {-1, -1}, {719, 367}, {1000, 600}} {
 		w, h := settingsSize(size[0], size[1])
 		if w < minW || h < minH {
 			t.Fatal("size below minimum")

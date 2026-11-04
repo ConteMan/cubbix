@@ -14,7 +14,16 @@ const (
 	configVersion      = 1
 	paletteRecentLimit = 5
 	defaultPaletteKey  = "Alt+."
+	defaultPanelKey    = "Ctrl+Alt+Cmd+P"
 )
+
+// paletteSeat is where the palette sits on one display: the offset of the
+// panel's top-left corner from that display's work area origin. Offsets
+// survive a display moving, an absolute position would not.
+type paletteSeat struct {
+	X int `toml:"x"`
+	Y int `toml:"y"`
+}
 
 // normalizeCommandIDs drops blanks and duplicates while keeping the order.
 func normalizeCommandIDs(ids []string) []string {
@@ -44,36 +53,38 @@ func normalizePaletteRecents(ids []string) []string {
 }
 
 type Config struct {
-	AwakeLid           bool          `toml:"awake_lid"`
-	AwakeLidBatteryMin int           `toml:"awake_lid_battery_min"`
-	JSONEnabled        bool          `toml:"json_enabled"`
-	JSONShortcut       string        `toml:"json_shortcut"`
-	JSONWidth          int           `toml:"json_width,omitempty"`
-	JSONHeight         int           `toml:"json_height,omitempty"`
-	JSONSplit          int           `toml:"json_split,omitempty"`
-	Version            int           `toml:"version"`
-	Language           string        `toml:"language"`
-	OpenAtLogin        bool          `toml:"open_at_login"`
-	FeedbackMode       string        `toml:"feedback_mode"`
-	FeedbackCorner     string        `toml:"feedback_corner"`
-	AutomaticUpdates   bool          `toml:"automatic_updates"`
-	AwakeEnabled       bool          `toml:"awake_enabled"`
-	AwakeMode          string        `toml:"awake_mode"`
-	AwakeMinutes       int           `toml:"awake_minutes"`
-	AwakeUntil         string        `toml:"awake_until,omitempty"`
-	AwakeAgents        string        `toml:"awake_agents"`
-	AwakeShortcut      string        `toml:"awake_shortcut"`
-	PaletteShortcut    string        `toml:"palette_shortcut"`
-	PaletteFavorites   []string      `toml:"palette_favorites,omitempty"`
-	PaletteRecents     []string      `toml:"palette_recents,omitempty"`
-	AwakeSession       *awakeSession `toml:"awake_session,omitempty"`
-	RestoreAwake       bool          `toml:"restore_awake,omitempty"`
-	WindowWidth        int           `toml:"window_width,omitempty"`
-	WindowHeight       int           `toml:"window_height,omitempty"`
+	AwakeLid           bool                   `toml:"awake_lid"`
+	AwakeLidBatteryMin int                    `toml:"awake_lid_battery_min"`
+	JSONEnabled        bool                   `toml:"json_enabled"`
+	JSONShortcut       string                 `toml:"json_shortcut"`
+	JSONWidth          int                    `toml:"json_width,omitempty"`
+	JSONHeight         int                    `toml:"json_height,omitempty"`
+	JSONSplit          int                    `toml:"json_split,omitempty"`
+	Version            int                    `toml:"version"`
+	Language           string                 `toml:"language"`
+	OpenAtLogin        bool                   `toml:"open_at_login"`
+	FeedbackMode       string                 `toml:"feedback_mode"`
+	FeedbackCorner     string                 `toml:"feedback_corner"`
+	AutomaticUpdates   bool                   `toml:"automatic_updates"`
+	AwakeEnabled       bool                   `toml:"awake_enabled"`
+	AwakeMode          string                 `toml:"awake_mode"`
+	AwakeMinutes       int                    `toml:"awake_minutes"`
+	AwakeUntil         string                 `toml:"awake_until,omitempty"`
+	AwakeAgents        string                 `toml:"awake_agents"`
+	AwakeShortcut      string                 `toml:"awake_shortcut"`
+	PaletteShortcut    string                 `toml:"palette_shortcut"`
+	PanelShortcut      string                 `toml:"panel_shortcut"`
+	PalettePositions   map[string]paletteSeat `toml:"palette_positions,omitempty"`
+	PaletteFavorites   []string               `toml:"palette_favorites,omitempty"`
+	PaletteRecents     []string               `toml:"palette_recents,omitempty"`
+	AwakeSession       *awakeSession          `toml:"awake_session,omitempty"`
+	RestoreAwake       bool                   `toml:"restore_awake,omitempty"`
+	WindowWidth        int                    `toml:"window_width,omitempty"`
+	WindowHeight       int                    `toml:"window_height,omitempty"`
 }
 
 func defaultConfig() Config {
-	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, FeedbackMode: "hint", FeedbackCorner: "top-right"}
+	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right"}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -122,12 +133,25 @@ func loadConfig(path string) (Config, error) {
 	if config.PaletteShortcut == "" {
 		config.PaletteShortcut = defaultPaletteKey
 	}
+	if config.PanelShortcut == "" {
+		config.PanelShortcut = defaultPanelKey
+	}
 	if config.AwakeLidBatteryMin != 10 && config.AwakeLidBatteryMin != 20 && config.AwakeLidBatteryMin != 30 {
 		config.AwakeLidBatteryMin = 20
 	}
 	config.PaletteFavorites = normalizePaletteFavorites(config.PaletteFavorites)
 	config.PaletteRecents = normalizePaletteRecents(config.PaletteRecents)
 	return config, nil
+}
+
+// putPaletteSeat remembers where the palette sits on a display. An older
+// config has no palette_positions table at all, so the map starts nil and an
+// assignment would panic: build it first.
+func (c *Config) putPaletteSeat(key string, seat paletteSeat) {
+	if c.PalettePositions == nil {
+		c.PalettePositions = map[string]paletteSeat{}
+	}
+	c.PalettePositions[key] = seat
 }
 
 func saveConfig(path string, config Config) (err error) {

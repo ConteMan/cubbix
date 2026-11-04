@@ -7,6 +7,13 @@ import (
 // paletteView draws the whole panel: search row, group list, ⌘K keycap,
 // action list and inline errors. All colors and sizes come from tokens.go
 // through applyTheme.
+//
+// The window is the panel plus SizePaletteShadowMargin on every side, because
+// the panel draws its own shadow. Three elements answer for a drag: the icon
+// at the start of the search row, the panel's own blank space (its padding,
+// the gaps and the separator), and the shadow margin around it. The field's
+// text and the list keep their presses, so selecting text and picking a row
+// still work.
 func (a *application) paletteView(c *ui.Context) {
 	locale, t := applyTheme(c)
 	p := a.palette
@@ -14,56 +21,93 @@ func (a *application) paletteView(c *ui.Context) {
 		return
 	}
 	a.refreshPalette(p, locale)
+	empty := len(p.rows) == 0
 	text := func(key string) string { return a.text(locale, key) }
 	c.OnShortcut(0, ui.KeyEscape, a.paletteEscape)
 	c.OnShortcut(ui.Cmd, ui.KeyW, a.hidePalette)
 	c.OnShortcut(ui.Cmd, ui.KeyK, a.togglePaletteActions)
+	c.Root().Background(ui.Transparent)
 
-	ui.Column(c).Fill().Padding(t.Space8).Gap(t.Space8).Radius(t.RadiusWindow).Clip().Background(ui.Hex(t.ColorMenuSurface)).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Children(func() {
-		ui.Row(c).FillWidth().Height(t.SizePaletteSearchHeight).PaddingX(t.Space8).Gap(t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center).Children(func() {
-			ui.Icon(c, icon("search")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-			input := ui.TextInput(c.Key("palette-search"), &p.query).Grow(1).FillHeight().Padding(0).Border(0, ui.Hex(t.ColorTransparent)).Background(ui.Hex(t.ColorTransparent)).FontSize(t.FontSizeBody).Placeholder(text("PaletteSearch")).Label(text("PaletteSearch")).FocusRing(true)
-			input.Focus()
-			input.OnChange(func() {
-				// Editing leaves the action list and clears the last error.
-				p.mode = paletteCommandMode
-				p.actionsCommand = nil
-				p.actionSelection = ""
-				p.errorKey = ""
-				p.runError = ""
-			})
-			input.OnSubmit(a.runPalette)
-			input.OnShortcut(0, ui.KeyDown, func() { a.movePaletteSelection(1) })
-			input.OnShortcut(0, ui.KeyUp, func() { a.movePaletteSelection(-1) })
-			if p.errorKey != "" {
-				label := text(p.errorKey)
-				alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(label).Description(label)
-				ui.TooltipBase(c, alert, func(tip ui.Element) {
-					tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
-						ui.Text(c, label).FontSize(t.FontSizeSmall)
+	// The margin belongs to the window, not the panel: a press there reads as
+	// a press outside the panel.
+	root := ui.Box(c.Key("palette-root")).Fill().Padding(t.SizePaletteShadowMargin).KeepFocus()
+	p.rootBounds = root.Bounds()
+	root.HandleInput(a.paletteDragHandler(&p.rootBounds, nil))
+
+	root.Children(func() {
+		panel := ui.Column(c.Key("palette-panel")).Fill().Padding(t.Space8).Gap(t.Space8).Radius(t.RadiusWindow).Clip().
+			Background(ui.Hex(t.ColorMenuSurface)).
+			Border(t.StrokeHairline, ui.Hex(t.ColorPanelStrokeOuter)).
+			InsetShadow(0, 0, 0, t.StrokeHairline, ui.Hex(t.ColorPanelStrokeInner)).
+			Shadow(0, t.Space8, t.Space24, 0, ui.Hex(t.ColorPanelShadow)).
+			KeepFocus()
+		// Blank panel space drags; the search row and the list answer for
+		// themselves, so their presses fall through to the field and the rows.
+		p.panelBounds = panel.Bounds()
+		panel.HandleInput(a.paletteDragHandler(&p.panelBounds, func(ev ui.InputEvent) bool {
+			return !a.paletteContentHit(ev, p.panelBounds)
+		}))
+		panel.Children(func() {
+			searchRow := ui.Row(c).FillWidth().Height(t.SizePaletteSearchHeight).PaddingX(t.Space8).Gap(t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center)
+			p.searchBounds = searchRow.Bounds()
+			searchRow.Children(func() {
+				grab := ui.Box(c.Key("palette-grab")).Size(t.SizePaletteSearchHeight, t.SizePaletteSearchHeight).KeepFocus()
+				p.grabBounds = grab.Bounds()
+				grab.HandleInput(a.paletteDragHandler(&p.grabBounds, nil))
+				grab.Children(func() {
+					ui.Row(c).Fill().AlignItems(ui.Center).Justify(ui.Center).Children(func() {
+						ui.Icon(c, icon("search")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 					})
 				})
+				input := ui.TextInput(c.Key("palette-search"), &p.query).Grow(1).FillHeight().Padding(0).Border(0, ui.Hex(t.ColorTransparent)).Background(ui.Hex(t.ColorTransparent)).FontSize(t.FontSizeBody).Placeholder(text("PaletteSearch")).Label(text("PaletteSearch")).FocusRing(true)
+				input.Focus()
+				input.OnChange(func() {
+					// Editing leaves the action list and clears the last error.
+					p.mode = paletteCommandMode
+					p.actionsCommand = nil
+					p.actionSelection = ""
+					p.errorKey = ""
+					p.runError = ""
+				})
+				input.OnSubmit(a.runPalette)
+				input.OnShortcut(0, ui.KeyDown, func() { a.movePaletteSelection(1) })
+				input.OnShortcut(0, ui.KeyUp, func() { a.movePaletteSelection(-1) })
+				if p.errorKey != "" {
+					label := text(p.errorKey)
+					alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(label).Description(label)
+					ui.TooltipBase(c, alert, func(tip ui.Element) {
+						tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
+							ui.Text(c, label).FontSize(t.FontSizeSmall)
+						})
+					})
+				}
+				ui.Row(c).Height(t.Space20).PaddingX(t.Space6).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center).Children(func() {
+					ui.Text(c, "⌘K").FontSize(t.FontSizeCaption).TextColor(ui.Hex(t.ColorTextDisabled))
+				})
+			})
+			ui.Box(c).FillWidth().Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
+			if empty {
+				// Nothing to pick: the whole body drags.
+				p.listBounds = ui.Rect{}
+				ui.Column(c).FillWidth().Grow(1).AlignItems(ui.Center).Justify(ui.Center).Gap(t.Space8).Children(func() {
+					ui.Icon(c, icon("search")).Size(t.SizeIconLarge, t.SizeIconLarge).TextColor(ui.Hex(t.ColorTextDisabled))
+					ui.Text(c, text("PaletteEmpty")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextDisabled))
+				})
+			} else {
+				label := text("PaletteAll")
+				if p.mode == paletteActionMode {
+					label = text("PaletteActions")
+				}
+				list := ui.List(c.Key("palette-list"), &p.list, len(p.rows), func(index int) {
+					a.paletteRow(c, t, locale, p, index)
+				}).FillWidth().Grow(1).Gap(0).Label(label)
+				p.listBounds = list.Bounds()
 			}
-			ui.Row(c).Height(t.Space20).PaddingX(t.Space6).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, "⌘K").FontSize(t.FontSizeCaption).TextColor(ui.Hex(t.ColorTextDisabled))
-			})
 		})
-		ui.Box(c).FillWidth().Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
-		if len(p.rows) == 0 {
-			ui.Column(c).FillWidth().Grow(1).AlignItems(ui.Center).Justify(ui.Center).Gap(t.Space8).Children(func() {
-				ui.Icon(c, icon("search")).Size(t.SizeIconLarge, t.SizeIconLarge).TextColor(ui.Hex(t.ColorTextDisabled))
-				ui.Text(c, text("PaletteEmpty")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextDisabled))
-			})
-			return
-		}
-		label := text("PaletteAll")
-		if p.mode == paletteActionMode {
-			label = text("PaletteActions")
-		}
-		ui.List(c.Key("palette-list"), &p.list, len(p.rows), func(index int) {
-			a.paletteRow(c, t, locale, p, index)
-		}).FillWidth().Grow(1).Gap(0).Label(label)
 	})
+	if empty {
+		return
+	}
 	// The panel closes on Esc and runs on Enter even when the list, not the
 	// field, has the keyboard; both are fallbacks behind the field's handlers.
 	ui.Overlay(c, func() {
@@ -74,6 +118,8 @@ func (a *application) paletteView(c *ui.Context) {
 	})
 }
 
+// paletteRow draws one row of the list: a group header, a separator, the
+// chosen command's title, or a command or action button.
 func (a *application) paletteRow(c *ui.Context, t tokenValues, locale string, p *paletteState, index int) {
 	row := p.rows[index]
 	switch row.Kind {
