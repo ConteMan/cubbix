@@ -62,6 +62,7 @@ type lidSnapshot struct {
 	response                       lid.Response
 	lastCode, hello, helperVersion string
 	lastFailure                    *lid.Response
+	install                        lidInstallDiagnostic
 	stale, ours                    bool
 }
 type lidController struct {
@@ -364,7 +365,20 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 			s.reason = "LidHelperUpdate"
 			c.publish()
 		}
+		s.install = lidInstallDiagnostic{step: "authorize"}
+		c.publish()
 		err := c.service.Register()
+		if err != nil {
+			var failure *lidInstallFailure
+			if errors.As(err, &failure) {
+				s.install = failure.diagnostic
+			} else {
+				s.install.failure = "script-failed"
+			}
+		} else {
+			zero := 0
+			s.install = lidInstallDiagnostic{step: "confirm", exit: &zero}
+		}
 		// Status is always reread, including cancelled/failed authorization.
 		s.service = c.service.Status()
 		if s.service == svcRequiresApproval {
@@ -378,6 +392,7 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 			return fail("LidServiceBroken", "LidServiceBroken")
 		}
 		if err := c.waitForHelper(); err != nil {
+			s.install.step, s.install.failure = "hello", "helper-not-ready"
 			return fail(err.Error(), err.Error())
 		}
 	}
@@ -429,7 +444,7 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 // A successful installer exit is not proof that the daemon can serve requests.
 // Only an authenticated hello from the expected helper version confirms readiness.
 func (c *lidController) waitForHelper() error {
-	until := c.now().Add(5 * time.Second)
+	until := c.now().Add(15 * time.Second)
 	wait := c.wait
 	if wait == nil {
 		wait = time.Sleep

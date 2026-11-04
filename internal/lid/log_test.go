@@ -123,6 +123,51 @@ func TestPMSetReadAndWriteDiagnostics(t *testing.T) {
 	}
 }
 
+func TestPollingLogsOnlyChangesAndErrors(t *testing.T) {
+	var logs bytes.Buffer
+	logf := func(f string, a ...any) { fmt.Fprintf(&logs, f+"\n", a...) }
+	value, failed := 0, false
+	p := &PMSet{Run: func(context.Context, string, ...string) ([]byte, error) {
+		if failed {
+			return nil, errors.New("private-output")
+		}
+		return []byte(fmt.Sprint("SleepDisabled ", value)), nil
+	}, Logf: logf}
+	e, _, _, _ := fixture(t)
+	e.Sleep, e.Logf = p, logf
+	e.Handle(1, request("ping"))
+	logs.Reset()
+	for range 20 {
+		e.Handle(1, request("ping"))
+	}
+	if logs.Len() != 0 {
+		t.Fatal("stable polling was noisy", logs.String())
+	}
+	value = 1
+	e.Handle(1, request("ping"))
+	if strings.Count(logs.String(), "pmset read") != 1 || !strings.Contains(logs.String(), "op=ping") || !strings.Contains(logs.String(), "state=on-foreign") {
+		t.Fatal(logs.String())
+	}
+	logs.Reset()
+	for range 20 {
+		e.Handle(1, request("ping"))
+	}
+	if logs.Len() != 0 {
+		t.Fatal(logs.String())
+	}
+	failed = true
+	e.Handle(1, request("ping"))
+	if !strings.Contains(logs.String(), "command-failed") {
+		t.Fatal(logs.String())
+	}
+	logs.Reset()
+	failed = false
+	e.Handle(1, request("ping"))
+	if !strings.Contains(logs.String(), "pmset read result=ok value=1") {
+		t.Fatal("missing read recovery", logs.String())
+	}
+}
+
 // Group 80 is inherited from an admin-owned parent on macOS. All operations
 // below are injected; this test never changes real ownership or requires root.
 func TestJournalInheritedGroupRepair(t *testing.T) {

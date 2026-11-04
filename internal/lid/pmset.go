@@ -6,13 +6,17 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 type CommandRunner func(context.Context, string, ...string) ([]byte, error)
 type PMSet struct {
-	Run  CommandRunner
-	Logf func(string, ...any)
+	Run       CommandRunner
+	Logf      func(string, ...any)
+	mu        sync.Mutex
+	readKnown bool
+	readValue int
 }
 
 func ParseSleep(data []byte) (int, error) {
@@ -27,27 +31,31 @@ func ParseSleep(data []byte) (int, error) {
 	}
 	return -1, errors.New("sleep setting unavailable")
 }
-func (p PMSet) Read() (int, error) {
+func (p *PMSet) Read() (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	data, err := p.Run(ctx, "/usr/bin/pmset", "-g")
 	if err != nil {
-		if p.Logf != nil {
-			p.Logf("pmset read result=command-failed value=-1")
-		}
+		p.logRead("command-failed", -1)
 		return -1, err
 	}
 	v, err := ParseSleep(bytes.TrimSpace(data))
-	if p.Logf != nil {
-		result := "ok"
-		if err != nil {
-			result = "parse-failed"
-		}
-		p.Logf("pmset read result=%s value=%d", result, v)
+	result := "ok"
+	if err != nil {
+		result = "parse-failed"
 	}
+	p.logRead(result, v)
 	return v, err
 }
-func (p PMSet) Set(v int) error {
+func (p *PMSet) logRead(result string, v int) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.Logf != nil && (result != "ok" || !p.readKnown || p.readValue != v) {
+		p.Logf("pmset read result=%s value=%d", result, v)
+	}
+	p.readKnown, p.readValue = result == "ok", v
+}
+func (p *PMSet) Set(v int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	// No request value can become a command argument.
