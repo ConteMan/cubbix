@@ -460,17 +460,7 @@ func (a *application) ready() {
 		log.Print(err)
 	}
 	mygo.Screen.OnDisplaysChanged(func() {
-		mygo.RunOnMain(func() {
-			if a.palette != nil && a.palette.drag.down {
-				// A display change ends the drag without moving or storing
-				// anything: the guides it drew are no longer true.
-				a.palette.drag = paletteDrag{}
-				a.hidePaletteGuides()
-			}
-			if a.paletteVisible() {
-				a.placePalette()
-			}
-		})
+		mygo.RunOnMain(a.paletteDisplaysChanged)
 	})
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnBeforeQuit(a.beforeQuit)

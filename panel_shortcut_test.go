@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -50,10 +52,76 @@ func TestPanelShortcutRowRecordsAndConflicts(t *testing.T) {
 	if a.config.PanelShortcut != "Ctrl+Alt+Cmd+M" || a.shortcutError != "JSONShortcutConflict" {
 		t.Fatalf("clashing shortcut was accepted: %q %q", a.config.PanelShortcut, a.shortcutError)
 	}
-	if reason := a.shortcutReasonKey("JSONShortcutConflict", "panel", a.config.AwakeShortcut); reason != "PanelShortcutSuffix" && reason == "" {
+	if reason := a.shortcutReasonKey("JSONShortcutConflict", "panel", a.config.AwakeShortcut); reason != "JSONShortcutConflict" {
 		t.Fatalf("clash reason = %q", reason)
 	}
 	a.cancelShortcutRecording()
+}
+
+func TestPanelShortcutConflictTooltipsInBothDirections(t *testing.T) {
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, target := range []string{"awake", "json", "palette", "panel"} {
+			t.Run(locale+"/"+target, func(t *testing.T) {
+				a := awakeTestApp(t)
+				a.page = 3
+				a.shortcutTarget = target
+				a.shortcutRecording = true
+				a.shortcutError = "JSONShortcutConflict"
+				a.shortcutDraft = a.config.PanelShortcut
+				want := "PanelShortcutSuffix"
+				if target == "panel" {
+					a.shortcutDraft = a.config.PaletteShortcut
+					want = "PaletteShortcutSuffix"
+				}
+				tt := ui.NewTester(a.view, 720, 368)
+				tt.SetLocale(locale)
+				alert, ok := tt.Find(a.text(locale, "JSONShortcutConflict"))
+				if !ok || alert.Y+alert.H > 368 {
+					t.Fatal("conflict alert is missing or clipped at the minimum height")
+				}
+				tt.Move(alert.X+alert.W/2, alert.Y+alert.H/2)
+				tt.Advance(time.Second)
+				if !tt.HasText(a.text(locale, want)) {
+					t.Fatalf("tooltip missed the owning slot: %v", tt.Texts())
+				}
+			})
+		}
+	}
+}
+
+func TestPanelShortcutRegistrationAndFailure(t *testing.T) {
+	a := panelTestApp(t)
+	var callback func()
+	a.registerShortcut = func(acc string, fn func()) error {
+		if acc != a.config.PanelShortcut {
+			t.Fatalf("registered wrong panel shortcut: %q", acc)
+		}
+		callback = fn
+		return nil
+	}
+	a.registerPanelShortcut()
+	if callback == nil || a.panelShortcutError != "" {
+		t.Fatal("registration did not install the panel callback")
+	}
+	callback()
+	if !a.menubarPanelVisible() {
+		t.Fatal("registered callback did not open the panel")
+	}
+	callback()
+	if a.menubarPanelVisible() {
+		t.Fatal("registered callback did not close the panel")
+	}
+	a.registerShortcut = func(string, func()) error { return errors.New("occupied") }
+	a.registerPanelShortcut()
+	if a.panelShortcutError != "ShortcutUnavailable" {
+		t.Fatal("registration failure did not reach the panel settings row")
+	}
+	a.config.PanelShortcut = a.config.PaletteShortcut
+	a.registerShortcut = func(string, func()) error { t.Fatal("registered a conflicting shortcut"); return nil }
+	a.registerPanelShortcut()
+	if a.panelShortcutError != "JSONShortcutConflict" {
+		t.Fatal("fourth-slot conflict was not rejected before registration")
+	}
 }
 
 // TestShortcutReasonNamesTheOwningSlot checks both directions of the slot

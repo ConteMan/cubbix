@@ -109,6 +109,9 @@ func nativeWindowChecks(a *application, dir string) error {
 			return err
 		}
 		fmt.Println("PASS: hidden feedback panel is nonactivating, click-through, floating, all-Spaces/fullscreen auxiliary; no shadow or focus")
+		if err := nativePalettePositionChecks(a, nsapp); err != nil {
+			return err
+		}
 		// MyGo's regular-policy wrapper activates the application. Inspect
 		// native policy values directly without making a foreground request.
 		nsapp.Send(objc.RegisterName("setActivationPolicy:"), 0)
@@ -260,5 +263,5 @@ func nativeWindowChecks(a *application, dir string) error {
 	}); err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(dir, "native-result.txt"), []byte("PASS: hidden NSApplication policies 1→0→1; native resizable style, minimum 720×340; saved 1000×600; application/edit menu actions and close button present; a hidden card panel flyout anchored to the tray with a content-driven size. Windows stayed hidden and inactive. No native screenshots or foreground requests.\n"), 0600)
+	return os.WriteFile(filepath.Join(dir, "native-result.txt"), []byte("PASS: hidden NSApplication policies 1→0→1; native resizable style and current minimum size; saved 1000×600; application/edit menu actions and close button present; hidden command and guide panels, and a hidden card panel flyout anchored to the tray. Windows stayed hidden and inactive. No native screenshots or foreground requests.\n"), 0600)
 }

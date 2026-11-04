@@ -5,11 +5,19 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
+// paletteGuideWindow exposes only inactive presentation for the overlay.
+type paletteGuideWindow interface {
+	SetBounds(mygo.Rectangle)
+	ShowInactive()
+	Hide()
+	Invalidate()
+}
+
 // paletteGuideState is the overlay that draws the three snap lines while the
 // panel is dragged. It covers the work area of the display the panel is over,
 // takes no pointer and never becomes the key window.
 type paletteGuideState struct {
-	window  *mygo.Window
+	window  paletteGuideWindow
 	guides  paletteGuides  // screen DIPs
 	work    mygo.Rectangle // the work area the window covers
 	snap    paletteSnap
@@ -71,10 +79,11 @@ func (a *application) showPaletteGuides(guides paletteGuides, work mygo.Rectangl
 	}
 	if first {
 		// The overlay and the panel are both floating windows. Show the overlay
-		// first, then bring the panel forward again so the lines stay under it.
+		// first, then order the panel forward without requesting key focus.
+		// It already owns the keyboard throughout the drag.
 		g.window.ShowInactive()
 		if a.palette != nil && a.palette.visible && a.palette.window != nil {
-			a.palette.window.Show()
+			a.palette.window.ShowInactive()
 		}
 	}
 	if changed {

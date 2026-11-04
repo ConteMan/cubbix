@@ -197,15 +197,17 @@ func TestPalettePressInsideTheDeadZoneIsAClick(t *testing.T) {
 func TestPaletteTextSelectionKeepsThePanelAndTheFocus(t *testing.T) {
 	a, f := paletteDragApp(t)
 	tt := paletteTester(a, "zh-CN")
+	tt.Type("select these words")
 	field, ok := tt.Find(a.text("zh-CN", "PaletteSearch"))
 	if !ok {
 		t.Fatalf("no search field in %v", tt.Texts())
 	}
 	before := panelPointOf(a, f)
-	center := palettePoint{X: f.window.X + int(field.X+field.W/2), Y: f.window.Y + int(field.Y+field.H/2)}
-	palettePress(tt, f, center)
-	paletteMove(tt, f, palettePoint{X: center.X + 20, Y: center.Y})
-	paletteRelease(tt, f, palettePoint{X: center.X + 20, Y: center.Y})
+	start := palettePoint{X: f.window.X + int(field.X+2), Y: f.window.Y + int(field.Y+field.H/2)}
+	end := palettePoint{X: start.X + 55, Y: start.Y}
+	palettePress(tt, f, start)
+	paletteMove(tt, f, end)
+	paletteRelease(tt, f, end)
 	if a.palette.drag.down {
 		t.Fatal("a press in the text field started a drag")
 	}
@@ -214,6 +216,115 @@ func TestPaletteTextSelectionKeepsThePanelAndTheFocus(t *testing.T) {
 	}
 	if active, _ := tt.TextInputActive(); !active {
 		t.Fatal("the text field lost the keyboard: KeepFocus is missing")
+	}
+	tt.Command("copy")
+	selected := tt.Clipboard()
+	if selected == "" || selected == a.palette.query {
+		t.Fatalf("pointer drag did not select part of the query: %q", selected)
+	}
+	tt.Type("X")
+	if a.palette.query == "select these wordsX" || len(a.palette.query) != len("select these words")-len(selected)+1 {
+		t.Fatalf("typing did not replace the pointer selection: %q", a.palette.query)
+	}
+}
+
+func TestPaletteDoubleClickMoveDoesNotStartDrag(t *testing.T) {
+	a, f := paletteDragApp(t)
+	a.config.putPaletteSeat("1", paletteSeat{X: 100, Y: 200})
+	a.config.putPaletteSeat("2", paletteSeat{X: 80, Y: 90})
+	f.window = palettePoint{X: 100, Y: 200}
+	base := ui.Rect{X: 32, Y: 32}
+	handle := a.paletteDragHandler(&base, nil)
+	handle(ui.InputEvent{Kind: ui.InputPointerDown, Clicks: 2, X: 25, Y: 25})
+	reset := f.window
+	handle(ui.InputEvent{Kind: ui.InputPointerMove, X: -100, Y: 300})
+	handle(ui.InputEvent{Kind: ui.InputPointerUp})
+	if f.window != reset || !a.palette.visible || len(a.config.PalettePositions) != 1 || a.config.PalettePositions["2"] != (paletteSeat{X: 80, Y: 90}) {
+		t.Fatalf("double-click move changed the reset: window=%+v seats=%v", f.window, a.config.PalettePositions)
+	}
+	if a.guide != nil || a.palette.drag.down {
+		t.Fatal("double-click move started a drag or displayed guides")
+	}
+}
+
+func TestPaletteDragDeadZoneBoundaryAndSecondaryRelease(t *testing.T) {
+	a, f := paletteDragApp(t)
+	base := ui.Rect{}
+	handle := a.paletteDragHandler(&base, nil)
+	handle(ui.InputEvent{Kind: ui.InputPointerDown, X: 100, Y: 100})
+	before := f.window
+	handle(ui.InputEvent{Kind: ui.InputPointerMove, X: 103, Y: 103})
+	if f.window != before || a.palette.drag.active || a.guide != nil {
+		t.Fatal("a movement of exactly three DIPs crossed the dead zone")
+	}
+	handle(ui.InputEvent{Kind: ui.InputPointerMove, X: 104, Y: 100, Mods: ui.Alt})
+	if !a.palette.drag.active || f.window.X != before.X+4 {
+		t.Fatal("a movement past three DIPs did not drag")
+	}
+	if handle(ui.InputEvent{Kind: ui.InputPointerUp, Button: 1}) || !a.palette.drag.down || len(a.config.PalettePositions) != 0 {
+		t.Fatal("a secondary release committed the primary drag")
+	}
+	handle(ui.InputEvent{Kind: ui.InputPointerUp})
+	if a.palette.drag.down || len(a.config.PalettePositions) != 1 {
+		t.Fatal("the primary release did not commit the drag")
+	}
+}
+
+func TestPaletteDisplayChangeCancelsDragWithoutMovingOrSaving(t *testing.T) {
+	a, f := paletteDragApp(t)
+	tt := paletteTester(a, "zh-CN")
+	grab := grabScreen(a, f)
+	palettePress(tt, f, grab)
+	paletteMove(tt, f, palettePoint{X: grab.X + 60, Y: grab.Y + 60})
+	before := f.window
+	f.displays = f.displays[1:]
+	a.paletteDisplaysChanged()
+	if f.window != before || len(a.config.PalettePositions) != 0 || a.palette.drag.down || a.guide.visible {
+		t.Fatalf("display change moved or committed a drag: window=%+v drag=%+v", f.window, a.palette.drag)
+	}
+	paletteRelease(tt, f, palettePoint{X: grab.X + 60, Y: grab.Y + 60})
+	if len(a.config.PalettePositions) != 0 {
+		t.Fatal("release committed the cancelled drag")
+	}
+	// Reopening uses the remaining display's normal placement and keeps the
+	// old display's remembered seat intact.
+	a.config.putPaletteSeat("1", paletteSeat{X: 100, Y: 200})
+	a.hidePalette()
+	a.showPalette()
+	if got := panelPointOf(a, f); got != (palettePoint{X: -1280, Y: 121}) || len(a.config.PalettePositions) != 1 {
+		t.Fatalf("reopen after disconnect: panel=%+v seats=%v", got, a.config.PalettePositions)
+	}
+}
+
+func TestPaletteDragKeepsTextInputAndComposition(t *testing.T) {
+	for _, area := range []string{"grab", "padding", "margin"} {
+		t.Run(area, func(t *testing.T) {
+			a, f := paletteDragApp(t)
+			tt := paletteTester(a, "zh-CN")
+			tt.Type("prefix ")
+			tt.Compose("pinyin", 6)
+			caret, composing := tt.TextCaret()
+			start := grabScreen(a, f)
+			if area == "padding" {
+				panel := panelPointOf(a, f)
+				start = palettePoint{X: panel.X + 4, Y: panel.Y + 4}
+			} else if area == "margin" {
+				start = palettePoint{X: f.window.X + 16, Y: f.window.Y + 16}
+			}
+			palettePress(tt, f, start)
+			if active, noIME := tt.TextInputActive(); !active || noIME {
+				t.Fatal("press stopped text input or disabled input methods")
+			}
+			paletteMove(tt, f, palettePoint{X: start.X + 60, Y: start.Y + 40})
+			paletteRelease(tt, f, palettePoint{X: start.X + 60, Y: start.Y + 40})
+			if after, active := tt.TextCaret(); !composing || !active || after != caret || a.palette.query != "prefix " {
+				t.Fatal("drag changed the text input caret or committed composition")
+			}
+			tt.Type("拼音")
+			if a.palette.query != "prefix 拼音" || !a.palette.visible {
+				t.Fatalf("typing after drag failed: %q", a.palette.query)
+			}
+		})
 	}
 }
 
@@ -401,5 +512,47 @@ func TestPaletteGuidesHideWithThePanel(t *testing.T) {
 	paletteRelease(tt, f, palettePoint{X: grab.X + 40, Y: grab.Y + 30})
 	if a.guide.visible {
 		t.Fatal("the guides stayed after the release")
+	}
+}
+
+type recordingPaletteGuideWindow struct {
+	bounds                      []mygo.Rectangle
+	shows, hides, invalidations int
+}
+
+func (w *recordingPaletteGuideWindow) SetBounds(r mygo.Rectangle) { w.bounds = append(w.bounds, r) }
+func (w *recordingPaletteGuideWindow) ShowInactive()              { w.shows++ }
+func (w *recordingPaletteGuideWindow) Hide()                      { w.hides++ }
+func (w *recordingPaletteGuideWindow) Invalidate()                { w.invalidations++ }
+
+func TestPaletteGuideWindowLifecycleAndRedraw(t *testing.T) {
+	a, f := paletteDragApp(t)
+	window := &recordingPaletteGuideWindow{}
+	created := 0
+	a.createPaletteGuide = func(g *paletteGuideState) { created++; g.window = window }
+	work := f.displays[0].WorkArea
+	guides := paletteGuidesFor(work, a.paletteTopOffset())
+	a.showPaletteGuides(guides, work, paletteSnap{})
+	a.showPaletteGuides(guides, work, paletteSnap{})
+	if created != 1 || window.shows != 1 || len(window.bounds) != 1 || window.invalidations != 1 {
+		t.Fatalf("unchanged guides were recreated or redrawn: %+v", window)
+	}
+	a.showPaletteGuides(guides, work, paletteSnap{X: true})
+	if window.invalidations != 2 || window.shows != 1 || len(window.bounds) != 1 {
+		t.Fatal("snap change should only invalidate the guide window")
+	}
+	work = f.displays[1].WorkArea
+	a.showPaletteGuides(paletteGuidesFor(work, a.paletteTopOffset()), work, paletteSnap{})
+	if window.invalidations != 3 || window.shows != 1 || len(window.bounds) != 2 || window.bounds[1] != work {
+		t.Fatal("cross-screen drag did not move/resize and redraw the guides")
+	}
+	a.hidePalette()
+	a.hidePaletteGuides()
+	if window.hides != 1 || a.guide.visible {
+		t.Fatal("hiding the palette must hide its guides once")
+	}
+	a.showPaletteGuides(guides, f.displays[0].WorkArea, paletteSnap{})
+	if created != 1 || window.shows != 2 || window.invalidations != 4 {
+		t.Fatal("next drag should reuse and redraw the inactive guide window")
 	}
 }

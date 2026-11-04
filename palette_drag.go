@@ -134,10 +134,14 @@ func (a *application) paletteDragHandler(base *ui.Rect, inside func(ui.InputEven
 			if !p.drag.down {
 				return false
 			}
-			a.movePaletteDrag(*base, ev)
+			// A double click only resets. Its captured move/release must not
+			// turn into a drag from the old position (or a zero press point).
+			if !p.drag.outsideClick {
+				a.movePaletteDrag(*base, ev)
+			}
 			return true
 		case ui.InputPointerUp:
-			if !p.drag.down {
+			if ev.Button != 0 || !p.drag.down {
 				return false
 			}
 			a.endPaletteDrag()
@@ -175,7 +179,7 @@ func (a *application) movePaletteDrag(base ui.Rect, ev ui.InputEvent) {
 	screen := palettePointerScreen(base, a.paletteWindowPosition(), ev)
 	dx, dy := screen.X-drag.pressScreen.X, screen.Y-drag.pressScreen.Y
 	if !drag.active {
-		if absInt(dx) < paletteDragDeadZone && absInt(dy) < paletteDragDeadZone {
+		if absInt(dx) <= paletteDragDeadZone && absInt(dy) <= paletteDragDeadZone {
 			return
 		}
 		drag.active = true
@@ -199,6 +203,20 @@ func (a *application) movePaletteDrag(base ui.Rect, ev ui.InputEvent) {
 	candidate = paletteClamp(candidate, size, display.WorkArea)
 	a.movePalettePanelTo(candidate)
 	a.showPaletteGuides(guides, display.WorkArea, drag.snap)
+}
+
+// paletteDisplaysChanged cancels a captured drag without committing or moving
+// it. The next opening places it on the current displays. An idle visible
+// palette can be placed immediately when the screen layout changes.
+func (a *application) paletteDisplaysChanged() {
+	if a.palette != nil && a.palette.drag.down {
+		a.palette.drag = paletteDrag{}
+		a.hidePaletteGuides()
+		return
+	}
+	if a.paletteVisible() {
+		a.placePalette()
+	}
 }
 
 // endPaletteDrag stores the panel's display and position, or closes the panel

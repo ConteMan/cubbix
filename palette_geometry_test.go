@@ -297,3 +297,26 @@ func TestPaletteResetCommand(t *testing.T) {
 		t.Fatalf("position after reset = %+v", panel)
 	}
 }
+
+func TestPaletteRememberedPositionOnSmallerWorkArea(t *testing.T) {
+	for _, work := range []mygo.Rectangle{
+		{X: -500, Y: 25, Width: 600, Height: 320},
+		{X: -500, Y: 25, Width: 600, Height: 900},
+		{X: -500, Y: 25, Width: 1000, Height: 320},
+	} {
+		a := paletteTestApp(t)
+		f := paletteTestScreens(a)
+		f.displays = []mygo.Display{{ID: 1, Bounds: work, WorkArea: work}}
+		seat := paletteSeat{X: 5000, Y: 5000}
+		a.config.putPaletteSeat("1", seat)
+		a.placePalette()
+		got := panelPointOf(a, f)
+		want := palettePoint{X: work.X + max(0, work.Width-640), Y: work.Y + max(0, work.Height-400)}
+		if work.Width < 640 {
+			want.X = work.X + (work.Width-640)/2
+		}
+		if got != want || a.config.PalettePositions["1"] != seat {
+			t.Fatalf("work=%+v: panel=%+v want=%+v seat=%+v", work, got, want, a.config.PalettePositions["1"])
+		}
+	}
+}
