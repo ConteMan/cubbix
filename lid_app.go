@@ -60,6 +60,9 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 	a.lidMessage = ""
 	a.lidNotice = ""
 	fromURL := a.lidURL
+	// The lid continues on a worker: capture the quiet flag now. The request
+	// that set it has long returned (and reset it) when the callback runs.
+	quiet := a.quiet
 	min := a.config.AwakeLidBatteryMin
 	if min == 0 {
 		min = 20
@@ -67,8 +70,8 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 	if !a.lidAsync {
 		err := a.lid.enable(end, min, authorize)
 		a.completeLid(err)
-		if fromURL && err == nil {
-			a.lidURLFeedback()
+		if err == nil {
+			a.lidURLAnnounce(fromURL, quiet, nil)
 		}
 		return err
 	}
@@ -85,13 +88,7 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 				return
 			}
 			a.completeLid(err)
-			if fromURL {
-				if err == nil {
-					a.lidURLFeedback()
-				} else {
-					a.announceAwake(err)
-				}
-			}
+			a.lidURLAnnounce(fromURL, quiet, err)
 		})
 	}()
 	return nil
@@ -178,8 +175,8 @@ func (a *application) finishLidPoll() {
 		return
 	}
 	s := a.lid.snapshot()
-	awake := a.awake.snapshot()
-	if awake.Active && awake.Session.Lid && s.state != lidOn {
+	state := a.awake.snapshot()
+	if state.Active && state.Session.Lid && s.state != lidOn {
 		a.setSessionLid(false)
 		a.awake.stop()
 	}
@@ -214,7 +211,25 @@ func (a *application) forceLid() {
 	a.refreshAwake()
 }
 
+// lidURLAnnounce reports a lid session started or failed from a URL or the
+// command line. Both paths arrive with a captured quiet flag: the lid continues
+// on a worker, and by the time this runs the request that asked for it has
+// already reset a.quiet.
+func (a *application) lidURLAnnounce(fromURL, quiet bool, err error) {
+	if !fromURL || quiet {
+		return
+	}
+	if err == nil {
+		a.lidURLFeedback()
+		return
+	}
+	a.announceAwake(err)
+}
+
 func (a *application) lidURLFeedback() {
+	if a.quiet {
+		return
+	}
 	state := a.awake.snapshot()
 	if !state.Active || !state.Session.Lid {
 		return

@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -194,6 +195,40 @@ func processIdentity(pid int) string {
 	}
 	return strings.Join(fields[1:], " ")
 }
+
+// psOutput runs ps with an argument vector: never a shell, never a format
+// string built from input. Tests replace it.
+var psOutput = func(args ...string) ([]byte, error) {
+	return exec.Command("/bin/ps", args...).Output()
+}
+
+// processByPID looks up one process for --follow, including daemons without a
+// terminal: the picker's table drops those, so it cannot be reused here.
+//
+// The identity string must be byte for byte the one processIdentity builds,
+// because awakeController.start compares them and would stop the session with
+// "target ended" otherwise.
+func processByPID(pid int) (runningProcess, bool) {
+	if pid <= 0 {
+		return runningProcess{}, false
+	}
+	data, err := psOutput("-p", strconv.Itoa(pid), "-o", "stat=,lstart=,comm=")
+	if err != nil {
+		return runningProcess{}, false
+	}
+	fields := strings.Fields(string(data))
+	// stat, then the five words of lstart, then comm.
+	if len(fields) < 7 || strings.Contains(fields[0], "Z") {
+		return runningProcess{}, false
+	}
+	identity := strings.Join(fields[1:6], " ")
+	name := filepath.Base(strings.Join(fields[6:], " "))
+	if name == "" {
+		name = strconv.Itoa(pid)
+	}
+	return runningProcess{PID: pid, Name: name, Identity: identity}, true
+}
+
 func processAlive(pid int, identity string) bool {
 	return pid > 0 && identity != "" && syscall.Kill(pid, 0) == nil && processIdentity(pid) == identity
 }
@@ -204,18 +239,6 @@ func restoreSession(s *awakeSession, now time.Time, alive func(int, string) bool
 	}
 	copy := *s
 	return &copy
-}
-
-func untilTime(value string, now time.Time) (time.Time, error) {
-	parsed, err := time.Parse("15:04", value)
-	if err != nil {
-		return time.Time{}, err
-	}
-	end := time.Date(now.Year(), now.Month(), now.Day(), parsed.Hour(), parsed.Minute(), 0, 0, now.Location())
-	if !end.After(now) {
-		end = end.AddDate(0, 0, 1)
-	}
-	return end, nil
 }
 
 func customDuration(hours, minutes string) (time.Duration, error) {

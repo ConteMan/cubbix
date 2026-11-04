@@ -20,6 +20,7 @@ macOS 菜单栏常驻的个人工具箱。每个功能是一个「格子」，�
 - 不使用 CGO。需要调用系统框架时优先用系统命令（如 `caffeinate`），其次用 purego。
 - 编辑器类界面可以用 MyGo 的 WebView 嵌入成熟前端库，库要固定版本并随应用打包，不从网络加载。
 - 应用名 `Cubbix.app`，路径和程序名都不能带空格。配置目录 `~/Library/Application Support/cubbix/`。
+- CLI（`cmd/cubbix`）只 import 标准库与 `internal/`，不依赖 MyGo 运行时：它要在应用没跑时也能执行。
 - 应用不保存凭据。构建和发布用到的签名、公证、更新密钥只通过环境变量注入，不进仓库、不进日志。
 
 ## 设计规则

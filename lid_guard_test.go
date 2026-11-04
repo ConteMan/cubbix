@@ -301,7 +301,10 @@ func lidSourceViolations(path string, source []byte) []string {
 			// Unknown executables can proxy a shell or a power-setting write.
 			// Adding another process boundary requires an explicit guard update.
 			switch executable {
-			case "/bin/ps", "/usr/bin/caffeinate", "/usr/bin/codesign", "/usr/bin/pmset", "/usr/bin/" + "osa" + "script":
+			// /usr/bin/open: the command line tool launches the app bundle the
+			// tool belongs to (006 §3.4). It is not privileged and cannot set
+			// power options; it starts an app, as LaunchServices would.
+			case "/bin/ps", "/usr/bin/caffeinate", "/usr/bin/codesign", "/usr/bin/pmset", "/usr/bin/" + "osa" + "script", "/usr/bin/open":
 			default:
 				reject("unreviewed executable or command proxy")
 				break

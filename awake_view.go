@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"sort"
 	"strconv"
 	"strings"
@@ -95,7 +96,7 @@ func (a *application) confirmAwakeDialog() {
 		minutes = int(duration / time.Minute)
 		s = awakeSession{Mode: a.config.AwakeMode, Minutes: minutes, End: time.Now().Add(duration)}
 	case "until":
-		end, err := untilTime(d.until, time.Now())
+		end, err := awake.UntilTime(d.until, time.Now())
 		if err != nil {
 			d.errorKey = "TimeError"
 			return

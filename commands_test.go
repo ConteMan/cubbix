@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ConteMan/cubbix/internal/awake"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -15,77 +16,6 @@ func commandTestApp(t *testing.T) *application {
 	}
 	t.Cleanup(func() { a.updates.close() })
 	return a
-}
-
-func TestParseAwakeArg(t *testing.T) {
-	now := time.Date(2026, 10, 30, 14, 0, 0, 0, time.Local)
-	cases := []struct {
-		arg     string
-		kind    awakeArgKind
-		minutes int
-		until   string
-		errKey  string
-	}{
-		{"", awakeArgDefault, 0, "", ""},
-		{"∞", awakeArgUnlimited, 0, "", ""},
-		{"inf", awakeArgUnlimited, 0, "", ""},
-		{"infinity", awakeArgUnlimited, 0, "", ""},
-		{"unlimited", awakeArgUnlimited, 0, "", ""},
-		{"无限", awakeArgUnlimited, 0, "", ""},
-		{"不限", awakeArgUnlimited, 0, "", ""},
-		{"不限时", awakeArgUnlimited, 0, "", ""},
-		{"0", awakeArgUnlimited, 0, "", ""},
-		{"45", awakeArgMinutes, 45, "", ""},
-		{"45m", awakeArgMinutes, 45, "", ""},
-		{"45min", awakeArgMinutes, 45, "", ""},
-		{"45分钟", awakeArgMinutes, 45, "", ""},
-		{"45 分", awakeArgMinutes, 45, "", ""},
-		{"2h", awakeArgMinutes, 120, "", ""},
-		{"2小时", awakeArgMinutes, 120, "", ""},
-		{"2 hour", awakeArgMinutes, 120, "", ""},
-		{"2hours", awakeArgMinutes, 120, "", ""},
-		{"1h30m", awakeArgMinutes, 90, "", ""},
-		{"1h30", awakeArgMinutes, 90, "", ""},
-		{"1h 30m", awakeArgMinutes, 90, "", ""},
-		{"1小时30分钟", awakeArgMinutes, 90, "", ""},
-		{"until 18:30", awakeArgUntil, 0, "18:30", ""},
-		{"到 18:30", awakeArgUntil, 0, "18:30", ""},
-		{"直到 18:30", awakeArgUntil, 0, "18:30", ""},
-		{"18:30", awakeArgUntil, 0, "18:30", ""},
-		{"1", awakeArgMinutes, 1, "", ""},
-		{"525659", awakeArgMinutes, 525659, "", ""},
-		{"8760h59m", awakeArgMinutes, 525659, "", ""},
-		{"525660", awakeArgDefault, 0, "", "DurationError"},
-		{"8761h", awakeArgDefault, 0, "", "DurationError"},
-		{"1h60m", awakeArgDefault, 0, "", "DurationError"},
-		{"45x", awakeArgDefault, 0, "", "DurationError"},
-		{"abc", awakeArgDefault, 0, "", "DurationError"},
-		{"1h30mx", awakeArgDefault, 0, "", "DurationError"},
-		{"0m", awakeArgDefault, 0, "", "DurationError"},
-		{"-1", awakeArgDefault, 0, "", "DurationError"},
-		{"1.5h", awakeArgDefault, 0, "", "DurationError"},
-		{"until 99:99", awakeArgUntil, 0, "", "TimeError"},
-		{"until", awakeArgUntil, 0, "", "TimeError"},
-	}
-	for _, scenario := range cases {
-		got := parseAwakeArg(scenario.arg, now)
-		if got.Kind != scenario.kind || got.Minutes != scenario.minutes || got.Until != scenario.until || got.Error != scenario.errKey {
-			t.Fatalf("parseAwakeArg(%q) = %+v; want kind=%v minutes=%d until=%q error=%q", scenario.arg, got, scenario.kind, scenario.minutes, scenario.until, scenario.errKey)
-		}
-	}
-}
-
-func TestParseAwakeArgCombinedBeforeSingleUnit(t *testing.T) {
-	arg := parseAwakeArg("1h30m", time.Now())
-	if arg.Kind != awakeArgMinutes || arg.Minutes != 90 {
-		t.Fatalf("combined duration = %+v", arg)
-	}
-	if single := parseAwakeArg("1h", time.Now()); single.Minutes != 60 {
-		t.Fatalf("single hour = %+v", single)
-	}
-	if single := parseAwakeArg("30m", time.Now()); single.Minutes != 30 {
-		t.Fatalf("single minute = %+v", single)
-	}
 }
 
 func TestMatchScoreTiers(t *testing.T) {
@@ -301,7 +231,7 @@ func TestPaletteGroupingDedupesAndHidesWindows(t *testing.T) {
 
 func TestAwakeStartActionsCoverInputAndOverrides(t *testing.T) {
 	a := awakeTestApp(t)
-	arg := awakeArg{Kind: awakeArgMinutes, Minutes: 45}
+	arg := awake.Arg{Kind: awake.KindMinutes, Minutes: 45}
 	req := request{Command: a.awakeCommands()[0], Arg: "45m", Awake: arg}
 	actions := awakeStartActions(a, req)
 	byID := map[string]paletteAction{}

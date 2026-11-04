@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"github.com/ConteMan/cubbix/internal/lid"
 	"os"
 	"path/filepath"
@@ -294,12 +295,12 @@ func TestLidURLLimitsAndAuthorization(t *testing.T) {
 }
 func TestLidModifierGrammar(t *testing.T) {
 	for _, raw := range []string{"2h 合盖", "合盖 2h", "合盖", "2h lid", "盖 2h", "2h LID1"} {
-		arg := parseAwakeArg(raw, time.Now())
+		arg := awake.ParseArg(raw, time.Now())
 		if !arg.Lid || arg.Error != "" {
 			t.Fatal(raw, arg)
 		}
 	}
-	if arg := parseAwakeArg("2h 合盖盖", time.Now()); arg.Error != "DurationError" {
+	if arg := awake.ParseArg("2h 合盖盖", time.Now()); arg.Error != "DurationError" {
 		t.Fatal(arg)
 	}
 }
@@ -542,7 +543,7 @@ func TestLidNewRequestWithoutLidRestoresBeforeRestart(t *testing.T) {
 			}
 			off := false
 			a.lidPending = &off
-			if err := a.startAwakeWith(awakeArg{Kind: awakeArgMinutes, Minutes: 120}, "tasks"); err != nil {
+			if err := a.startAwakeWith(awake.Arg{Kind: awake.KindMinutes, Minutes: 120}, "tasks"); err != nil {
 				t.Fatal(err)
 			}
 			state := a.awake.snapshot()
@@ -591,7 +592,7 @@ func TestLidNewOrdinaryRequestRequiresConfirmedRecovery(t *testing.T) {
 			a.awake.launch = func([]string) (awakeChild, error) { launches++; return nil, errors.New("must not launch") }
 			off := false
 			a.lidPending = &off
-			if err := a.startAwakeWith(awakeArg{Kind: awakeArgMinutes, Minutes: 120}, "tasks"); err == nil {
+			if err := a.startAwakeWith(awake.Arg{Kind: awake.KindMinutes, Minutes: 120}, "tasks"); err == nil {
 				t.Fatal("unconfirmed recovery accepted")
 			}
 			after := a.awake.snapshot()

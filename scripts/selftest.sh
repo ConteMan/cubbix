@@ -21,12 +21,13 @@ tiffutil -cathidpicheck brand/dist/menubar-template.png brand/dist/menubar-templ
 cmp assets/menubar-template.tiff "$tmp_dir/menubar-template.tiff"
 tiffutil -cathidpicheck brand/dist/menubar-template-active.png brand/dist/menubar-template-active@2x.png -out "$tmp_dir/menubar-template-active.tiff"
 cmp assets/menubar-template-active.tiff "$tmp_dir/menubar-template-active.tiff"
-./scripts/build-helper.sh
+./scripts/build-tools.sh
 go vet ./...
 go test ./...
 release_dir="$HOME/Projects/temp/cubbix/release"
 mkdir -p "$release_dir"
 go run github.com/egoist/mygo/cmd/mygo@v0.6.2 build -platform darwin/arm64 -sign - -skip-dmg -skip-notarize -o "$tmp_dir/build"
 ./scripts/check-helper.sh "$tmp_dir/build/darwin-arm64/Cubbix.app"
+./scripts/check-cli.sh "$tmp_dir/build/darwin-arm64/Cubbix.app"
 rm -rf "$release_dir/Cubbix.app"
 ditto "$tmp_dir/build/darwin-arm64/Cubbix.app" "$release_dir/Cubbix.app"

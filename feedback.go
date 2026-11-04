@@ -330,7 +330,7 @@ func feedbackPosition(area mygo.Rectangle, corner string, width, height, margin 
 // already localized icon and sentence; the presenter decides whether the
 // user sees a hint, a notification or nothing.
 func (a *application) announce(message feedbackMessage) {
-	if a.feedback == nil {
+	if a.feedback == nil || a.quiet {
 		return
 	}
 	a.feedback.present(message)

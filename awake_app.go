@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"math"
 	"os/exec"
 	"strings"
@@ -89,7 +90,7 @@ func (a *application) selectedSession() awakeSession {
 	}
 	if a.config.AwakeUntil != "" {
 		var err error
-		s.End, err = untilTime(a.config.AwakeUntil, time.Now())
+		s.End, err = awake.UntilTime(a.config.AwakeUntil, time.Now())
 		if err != nil {
 			s.End = time.Now().Add(-time.Second)
 		}
@@ -136,7 +137,7 @@ func (a *application) setMode(mode string) error {
 	return nil
 }
 func (a *application) setDuration(minutes int) error {
-	if minutes < 0 || minutes > awakeMinutesMaximum {
+	if minutes < 0 || minutes > awake.MinutesMaximum {
 		return fmt.Errorf("DurationError")
 	}
 	s := awakeSession{Lid: a.savedLidPreference(), Mode: a.config.AwakeMode, Minutes: minutes}

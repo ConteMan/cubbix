@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"strings"
 	"testing"
 	"time"
@@ -169,7 +170,7 @@ func TestPanelSessionMetadataSurvivesRestore(t *testing.T) {
 	if err != nil || saved.AwakeSession == nil || saved.AwakeSession.Minutes != 120 {
 		t.Fatalf("duration metadata did not round trip: %+v %v", saved.AwakeSession, err)
 	}
-	if err := a.runAwakeStart(request{Awake: awakeArg{Kind: awakeArgUntil, Until: "18:30"}}); err != nil {
+	if err := a.runAwakeStart(request{Awake: awake.Arg{Kind: awake.KindUntil, Until: "18:30"}}); err != nil {
 		t.Fatal(err)
 	}
 	saved, err = loadConfig(a.path)

@@ -48,7 +48,7 @@ if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
   printf 'Selftest changed the working tree; refusing to release.\n' >&2
   exit 1
 fi
-./scripts/build-helper.sh
+./scripts/build-tools.sh
 # Only this build process receives the key; it is never copied to another file.
 if [ "$upload" = true ]; then
   MYGO_UPDATER_PRIVATE_KEY="$(cat "$update_key_path")" \
@@ -61,4 +61,5 @@ fi
 for app in build/darwin-*/Cubbix.app; do
   [ -d "$app" ] || continue
   ./scripts/check-helper.sh "$app"
+  ./scripts/check-cli.sh "$app"
 done

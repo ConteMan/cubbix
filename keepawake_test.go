@@ -166,14 +166,6 @@ func TestAwakeSessionRestore(t *testing.T) {
 	}
 }
 func TestAwakeTimeInputs(t *testing.T) {
-	now := time.Date(2026, 10, 29, 23, 0, 0, 0, time.Local)
-	end, err := untilTime("02:30", now)
-	if err != nil || end.Day() != 30 || end.Sub(now) != 210*time.Minute {
-		t.Fatal(end, err)
-	}
-	if _, err := untilTime("25:00", now); err == nil {
-		t.Fatal("invalid time accepted")
-	}
 	if d, err := customDuration("1", "30"); err != nil || d != 90*time.Minute {
 		t.Fatal(d, err)
 	}
