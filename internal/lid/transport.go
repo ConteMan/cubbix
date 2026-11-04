@@ -21,35 +21,40 @@ type Server struct {
 }
 
 // Serve checks identity before reading any bytes or touching the lease owner.
-func (s *Server) Serve(ctx context.Context, l *net.UnixListener) error {
+func (s *Server) Serve(ctx context.Context, l *net.UnixListener) (err error) {
 	if s.Verify == nil {
 		return ErrUntrusted
 	}
+	ctx, cancel := context.WithCancel(ctx)
 	var wg sync.WaitGroup
-	done := make(chan struct{})
-	defer close(done)
-	go func() {
-		select {
-		case <-ctx.Done():
-			l.Close()
-		case <-done:
+	defer func() {
+		cancel()
+		l.Close()
+		wg.Wait()
+		if restoreErr := s.Engine.Shutdown(); restoreErr != nil {
+			err = restoreErr
 		}
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-ctx.Done()
+		l.Close()
 	}()
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		for {
 			select {
 			case <-ctx.Done():
-				return
-			case <-done:
 				return
 			case <-ticker.C:
 				s.Engine.Tick()
 			}
 		}
 	}()
-	defer wg.Wait()
 	for {
 		c, err := l.AcceptUnix()
 		if err != nil {
@@ -62,15 +67,22 @@ func (s *Server) Serve(ctx context.Context, l *net.UnixListener) error {
 		go func() {
 			defer wg.Done()
 			defer c.Close()
+			stop := context.AfterFunc(ctx, func() { c.Close() })
+			defer stop()
 			if s.Verify(c) != nil {
 				return
 			}
 			owner := s.next.Add(1)
-			defer s.Engine.Disconnect(owner)
-			stop := context.AfterFunc(ctx, func() { c.Close() })
-			defer stop()
+			defer func() {
+				if ctx.Err() == nil {
+					s.Engine.Disconnect(owner)
+				}
+			}()
 			reader := bufio.NewReaderSize(c, MaxLine+1)
 			for {
+				if ctx.Err() != nil {
+					return
+				}
 				c.SetReadDeadline(time.Now().Add(Lease))
 				if _, err := reader.Peek(1); err != nil {
 					return
@@ -83,6 +95,9 @@ func (s *Server) Serve(ctx context.Context, l *net.UnixListener) error {
 				var req Request
 				if json.Unmarshal(line, &req) != nil {
 					writeResponse(c, Response{V: Protocol, Protocol: Protocol, Helper: Version, Code: "bad-request"})
+					return
+				}
+				if ctx.Err() != nil {
 					return
 				}
 				resp := s.Engine.Handle(owner, req)

@@ -11,7 +11,7 @@ const (
 	Protocol = 1
 	// Version is the helper implementation revision, independent of Protocol.
 	// Bump it whenever helper behavior changes so installed copies get replaced.
-	Version             = "2"
+	Version             = "3"
 	SocketPath          = "/var/run/com.conteman.cubbix.helper.sock"
 	JournalPath         = "/Library/Application Support/com.conteman.cubbix.helper/session.json"
 	ClientRequirement   = `anchor apple generic and certificate leaf[subject.OU] = "P93GN4N3DC" and identifier "com.conteman.cubbix"`

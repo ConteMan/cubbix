@@ -8,7 +8,6 @@ import (
 	"net"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -68,15 +67,8 @@ func (a *application) prepareLid() {
 		default:
 			return errors.New("LidServiceBroken")
 		}
-		_, err := command.Output()
-		if err == nil {
-			return nil
-		}
-		var failure *exec.ExitError
-		if errors.As(err, &failure) && strings.Contains(string(failure.Stderr), "(-128)") {
-			return errLidDenied
-		}
-		return errors.New("LidServiceBroken")
+		output, err := command.CombinedOutput()
+		return lidAdminResult(output, err)
 	}
 	c.read = func() (int, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)

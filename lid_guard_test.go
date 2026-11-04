@@ -455,7 +455,11 @@ func TestLidImmutableAuthorizationScripts(t *testing.T) {
 		}
 	}
 	for _, body := range []string{lidInstallScript, lidUninstallScript, lidForceScript} {
-		if strings.Contains(body, "%") || strings.Contains(body, "cubbix://") {
+		checked := strings.NewReplacer(
+			`printf "cubbix-step=%s\ncubbix-exit=%s\n"`, `printf "fixed-markers"`,
+			`printf 'cubbix-command-exit=%s\n'`, `printf 'fixed-marker'`,
+		).Replace(body)
+		if strings.Contains(checked, "%") || strings.Contains(body, "cubbix://") {
 			t.Fatal("runtime placeholder")
 		}
 	}
@@ -469,8 +473,8 @@ func TestLidImmutableAuthorizationScripts(t *testing.T) {
 	steps := []string{
 		"/bin/chmod 0644", "/bin/launch" + "ctl bootout",
 		"while /bin/launch" + "ctl print", "unload_attempt + 1", "/bin/sleep 0.1",
-		"while ! /bin/launch" + "ctl bootstrap", "bootstrap_attempt + 1", "/bin/sleep 1",
-		"if ! /bin/launch" + "ctl print", "load was not confirmed", "exit 1",
+		"/bin/launch" + "ctl bootstrap", "bootstrap_attempt + 1", "/bin/sleep 1",
+		"if ! /bin/launch" + "ctl print", "cubbix-error=confirm-failed", "exit 1",
 	}
 	rest := lidInstallScript
 	for _, step := range steps {

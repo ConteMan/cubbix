@@ -13,6 +13,12 @@ import (
 const HelperLogPath = "/Library/Logs/Cubbix/helper.log"
 const HelperLogLimit = 1 << 20
 
+type responseLogState struct {
+	ok                  bool
+	code, state, detail string
+	value               int
+}
+
 // HelperLog keeps at most two bounded files in a trusted directory. It never
 // follows symlinks or appends to files owned by another user (root in production).
 type HelperLog struct {

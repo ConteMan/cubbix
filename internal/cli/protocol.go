@@ -220,18 +220,23 @@ type Follow struct {
 
 // LidState is the lid keep awake snapshot.
 type LidState struct {
-	Capable       bool   `json:"capable"`
-	Available     bool   `json:"available"`
-	State         string `json:"state"`
-	Reason        string `json:"reason"`
-	BatteryMin    int    `json:"batteryMin"`
-	LastCode      string `json:"lastCode,omitempty"`
-	HelperVersion string `json:"helperVersion,omitempty"`
-	Hello         string `json:"hello,omitempty"`
-	HelperCode    string `json:"helperCode,omitempty"`
-	HelperState   string `json:"helperState,omitempty"`
-	HelperValue   *int   `json:"helperValue,omitempty"`
-	HelperDetail  string `json:"helperDetail,omitempty"`
+	Capable                bool   `json:"capable"`
+	Available              bool   `json:"available"`
+	State                  string `json:"state"`
+	Reason                 string `json:"reason"`
+	BatteryMin             int    `json:"batteryMin"`
+	LastCode               string `json:"lastCode,omitempty"`
+	HelperVersion          string `json:"helperVersion,omitempty"`
+	Hello                  string `json:"hello,omitempty"`
+	HelperCode             string `json:"helperCode,omitempty"`
+	HelperState            string `json:"helperState,omitempty"`
+	HelperValue            *int   `json:"helperValue,omitempty"`
+	HelperDetail           string `json:"helperDetail,omitempty"`
+	InstallStep            string `json:"installStep,omitempty"`
+	InstallError           string `json:"installError,omitempty"`
+	InstallExitCode        *int   `json:"installExitCode,omitempty"`
+	InstallScriptExitCode  *int   `json:"installScriptExitCode,omitempty"`
+	InstallCommandExitCode *int   `json:"installCommandExitCode,omitempty"`
 }
 
 // JSONState reports the open JSON windows.

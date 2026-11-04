@@ -36,6 +36,7 @@ type Engine struct {
 	state, code                       string
 	detail                            string
 	Logf                              func(string, ...any)
+	logged                            *responseLogState
 }
 
 func NewEngine(s SleepSetter, p PowerSource, j JournalStore) *Engine {
@@ -80,6 +81,9 @@ func (e *Engine) refresh() {
 }
 func (e *Engine) response(id string, ok bool, code string) Response {
 	e.refresh()
+	if code == "" {
+		code = e.code
+	}
 	r := Response{V: Protocol, ID: id, OK: ok, Protocol: Protocol, Helper: Version, State: e.state, Code: code, Detail: e.detail, MinPercent: 20, Power: "unknown"}
 	if v, err := e.Sleep.Read(); err == nil && (v == 0 || v == 1) {
 		r.Value = &v
@@ -106,7 +110,16 @@ func (e *Engine) effectiveDeadline() time.Time {
 func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	defer func() { LogResponse(e.Logf, r.Op, out) }()
+	defer func() {
+		state := responseLogState{out.OK, out.Code, out.State, out.Detail, -1}
+		if out.Value != nil {
+			state.value = *out.Value
+		}
+		if r.Op == "enable" || r.Op == "disable" || !out.OK || out.Code == "pmset-failed" || out.Code == "restore-failed" || e.logged == nil || *e.logged != state {
+			LogResponse(e.Logf, r.Op, out)
+		}
+		e.logged = &state
+	}()
 	now := e.Now()
 	if code := r.Validate(now); code != "" {
 		return e.response(r.ID, false, code)
@@ -191,7 +204,8 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 			e.restore("ok")
 		}
 	}
-	return e.response(r.ID, e.state != "restore-failed", e.code)
+	// Select the current code after response refreshes the observed setting.
+	return e.response(r.ID, e.state != "restore-failed", "")
 }
 
 var backoff = []time.Duration{time.Second, 2 * time.Second, 5 * time.Second, 10 * time.Second, 30 * time.Second, 60 * time.Second}
@@ -237,6 +251,20 @@ func (e *Engine) Disconnect(owner uint64) {
 	if e.owner == owner {
 		e.restore("ok")
 	}
+}
+
+// Shutdown runs after request handlers stop. It also covers a failed startup
+// recovery with no connected owner. A failed restore keeps the durable journal.
+func (e *Engine) Shutdown() error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	if e.journal != nil {
+		e.restore("ok")
+	}
+	if e.journal != nil {
+		return errors.New("restore-failed")
+	}
+	return nil
 }
 func (e *Engine) Tick() { e.mu.Lock(); defer e.mu.Unlock(); e.tick(e.Now()) }
 func (e *Engine) tick(now time.Time) {

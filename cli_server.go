@@ -504,6 +504,9 @@ func (a *application) cliState() *cli.State {
 		awake.Lid.LastCode = s.lastCode
 		awake.Lid.HelperVersion = s.helperVersion
 		awake.Lid.Hello = s.hello
+		awake.Lid.InstallStep, awake.Lid.InstallError = s.install.step, s.install.failure
+		awake.Lid.InstallExitCode, awake.Lid.InstallScriptExitCode = s.install.exit, s.install.scriptExit
+		awake.Lid.InstallCommandExitCode = s.install.commandExit
 		r := s.response
 		if s.lastFailure != nil {
 			r = *s.lastFailure
