@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3 — 2026-11-04
+
+- Fixed the Lid switch staying off after you entered your admin password the first time. If the helper still does not start, the card now tells you, and one click tries again.
+
 ## 0.5.2 — 2026-11-04
 
 - Fixed Quit and Restart to Update doing nothing, and Settings not opening, after you had used the command palette.
