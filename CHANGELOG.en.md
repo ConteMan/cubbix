@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.6 — 2026-11-05
+
+- Found the real reason the lid helper kept failing to install: the installer looked for a system command in the wrong place. Turn on the Lid switch and enter your admin password once, and it just works now.
+
 ## 0.5.5 — 2026-11-04
 
 - Updating the lid helper is steadier: Cubbix now waits for the old helper to quit before starting the new one, so there is nothing to fix by hand.
