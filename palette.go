@@ -187,8 +187,10 @@ func (a *application) buildPaletteWindow(p *paletteState) {
 		Content:           ui.View(a.paletteView),
 	})
 	window.OnClose(func(event *mygo.CloseEvent) {
-		event.PreventDefault()
-		a.hidePalette()
+		if !a.quitting {
+			event.PreventDefault()
+			a.hidePalette()
+		}
 	})
 	window.OnBlur(a.hidePalette)
 	p.window = window

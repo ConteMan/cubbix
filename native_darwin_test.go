@@ -18,6 +18,9 @@ import (
 // The helper keeps its AppKit window hidden throughout. It never calls the
 // application's show/ready paths, Focus, activation APIs or screen capture.
 func TestMain(m *testing.M) {
+	if os.Getenv("CUBBIX_QUIT_NATIVE_HELPER") != "" {
+		os.Exit(quitNativeMain())
+	}
 	if os.Getenv("CUBBIX_JSON_NATIVE_HELPER") == "1" {
 		os.Exit(jsonNativeMain())
 	}

@@ -59,55 +59,86 @@ func initPower() {
 
 type SystemPower struct{}
 
-func (SystemPower) Source() (string, int, error) {
+// HasInternalBattery identifies laptop hardware even when its lid is closed.
+// UPS and external batteries do not qualify; capacity and AC state are irrelevant.
+func (SystemPower) HasInternalBattery() bool {
+	found := false
+	_ = withPowerSources(func(info, list uintptr) error {
+		found = internalBattery(info, list) != 0
+		return nil
+	})
+	return found
+}
+
+func withPowerSources(visit func(info, list uintptr) error) error {
 	powerOnce.Do(initPower)
 	if powerErr != nil {
-		return "unknown", -1, powerErr
+		return powerErr
 	}
 	info := iopsInfo()
 	if info == 0 {
-		return "unknown", -1, errors.New("power info")
+		return errors.New("power info")
 	}
 	defer cfRelease(info)
 	list := iopsList(info)
 	if list == 0 {
-		return "unknown", -1, errors.New("power list")
+		return errors.New("power list")
 	}
 	defer cfRelease(list)
-	str := func(s string) uintptr { return cfString(0, s, 0x08000100) }
+	return visit(info, list)
+}
+
+func powerValue(description uintptr, key string) uintptr {
+	k := cfString(0, key, 0x08000100)
+	defer cfRelease(k)
+	return dictValue(description, k)
+}
+
+func internalBattery(info, list uintptr) uintptr {
+	internal := cfString(0, "InternalBattery", 0x08000100)
+	defer cfRelease(internal)
 	for i := int64(0); i < arrayCount(list); i++ {
 		d := iopsDescription(info, arrayValue(list, i))
-		if d == 0 {
-			continue
+		if d != 0 {
+			typ := powerValue(d, "Type")
+			if typ != 0 && cfEqual(typ, internal) {
+				return d
+			}
 		}
-		get := func(key string) uintptr { k := str(key); defer cfRelease(k); return dictValue(d, k) }
-		internal := str("InternalBattery")
-		typ := get("Type")
-		matches := typ != 0 && cfEqual(typ, internal)
-		cfRelease(internal)
-		if !matches {
-			continue
+	}
+	return 0
+}
+
+func (SystemPower) Source() (string, int, error) {
+	kind, percent := "unknown", -1
+	err := withPowerSources(func(info, list uintptr) error {
+		d := internalBattery(info, list)
+		if d == 0 {
+			return errors.New("internal battery unavailable")
 		}
 		current, maxCap := int64(0), int64(0)
-		c, m := get("Current Capacity"), get("Max Capacity")
+		c, m := powerValue(d, "Current Capacity"), powerValue(d, "Max Capacity")
 		if c == 0 || m == 0 || typeID(c) != numberType() || typeID(m) != numberType() || !numberValue(c, 4, unsafe.Pointer(&current)) || !numberValue(m, 4, unsafe.Pointer(&maxCap)) {
-			return "unknown", -1, errors.New("power capacity")
+			return errors.New("power capacity")
 		}
 		p, err := CapacityPercent(current, maxCap)
 		if err != nil {
-			return "unknown", -1, err
+			return err
 		}
-		state := get("Power Source State")
-		ac := str("AC Power")
-		battery := str("Battery Power")
+		state := powerValue(d, "Power Source State")
+		ac := cfString(0, "AC Power", 0x08000100)
+		battery := cfString(0, "Battery Power", 0x08000100)
 		defer cfRelease(ac)
 		defer cfRelease(battery)
-		if state != 0 && cfEqual(state, ac) {
-			return "ac", p, nil
+		switch {
+		case state != 0 && cfEqual(state, ac):
+			kind, percent = "ac", p
+		case state != 0 && cfEqual(state, battery):
+			kind, percent = "battery", p
+		default:
+			return errors.New("power state")
 		}
-		if state != 0 && cfEqual(state, battery) {
-			return "battery", p, nil
-		}
-	}
-	return "unknown", -1, errors.New("internal battery unavailable")
+		return nil
+	})
+	return kind, percent, err
 }
