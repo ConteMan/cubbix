@@ -133,6 +133,10 @@ func TestIntegrationStatus(t *testing.T) {
 	if lines := strings.Split(strings.TrimSpace(stdout), "\n"); len(lines) != 3 {
 		t.Fatalf("stdout = %q", stdout)
 	}
+	stdout, stderr, code := runCLI(t, "awake", "status", "--socket", path)
+	if code != 0 || stderr != "" || stdout != "第一行\n" {
+		t.Fatalf("awake status = %q %q %d", stdout, stderr, code)
+	}
 }
 
 func TestIntegrationJSONOutput(t *testing.T) {

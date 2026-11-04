@@ -32,6 +32,8 @@ func TestRequestValidate(t *testing.T) {
 		{"run without action", Request{V: Protocol, ID: "a", Op: OpRun}, CodeBadRequest},
 		{"unknown action", Request{V: Protocol, ID: "a", Op: OpRun, Action: "shell"}, CodeBadRequest},
 		{"body on awake", Request{V: Protocol, ID: "a", Op: OpRun, Action: ActionAwake, Bytes: 1}, CodeBadRequest},
+		{"negative body on stop", Request{V: Protocol, ID: "a", Op: OpRun, Action: ActionAwakeStop, Bytes: -1}, CodeBadRequest},
+		{"negative body on settings", Request{V: Protocol, ID: "a", Op: OpRun, Action: ActionSettings, Bytes: -1}, CodeBadRequest},
 		{"negative body", Request{V: Protocol, ID: "a", Op: OpRun, Action: ActionJSONNew, Bytes: -1}, CodeBadRequest},
 		{"body over limit", Request{V: Protocol, ID: "a", Op: OpRun, Action: ActionJSONNew, Bytes: MaxPayload + 1}, CodeBadRequest},
 		{"bad mode", Request{V: Protocol, ID: "a", Op: OpRun, Action: ActionAwake, Mode: "lid"}, CodeBadRequest},

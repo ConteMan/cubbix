@@ -108,9 +108,11 @@ type awakeOptions struct {
 }
 
 type bodyOptions struct {
-	text  string
-	file  string
-	blank bool
+	text    string
+	file    string
+	blank   bool
+	hasText bool
+	hasFile bool
 }
 
 // usageError is a mistake in the command line itself: exit 2.
@@ -146,6 +148,9 @@ func run(args []string, e *env) int {
 	result, err := c.Do(request, payload, inv.flags.timeout)
 	if err != nil {
 		return report(e, inv, inv.flags.json, failure(err))
+	}
+	if inv.command == "awake.status" && len(result.Lines) > 1 {
+		result.Lines = result.Lines[:1]
 	}
 	return report(e, inv, inv.flags.json, result)
 }
@@ -282,10 +287,13 @@ func buildRequest(inv invocation, e *env) (cli.Request, []byte, error) {
 // readBody reads the document a json.new carries: --text, a file, or stdin when
 // it is a pipe.
 func readBody(body bodyOptions, e *env) ([]byte, error) {
-	if body.text != "" {
+	if body.hasText || body.text != "" {
 		return checkSize([]byte(body.text))
 	}
-	if body.file != "" {
+	if body.blank {
+		return nil, nil
+	}
+	if body.hasFile || body.file != "" {
 		if body.file == "-" {
 			return readStdin(e)
 		}
@@ -299,11 +307,20 @@ func readBody(body bodyOptions, e *env) ([]byte, error) {
 		if info.Size() > cli.MaxPayload {
 			return nil, usagef("Reading %s: file exceeds the 64 MiB limit", body.file)
 		}
-		data, err := os.ReadFile(body.file)
+		file, err := os.Open(body.file)
 		if err != nil {
 			return nil, usagef("Reading %s: %v", body.file, err)
 		}
-		return data, nil
+		defer file.Close()
+		info, err = file.Stat()
+		if err != nil || !info.Mode().IsRegular() {
+			return nil, usagef("Reading %s: not a regular file", body.file)
+		}
+		data, err := io.ReadAll(io.LimitReader(file, cli.MaxPayload+1))
+		if err != nil {
+			return nil, usagef("Reading %s: %v", body.file, err)
+		}
+		return checkSize(data)
 	}
 	reader, terminal := e.stdin()
 	if terminal {
@@ -345,7 +362,7 @@ func connect(e *env, inv invocation) (conn, error) {
 	if err == nil {
 		return c, nil
 	}
-	if inv.flags.noLaunch || !cli.CanLaunch(err) {
+	if inv.flags.noLaunch || inv.command == "status" || inv.command == "awake.status" || !cli.CanLaunch(err) {
 		return nil, err
 	}
 	launchApp(e)
@@ -355,6 +372,9 @@ func connect(e *env, inv invocation) (conn, error) {
 		c, err = e.dial(path, dialTimeout)
 		if err == nil {
 			return c, nil
+		}
+		if !cli.CanLaunch(err) {
+			return nil, err
 		}
 		if !time.Now().Before(deadline) {
 			return nil, &cli.Error{Code: cli.CodeNotRunning,

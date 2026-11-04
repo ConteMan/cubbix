@@ -271,3 +271,27 @@ func TestPlistVersion(t *testing.T) {
 		t.Fatalf("missing version = %q", got)
 	}
 }
+
+func TestReadOnlyStatusNeverLaunches(t *testing.T) {
+	for _, command := range [][]string{{"status"}, {"awake", "status"}} {
+		e, _, _, launched := testEnv(t, func(string, time.Duration) (conn, error) { return nil, &cli.Error{Code: cli.CodeStale} })
+		if code := run(command, e); code != exitUnavail || len(*launched) != 0 {
+			t.Fatalf("status launched: %v %d %v", command, code, *launched)
+		}
+	}
+}
+
+func TestBodyExplicitEmptyAndBlank(t *testing.T) {
+	for _, args := range [][]string{{"json", "new", "--blank"}, {"json", "new", "--text="}, {"json", "new", "--text=", "--file=missing"}} {
+		inv, err := parse(args)
+		if err != nil {
+			t.Fatal(err)
+		}
+		e, _, _, _ := testEnv(t, nil)
+		e.stdin = func() (io.Reader, bool) { t.Fatal("explicit empty input read stdin"); return nil, false }
+		req, body, err := buildRequest(inv, e)
+		if err != nil || len(body) != 0 || !req.Blank {
+			t.Fatalf("%v = %+v %q %v", args, req, body, err)
+		}
+	}
+}

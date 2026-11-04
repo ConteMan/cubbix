@@ -159,14 +159,17 @@ func parse(argv []string) (inv invocation, err error) {
 				return inv, err
 			}
 			seen = append(seen, name)
-			inv.body.text = raw
+			inv.body.text, inv.body.hasText = raw, true
 		case "--file":
 			raw, err := value(&i, name, inline, hasInline)
 			if err != nil {
 				return inv, err
 			}
 			seen = append(seen, name)
-			inv.body.file = raw
+			if raw == "" {
+				return inv, usagef("Invalid value for --file: %q", raw)
+			}
+			inv.body.file, inv.body.hasFile = raw, true
 		case "--page":
 			raw, err := value(&i, name, inline, hasInline)
 			if err != nil {

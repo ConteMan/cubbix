@@ -137,12 +137,8 @@ func installCLILink(path cliPaths) error {
 	if err := os.MkdirAll(filepath.Dir(path.link), 0o755); err != nil {
 		return errors.New("CLIInstallFailed")
 	}
-	// A broken link of ours is replaced; anything else was refused above.
-	if _, err := os.Lstat(path.link); err == nil {
-		if err := os.Remove(path.link); err != nil {
-			return errors.New("CLIInstallFailed")
-		}
-	}
+	// Symlink creation is exclusive. Never remove an entry that appeared
+	// since the status check, even when it arrived during installation.
 	if err := os.Symlink(path.target, path.link); err != nil {
 		return errors.New("CLIInstallFailed")
 	}
@@ -195,7 +191,7 @@ func (a *application) cliSettingsRow(c *ui.Context, t tokenValues, locale string
 				ui.Icon(c, icon("x")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 			})
 		case cliBroken, cliConflict:
-			reason := text("CLILinkConflict")
+			reason := strings.ReplaceAll(text("CLILinkConflict"), "%s", paths.link)
 			if state == cliBroken {
 				reason = text("CLILinkBroken")
 			}

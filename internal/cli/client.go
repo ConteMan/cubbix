@@ -87,6 +87,9 @@ type Client struct {
 
 // Dial connects to path and verifies who serves it before writing anything.
 func Dial(path string, timeout time.Duration) (*Client, error) {
+	if info, err := os.Lstat(path); err == nil && info.Mode()&os.ModeSocket == 0 {
+		return nil, failf(CodeRefused, "cli: path is not a socket")
+	}
 	conn, err := net.DialTimeout("unix", path, timeout)
 	if err != nil {
 		return nil, dialError(err)
@@ -120,19 +123,26 @@ func dialError(err error) error {
 // VerifyServer refuses to talk to anything but this user's own app: the socket
 // file must belong to us, and the process on the other end must be us too
 // before a body (which may hold a document) is sent.
-func VerifyServer(conn *net.UnixConn, path string) error {
-	info, err := os.Stat(path)
+func socketInfo(path string) (os.FileInfo, error) {
+	info, err := os.Lstat(path)
 	if err != nil {
-		return &Error{Code: CodeStale, Err: err}
+		return nil, &Error{Code: CodeStale, Err: err}
 	}
 	if info.Mode()&os.ModeSocket == 0 {
-		return failf(CodeRefused, "%s is not a socket", path)
+		return nil, failf(CodeRefused, "%s is not a socket", path)
 	}
-	if uid, ok := ownerUID(info); ok && uid != uint32(os.Getuid()) {
-		return failf(CodeRefused, "%s belongs to another user", path)
+	if uid, ok := ownerUID(info); !ok || uid != uint32(os.Getuid()) {
+		return nil, failf(CodeRefused, "%s belongs to another user", path)
 	}
 	if info.Mode().Perm()&0o022 != 0 {
-		return failf(CodeRefused, "%s is writable by other users", path)
+		return nil, failf(CodeRefused, "%s is writable by other users", path)
+	}
+	return info, nil
+}
+
+func VerifyServer(conn *net.UnixConn, path string) error {
+	if _, err := socketInfo(path); err != nil {
+		return err
 	}
 	uid, err := PeerUID(conn)
 	if err != nil {
@@ -153,14 +163,27 @@ func (c *Client) Do(req Request, payload []byte, timeout time.Duration) (Result,
 	if err := c.conn.SetDeadline(time.Now().Add(timeout)); err != nil {
 		return Result{}, &Error{Code: CodeInternal, Err: err}
 	}
-	if _, err := c.conn.Write(line); err != nil {
-		return Result{}, &Error{Code: CodeNotRunning, Err: err}
+	_, writeErr := c.conn.Write(line)
+	if writeErr == nil && len(payload) > 0 {
+		_, writeErr = c.conn.Write(payload)
 	}
-	if len(payload) > 0 {
-		if _, err := c.conn.Write(payload); err != nil {
-			return Result{}, &Error{Code: CodeNotRunning, Err: err}
+	// An overloaded server answers before reading the request and closes.
+	// Its busy response remains authoritative even if our upload hit EPIPE.
+	result, err := c.readResponse(req)
+	if err == nil {
+		return result, nil
+	}
+	if writeErr != nil {
+		code := CodeNotRunning
+		if errors.Is(writeErr, os.ErrDeadlineExceeded) {
+			code = CodeTimeout
 		}
+		return Result{}, &Error{Code: code, Err: writeErr}
 	}
+	return Result{}, err
+}
+
+func (c *Client) readResponse(req Request) (Result, error) {
 	data, err := readLine(c.r, MaxLine)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
@@ -175,7 +198,7 @@ func (c *Client) Do(req Request, payload []byte, timeout time.Duration) (Result,
 	if err := json.Unmarshal(data, &response); err != nil {
 		return Result{}, &Error{Code: CodeInternal, Msg: "Cubbix sent a malformed answer", Err: err}
 	}
-	if response.ID != req.ID {
+	if response.ID != req.ID && !(response.ID == "" && !response.OK && response.Code == CodeBusy) {
 		return Result{}, &Error{Code: CodeInternal, Msg: "Cubbix answered another request"}
 	}
 	if response.V != Protocol {

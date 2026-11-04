@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -199,9 +201,8 @@ func TestCLIServerUntrustedPeer(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	if _, err := conn.Write([]byte("{\"v\":1,\"id\":\"a\",\"op\":\"status\"}\n")); err != nil {
-		t.Fatalf("write: %v", err)
-	}
+	// The verified rejection may close before the first write.
+	_, _ = conn.Write([]byte("{\"v\":1,\"id\":\"a\",\"op\":\"status\"}\n"))
 	_ = conn.SetReadDeadline(time.Now().Add(time.Second))
 	buf := make([]byte, 8)
 	if n, _ := conn.Read(buf); n != 0 {
@@ -616,21 +617,49 @@ func TestCLIQuietByDefault(t *testing.T) {
 }
 
 func TestLidAsyncQuietIsCaptured(t *testing.T) {
-	a := cliTestApp(t)
-	sent := 0
-	a.notifyBattery = func(string, string) { sent++ }
-	a.lid = testLidController(t, svcEnabled)
-	a.quiet = true
-	captured := a.quiet
-	a.quiet = false // the request returned and reset it
-	a.lidURL = true
-	a.lidURLAnnounce(true, captured, nil)
-	if sent != 0 {
-		t.Fatalf("the deferred lid notification escaped the quiet flag: %d", sent)
-	}
-	a.lidURLAnnounce(true, false, nil)
-	if sent != 0 {
-		t.Fatal("lidURLFeedback sent nothing without an active lid session")
+	for _, notify := range []bool{false, true} {
+		for _, fail := range []bool{false, true} {
+			t.Run(fmt.Sprintf("notify=%t/fail=%t", notify, fail), func(t *testing.T) {
+				a, _, power, svc, _ := lidTestApp(t)
+				a.lidAsync = true
+				a.feedback.mode = func() string { return "hint" }
+				a.feedback.cursorDisplay = func() mygo.Display { return mygo.Display{} }
+				if fail {
+					power.kind, power.percent = "battery", 1
+				}
+				callbacks := make(chan func(), 1)
+				a.urlDispatch = func(run func()) { callbacks <- run }
+				sent := 0
+				a.notifyBattery = func(string, string) { sent++ }
+				a.config.AwakeLid = false
+				yes := true
+				result := a.applyCLI(cli.Request{Op: cli.OpRun, Action: cli.ActionAwake, Arg: "1m", Lid: &yes, Notify: notify}, nil)
+				if !result.OK || a.quiet {
+					t.Fatalf("start = %+v, quiet=%t", result, a.quiet)
+				}
+				select {
+				case callback := <-callbacks:
+					callback()
+				case <-time.After(3 * time.Second):
+					t.Fatal("lid callback did not arrive")
+				}
+				if svc.registers != 0 {
+					t.Fatal("CLI authorized the helper")
+				}
+				if a.config.AwakeLid == fail {
+					t.Fatalf("success preference = %t", a.config.AwakeLid)
+				}
+				if !notify && (sent != 0 || a.feedback.message.Text != "") {
+					t.Fatal("async callback escaped quiet")
+				}
+				if notify && !fail && sent != 1 {
+					t.Fatalf("notifications = %d", sent)
+				}
+				if notify && fail && a.feedback.message.Text == "" {
+					t.Fatal("failure feedback missing")
+				}
+			})
+		}
 	}
 }
 
@@ -764,5 +793,76 @@ func TestPaletteViewStillDraws(t *testing.T) {
 	tt.SetLocale("zh-CN")
 	if !tt.HasText(a.text("zh-CN", "PaletteAll")) {
 		t.Fatalf("palette view = %v", tt.Texts())
+	}
+}
+
+func TestCLIServerPreservesNonSockets(t *testing.T) {
+	for _, symlink := range []bool{false, true} {
+		t.Run(fmt.Sprint(symlink), func(t *testing.T) {
+			dir := shortDir(t)
+			path := filepath.Join(dir, "cli.sock")
+			target := filepath.Join(dir, "keep")
+			if err := os.WriteFile(target, []byte("keep"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if symlink {
+				if err := os.Symlink(target, path); err != nil {
+					t.Fatal(err)
+				}
+			} else if err := os.WriteFile(path, []byte("keep"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			s := &cliServer{path: path}
+			if err := s.listen(); err == nil {
+				s.stop()
+				t.Fatal("unsafe path accepted")
+			}
+			if data, err := os.ReadFile(path); err != nil || string(data) != "keep" {
+				t.Fatalf("entry changed: %q %v", data, err)
+			}
+		})
+	}
+}
+
+func TestCLIServerQueuedTimeoutAndShutdown(t *testing.T) {
+	s, path := testServer(t, cliTestApp(t))
+	callbacks := make(chan func(), 1)
+	returned := make(chan struct{})
+	// Set before connecting, when serve has not dispatched any request.
+	s.actionTimeout = 20 * time.Millisecond
+	s.dispatch = func(run func()) { callbacks <- run; <-returned }
+	var applied atomic.Int32
+	s.apply = func(cli.Request, []byte) cli.Result { applied.Add(1); return cli.NewResult(nil) }
+	client := dial(t, path)
+	result := do(t, client, cli.Request{Op: cli.OpStatus}, nil)
+	if result.Code != cli.CodeBusy {
+		t.Fatalf("timeout = %+v", result)
+	}
+	callback := <-callbacks
+	callback() // a timed-out queued action must not run later
+	if applied.Load() != 0 {
+		t.Fatal("expired action executed")
+	}
+	if len(s.slots) != 1 {
+		t.Fatal("blocked dispatch released its concurrency slot")
+	}
+	close(returned)
+	s.stop()
+	if _, err := os.Lstat(path); !os.IsNotExist(err) {
+		t.Fatalf("shutdown: %v", err)
+	}
+}
+
+func TestApplyCLIQuittingAndToggleNotify(t *testing.T) {
+	a := cliTestApp(t)
+	t.Cleanup(a.awake.stop)
+	a.quitting = true
+	if result := a.applyCLI(cli.Request{Op: cli.OpStatus}, nil); result.Code != cli.CodeQuitting {
+		t.Fatalf("quitting = %+v", result)
+	}
+	a.quitting = false
+	result := a.applyCLI(cli.Request{Op: cli.OpRun, Action: cli.ActionAwakeToggle, Notify: true}, nil)
+	if !result.OK || a.feedback.message.Text == "" {
+		t.Fatalf("toggle notification missing: %+v", result)
 	}
 }

@@ -52,7 +52,7 @@ func PeerUID(conn *net.UnixConn) (uint32, error) {
 	if callErr != nil {
 		return 0, callErr
 	}
-	if size < uint32(unsafe.Offsetof(cred.Groups)) {
+	if cred.Version != 0 || size < uint32(unsafe.Offsetof(cred.Groups)) {
 		return 0, fmt.Errorf("cli: peer credential too short (%d bytes)", size)
 	}
 	return cred.UID, nil

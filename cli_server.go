@@ -22,12 +22,14 @@ import (
 // cliServer is the app's end of the command line protocol: a Unix socket only
 // this user may connect to, serving status and the same actions URLs carry.
 type cliServer struct {
-	path     string
-	listener *net.UnixListener
-	inode    os.FileInfo
-	slots    chan struct{}
-	wg       sync.WaitGroup
-	closing  atomic.Bool
+	path          string
+	listener      *net.UnixListener
+	inode         os.FileInfo
+	slots         chan struct{}
+	wg            sync.WaitGroup
+	closing       atomic.Bool
+	lifecycle     sync.Mutex // serializes WaitGroup.Add with shutdown
+	actionTimeout time.Duration
 
 	// Seams: tests replace them so no socket, no window and no main loop is
 	// involved.
@@ -42,7 +44,7 @@ type cliServer struct {
 func (a *application) startCLIServer() {
 	dir := filepath.Dir(a.path)
 	if err := os.MkdirAll(dir, 0o700); err != nil {
-		log.Printf("cli: %v", err)
+		log.Print("cli: support directory unavailable")
 		return
 	}
 	s := &cliServer{
@@ -54,7 +56,7 @@ func (a *application) startCLIServer() {
 	}
 	s.apply = a.applyCLI
 	if err := s.listen(); err != nil {
-		s.logf("cli: %v", err)
+		s.logf("cli: socket unavailable")
 		return
 	}
 	a.cli = s
@@ -64,34 +66,68 @@ func (a *application) startCLIServer() {
 // listen binds the socket. It follows the single instance lock's order: connect
 // first (someone may be serving), then remove a leftover file, then bind.
 func (s *cliServer) listen() error {
-	for attempt := 0; attempt < 5; attempt++ {
-		if info, err := os.Stat(s.path); err == nil {
-			if uid, ok := cli.FileOwner(info); ok && uid != uint32(os.Getuid()) {
-				return fmt.Errorf("%s belongs to another user", s.path)
-			}
+	dir := filepath.Dir(s.path)
+	info, err := os.Stat(dir)
+	if err != nil || !info.IsDir() {
+		return errors.New("cli: socket directory unavailable")
+	}
+	// The shared /tmp fallback is protected by its sticky bit and peer checks.
+	if dir != "/tmp" && dir != "/private/tmp" {
+		if uid, ok := cli.FileOwner(info); !ok || uid != uint32(os.Getuid()) {
+			return errors.New("cli: socket directory belongs to another user")
 		}
-		if conn, err := net.DialTimeout("unix", s.path, time.Second); err == nil {
-			conn.Close()
-			return errors.New("another instance serves " + s.path)
-		}
-		_ = os.Remove(s.path)
-		addr, err := net.ResolveUnixAddr("unix", s.path)
-		if err != nil {
+		if err := os.Chmod(dir, 0o700); err != nil {
 			return err
 		}
-		listener, err := net.ListenUnix("unix", addr)
-		if err == nil {
-			listener.SetUnlinkOnClose(false)
-			if err := os.Chmod(s.path, 0o600); err != nil {
-				listener.Close()
+	}
+	for attempt := 0; attempt < 5; attempt++ {
+		info, statErr := os.Lstat(s.path)
+		if statErr != nil && !os.IsNotExist(statErr) {
+			return statErr
+		}
+		if statErr == nil {
+			if uid, ok := cli.FileOwner(info); !ok || uid != uint32(os.Getuid()) || info.Mode()&os.ModeSocket == 0 {
+				return errors.New("cli: unsafe socket path")
+			}
+			conn, err := net.DialTimeout("unix", s.path, time.Second)
+			if err == nil {
+				conn.Close()
+				return errors.New("cli: another instance is serving")
+			}
+			// Only connection refusal proves that an existing socket is stale.
+			if !errors.Is(err, syscall.ECONNREFUSED) && !errors.Is(err, syscall.ENOENT) {
 				return err
 			}
-			inode, err := os.Stat(s.path)
+			current, err := os.Lstat(s.path)
+			if err == nil {
+				if !os.SameFile(current, info) {
+					continue
+				}
+				if err := os.Remove(s.path); err != nil && !os.IsNotExist(err) {
+					return err
+				}
+			} else if !os.IsNotExist(err) {
+				return err
+			}
+		}
+		listener, err := net.ListenUnix("unix", &net.UnixAddr{Name: s.path, Net: "unix"})
+		if err == nil {
+			listener.SetUnlinkOnClose(false)
+			inode, err := os.Lstat(s.path)
 			if err != nil {
 				listener.Close()
 				return err
 			}
 			s.listener, s.inode = listener, inode
+			if uid, ok := cli.FileOwner(inode); !ok || uid != uint32(os.Getuid()) || inode.Mode()&os.ModeSocket == 0 {
+				listener.Close()
+				return errors.New("cli: unsafe bound socket")
+			}
+			// Bind first: never chmod an inode left by another process.
+			if err := os.Chmod(s.path, 0o600); err != nil {
+				s.stop()
+				return err
+			}
 			return nil
 		}
 		if !errors.Is(err, syscall.EADDRINUSE) {
@@ -99,7 +135,7 @@ func (s *cliServer) listen() error {
 		}
 		time.Sleep(time.Duration(attempt+1) * 20 * time.Millisecond)
 	}
-	return errors.New("the CLI socket could not be bound")
+	return errors.New("cli: socket could not be bound")
 }
 
 // serve accepts connections until stop.
@@ -109,17 +145,28 @@ func (s *cliServer) serve() {
 		if err != nil {
 			return
 		}
-		// Take the slot before reading anything: a client that never sends a
-		// line must not hold a slot, and the ninth gets busy without its bytes
-		// being read.
+		// Verify even rejected peers before responding; never read their data.
+		if err := s.verify(conn); err != nil {
+			conn.Close()
+			continue
+		}
+		// Slow clients occupy one of the bounded slots before any reads.
+		s.lifecycle.Lock()
+		if s.closing.Load() {
+			s.lifecycle.Unlock()
+			conn.Close()
+			return
+		}
 		select {
 		case s.slots <- struct{}{}:
 		default:
+			s.lifecycle.Unlock()
 			writeBusy(conn)
 			conn.Close()
 			continue
 		}
 		s.wg.Add(1)
+		s.lifecycle.Unlock()
 		go s.handle(conn)
 	}
 }
@@ -130,7 +177,9 @@ func (s *cliServer) stop() {
 	if s == nil {
 		return
 	}
+	s.lifecycle.Lock()
 	s.closing.Store(true)
+	s.lifecycle.Unlock()
 	if s.listener != nil {
 		s.listener.Close()
 	}
@@ -146,9 +195,9 @@ func (s *cliServer) stop() {
 	if s.inode == nil {
 		return
 	}
-	if info, err := os.Stat(s.path); err == nil && os.SameFile(info, s.inode) {
+	if info, err := os.Lstat(s.path); err == nil && os.SameFile(info, s.inode) {
 		if err := os.Remove(s.path); err != nil && !os.IsNotExist(err) {
-			s.logf("cli: %v", err)
+			s.logf("cli: socket cleanup failed")
 		}
 	}
 }
@@ -158,9 +207,6 @@ func (s *cliServer) handle(conn *net.UnixConn) {
 	defer s.wg.Done()
 	defer func() { <-s.slots }()
 	defer conn.Close()
-	if err := s.verify(conn); err != nil {
-		return
-	}
 	_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	reader := bufio.NewReaderSize(conn, cli.MaxLine+1)
 	line, err := readCLILine(reader)
@@ -189,34 +235,51 @@ func (s *cliServer) handle(conn *net.UnixConn) {
 			return
 		}
 	}
-	result, ran := s.applyReq(req, body)
+	result, ran, dispatched := s.applyReq(req, body)
 	response := cli.Response{V: cli.Protocol, ID: req.ID, OK: result.OK, Code: result.Code,
 		Message: result.Message, Lines: result.Lines, State: result.State}
 	if !ran {
 		response = cli.Response{V: cli.Protocol, ID: req.ID, OK: false, Code: cli.CodeQuitting}
 	}
 	writeResult(conn, response)
+	// A blocked main-thread dispatch keeps its slot until it has returned.
+	// Otherwise repeated timeouts could create an unbounded queue of bodies.
+	<-dispatched
 }
 
 // applyReq runs the request on the main thread and reports whether it ran at
 // all: RunOnMain drops the function once the loop is gone.
-func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, bool) {
-	var out cli.Result
-	ran := false
-	done := make(chan struct{})
-	s.dispatch(func() {
-		ran = true
-		out = s.apply(req, body)
-		close(done)
-	})
-	if !ran {
-		return cli.Result{}, false
+func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, bool, <-chan struct{}) {
+	type outcome struct {
+		result cli.Result
+		ran    bool
 	}
+	result := make(chan outcome, 1)
+	finished := make(chan struct{})
+	var phase atomic.Int32 // 0 queued, 1 started, 2 cancelled
+	go func() {
+		defer close(finished)
+		var out outcome
+		s.dispatch(func() {
+			if !phase.CompareAndSwap(0, 1) || s.closing.Load() {
+				return
+			}
+			out = outcome{result: s.apply(req, body), ran: true}
+		})
+		result <- out
+	}()
+	timeout := s.actionTimeout
+	if timeout == 0 {
+		timeout = 15 * time.Second
+	}
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
 	select {
-	case <-done:
-		return out, true
-	case <-time.After(15 * time.Second):
-		return cli.Failure(cli.CodeBusy), true
+	case out := <-result:
+		return out.result, out.ran, finished
+	case <-timer.C:
+		phase.CompareAndSwap(0, 2) // timed-out queued actions must never execute later
+		return cli.Failure(cli.CodeBusy), true, finished
 	}
 }
 
@@ -284,6 +347,9 @@ func verifySameUser(conn *net.UnixConn) error {
 // remembered durations, never authorizes anything and stays quiet unless the
 // request asked for a hint.
 func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
+	if a.quitting {
+		return cli.Failure(cli.CodeQuitting)
+	}
 	previous := a.quiet
 	a.quiet = !req.Notify
 	defer func() { a.quiet = previous }()
@@ -316,6 +382,7 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 		err = a.runURL(paletteURLRequest{Kind: "awake.stop", CLI: true})
 	case cli.ActionAwakeToggle:
 		err = a.runCLIToggle()
+		a.announceAwake(err)
 	case cli.ActionJSONNew:
 		if len(body) > cli.MaxPayload {
 			return cli.Failure(cli.CodeBadRequest)

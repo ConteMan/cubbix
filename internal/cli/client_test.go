@@ -255,3 +255,60 @@ func TestDialClassifies(t *testing.T) {
 		t.Fatal("a refused socket must not start the app")
 	}
 }
+
+func TestDialRejectsSymlinkWithoutSending(t *testing.T) {
+	path := shortPath(t)
+	ln := listener(t, path)
+	if err := os.Chmod(path, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	alias := path + ".alias"
+	if err := os.Symlink(path, alias); err != nil {
+		t.Fatal(err)
+	}
+	if c, err := Dial(alias, time.Second); CodeOf(err) != CodeRefused {
+		if c != nil {
+			c.Close()
+		}
+		t.Fatalf("symlink accepted: %v", err)
+	}
+	ln.SetDeadline(time.Now().Add(20 * time.Millisecond))
+	if conn, err := ln.AcceptUnix(); err == nil {
+		conn.Close()
+		t.Fatal("connected to symlink server")
+	}
+}
+
+func TestDoAcceptsIDLessBusy(t *testing.T) {
+	for _, size := range []int{0, 2 << 20} {
+		t.Run(itoa(size), func(t *testing.T) { testIDLessBusy(t, size) })
+	}
+}
+
+func testIDLessBusy(t *testing.T, size int) {
+	path := shortPath(t)
+	ln := listener(t, path)
+	os.Chmod(path, 0o600)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		c, err := ln.AcceptUnix()
+		if err != nil {
+			return
+		}
+		defer c.Close()
+		// The server must answer before receiving even the request header.
+		data, _ := EncodeLine(Response{V: Protocol, Code: CodeBusy})
+		c.Write(data)
+	}()
+	c, err := Dial(path, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	result, err := c.Do(Request{V: Protocol, ID: "busy", Op: OpRun, Action: ActionJSONNew, Bytes: size}, make([]byte, size), time.Second)
+	if err != nil || result.OK || result.Code != CodeBusy {
+		t.Fatalf("busy = %+v %v", result, err)
+	}
+	<-done
+}

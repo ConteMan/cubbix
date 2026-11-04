@@ -671,7 +671,15 @@ func (a *application) view(c *ui.Context) {
 					errorKey = a.awake.snapshot().Error
 				}
 				if errorKey != "" {
-					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(errorKey))
+					message := text(errorKey)
+					if errorKey == "CLILinkConflict" {
+						if paths, ok := cliPathsFor(); ok {
+							message = strings.ReplaceAll(message, "%s", paths.link)
+						} else {
+							message = text("CLIInstallFailed")
+						}
+					}
+					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(message)
 				}
 			})
 		})

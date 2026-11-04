@@ -82,7 +82,7 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 	a.refreshAwake()
 	go func() {
 		err := a.lid.enable(end, min, authorize)
-		mygo.RunOnMain(func() {
+		a.urlDispatch(func() {
 			a.lidBusy = false
 			if a.quitting {
 				return

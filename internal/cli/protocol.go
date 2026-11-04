@@ -93,6 +93,9 @@ type Request struct {
 
 // Validate reports the protocol code of an invalid request, or "".
 func (r Request) Validate(maxPayload int) string {
+	if r.Bytes < 0 {
+		return CodeBadRequest
+	}
 	if r.V != Protocol {
 		return CodeProtocolMismatch
 	}
