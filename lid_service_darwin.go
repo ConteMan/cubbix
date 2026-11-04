@@ -36,9 +36,14 @@ func (s *legacyLidService) Status() lidServiceStatus {
 	}
 	path := objc.ID(objc.GetClass("NSString")).Send(objc.RegisterName("stringWithUTF8String:"), lidPlistPath+"\x00")
 	url := objc.ID(objc.GetClass("NSURL")).Send(objc.RegisterName("fileURLWithPath:"), path)
-	switch objc.Send[int64](cls, objc.RegisterName("statusForLegacyURL:"), url) {
-	case 0:
-		return svcNotRegistered
+	return legacyLidStatus(objc.Send[int64](cls, objc.RegisterName("statusForLegacyURL:"), url))
+}
+
+// The caller has already confirmed both installed files exist.
+func legacyLidStatus(status int64) lidServiceStatus {
+	switch status {
+	case 0, 3: // notRegistered / notFound: files exist, but no running service.
+		return svcNotRunning
 	case 1:
 		return svcEnabled
 	case 2:

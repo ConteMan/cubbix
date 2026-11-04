@@ -24,10 +24,17 @@ func TestLidScreenshots(t *testing.T) {
 			if dark {
 				mode = "dark"
 			}
-			for _, state := range []string{"unregistered", "available", "enabling", "on", "battery", "low", "foreign", "restore-failed", "approval", "denied", "unsupported", "stale", "settings", "palette"} {
+			for _, state := range []string{"not-running", "install-failed", "unregistered", "available", "enabling", "on", "battery", "low", "foreign", "restore-failed", "approval", "denied", "unsupported", "stale", "settings", "palette"} {
 				a, s, p, svc, conn := lidTestApp(t)
 				a.panel = &menubarPanelState{}
 				switch state {
+				case "not-running", "install-failed":
+					conn.gone = true
+					svc.status = svcNotRunning
+					if state == "install-failed" {
+						svc.status = svcBroken
+					}
+					a.lid.Inspect()
 				case "unregistered":
 					svc.status = svcNotRegistered
 					a.lid.snapshotValue.service = svcNotRegistered
@@ -97,6 +104,15 @@ func TestLidScreenshots(t *testing.T) {
 				tt.SetLocale(locale)
 				tt.SetDark(dark)
 				tt.Frame()
+				if state == "not-running" || state == "install-failed" {
+					r, ok := tt.Find(a.text(locale, a.lidReason()))
+					if !ok {
+						t.Fatal("missing startup failure", state)
+					}
+					tt.Move(r.X+r.W/2, r.Y+r.H/2)
+					tt.Advance(time.Second)
+					tt.Frame()
+				}
 				if state == "restore-failed" || state == "stale" || state == "approval" {
 					r, ok := tt.Find(a.text(locale, a.lidReason()))
 					if !ok {

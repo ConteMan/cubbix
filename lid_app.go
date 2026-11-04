@@ -185,7 +185,7 @@ func (a *application) finishLidPoll() {
 }
 func (a *application) notifyLid(key string) {
 	switch key {
-	case "LidRestoreFailed", "LidHelperGone", "LidDenied", "LidForceRestoreFailed", "LidStaleSetting", "LidMaxDuration", "LidBatteryLow", "LidBatteryUnknown":
+	case "LidServiceBroken", "LidHelperNotRunning", "LidRestoreFailed", "LidHelperGone", "LidDenied", "LidForceRestoreFailed", "LidStaleSetting", "LidMaxDuration", "LidBatteryLow", "LidBatteryUnknown":
 	default:
 		return
 	}
