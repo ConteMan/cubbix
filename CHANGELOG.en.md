@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — 2026-11-04
+
+- You can drag the command palette now! Grab an empty spot and move it wherever feels right. Guides appear while you drag and the palette snaps to them, so centering takes one move. Hold ⌥ to place it freely. Each display remembers its own spot, and a double-click on an empty area puts it back.
+- The command palette has a softer shadow and a thin outline, so it sits on your desktop more naturally.
+- Press ⌃⌥⌘P to open or close the menu bar card, so you can check Keep Awake without clicking the cat.
+- Meet the `cubbix` command-line tool: turn Keep Awake on or off, check its status, and open JSON windows from the terminal, scripts or agents, for example `cubbix awake on --minutes 90` or `cubbix awake status --json`. Install it in one click under Settings › General, no admin password needed.
+
 ## 0.4.0 — 2026-11-03
 
 - Close the lid and your tasks keep running! Turn on the Lid switch when you start Keep Awake, and agents, downloads and builds won't stop when the lid closes. The first time, you'll enter an admin password once, and Cubbix needs to live in the Applications folder.
