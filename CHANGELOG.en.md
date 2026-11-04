@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4 — 2026-11-04
+
+- The Lid switch finally turns on! The helper refused to work because of a small folder permission issue, and now it fixes that itself. The first time after updating, you will see "Helper needs an update" and enter your admin password once.
+- `cubbix awake on --lid` now waits until the lid setting is really on, and tells you why if it cannot be.
+
 ## 0.5.3 — 2026-11-04
 
 - Fixed the Lid switch staying off after you entered your admin password the first time. If the helper still does not start, the card now tells you, and one click tries again.
