@@ -24,6 +24,7 @@ const (
 	svcDenied
 	svcBroken
 	svcEnabled
+	svcNotRunning
 )
 
 type lidService interface {
@@ -75,6 +76,7 @@ type lidController struct {
 	snapshotValue      lidSnapshot
 	deadline           time.Time
 	now                func() time.Time
+	wait               func(time.Duration)
 }
 
 func (c *lidController) snapshot() lidSnapshot {
@@ -234,16 +236,28 @@ func (c *lidController) Inspect() {
 	c.mu.Lock()
 	defer func() { c.publish(); c.mu.Unlock() }()
 	c.snapshotValue.service = c.service.Status()
-	if c.snapshotValue.service == svcRequiresApproval {
+	switch c.snapshotValue.service {
+	case svcUnavailable:
+		c.snapshotValue.state = lidBlocked
+		c.snapshotValue.reason = "LidUnsupported"
+	case svcRequiresApproval:
+		c.snapshotValue.state = lidBlocked
 		c.snapshotValue.reason = "LidAuthNeeded"
-	}
-	if c.snapshotValue.service == svcBroken {
+	case svcBroken:
+		c.snapshotValue.state = lidBlocked
 		c.snapshotValue.reason = "LidServiceBroken"
+	case svcNotRunning:
+		c.snapshotValue.state = lidBlocked
+		c.snapshotValue.reason = "LidHelperNotRunning"
 	}
 	c.publish()
 	c.readStale()
 	if err := c.connect(); err != nil {
 		c.snapshotValue.online = false
+		if c.snapshotValue.reason == "" && c.snapshotValue.service != svcNotRegistered {
+			c.snapshotValue.state = lidBlocked
+			c.snapshotValue.reason = "LidHelperNotRunning"
+		}
 		return
 	}
 	r, err := c.connection.Call(lid.Request{Op: "ping"})
@@ -302,7 +316,7 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 	if s.service == svcRequiresApproval {
 		return fail("LidAuthNeeded")
 	}
-	needsInstall := s.service == svcNotRegistered || s.service == svcBroken
+	needsInstall := s.service == svcNotRegistered || s.service == svcBroken || s.service == svcNotRunning
 	if s.service == svcUnavailable {
 		return fail("LidUnsupported")
 	}
@@ -331,25 +345,14 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 			return fail("LidAuthNeeded")
 		}
 		if err != nil {
-			if s.service == svcNotRegistered && errors.Is(err, errLidDenied) {
+			if errors.Is(err, errLidDenied) {
 				s.service = svcDenied
 				return fail("LidDenied")
 			}
 			return fail("LidServiceBroken")
 		}
-		until := time.Now().Add(5 * time.Second)
-		for {
-			if err = c.connect(); err == nil {
-				break
-			}
-			if c.connection != nil {
-				c.connection.Close()
-				c.connection = nil
-			}
-			if !time.Now().Before(until) {
-				return fail("LidServiceBroken")
-			}
-			time.Sleep(50 * time.Millisecond)
+		if err := c.waitForHelper(); err != nil {
+			return fail(err.Error())
 		}
 	}
 	if err := c.connect(); err != nil {
@@ -388,6 +391,40 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 	s.reason = ""
 	return nil
 }
+
+// A successful installer exit is not proof that the daemon can serve requests.
+// Only an authenticated hello from the expected helper version confirms readiness.
+func (c *lidController) waitForHelper() error {
+	until := c.now().Add(5 * time.Second)
+	wait := c.wait
+	if wait == nil {
+		wait = time.Sleep
+	}
+	for {
+		c.snapshotValue.service = c.service.Status()
+		if c.snapshotValue.service == svcRequiresApproval {
+			return errors.New("LidAuthNeeded")
+		}
+		err := c.connect()
+		if err == nil {
+			c.snapshotValue.service = svcEnabled
+			return nil
+		}
+		if c.connection != nil {
+			c.connection.Close()
+			c.connection = nil
+		}
+		c.snapshotValue.online = false
+		if !c.now().Before(until) {
+			if err.Error() == "LidHelperUpdate" {
+				return err
+			}
+			return errors.New("LidHelperNotRunning")
+		}
+		wait(50 * time.Millisecond)
+	}
+}
+
 func (c *lidController) stopLocked() error {
 	s := &c.snapshotValue
 	if c.connection == nil {

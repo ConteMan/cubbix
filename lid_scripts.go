@@ -30,9 +30,30 @@ PLIST
 /bin/chown root:wheel /Library/LaunchDaemons/com.conteman.cubbix.helper.plist
 /bin/chmod 0644 /Library/LaunchDaemons/com.conteman.cubbix.helper.plist
 /bin/launchctl bootout system/com.conteman.cubbix.helper 2>/dev/null || true
-/bin/launchctl bootstrap system /Library/LaunchDaemons/com.conteman.cubbix.helper.plist
+unload_attempt=0
+while /bin/launchctl print system/com.conteman.cubbix.helper >/dev/null 2>&1; do
+  if [ "$unload_attempt" -ge 50 ]; then
+    echo "Cubbix helper did not unload" >&2
+    exit 1
+  fi
+  unload_attempt=$((unload_attempt + 1))
+  /bin/sleep 0.1
+done
+bootstrap_attempt=0
+while ! /bin/launchctl bootstrap system /Library/LaunchDaemons/com.conteman.cubbix.helper.plist; do
+  bootstrap_attempt=$((bootstrap_attempt + 1))
+  if [ "$bootstrap_attempt" -ge 5 ]; then
+    echo "Cubbix helper could not be loaded" >&2
+    exit 1
+  fi
+  /bin/sleep 1
+done
+if ! /bin/launchctl print system/com.conteman.cubbix.helper >/dev/null 2>&1; then
+  echo "Cubbix helper load was not confirmed" >&2
+  exit 1
+fi
 `
-	lidInstallScriptApple = "do shell script \"set -eu\\nPATH=/usr/bin:/bin:/usr/sbin:/sbin\\nexport PATH\\n/usr/bin/install -d -m 0755 -o root -g wheel /Library/PrivilegedHelperTools\\n/usr/bin/install -m 0755 -o root -g wheel /Applications/Cubbix.app/Contents/Resources/bin/cubbix-helper /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new\\nif ! /usr/bin/codesign -v -R=\\\"anchor apple generic and certificate leaf[subject.OU] = \\\\\\\"P93GN4N3DC\\\\\\\" and identifier \\\\\\\"cubbix-helper\\\\\\\"\\\" /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new; then\\n  /bin/rm -f /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new\\n  exit 1\\nfi\\n/bin/mv -f /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new /Library/PrivilegedHelperTools/com.conteman.cubbix.helper\\n/bin/cat > /Library/LaunchDaemons/com.conteman.cubbix.helper.plist <<'PLIST'\\n<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>\\n<!DOCTYPE plist PUBLIC \\\"-//Apple//DTD PLIST 1.0//EN\\\" \\\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\\\">\\n<plist version=\\\"1.0\\\">\\n<dict>\\n  <key>Label</key><string>com.conteman.cubbix.helper</string>\\n  <key>Program</key><string>/Library/PrivilegedHelperTools/com.conteman.cubbix.helper</string>\\n  <key>RunAtLoad</key><true/>\\n  <key>KeepAlive</key><true/>\\n  <key>ThrottleInterval</key><integer>10</integer>\\n  <key>ProcessType</key><string>Background</string>\\n  <key>AssociatedBundleIdentifiers</key><array><string>com.conteman.cubbix</string></array>\\n</dict>\\n</plist>\\nPLIST\\n/bin/chown root:wheel /Library/LaunchDaemons/com.conteman.cubbix.helper.plist\\n/bin/chmod 0644 /Library/LaunchDaemons/com.conteman.cubbix.helper.plist\\n/bin/launchctl bootout system/com.conteman.cubbix.helper 2>/dev/null || true\\n/bin/launchctl bootstrap system /Library/LaunchDaemons/com.conteman.cubbix.helper.plist\\n\" with administrator privileges"
+	lidInstallScriptApple = "do shell script \"set -eu\\nPATH=/usr/bin:/bin:/usr/sbin:/sbin\\nexport PATH\\n/usr/bin/install -d -m 0755 -o root -g wheel /Library/PrivilegedHelperTools\\n/usr/bin/install -m 0755 -o root -g wheel /Applications/Cubbix.app/Contents/Resources/bin/cubbix-helper /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new\\nif ! /usr/bin/codesign -v -R=\\\"anchor apple generic and certificate leaf[subject.OU] = \\\\\\\"P93GN4N3DC\\\\\\\" and identifier \\\\\\\"cubbix-helper\\\\\\\"\\\" /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new; then\\n  /bin/rm -f /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new\\n  exit 1\\nfi\\n/bin/mv -f /Library/PrivilegedHelperTools/com.conteman.cubbix.helper.new /Library/PrivilegedHelperTools/com.conteman.cubbix.helper\\n/bin/cat > /Library/LaunchDaemons/com.conteman.cubbix.helper.plist <<'PLIST'\\n<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>\\n<!DOCTYPE plist PUBLIC \\\"-//Apple//DTD PLIST 1.0//EN\\\" \\\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\\\">\\n<plist version=\\\"1.0\\\">\\n<dict>\\n  <key>Label</key><string>com.conteman.cubbix.helper</string>\\n  <key>Program</key><string>/Library/PrivilegedHelperTools/com.conteman.cubbix.helper</string>\\n  <key>RunAtLoad</key><true/>\\n  <key>KeepAlive</key><true/>\\n  <key>ThrottleInterval</key><integer>10</integer>\\n  <key>ProcessType</key><string>Background</string>\\n  <key>AssociatedBundleIdentifiers</key><array><string>com.conteman.cubbix</string></array>\\n</dict>\\n</plist>\\nPLIST\\n/bin/chown root:wheel /Library/LaunchDaemons/com.conteman.cubbix.helper.plist\\n/bin/chmod 0644 /Library/LaunchDaemons/com.conteman.cubbix.helper.plist\\n/bin/launchctl bootout system/com.conteman.cubbix.helper 2>/dev/null || true\\nunload_attempt=0\\nwhile /bin/launchctl print system/com.conteman.cubbix.helper >/dev/null 2>&1; do\\n  if [ \\\"$unload_attempt\\\" -ge 50 ]; then\\n    echo \\\"Cubbix helper did not unload\\\" >&2\\n    exit 1\\n  fi\\n  unload_attempt=$((unload_attempt + 1))\\n  /bin/sleep 0.1\\ndone\\nbootstrap_attempt=0\\nwhile ! /bin/launchctl bootstrap system /Library/LaunchDaemons/com.conteman.cubbix.helper.plist; do\\n  bootstrap_attempt=$((bootstrap_attempt + 1))\\n  if [ \\\"$bootstrap_attempt\\\" -ge 5 ]; then\\n    echo \\\"Cubbix helper could not be loaded\\\" >&2\\n    exit 1\\n  fi\\n  /bin/sleep 1\\ndone\\nif ! /bin/launchctl print system/com.conteman.cubbix.helper >/dev/null 2>&1; then\\n  echo \\\"Cubbix helper load was not confirmed\\\" >&2\\n  exit 1\\nfi\\n\" with administrator privileges"
 	lidUninstallScript    = `set -eu
 /bin/launchctl bootout system/com.conteman.cubbix.helper 2>/dev/null || true
 /bin/rm -f /Library/LaunchDaemons/com.conteman.cubbix.helper.plist

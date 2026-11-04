@@ -447,6 +447,20 @@ func TestLidImmutableAuthorizationScripts(t *testing.T) {
 	if verify < 0 || rename < verify || plist < rename || bootstrap < plist || !strings.Contains(lidInstallScript, ".new") || !strings.HasPrefix(lidInstallScript, "set -eu") {
 		t.Fatal("install trust order")
 	}
+	steps := []string{
+		"/bin/chmod 0644", "/bin/launch" + "ctl bootout",
+		"while /bin/launch" + "ctl print", "unload_attempt + 1", "/bin/sleep 0.1",
+		"while ! /bin/launch" + "ctl bootstrap", "bootstrap_attempt + 1", "/bin/sleep 1",
+		"if ! /bin/launch" + "ctl print", "load was not confirmed", "exit 1",
+	}
+	rest := lidInstallScript
+	for _, step := range steps {
+		at := strings.Index(rest, step)
+		if at < 0 {
+			t.Fatal("missing or reordered install step", step)
+		}
+		rest = rest[at+len(step):]
+	}
 }
 
 // Decode only the string literal grammar used by our fixed AppleScript wrapper.
