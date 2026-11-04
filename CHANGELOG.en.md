@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2 — 2026-11-04
+
+- Fixed Quit and Restart to Update doing nothing, and Settings not opening, after you had used the command palette.
+- The Lid switch now shows up on the card even when your MacBook is closed and running on an external display.
+
 ## 0.5.1 — 2026-11-04
 
 - Fixed "Keep awake with the lid closed" always saying development builds aren't supported in the released app. The Lid switch on the card works now.
