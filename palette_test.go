@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -262,7 +263,7 @@ func TestPaletteCommandFailureKeepsPanelOpen(t *testing.T) {
 		selected:     0,
 		selectionKey: command.ID,
 		rows:         []paletteRow{{Kind: paletteRowCommand, Key: command.ID, Command: command}},
-		request:      request{Command: command, Arg: "30m", Awake: awakeArg{Kind: awakeArgMinutes, Minutes: 30}},
+		request:      request{Command: command, Arg: "30m", Awake: awake.Arg{Kind: awake.KindMinutes, Minutes: 30}},
 	}
 	a.runPalette()
 	if a.palette == nil || a.palette.errorKey != "AwakeStartError" {
@@ -289,7 +290,7 @@ func TestInvalidParameterNeverRuns(t *testing.T) {
 		mode:     paletteCommandMode,
 		selected: 0,
 		rows:     []paletteRow{{Kind: paletteRowCommand, Key: command.ID, Command: command}},
-		request:  request{Command: command, Arg: "45x", Awake: awakeArg{Error: "DurationError"}},
+		request:  request{Command: command, Arg: "45x", Awake: awake.Arg{Error: "DurationError"}},
 	}
 	a.runPalette()
 	if called {

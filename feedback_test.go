@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"testing"
 	"time"
 
@@ -217,7 +218,7 @@ func TestFeedbackOnlyShortcutsAndURLsAnnounce(t *testing.T) {
 		"menu toggle": a.toggleAwake,
 		"card switch": a.panelToggleAwake,
 		"palette start": func() {
-			_ = a.runAwakeStart(request{Command: &command{ID: "awake.start"}, Awake: awakeArg{Kind: awakeArgDefault}})
+			_ = a.runAwakeStart(request{Command: &command{ID: "awake.start"}, Awake: awake.Arg{Kind: awake.KindDefault}})
 		},
 	} {
 		h.presenter.message = feedbackMessage{}

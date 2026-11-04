@@ -73,6 +73,34 @@ Cubbix 是维护者自用的 macOS 菜单栏工具箱，基于 [MyGo](https://gi
 
 `cubbix://` scheme 支持 `awake`（`minutes`、`mode`）、`awake/stop`、`awake/toggle`、`json/new`（`text`、`blank`）、`palette` 与 `settings?page=`。输入按不可信处理：host 与 path 折叠大小写、去掉首尾 `/` 后查白名单；`minutes` 限制 0–525659，`mode` 只接受 `screen`／`tasks`，`text` 上限 64 MiB，未知参数忽略，任一参数非法则整个请求丢弃。`json/new` 只开空白文档或写入 `text`，绝不读剪贴板、不执行文本、不接受路径；`awake` 只读本次请求的参数，不写记忆时长、截止或模式。应用未运行时也通过 `OnOpenURL` 接收启动 URL。
 
+## 命令行
+
+应用包里带一个 `cubbix` 命令行工具，供脚本、Agent 与启动器联动。「设置 → 通用 → 命令行工具」点一次会在 `~/.local/bin/cubbix` 建一个符号链接，不需要管理员授权；`~/.local/bin` 需要在你 shell 的 `PATH` 里（zsh 默认不含，配置里加一行 `export PATH="$HOME/.local/bin:$PATH"`）。不想用按钮就手动（把路径换成你自己那份 `Cubbix.app`；默认装在 `/Applications`）：
+
+```sh
+mkdir -p ~/.local/bin
+ln -sf "/Applications/Cubbix.app/Contents/Resources/bin/cubbix" ~/.local/bin/cubbix
+```
+
+```sh
+cubbix awake on --minutes 60          # 一小时常亮
+cubbix awake on --until 18:30         # 到 18:30
+cubbix awake on --follow 1234         # 跟随进程
+cubbix awake on --minutes 120 --lid   # 合盖也保持（助手已授权时）
+cubbix awake status --json | jq .state.awake.active
+cubbix awake off
+echo '{"a":1}' | cubbix json new      # 新建 JSON 窗口并写入正文
+cubbix palette                        # 打开命令面板
+```
+
+参数语法与命令面板完全一致（`45m`、`1h30m`、`until 18:30`、`∞`），CLI 只是把同一句话交给同一个解析器。动作范围与 `cubbix://` 相同：开／关／切换常亮、新建 JSON 窗口、开面板、开设置，外加只读的 `status`。CLI 不改记忆的时长、截止与模式，也和 URL 一样绝不读剪贴板——`json new` 的内容只来自参数、文件或标准输入。
+
+需要改状态的命令在应用没运行时后台拉起（用你这个 `cubbix` 所属的那份 `Cubbix.app`），最多等 5 秒；`status` 与 `version` 不会拉起应用。默认不弹提示（输出即反馈），`--notify` 才走与快捷键相同的提示。人读输出是应用当前界面语言的一句话；`--json` 是给脚本的稳定接口，字段只增不改，退出码 `0` 成功、`1` 内部错误、`2` 用法错误、`3` 应用不可用、`4` 被拒绝、`5` 超时。
+
+`--lid` 不会弹授权：助手没装或没授权时直接返回错误，脚本自己决定要不要提示用户去卡片面板点一下。合盖会话仍受 12 小时上限与低电量下限保护，且应用必须装在 `/Applications/Cubbix.app` 才支持合盖。
+
+通信走 `~/Library/Application Support/cubbix/cli.sock`（目录 0700、socket 0600，双方都用各自进程的对端凭据校验 uid：应用只服务本用户，工具也只把正文发给本用户的应用），协议与边界见 [006 规格](docs/specs/006-命令行.md)。卸载应用后记得 `rm -f ~/.local/bin/cubbix`。
+
 ## 项目资料
 
 - [Agent 规则](AGENTS.md)

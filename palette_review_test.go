@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"net/url"
 	"reflect"
 	"strings"
@@ -174,13 +175,13 @@ func TestPaletteActionsRecordOnlySuccessfulExecutions(t *testing.T) {
 
 func TestAwakeMinutesRejectOverflowAndSplitDigits(t *testing.T) {
 	for _, arg := range []string{"307445734561825861h17m", "9223372036854775807h", "999999999999999999999h", "1 2m", "1 h o u r", "1m30h"} {
-		if got := parseAwakeArg(arg, time.Now()); got.Error != "DurationError" {
+		if got := awake.ParseArg(arg, time.Now()); got.Error != "DurationError" {
 			t.Fatalf("unsafe duration %q = %+v", arg, got)
 		}
 	}
 	a := awakeTestApp(t)
 	before := a.config
-	for _, value := range []int{-1, awakeMinutesMaximum + 1} {
+	for _, value := range []int{-1, awake.MinutesMaximum + 1} {
 		if err := a.setDuration(value); err == nil {
 			t.Fatal("invalid duration accepted")
 		}

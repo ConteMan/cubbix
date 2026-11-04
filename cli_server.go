@@ -1,0 +1,533 @@
+package main
+
+import (
+	"bufio"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
+	"math"
+	"net"
+	"os"
+	"path/filepath"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"time"
+	"unicode/utf8"
+
+	"github.com/ConteMan/cubbix/internal/cli"
+)
+
+// cliServer is the app's end of the command line protocol: a Unix socket only
+// this user may connect to, serving status and the same actions URLs carry.
+type cliServer struct {
+	path          string
+	listener      *net.UnixListener
+	inode         os.FileInfo
+	slots         chan struct{}
+	wg            sync.WaitGroup
+	closing       atomic.Bool
+	lifecycle     sync.Mutex // serializes WaitGroup.Add with shutdown
+	actionTimeout time.Duration
+
+	// Seams: tests replace them so no socket, no window and no main loop is
+	// involved.
+	verify   func(*net.UnixConn) error
+	apply    func(cli.Request, []byte) cli.Result
+	dispatch func(func())
+	logf     func(string, ...any)
+}
+
+// startCLIServer listens for the command line tool. It never blocks the app:
+// a socket that cannot be created only costs the tool.
+func (a *application) startCLIServer() {
+	dir := filepath.Dir(a.path)
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		log.Print("cli: support directory unavailable")
+		return
+	}
+	s := &cliServer{
+		path:     cli.SocketPath(dir),
+		slots:    make(chan struct{}, cli.MaxConcurrent),
+		verify:   verifySameUser,
+		dispatch: a.urlDispatch,
+		logf:     log.Printf,
+	}
+	s.apply = a.applyCLI
+	if err := s.listen(); err != nil {
+		s.logf("cli: socket unavailable")
+		return
+	}
+	a.cli = s
+	go s.serve()
+}
+
+// listen binds the socket. It follows the single instance lock's order: connect
+// first (someone may be serving), then remove a leftover file, then bind.
+func (s *cliServer) listen() error {
+	dir := filepath.Dir(s.path)
+	info, err := os.Stat(dir)
+	if err != nil || !info.IsDir() {
+		return errors.New("cli: socket directory unavailable")
+	}
+	// The shared /tmp fallback is protected by its sticky bit and peer checks.
+	if dir != "/tmp" && dir != "/private/tmp" {
+		if uid, ok := cli.FileOwner(info); !ok || uid != uint32(os.Getuid()) {
+			return errors.New("cli: socket directory belongs to another user")
+		}
+		if err := os.Chmod(dir, 0o700); err != nil {
+			return err
+		}
+	}
+	for attempt := 0; attempt < 5; attempt++ {
+		info, statErr := os.Lstat(s.path)
+		if statErr != nil && !os.IsNotExist(statErr) {
+			return statErr
+		}
+		if statErr == nil {
+			if uid, ok := cli.FileOwner(info); !ok || uid != uint32(os.Getuid()) || info.Mode()&os.ModeSocket == 0 {
+				return errors.New("cli: unsafe socket path")
+			}
+			conn, err := net.DialTimeout("unix", s.path, time.Second)
+			if err == nil {
+				conn.Close()
+				return errors.New("cli: another instance is serving")
+			}
+			// Only connection refusal proves that an existing socket is stale.
+			if !errors.Is(err, syscall.ECONNREFUSED) && !errors.Is(err, syscall.ENOENT) {
+				return err
+			}
+			current, err := os.Lstat(s.path)
+			if err == nil {
+				if !os.SameFile(current, info) {
+					continue
+				}
+				if err := os.Remove(s.path); err != nil && !os.IsNotExist(err) {
+					return err
+				}
+			} else if !os.IsNotExist(err) {
+				return err
+			}
+		}
+		listener, err := net.ListenUnix("unix", &net.UnixAddr{Name: s.path, Net: "unix"})
+		if err == nil {
+			listener.SetUnlinkOnClose(false)
+			inode, err := os.Lstat(s.path)
+			if err != nil {
+				listener.Close()
+				return err
+			}
+			s.listener, s.inode = listener, inode
+			if uid, ok := cli.FileOwner(inode); !ok || uid != uint32(os.Getuid()) || inode.Mode()&os.ModeSocket == 0 {
+				listener.Close()
+				return errors.New("cli: unsafe bound socket")
+			}
+			// Bind first: never chmod an inode left by another process.
+			if err := os.Chmod(s.path, 0o600); err != nil {
+				s.stop()
+				return err
+			}
+			return nil
+		}
+		if !errors.Is(err, syscall.EADDRINUSE) {
+			return err
+		}
+		time.Sleep(time.Duration(attempt+1) * 20 * time.Millisecond)
+	}
+	return errors.New("cli: socket could not be bound")
+}
+
+// serve accepts connections until stop.
+func (s *cliServer) serve() {
+	for {
+		conn, err := s.listener.AcceptUnix()
+		if err != nil {
+			return
+		}
+		// Verify even rejected peers before responding; never read their data.
+		if err := s.verify(conn); err != nil {
+			conn.Close()
+			continue
+		}
+		// Slow clients occupy one of the bounded slots before any reads.
+		s.lifecycle.Lock()
+		if s.closing.Load() {
+			s.lifecycle.Unlock()
+			conn.Close()
+			return
+		}
+		select {
+		case s.slots <- struct{}{}:
+		default:
+			s.lifecycle.Unlock()
+			writeBusy(conn)
+			conn.Close()
+			continue
+		}
+		s.wg.Add(1)
+		s.lifecycle.Unlock()
+		go s.handle(conn)
+	}
+}
+
+// stop closes the listener, lets in-flight requests finish and removes the
+// socket only if it is still ours.
+func (s *cliServer) stop() {
+	if s == nil {
+		return
+	}
+	s.lifecycle.Lock()
+	s.closing.Store(true)
+	s.lifecycle.Unlock()
+	if s.listener != nil {
+		s.listener.Close()
+	}
+	done := make(chan struct{})
+	go func() {
+		s.wg.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+	}
+	if s.inode == nil {
+		return
+	}
+	if info, err := os.Lstat(s.path); err == nil && os.SameFile(info, s.inode) {
+		if err := os.Remove(s.path); err != nil && !os.IsNotExist(err) {
+			s.logf("cli: socket cleanup failed")
+		}
+	}
+}
+
+// handle serves one connection: verify, read, apply on the main thread, answer.
+func (s *cliServer) handle(conn *net.UnixConn) {
+	defer s.wg.Done()
+	defer func() { <-s.slots }()
+	defer conn.Close()
+	_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	reader := bufio.NewReaderSize(conn, cli.MaxLine+1)
+	line, err := readCLILine(reader)
+	if err != nil {
+		return
+	}
+	var req cli.Request
+	if err := json.Unmarshal(line, &req); err != nil {
+		writeResult(conn, cli.Response{V: cli.Protocol, OK: false, Code: cli.CodeBadRequest})
+		return
+	}
+	if code := req.Validate(cli.MaxPayload); code != "" {
+		writeResult(conn, cli.Response{V: cli.Protocol, ID: req.ID, OK: false, Code: code})
+		return
+	}
+	var body []byte
+	if req.Bytes > 0 {
+		body = make([]byte, req.Bytes)
+		_ = conn.SetReadDeadline(time.Now().Add(30 * time.Second))
+		if _, err := readFull(reader, body); err != nil {
+			writeResult(conn, cli.Response{V: cli.Protocol, ID: req.ID, OK: false, Code: cli.CodeBadRequest})
+			return
+		}
+		if !utf8.Valid(body) {
+			writeResult(conn, cli.Response{V: cli.Protocol, ID: req.ID, OK: false, Code: cli.CodeBadRequest})
+			return
+		}
+	}
+	result, ran, dispatched := s.applyReq(req, body)
+	response := cli.Response{V: cli.Protocol, ID: req.ID, OK: result.OK, Code: result.Code,
+		Message: result.Message, Lines: result.Lines, State: result.State}
+	if !ran {
+		response = cli.Response{V: cli.Protocol, ID: req.ID, OK: false, Code: cli.CodeQuitting}
+	}
+	writeResult(conn, response)
+	// A blocked main-thread dispatch keeps its slot until it has returned.
+	// Otherwise repeated timeouts could create an unbounded queue of bodies.
+	<-dispatched
+}
+
+// applyReq runs the request on the main thread and reports whether it ran at
+// all: RunOnMain drops the function once the loop is gone.
+func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, bool, <-chan struct{}) {
+	type outcome struct {
+		result cli.Result
+		ran    bool
+	}
+	result := make(chan outcome, 1)
+	finished := make(chan struct{})
+	var phase atomic.Int32 // 0 queued, 1 started, 2 cancelled
+	go func() {
+		defer close(finished)
+		var out outcome
+		s.dispatch(func() {
+			if !phase.CompareAndSwap(0, 1) || s.closing.Load() {
+				return
+			}
+			out = outcome{result: s.apply(req, body), ran: true}
+		})
+		result <- out
+	}()
+	timeout := s.actionTimeout
+	if timeout == 0 {
+		timeout = 15 * time.Second
+	}
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+	select {
+	case out := <-result:
+		return out.result, out.ran, finished
+	case <-timer.C:
+		phase.CompareAndSwap(0, 2) // timed-out queued actions must never execute later
+		return cli.Failure(cli.CodeBusy), true, finished
+	}
+}
+
+// writeBusy answers without a request id: the request was never read.
+func writeBusy(conn *net.UnixConn) {
+	writeResult(conn, cli.Response{V: cli.Protocol, OK: false, Code: cli.CodeBusy})
+}
+
+func writeResult(conn *net.UnixConn, response cli.Response) {
+	line, err := cli.EncodeLine(response)
+	if err != nil {
+		line, err = cli.EncodeLine(cli.Response{V: cli.Protocol, ID: response.ID, OK: false, Code: cli.CodeInternal})
+		if err != nil {
+			return
+		}
+	}
+	_ = conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+	_, _ = conn.Write(line)
+}
+
+// readCLILine reads one line, refusing anything over the line limit.
+func readCLILine(reader *bufio.Reader) ([]byte, error) {
+	var out []byte
+	for {
+		chunk, err := reader.ReadSlice('\n')
+		out = append(out, chunk...)
+		if len(out) > cli.MaxLine {
+			return nil, errors.New("cli: request line too long")
+		}
+		if err == nil {
+			return out[:len(out)-1], nil
+		}
+		if !errors.Is(err, bufio.ErrBufferFull) {
+			return nil, err
+		}
+	}
+}
+
+// readFull fills buf from reader.
+func readFull(reader *bufio.Reader, buf []byte) (int, error) {
+	read := 0
+	for read < len(buf) {
+		n, err := reader.Read(buf[read:])
+		read += n
+		if err != nil {
+			return read, err
+		}
+	}
+	return read, nil
+}
+
+// verifySameUser refuses a connection from another user before reading a byte.
+func verifySameUser(conn *net.UnixConn) error {
+	uid, err := cli.PeerUID(conn)
+	if err != nil {
+		return err
+	}
+	if uid != uint32(os.Getuid()) {
+		return errors.New("cli: connection from another user")
+	}
+	return nil
+}
+
+// applyCLI runs one command line request on the main thread. It never writes
+// remembered durations, never authorizes anything and stays quiet unless the
+// request asked for a hint.
+func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
+	if a.quitting {
+		return cli.Failure(cli.CodeQuitting)
+	}
+	previous := a.quiet
+	a.quiet = !req.Notify
+	defer func() { a.quiet = previous }()
+	locale := uiLocale()
+	if req.Op == cli.OpStatus {
+		state := a.cliState()
+		result := cli.NewResult(state)
+		result.Lines = a.cliStatusLines(locale, state)
+		return result
+	}
+	switch req.Action {
+	case cli.ActionAwake, cli.ActionAwakeStop, cli.ActionAwakeToggle:
+		if !a.config.AwakeEnabled {
+			return cli.Failure(cli.CodeDisabled)
+		}
+	case cli.ActionJSONNew:
+		if !a.config.JSONEnabled {
+			return cli.Failure(cli.CodeDisabled)
+		}
+	}
+	var err error
+	switch req.Action {
+	case cli.ActionAwake:
+		request := paletteURLRequest{Kind: "awake", Arg: req.Arg, Mode: req.Mode, Follow: req.Follow, CLI: true}
+		if req.Lid != nil {
+			request.Lid, request.HasLid = *req.Lid, true
+		}
+		err = a.runURL(request)
+	case cli.ActionAwakeStop:
+		err = a.runURL(paletteURLRequest{Kind: "awake.stop", CLI: true})
+	case cli.ActionAwakeToggle:
+		err = a.runCLIToggle()
+		a.announceAwake(err)
+	case cli.ActionJSONNew:
+		if len(body) > cli.MaxPayload {
+			return cli.Failure(cli.CodeBadRequest)
+		}
+		err = a.runURL(paletteURLRequest{Kind: "json.new", Text: string(body), CLI: true})
+	case cli.ActionPalette:
+		err = a.runURL(paletteURLRequest{Kind: "palette", CLI: true})
+	case cli.ActionSettings:
+		page, _ := settingsPageIndex(req.Page, a)
+		err = a.runURL(paletteURLRequest{Kind: "settings", Page: page, CLI: true})
+	default:
+		return cli.Failure(cli.CodeBadRequest)
+	}
+	result := cli.Result{V: cli.Protocol, OK: err == nil}
+	if err != nil {
+		result.Code = cliErrorKey(err)
+		result.Message = a.text(locale, result.Code)
+	} else {
+		result.Message = a.cliMessage(locale, req.Action)
+	}
+	result.State = a.cliState()
+	return result
+}
+
+// runCLIToggle is the shortcut's toggle with the command line's rule: the lid
+// helper may never ask for authorization on this path.
+func (a *application) runCLIToggle() error {
+	previous := a.lidURL
+	a.lidURL = true
+	defer func() { a.lidURL = previous }()
+	return a.toggleAwakeResult()
+}
+
+// cliErrorKey names the failure the tool reports. ProcessEnded keeps its own
+// name so a script can tell a finished target process from a failed start.
+func cliErrorKey(err error) string {
+	if err == nil {
+		return ""
+	}
+	if err.Error() == "ProcessEnded" {
+		return "ProcessEnded"
+	}
+	return paletteErrorKey(err)
+}
+
+// cliMessage is the one human sentence a successful action reports.
+func (a *application) cliMessage(locale, action string) string {
+	switch action {
+	case cli.ActionAwake, cli.ActionAwakeToggle:
+		state := a.awake.snapshot()
+		if !state.Active {
+			return a.text(locale, "ToastAwakeOff")
+		}
+		return a.awakeFeedbackMessage(locale, state.Session).Text
+	case cli.ActionAwakeStop:
+		return a.text(locale, "ToastAwakeOff")
+	}
+	return ""
+}
+
+// cliStatusLines is the human form of `cubbix status`: the same sentence the
+// menu bar shows, the JSON window count and the version.
+func (a *application) cliStatusLines(locale string, state *cli.State) []string {
+	return []string{
+		a.awakeStatus(locale, time.Now()),
+		fmt.Sprintf(a.text(locale, "CLIStatusJSON"), state.JSON.Windows),
+		"Cubbix " + state.Version,
+	}
+}
+
+// cliState is the snapshot every answer carries. It is read-only: no probe, no
+// helper call, no write to the config.
+func (a *application) cliState() *cli.State {
+	state := &cli.State{
+		Version: runningVersion(),
+		Tiles:   cli.Tiles{Awake: a.config.AwakeEnabled, JSON: a.config.JSONEnabled},
+	}
+	snapshot := a.awake.snapshot()
+	state.JSON.Windows = len(a.jsonDocuments)
+	awake := cli.AwakeState{Error: snapshot.Error}
+	if snapshot.Active {
+		session := snapshot.Session
+		awake.Active = true
+		awake.Mode = session.Mode
+		awake.Minutes = session.Minutes
+		awake.Until = session.Until
+		awake.End = cli.FormatEnd(session.End)
+		if !session.End.IsZero() {
+			remaining := int(math.Ceil(session.End.Sub(time.Now()).Seconds()))
+			if remaining < 0 {
+				remaining = 0
+			}
+			awake.RemainingSeconds = &remaining
+		}
+		if session.PID > 0 {
+			awake.Follow = &cli.Follow{PID: session.PID, Name: session.Name}
+		}
+	}
+	awake.Lid = cli.LidState{
+		Capable:    a.lidCapable(),
+		Available:  a.lid != nil && a.lid.Available(),
+		BatteryMin: a.config.AwakeLidBatteryMin,
+		Reason:     a.lidReason(),
+	}
+	if a.lid != nil {
+		awake.Lid.State = lidStateName(a.lid.snapshot().state)
+	} else {
+		awake.Lid.State = lidStateName(lidOff)
+	}
+	state.Awake = awake
+	return state
+}
+
+// lidStateName maps the controller's states to the JSON enum.
+func lidStateName(state lidState) string {
+	switch state {
+	case lidEnabling:
+		return "enabling"
+	case lidOn:
+		return "on"
+	case lidStopping:
+		return "stopping"
+	case lidRestoreFailed:
+		return "restore-failed"
+	case lidHelperGone:
+		return "helper-gone"
+	case lidBlocked:
+		return "blocked"
+	case lidError:
+		return "error"
+	}
+	return "off"
+}
+
+// settingsPageIndex maps the page name to the app's page number.
+func settingsPageIndex(page string, a *application) (int, bool) {
+	switch page {
+	case "", "general":
+		return 0, true
+	case "about":
+		return 1, true
+	case "tiles":
+		return 2, true
+	case "shortcuts":
+		return 3, true
+	}
+	return 0, false
+}

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"github.com/ConteMan/cubbix/internal/awake"
 	"log"
 	"net/url"
 	"slices"
@@ -378,7 +380,7 @@ func (a *application) runPalette() {
 	}
 	req := p.request
 	if req.Command != cmd {
-		req = request{Command: cmd, Awake: awakeArg{Kind: awakeArgDefault}}
+		req = request{Command: cmd, Awake: awake.Arg{Kind: awake.KindDefault}}
 	}
 	if req.Awake.Error != "" {
 		// Invalid parameters never execute and never close the panel.
@@ -473,14 +475,14 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 	forced := matchedPrefix && prefix.Command.Param != paramNone && prefix.Arg != ""
 	now := time.Now()
 
-	argFor := func(cmd *command) awakeArg {
+	argFor := func(cmd *command) awake.Arg {
 		if cmd.Param != paramAwake {
-			return awakeArg{}
+			return awake.Arg{}
 		}
 		if matchedPrefix && prefix.Command == cmd {
-			return parseAwakeArg(prefix.Arg, now)
+			return awake.ParseArg(prefix.Arg, now)
 		}
-		return awakeArg{Kind: awakeArgDefault}
+		return awake.Arg{Kind: awake.KindDefault}
 	}
 	commandRow := func(cmd *command) paletteRow {
 		row := paletteRow{Kind: paletteRowCommand, Key: cmd.ID, Title: cmd.Title(a, locale), Icon: cmd.Icon, Command: cmd}
@@ -593,7 +595,7 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		cmd := rows[selected].Command
 		if cmd != nil {
 			p.selectionKey = cmd.ID
-			arg := awakeArg{}
+			arg := awake.Arg{}
 			rawArg := ""
 			if cmd.Param == paramAwake {
 				arg = argFor(cmd)
@@ -635,7 +637,7 @@ func (a *application) refreshPaletteActions(p *paletteState, locale string) {
 		req = p.request
 	}
 	if req.Command != cmd {
-		req = request{Command: cmd, Awake: awakeArg{Kind: awakeArgDefault}}
+		req = request{Command: cmd, Awake: awake.Arg{Kind: awake.KindDefault}}
 	}
 	if p.errorKey == "" {
 		p.errorKey = req.Awake.Error
@@ -706,6 +708,14 @@ type paletteURLRequest struct {
 	Text        string
 	Blank       bool
 	Page        int
+	// Arg and Follow carry what a URL cannot express: a duration, a deadline or
+	// a followed process typed at the command line. ParsePaletteURL never sets
+	// them; only the CLI channel does.
+	Arg    string
+	Follow int
+	// CLI marks a request from the command line tool: same actions, but the lid
+	// rules and the quiet default differ from a URL's.
+	CLI bool
 }
 
 // parsePaletteURL validates a cubbix:// URL. Host and path are case-folded
@@ -753,7 +763,7 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 		}
 		if values, ok := query["minutes"]; ok && len(values) > 0 {
 			minutes, err := strconv.Atoi(values[0])
-			if err != nil || minutes < 0 || minutes > awakeMinutesMaximum {
+			if err != nil || minutes < 0 || minutes > awake.MinutesMaximum {
 				return paletteURLRequest{}, false
 			}
 			request.Minutes, request.HasMinutes = minutes, true
@@ -833,6 +843,53 @@ func (a *application) handleURL(raw string) {
 	}()
 }
 
+// awakeLidGate decides whether this request may use the lid helper without
+// ever asking for authorization. URLs keep their original rule; the command
+// line accepts a deadline or a followed process instead of minutes.
+func (a *application) awakeLidGate(req paletteURLRequest, session awakeSession, origin string) error {
+	if !session.Lid {
+		return nil
+	}
+	if origin == "url" {
+		if a.lid == nil || !a.lid.Available() || a.lid.service.Status() != svcEnabled || !req.HasMinutes || req.Minutes < 1 || req.Minutes > 480 {
+			return fmt.Errorf("LidAuthNeeded")
+		}
+		return nil
+	}
+	if a.lid == nil || !a.lid.Available() {
+		// lidReason is empty when there is no controller at all; name the reason
+		// rather than returning an empty error key.
+		reason := a.lidReason()
+		if reason == "" {
+			reason = "LidUnsupported"
+		}
+		return errors.New(reason)
+	}
+	if a.lid.service.Status() != svcEnabled {
+		return errors.New("LidAuthNeeded")
+	}
+	// Only a lid the request asked for needs a stated deadline; the remembered
+	// preference follows the shortcut, which needs none.
+	if req.HasLid && req.Lid && !lidDurationStated(session, time.Now()) {
+		return errors.New("LidNeedsMinutes")
+	}
+	return nil
+}
+
+// lidDurationStated reports whether the user asked for a deadline the lid cap
+// allows, or for a process to follow.
+func lidDurationStated(session awakeSession, now time.Time) bool {
+	switch {
+	case session.PID > 0:
+		return true
+	case session.Minutes >= 1 && session.Minutes <= 480:
+		return true
+	case session.Until != "" && !session.End.IsZero():
+		return !session.End.After(now.Add(480 * time.Minute))
+	}
+	return false
+}
+
 func (a *application) runURL(req paletteURLRequest) error {
 	switch req.Kind {
 	case "awake":
@@ -840,7 +897,23 @@ func (a *application) runURL(req paletteURLRequest) error {
 		if req.Mode != "" {
 			session.Mode = req.Mode
 		}
-		if req.HasMinutes {
+		switch {
+		case req.Follow > 0:
+			// A followed process carries its own name and identity, read the way
+			// the controller reads them, or the session would start and stop.
+			process, ok := processByPID(req.Follow)
+			if !ok {
+				return errors.New("ProcessEnded")
+			}
+			session = awakeSession{Mode: session.Mode, PID: req.Follow, Identity: process.Identity, Name: process.Name}
+		case req.Arg != "":
+			arg := awake.ParseArg(req.Arg, time.Now())
+			built, err := a.buildAwakeSession(arg, session.Mode)
+			if err != nil {
+				return err
+			}
+			session = built
+		case req.HasMinutes:
 			session = awakeSession{Mode: session.Mode, Minutes: req.Minutes}
 			if req.Minutes > 0 {
 				session.End = time.Now().Add(time.Duration(req.Minutes) * time.Minute)
@@ -850,8 +923,13 @@ func (a *application) runURL(req paletteURLRequest) error {
 		if req.HasLid {
 			wanted = req.Lid
 		}
-		if wanted && (a.lid == nil || !a.lid.Available() || a.lid.service.Status() != svcEnabled || !req.HasMinutes || req.Minutes < 1 || req.Minutes > 480) {
-			return fmt.Errorf("LidAuthNeeded")
+		session.Lid = wanted
+		origin := "url"
+		if req.CLI {
+			origin = "cli"
+		}
+		if err := a.awakeLidGate(req, session, origin); err != nil {
+			return err
 		}
 		if !wanted && a.awake.snapshot().Session.Lid {
 			if err := a.lid.stop(); err != nil {
@@ -859,7 +937,6 @@ func (a *application) runURL(req paletteURLRequest) error {
 			}
 			a.setSessionLid(false)
 		}
-		session.Lid = wanted
 		a.lidURL = true
 		defer func() { a.lidURL = false }()
 		// The request never writes the remembered duration or deadline.
@@ -874,7 +951,11 @@ func (a *application) runURL(req paletteURLRequest) error {
 		a.announceAwake(err)
 		return err
 	case "awake.toggle":
-		// Same toggle as the shortcut, and the same hint when it fails.
+		// Kept for cubbix://awake/toggle only. It is not the shortcut's path: a
+		// remembered lid preference makes this branch answer LidAuthNeeded
+		// because the URL carries no minutes. The command line's toggle goes
+		// through runCLIToggle and toggleAwakeResult instead (006 §4.2), and a
+		// test pins this behavior so nobody "unifies" it by accident.
 		if a.awake.snapshot().Active {
 			return a.runURL(paletteURLRequest{Kind: "awake.stop"})
 		}

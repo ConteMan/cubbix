@@ -4,15 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/egoist/mygo"
+
+	"github.com/ConteMan/cubbix/internal/awake"
 )
 
 // commandParam is the kind of argument a command accepts. Only keep awake
@@ -23,24 +23,6 @@ const (
 	paramNone  commandParam = iota
 	paramAwake              // duration, until, unlimited, or the remembered setting
 )
-
-// awakeArgKind is the parsed form of a keep awake argument.
-type awakeArgKind int
-
-const (
-	awakeArgDefault   awakeArgKind = iota // use the remembered setting
-	awakeArgMinutes                       // fixed number of minutes
-	awakeArgUntil                         // until a clock time
-	awakeArgUnlimited                     // no deadline
-)
-
-type awakeArg struct {
-	Lid     bool
-	Kind    awakeArgKind
-	Minutes int    // awakeArgMinutes
-	Until   string // awakeArgUntil, "18:30"
-	Error   string // non-empty is a resource key: DurationError or TimeError
-}
 
 // command is pure data plus functions; it never holds a window.
 type command struct {
@@ -59,7 +41,7 @@ type command struct {
 type request struct {
 	Command *command
 	Arg     string
-	Awake   awakeArg
+	Awake   awake.Arg
 }
 
 // paletteAction is one row of the ⌘K action list.
@@ -397,50 +379,61 @@ func (a *application) runAwakeStart(req request) error {
 	return a.startAwakeWith(req.Awake, a.config.AwakeMode)
 }
 
-// startAwakeWith starts keep awake with the given parsed argument and mode.
-// It is the action-list path: the mode is an explicit choice and replaces the
-// remembered one, while the duration comes from the input unless the action
-// itself chose a preset.
-func (a *application) startAwakeWith(arg awakeArg, mode string) error {
-	previous := a.lidAuthorize
-	a.lidAuthorize = true
-	defer func() { a.lidAuthorize = previous }()
+// buildAwakeSession maps a parsed argument and a mode to the session to start.
+// It starts nothing and writes no setting: the command line, the palette and the
+// URL channel all use it, and only startAwakeWith remembers the choice.
+func (a *application) buildAwakeSession(arg awake.Arg, mode string) (awakeSession, error) {
 	if arg.Error != "" {
 		// The action keeps the typed parameter, so an invalid one stays an error.
-		return errors.New(arg.Error)
+		return awakeSession{}, errors.New(arg.Error)
 	}
 	var session awakeSession
 	switch arg.Kind {
-	case awakeArgUntil:
-		end, err := untilTime(arg.Until, time.Now())
+	case awake.KindUntil:
+		end, err := awake.UntilTime(arg.Until, time.Now())
 		if err != nil {
-			return err
+			return awakeSession{}, err
 		}
 		session = awakeSession{Mode: mode, End: end, Until: arg.Until}
-	case awakeArgMinutes:
-		if arg.Minutes < awakeMinutesMinimum || arg.Minutes > awakeMinutesMaximum {
-			return errors.New("DurationError")
+	case awake.KindMinutes:
+		if arg.Minutes < awake.MinutesMinimum || arg.Minutes > awake.MinutesMaximum {
+			return awakeSession{}, errors.New("DurationError")
 		}
 		session = awakeSession{Mode: mode, Minutes: arg.Minutes, End: time.Now().Add(time.Duration(arg.Minutes) * time.Minute)}
 	default:
 		session = a.selectedSession()
 		session.Mode = mode
 	}
-	if arg.Kind == awakeArgUnlimited {
+	if arg.Kind == awake.KindUnlimited {
 		session.End = time.Time{}
 		session.Minutes, session.Until = 0, ""
 	}
 	session.Lid = arg.Lid || a.lidPreference()
+	return session, nil
+}
+
+// startAwakeWith starts keep awake with the given parsed argument and mode.
+// It is the action-list path: the mode is an explicit choice and replaces the
+// remembered one, while the duration comes from the input unless the action
+// itself chose a preset.
+func (a *application) startAwakeWith(arg awake.Arg, mode string) error {
+	previous := a.lidAuthorize
+	a.lidAuthorize = true
+	defer func() { a.lidAuthorize = previous }()
+	session, err := a.buildAwakeSession(arg, mode)
+	if err != nil {
+		return err
+	}
 	if err := a.startAwake(session); err != nil {
 		return err
 	}
 	a.config.AwakeMode = mode
 	switch arg.Kind {
-	case awakeArgMinutes:
+	case awake.KindMinutes:
 		a.config.AwakeMinutes, a.config.AwakeUntil = arg.Minutes, ""
-	case awakeArgUnlimited:
+	case awake.KindUnlimited:
 		a.config.AwakeMinutes, a.config.AwakeUntil = 0, ""
-	case awakeArgUntil:
+	case awake.KindUntil:
 		a.config.AwakeUntil = arg.Until
 	}
 	a.save()
@@ -479,9 +472,9 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Title:   localizedTitle(preset.key),
 			Icon:    "clock-3",
 			Group:   1,
-			Checked: func(a *application) bool { return arg.Kind == awakeArgMinutes && arg.Minutes == minutes },
+			Checked: func(a *application) bool { return arg.Kind == awake.KindMinutes && arg.Minutes == minutes },
 			Run: func(a *application) error {
-				return a.startAwakeWith(awakeArg{Kind: awakeArgMinutes, Minutes: minutes, Lid: arg.Lid}, a.config.AwakeMode)
+				return a.startAwakeWith(awake.Arg{Kind: awake.KindMinutes, Minutes: minutes, Lid: arg.Lid}, a.config.AwakeMode)
 			},
 		})
 	}
@@ -491,9 +484,9 @@ func awakeStartActions(a *application, req request) []paletteAction {
 			Title:   localizedTitle("R05Unlimited"),
 			Icon:    "clock-3",
 			Group:   1,
-			Checked: func(a *application) bool { return arg.Kind == awakeArgUnlimited },
+			Checked: func(a *application) bool { return arg.Kind == awake.KindUnlimited },
 			Run: func(a *application) error {
-				return a.startAwakeWith(awakeArg{Kind: awakeArgUnlimited, Lid: arg.Lid}, a.config.AwakeMode)
+				return a.startAwakeWith(awake.Arg{Kind: awake.KindUnlimited, Lid: arg.Lid}, a.config.AwakeMode)
 			},
 		},
 		paletteAction{
@@ -834,111 +827,16 @@ func sortedCommands(a *application, locale, query string, commands []*command) [
 	return out
 }
 
-// --- Keep awake argument parsing ---
-
-const (
-	awakeMinutesMinimum = 1
-	awakeMinutesMaximum = 525659 // 8760 hours 59 minutes
-)
-
-// parseAwakeArg parses the whole argument; every grammar in the table must
-// match end to end. Combined forms come before a lone hour or minute.
-func parseAwakeArg(arg string, now time.Time) (result awakeArg) {
-	value, lidOn := stripLidModifier(arg)
-	defer func() { result.Lid = lidOn }()
-	return parseAwakeDuration(value, now)
-}
-func stripLidModifier(arg string) (string, bool) {
-	value := strings.TrimSpace(arg)
-	lower := strings.ToLower(value)
-	for _, word := range []string{"合盖", "lid1", "lid", "盖"} {
-		if strings.HasPrefix(lower, word) {
-			return strings.TrimSpace(value[len(word):]), true
-		}
-		if strings.HasSuffix(lower, word) {
-			return strings.TrimSpace(value[:len(value)-len(word)]), true
-		}
-	}
-	return value, false
-}
-func parseAwakeDuration(arg string, now time.Time) awakeArg {
-	value := strings.TrimSpace(arg)
-	if value == "" {
-		return awakeArg{Kind: awakeArgDefault}
-	}
-	lower := strings.ToLower(value)
-	switch lower {
-	case "∞", "inf", "infinity", "unlimited", "无限", "不限", "不限时", "0":
-		return awakeArg{Kind: awakeArgUnlimited}
-	}
-	if until, ok := awakeUntilArg(lower); ok {
-		if _, err := untilTime(until, now); err != nil {
-			return awakeArg{Kind: awakeArgUntil, Error: "TimeError"}
-		}
-		return awakeArg{Kind: awakeArgUntil, Until: until}
-	}
-	minutes, ok := parseAwakeMinutes(lower)
-	if !ok || minutes < awakeMinutesMinimum || minutes > awakeMinutesMaximum {
-		return awakeArg{Error: "DurationError"}
-	}
-	return awakeArg{Kind: awakeArgMinutes, Minutes: minutes}
-}
-
-// awakeUntilArg recognizes "until 18:30", "到 18:30", "直到 18:30" and a bare
-// clock time. Validation is left to untilTime, the same function the dialog
-// uses.
-func awakeUntilArg(value string) (string, bool) {
-	for _, prefix := range []string{"until", "直到", "到"} {
-		if strings.HasPrefix(value, prefix) {
-			return strings.TrimSpace(value[len(prefix):]), true
-		}
-	}
-	if strings.Contains(value, ":") {
-		return value, true
-	}
-	return "", false
-}
-
-// parseAwakeMinutes parses 45, 45m, 2h, 1h30m, 1h 30m and the Chinese forms,
-// returning minutes.
-var (
-	awakeHoursPattern   = regexp.MustCompile(`^([0-9]+)\s*(?:h|小时|hours?|hrs?)(?:\s*([0-9]+)\s*(?:m|mins?|分钟|分)?)?$`)
-	awakeMinutesPattern = regexp.MustCompile(`^([0-9]+)\s*(?:m|mins?|分钟|分)?$`)
-)
-
-func parseAwakeMinutes(value string) (int, bool) {
-	value = strings.ToLower(strings.TrimSpace(value))
-	if match := awakeHoursPattern.FindStringSubmatch(value); match != nil {
-		hours, err := strconv.Atoi(match[1])
-		if err != nil || hours > awakeMinutesMaximum/60 {
-			return 0, false
-		}
-		minutes := 0
-		if match[2] != "" {
-			minutes, err = strconv.Atoi(match[2])
-			if err != nil || minutes > 59 {
-				return 0, false
-			}
-		}
-		return hours*60 + minutes, true
-	}
-	if match := awakeMinutesPattern.FindStringSubmatch(value); match != nil {
-		minutes, err := strconv.Atoi(match[1])
-		return minutes, err == nil
-	}
-	return 0, false
-}
-
 // awakeHint describes the parsed argument for the row's right side. It only
 // talks about the duration; the mode lives in the ⌘K action list.
-func awakeHint(a *application, locale string, arg awakeArg) string {
+func awakeHint(a *application, locale string, arg awake.Arg) string {
 	text := func(key string) string { return a.text(locale, key) }
 	switch arg.Kind {
-	case awakeArgMinutes:
+	case awake.KindMinutes:
 		return awakeDurationText(a, locale, arg.Minutes)
-	case awakeArgUntil:
+	case awake.KindUntil:
 		return fmt.Sprintf(text("PaletteAwakeUntil"), arg.Until)
-	case awakeArgUnlimited:
+	case awake.KindUnlimited:
 		return text("R05Unlimited")
 	default:
 		if a.config.AwakeUntil != "" {

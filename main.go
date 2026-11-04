@@ -72,6 +72,11 @@ type application struct {
 	registerURLScheme func(string) error
 	urlDispatch       func(func())
 
+	// cli is the command line socket server, nil until ready.
+	cli *cliServer
+	// quiet silences the hint and the lid notification for one command line
+	// request; it is set and reset on the main thread only.
+	quiet                  bool
 	registerShortcut       func(string, func()) error
 	shortcutSuspended      bool
 	refreshApplicationMenu func()
@@ -194,7 +199,7 @@ func (a *application) changeLogin() {
 }
 
 func settingsHeight(t tokenValues, page int, hasError bool) int {
-	content := 2*t.SizeRowHeight + t.StrokeHairline
+	content := 3*t.SizeRowHeight + 2*t.StrokeHairline // general: language, login, CLI
 	if page == 1 {
 		content = t.FontSizeSmall*t.LineHeightBody + t.Space8 + 3*t.SizeRowHeight + 2*t.StrokeHairline
 	}
@@ -455,6 +460,7 @@ func (a *application) ready() {
 	a.registerPaletteShortcut()
 	a.registerPanelShortcut()
 	a.feedback.watch()
+	a.startCLIServer()
 	if err := a.registerURLScheme("cubbix"); err != nil {
 		// A missing declaration only disables deep links; it must not block launch.
 		log.Print(err)
@@ -485,6 +491,7 @@ func (a *application) ready() {
 func (a *application) beforeQuit(*mygo.QuitEvent) {
 	// JSON windows are tools: quitting never asks about unsaved text.
 	a.quitting = true
+	a.cli.stop()
 	a.hidePalette()
 	a.hidePaletteGuides()
 	a.hideMenubarPanel()
@@ -630,6 +637,7 @@ func (a *application) view(c *ui.Context) {
 						})
 						ui.Divider(c)
 						a.row(c, t, text("LaunchAtLogin"), func() { a.switchControl(c, t, "login", text("LaunchAtLogin"), &a.config.OpenAtLogin, a.changeLogin) })
+						a.cliSettingsRow(c, t, locale)
 					} else {
 						a.row(c, t, text("Version"), func() {
 							ui.Text(c, version()).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
@@ -663,7 +671,15 @@ func (a *application) view(c *ui.Context) {
 					errorKey = a.awake.snapshot().Error
 				}
 				if errorKey != "" {
-					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(errorKey))
+					message := text(errorKey)
+					if errorKey == "CLILinkConflict" {
+						if paths, ok := cliPathsFor(); ok {
+							message = strings.ReplaceAll(message, "%s", paths.link)
+						} else {
+							message = text("CLIInstallFailed")
+						}
+					}
+					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(message)
 				}
 			})
 		})

@@ -189,7 +189,8 @@ func TestLanguageAndPreferencesPersist(t *testing.T) {
 
 func TestSettingsHeight(t *testing.T) {
 	tokens := tokens(false, "zh-CN")
-	if got := settingsHeight(tokens, 0, false); got != 176 {
+	// General: language, launch at login, command line tool = 3 rows.
+	if got := settingsHeight(tokens, 0, false); got != 196 {
 		t.Fatalf("general height = %d", got)
 	}
 	if got := settingsHeight(tokens, 1, false); got != 220 {
