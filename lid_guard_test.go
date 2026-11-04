@@ -77,15 +77,34 @@ func lidCapabilityName(expr ast.Expr) string {
 // Only this exact, replaceable PMSet.Run closure may use a dynamic executable.
 // Any additional command in helper main is checked normally.
 func lidHelperBridge(literal *ast.CompositeLit) (*ast.FuncLit, bool) {
-	if len(literal.Elts) != 1 {
+	if len(literal.Elts) < 1 || len(literal.Elts) > 2 {
 		return nil, false
 	}
-	field, ok := literal.Elts[0].(*ast.KeyValueExpr)
-	if !ok {
-		return nil, false
+	var field *ast.KeyValueExpr
+	for _, elt := range literal.Elts {
+		kv, ok := elt.(*ast.KeyValueExpr)
+		if !ok {
+			return nil, false
+		}
+		key, ok := kv.Key.(*ast.Ident)
+		if !ok {
+			return nil, false
+		}
+		switch key.Name {
+		case "Run":
+			if field != nil {
+				return nil, false
+			}
+			field = kv
+		case "Logf":
+			if lidASTText(kv.Value) != "log.Printf" {
+				return nil, false
+			}
+		default:
+			return nil, false
+		}
 	}
-	key, ok := field.Key.(*ast.Ident)
-	if !ok || key.Name != "Run" {
+	if field == nil {
 		return nil, false
 	}
 	runner, ok := field.Value.(*ast.FuncLit)

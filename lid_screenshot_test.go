@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ConteMan/cubbix/internal/lid"
 	"github.com/egoist/mygo/ui"
 	"image/png"
 	"os"
@@ -24,10 +25,21 @@ func TestLidScreenshots(t *testing.T) {
 			if dark {
 				mode = "dark"
 			}
-			for _, state := range []string{"not-running", "install-failed", "unregistered", "available", "enabling", "on", "battery", "low", "foreign", "restore-failed", "approval", "denied", "unsupported", "stale", "settings", "palette"} {
+			for _, state := range []string{"helper-update", "enable-failed", "not-running", "install-failed", "unregistered", "available", "enabling", "on", "battery", "low", "foreign", "restore-failed", "approval", "denied", "unsupported", "stale", "settings", "palette"} {
 				a, s, p, svc, conn := lidTestApp(t)
 				a.panel = &menubarPanelState{}
 				switch state {
+				case "helper-update":
+					conn.helloVersion = "1"
+					a.lid.Inspect()
+				case "enable-failed":
+					zero := 0
+					a.lid.dial = func() (lidConnection, error) {
+						return lidEnableReply{conn, lid.Response{Helper: lid.Version, Code: "pmset-failed", State: "off", Value: &zero, Detail: "journal-save-failed"}}, nil
+					}
+					session := a.selectedSession()
+					session.Lid = true
+					_ = a.startAwake(session)
 				case "not-running", "install-failed":
 					conn.gone = true
 					svc.status = svcNotRunning
@@ -113,7 +125,7 @@ func TestLidScreenshots(t *testing.T) {
 					tt.Advance(time.Second)
 					tt.Frame()
 				}
-				if state == "restore-failed" || state == "stale" || state == "approval" {
+				if state == "helper-update" || state == "enable-failed" || state == "restore-failed" || state == "stale" || state == "approval" {
 					r, ok := tt.Find(a.text(locale, a.lidReason()))
 					if !ok {
 						t.Fatal("missing alert", state)

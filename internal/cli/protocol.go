@@ -220,11 +220,18 @@ type Follow struct {
 
 // LidState is the lid keep awake snapshot.
 type LidState struct {
-	Capable    bool   `json:"capable"`
-	Available  bool   `json:"available"`
-	State      string `json:"state"`
-	Reason     string `json:"reason"`
-	BatteryMin int    `json:"batteryMin"`
+	Capable       bool   `json:"capable"`
+	Available     bool   `json:"available"`
+	State         string `json:"state"`
+	Reason        string `json:"reason"`
+	BatteryMin    int    `json:"batteryMin"`
+	LastCode      string `json:"lastCode,omitempty"`
+	HelperVersion string `json:"helperVersion,omitempty"`
+	Hello         string `json:"hello,omitempty"`
+	HelperCode    string `json:"helperCode,omitempty"`
+	HelperState   string `json:"helperState,omitempty"`
+	HelperValue   *int   `json:"helperValue,omitempty"`
+	HelperDetail  string `json:"helperDetail,omitempty"`
 }
 
 // JSONState reports the open JSON windows.

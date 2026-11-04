@@ -33,10 +33,11 @@ type cliServer struct {
 
 	// Seams: tests replace them so no socket, no window and no main loop is
 	// involved.
-	verify   func(*net.UnixConn) error
-	apply    func(cli.Request, []byte) cli.Result
-	dispatch func(func())
-	logf     func(string, ...any)
+	verify     func(*net.UnixConn) error
+	apply      func(cli.Request, []byte) cli.Result
+	applyAsync func(cli.Request, []byte, func(cli.Result))
+	dispatch   func(func())
+	logf       func(string, ...any)
 }
 
 // startCLIServer listens for the command line tool. It never blocks the app:
@@ -54,7 +55,7 @@ func (a *application) startCLIServer() {
 		dispatch: a.urlDispatch,
 		logf:     log.Printf,
 	}
-	s.apply = a.applyCLI
+	s.applyAsync = a.applyCLIAsync
 	if err := s.listen(); err != nil {
 		s.logf("cli: socket unavailable")
 		return
@@ -260,13 +261,21 @@ func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, bool, <-
 	go func() {
 		defer close(finished)
 		var out outcome
+		deferred := false
 		s.dispatch(func() {
 			if !phase.CompareAndSwap(0, 1) || s.closing.Load() {
 				return
 			}
+			if s.applyAsync != nil {
+				deferred = true
+				s.applyAsync(req, body, func(r cli.Result) { result <- outcome{result: r, ran: true} })
+				return
+			}
 			out = outcome{result: s.apply(req, body), ran: true}
 		})
-		result <- out
+		if !deferred {
+			result <- out
+		}
 	}()
 	timeout := s.actionTimeout
 	if timeout == 0 {
@@ -382,7 +391,9 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 		err = a.runURL(paletteURLRequest{Kind: "awake.stop", CLI: true})
 	case cli.ActionAwakeToggle:
 		err = a.runCLIToggle()
-		a.announceAwake(err)
+		if err != nil || !a.lidBusy {
+			a.announceAwake(err)
+		}
 	case cli.ActionJSONNew:
 		if len(body) > cli.MaxPayload {
 			return cli.Failure(cli.CodeBadRequest)
@@ -488,9 +499,22 @@ func (a *application) cliState() *cli.State {
 		Reason:     a.lidReason(),
 	}
 	if a.lid != nil {
-		awake.Lid.State = lidStateName(a.lid.snapshot().state)
+		s := a.lid.snapshot()
+		awake.Lid.State = lidStateName(s.state)
+		awake.Lid.LastCode = s.lastCode
+		awake.Lid.HelperVersion = s.helperVersion
+		awake.Lid.Hello = s.hello
+		r := s.response
+		if s.lastFailure != nil {
+			r = *s.lastFailure
+		}
+		awake.Lid.HelperCode, awake.Lid.HelperState = r.Code, r.State
+		awake.Lid.HelperValue, awake.Lid.HelperDetail = r.Value, r.Detail
 	} else {
 		awake.Lid.State = lidStateName(lidOff)
+	}
+	if a.lidLastCode != "" {
+		awake.Lid.LastCode = a.lidLastCode
 	}
 	state.Awake = awake
 	return state
@@ -530,4 +554,31 @@ func settingsPageIndex(page string, a *application) (int, bool) {
 		return 3, true
 	}
 	return 0, false
+}
+
+// applyCLIAsync installs a completion only for this request. enableLid captures
+// it before returning, so unrelated requests cannot claim the pending result.
+// Both the action and its final snapshot run on the main thread.
+func (a *application) applyCLIAsync(req cli.Request, body []byte, reply func(cli.Result)) {
+	previous := a.lidCompletion
+	a.lidCompletion = func(err error) {
+		result := cli.Result{V: cli.Protocol, OK: err == nil, State: a.cliState()}
+		if err != nil {
+			result.Code = cliErrorKey(err)
+			if a.quitting {
+				result.Code = cli.CodeQuitting
+			}
+			result.Message = a.text(uiLocale(), result.Code)
+		} else {
+			result.Message = a.cliMessage(uiLocale(), req.Action)
+		}
+		reply(result)
+	}
+	wasBusy := a.lidBusy
+	result := a.applyCLI(req, body)
+	pending := !wasBusy && a.lidBusy && result.OK
+	a.lidCompletion = previous
+	if !pending {
+		reply(result)
+	}
 }

@@ -34,6 +34,8 @@ type Engine struct {
 	lastRequest, lastBattery, retryAt time.Time
 	failures, unknown                 int
 	state, code                       string
+	detail                            string
+	Logf                              func(string, ...any)
 }
 
 func NewEngine(s SleepSetter, p PowerSource, j JournalStore) *Engine {
@@ -78,7 +80,7 @@ func (e *Engine) refresh() {
 }
 func (e *Engine) response(id string, ok bool, code string) Response {
 	e.refresh()
-	r := Response{V: Protocol, ID: id, OK: ok, Protocol: Protocol, Helper: Version, State: e.state, Code: code, MinPercent: 20, Power: "unknown"}
+	r := Response{V: Protocol, ID: id, OK: ok, Protocol: Protocol, Helper: Version, State: e.state, Code: code, Detail: e.detail, MinPercent: 20, Power: "unknown"}
 	if v, err := e.Sleep.Read(); err == nil && (v == 0 || v == 1) {
 		r.Value = &v
 	}
@@ -101,9 +103,10 @@ func (e *Engine) effectiveDeadline() time.Time {
 	}
 	return hard
 }
-func (e *Engine) Handle(owner uint64, r Request) Response {
+func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	defer func() { LogResponse(e.Logf, r.Op, out) }()
 	now := e.Now()
 	if code := r.Validate(now); code != "" {
 		return e.response(r.ID, false, code)
@@ -114,6 +117,7 @@ func (e *Engine) Handle(owner uint64, r Request) Response {
 	}
 	switch r.Op {
 	case "enable":
+		e.detail = ""
 		if e.journal != nil {
 			if e.state != "on-ours" {
 				return e.response(r.ID, false, "restore-failed")
@@ -125,12 +129,14 @@ func (e *Engine) Handle(owner uint64, r Request) Response {
 			j := *e.journal
 			j.Deadline = r.Deadline
 			if err := e.Store.Save(j); err != nil {
+				e.detail = "journal-save-failed"
 				return e.response(r.ID, false, "pmset-failed")
 			}
 			e.journal = &j
 			e.lastRequest = now
 			v, err := e.Sleep.Read()
 			if err != nil || v != 1 {
+				e.detail = "renew-readback-failed"
 				e.restore("pmset-failed")
 				return e.response(r.ID, false, e.code)
 			}
@@ -138,6 +144,7 @@ func (e *Engine) Handle(owner uint64, r Request) Response {
 		}
 		value, err := e.Sleep.Read()
 		if err != nil {
+			e.detail = "preflight-read-failed"
 			return e.response(r.ID, false, "pmset-failed")
 		}
 		if value != 0 {
@@ -154,6 +161,7 @@ func (e *Engine) Handle(owner uint64, r Request) Response {
 		}
 		j := Journal{Started: now, Deadline: r.Deadline, MinPercent: min, Previous: 0}
 		if err = e.Store.Save(j); err != nil {
+			e.detail = "journal-save-failed"
 			return e.response(r.ID, false, "pmset-failed")
 		}
 		e.journal = &j
@@ -163,6 +171,11 @@ func (e *Engine) Handle(owner uint64, r Request) Response {
 		e.unknown = 0
 		if err = e.Sleep.Set(1); err == nil {
 			value, err = e.Sleep.Read()
+			if err != nil || value != 1 {
+				e.detail = "enable-readback-failed"
+			}
+		} else {
+			e.detail = "enable-write-failed"
 		}
 		if err != nil || value != 1 {
 			e.restore("pmset-failed")
@@ -184,6 +197,11 @@ func (e *Engine) Handle(owner uint64, r Request) Response {
 var backoff = []time.Duration{time.Second, 2 * time.Second, 5 * time.Second, 10 * time.Second, 30 * time.Second, 60 * time.Second}
 
 func (e *Engine) restore(code string) {
+	defer func() {
+		if e.Logf != nil {
+			e.Logf("restore code=%s state=%s detail=%s", e.code, e.state, e.detail)
+		}
+	}()
 	if e.journal == nil {
 		return
 	}
