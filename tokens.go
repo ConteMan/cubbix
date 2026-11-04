@@ -117,6 +117,13 @@ type tokenValues struct {
 	SizeToastSlotWidth        float32
 	SizeToastHeight           float32
 	SizeFeedbackPositionWidth float32
+	ColorPanelStrokeOuter     string
+	ColorPanelStrokeInner     string
+	ColorPanelShadow          string
+	ColorGuideLine            string
+	ColorGuideLineSnap        string
+	SizePaletteShadowMargin   float32
+	SizePaletteSnap           float32
 }
 
 func tokens(dark bool, language string) tokenValues {
@@ -233,6 +240,13 @@ func tokens(dark bool, language string) tokenValues {
 		SizeToastSlotWidth:        320,
 		SizeToastHeight:           36,
 		SizeFeedbackPositionWidth: 144,
+		ColorPanelStrokeOuter:     "#00000014",
+		ColorPanelStrokeInner:     "#FFFFFFB3",
+		ColorPanelShadow:          "#0000002E",
+		ColorGuideLine:            "#2020203D",
+		ColorGuideLineSnap:        "#202020CC",
+		SizePaletteShadowMargin:   32,
+		SizePaletteSnap:           8,
 	}
 	if dark {
 		t.ColorWindow = "#202020"
@@ -261,6 +275,11 @@ func tokens(dark bool, language string) tokenValues {
 		t.ColorSyntaxBool = "#6CB6FF"
 		t.ColorSyntaxNull = "#6CB6FF"
 		t.ColorSyntaxIndent = "#3C3C3C"
+		t.ColorPanelStrokeOuter = "#FFFFFF1F"
+		t.ColorPanelStrokeInner = "#FFFFFF14"
+		t.ColorPanelShadow = "#0000007A"
+		t.ColorGuideLine = "#F5F5F53D"
+		t.ColorGuideLineSnap = "#F5F5F5CC"
 	}
 	if language == "en" {
 		t.FontFamily = "Inter"

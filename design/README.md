@@ -10,10 +10,14 @@ JSON 使用反馈修正及代码评审见 [R08 交付](rounds/R08-2026-10-30-JSO
 
 设计源为 [`cubbix.pen`](cubbix.pen)，R04 基础系统的预览、规则与验证见 [R04 目录](rounds/R04-2026-10-28-收尾/README.md)。R04 在 main 的 Logo 定稿基础上完成单色猫标接入，并移除导航选中描边。R01／R02／R03 目录保留为历史归档。
 
-- [Token 映射](token-index.md)：当前 116 个样式 Token，强调色只按浅深主题解析黑白灰。
+- [Token 映射](token-index.md)：当前 123 个样式 Token，强调色只按浅深主题解析黑白灰。
 - [组件索引](component-index.md)：当前 104 个 reusable、606 个源稿 ref。
-- [语言资源](locales/)：中文和英文各 238 个资源键。
+- [语言资源](locales/)：中文和英文各 267 个资源键。
 - [Lucide 0.468.0 图标与 ISC 许可证](assets/lucide-0.468.0/)；品牌猫标来自 [`mark.svg`](../brand/dist/mark.svg)。
+
+## 面板位置与外观（R14）
+
+命令面板的拖动、参考线、边框与阴影见 [R14 交付](rounds/R14-2026-11-04-面板位置与外观/README.md)：中英浅深四张评审板，每张含三套边框阴影方案、拖动中与吸附后两态、快捷键页 6 行。推荐方案把阴影改为自绘（圆角 12、外描边 1、内高光 1、阴影 `0/8/24`），窗口因此比面板每边大 `SizePaletteShadowMargin = 32`；参考线用 `ColorGuideLine`／`ColorGuideLineSnap`，吸附阈值 `SizePaletteSnap = 8`。R14 后共 123 个样式 Token，中英文各 267 个资源键。本轮只出设计，未实现、未合并；规格见 [005](../../docs/specs/005-面板位置与外观.md)。
 
 ## 使用反馈（R12）
 
