@@ -261,9 +261,9 @@ func TestCLIServerBusyBeforeBody(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer ninth.Close()
-	if _, err := ninth.Write([]byte("{\"v\":1,\"id\":\"n\",\"op\":\"run\",\"action\":\"json.new\",\"bytes\":4}" + "\n" + "body")); err != nil {
-		t.Fatal(err)
-	}
+	// The server may answer busy and close before this write lands, so a
+	// failed write is expected; the busy line is still there to read.
+	_, _ = ninth.Write([]byte("{\"v\":1,\"id\":\"n\",\"op\":\"run\",\"action\":\"json.new\",\"bytes\":4}" + "\n" + "body"))
 	_ = ninth.SetReadDeadline(time.Now().Add(2 * time.Second))
 	line, err := bufio.NewReader(ninth).ReadBytes('\n')
 	if err != nil {
