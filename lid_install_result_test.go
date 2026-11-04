@@ -109,7 +109,7 @@ esac
 				t.Fatal(err)
 			}
 			script := lidInstallScript
-			for _, name := range []string{"/usr/bin/install", "/usr/bin/codesign", "/bin/rm", "/bin/mv", "/bin/cat", "/bin/chown", "/bin/chmod", "/bin/launch" + "ctl", "/bin/sleep"} {
+			for _, name := range []string{"/usr/bin/install", "/usr/bin/codesign", "/bin/rm", "/bin/mv", "/bin/cat", "/usr/sbin/chown", "/bin/chmod", "/bin/launch" + "ctl", "/bin/sleep"} {
 				script = strings.ReplaceAll(script, name, "'"+fixture+"' "+filepath.Base(name))
 			}
 			script = strings.ReplaceAll(script, lidPlistPath, filepath.Join(dir, "helper.plist"))
