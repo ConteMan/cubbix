@@ -1,6 +1,6 @@
 # Token 与 Go 标识符映射
 
-当前共 116 个样式 Token（颜色 30、数值 80、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」，快捷键反馈尺寸见「R11 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+当前共 123 个样式 Token（颜色 35、数值 82、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」，快捷键反馈尺寸见「R11 追加」，面板外观与拖动参考线见「R14 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
@@ -158,3 +158,17 @@ ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代�
 | `SizeFeedbackPositionWidth` | number | `144` |
 
 屏幕提示固定 320 × 36 的透明槽：单行文字 13 × 1.5 ≈ 20，上下各 Space8；胶囊宽度随内容，靠固定槽宽把定位化简为只读 Token，超长文案按「…」截断。设置页「提示位置」的五段分段控件宽 144。颜色全部复用既有 Token：胶囊 ColorMenuSurface、文字 ColorText、关闭态图标 ColorTextSecondary、失败图标 ColorDanger。三个 Token 已同步 `design/tokens.json` 与 `tokens.go`；`cubbix.pen` 变量与 R11 画板在评审步骤补齐（同 R09 的做法）。
+
+## R14 追加
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `ColorPanelStrokeOuter` | color | `mode=light: #00000014 / mode=dark: #FFFFFF1F` |
+| `ColorPanelStrokeInner` | color | `mode=light: #FFFFFFB3 / mode=dark: #FFFFFF14` |
+| `ColorPanelShadow` | color | `mode=light: #0000002E / mode=dark: #0000007A` |
+| `ColorGuideLine` | color | `mode=light: #2020203D / mode=dark: #F5F5F53D` |
+| `ColorGuideLineSnap` | color | `mode=light: #202020CC / mode=dark: #F5F5F5CC` |
+| `SizePaletteShadowMargin` | number | `32` |
+| `SizePaletteSnap` | number | `8` |
+
+命令面板（003）的外观与拖动参考线见 [规格 005](../docs/specs/005-面板位置与外观.md) 与 [R14 交付](rounds/R14-2026-11-04-面板位置与外观/README.md)。推荐方案把阴影改为自绘（系统阴影无法调参），因此窗口比面板每边大 `SizePaletteShadowMargin`：面板 640 × 400，窗口 704 × 464；`32` 取自 `ui` 的阴影外扩公式 `|x| + |y| + blur + spread`（`0 + 8 + 24 + 0 = 32`），与 `Shadow(0, Space8, Space24, 0, ColorPanelShadow)` 严格对应。外描边与内高光各 1px（`StrokeHairline`），内高光用 `InsetShadow(0, 0, 0, 1, ColorPanelStrokeInner)` 画在描边内侧。参考线宽 1（`StrokeHairline`）、吸附后改 2（`StrokeIcon`）并换成 `ColorGuideLineSnap`；吸附阈值 `SizePaletteSnap` 为 8。七个 Token 已同步 `design/cubbix.pen` 变量、`design/tokens.json` 与 `tokens.go`。
