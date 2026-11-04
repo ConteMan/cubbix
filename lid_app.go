@@ -41,6 +41,8 @@ func (a *application) setSessionLid(value bool) {
 }
 func (a *application) completeLid(err error) {
 	if err == nil && a.awake.snapshot().Active && a.lid.snapshot().state == lidOn {
+		a.lidMessage = ""
+		a.lidLastCode = ""
 		a.config.AwakeLid = true
 		a.lidPending = nil
 		a.setSessionLid(true)
@@ -57,6 +59,12 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 	if a.lid == nil || !a.lid.Available() {
 		return errors.New("LidUnsupported")
 	}
+	if a.lidBusy {
+		a.lidLastCode = "lid-busy"
+		a.lidMessage = "LidEnableFailed"
+		return errors.New("LidEnableFailed")
+	}
+	a.lidLastCode = ""
 	a.lidMessage = ""
 	a.lidNotice = ""
 	fromURL := a.lidURL
@@ -75,9 +83,7 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 		}
 		return err
 	}
-	if a.lidBusy {
-		return errors.New("LidEnableFailed")
-	}
+	completion := a.lidCompletion
 	a.lidBusy = true
 	a.refreshAwake()
 	go func() {
@@ -85,10 +91,20 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 		a.urlDispatch(func() {
 			a.lidBusy = false
 			if a.quitting {
+				if completion != nil {
+					completion(errors.New("quitting"))
+				}
 				return
+			}
+			if err == nil && (!a.awake.snapshot().Active || a.lid.snapshot().state != lidOn) {
+				err = errors.New("LidEnableFailed")
+				a.lidLastCode = "session-ended-before-completion"
 			}
 			a.completeLid(err)
 			a.lidURLAnnounce(fromURL, quiet, err)
+			if completion != nil {
+				completion(err)
+			}
 		})
 	}()
 	return nil

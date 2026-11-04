@@ -26,9 +26,11 @@ var jsonAssets embed.FS
 const appVersion = "0.5.3"
 
 type application struct {
-	lidMessage   string
-	lidAuthorize bool
-	lidPolling   bool
+	lidCompletion func(error)
+	lidLastCode   string
+	lidMessage    string
+	lidAuthorize  bool
+	lidPolling    bool
 
 	lid                       *lidController
 	lidBusy, lidAsync, lidURL bool

@@ -3,6 +3,7 @@ package lid
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -10,22 +11,59 @@ import (
 
 type FileJournal struct{ Path string }
 
+// normalizeJournalGroup repairs group inheritance only after the descriptor's
+// owner and permissions have been checked. A root-created directory can inherit
+// admin from its parent on macOS; its 0700 mode still protects the contents.
+func normalizeJournalGroup(uid, gid, euid uint32, chown func() error) error {
+	if uid != euid {
+		return fmt.Errorf("unsafe journal owner")
+	}
+	if euid == 0 && gid != 0 {
+		return chown()
+	}
+	return nil
+}
+func secureJournalFile(f *os.File, directory bool) error {
+	info, err := f.Stat()
+	if err != nil {
+		return err
+	}
+	mode := os.FileMode(0600)
+	if directory {
+		mode = 0700
+	}
+	st, ok := info.Sys().(*syscall.Stat_t)
+	if !ok || info.IsDir() != directory || !directory && (!info.Mode().IsRegular() || st.Nlink != 1) || info.Mode().Perm() != mode {
+		return fmt.Errorf("unsafe journal metadata")
+	}
+	return normalizeJournalGroup(st.Uid, st.Gid, uint32(os.Geteuid()), func() error { return f.Chown(-1, 0) })
+}
+func openJournalDir(path string) (*os.File, error) {
+	f, err := os.OpenFile(path, os.O_RDONLY|syscall.O_DIRECTORY|syscall.O_NOFOLLOW, 0)
+	if err != nil {
+		return nil, err
+	}
+	if err = secureJournalFile(f, true); err != nil {
+		f.Close()
+		return nil, err
+	}
+	return f, nil
+}
 func (j FileJournal) Load() (*Journal, error) {
-	dir, err := os.Lstat(filepath.Dir(j.Path))
+	dir, err := openJournalDir(filepath.Dir(j.Path))
 	if err != nil {
 		return nil, err
 	}
-	if !dir.IsDir() || dir.Mode().Perm() != 0700 || !journalOwner(dir) {
-		return nil, fmt.Errorf("unsafe journal directory")
-	}
-	info, err := os.Lstat(j.Path)
+	defer dir.Close()
+	f, err := os.OpenFile(j.Path, os.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK, 0)
 	if err != nil {
 		return nil, err
 	}
-	if !info.Mode().IsRegular() || info.Mode().Perm() != 0600 || !journalOwner(info) {
-		return nil, fmt.Errorf("unsafe journal")
+	defer f.Close()
+	if err = secureJournalFile(f, false); err != nil {
+		return nil, err
 	}
-	data, err := os.ReadFile(j.Path)
+	data, err := io.ReadAll(f)
 	if err != nil {
 		return &Journal{}, err
 	}
@@ -46,13 +84,11 @@ func (j FileJournal) Save(v Journal) error {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return err
 	}
-	info, err := os.Lstat(dir)
+	d, err := openJournalDir(dir)
 	if err != nil {
 		return err
 	}
-	if !info.IsDir() || info.Mode().Perm() != 0700 || !journalOwner(info) {
-		return fmt.Errorf("unsafe journal directory")
-	}
+	defer d.Close()
 	data, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -64,6 +100,9 @@ func (j FileJournal) Save(v Journal) error {
 	defer os.Remove(f.Name())
 	defer f.Close()
 	if err = f.Chmod(0600); err != nil {
+		return err
+	}
+	if err = secureJournalFile(f, false); err != nil {
 		return err
 	}
 	if _, err = f.Write(data); err != nil {
@@ -85,9 +124,4 @@ func (j FileJournal) Remove() error {
 		return err
 	}
 	return syncDir(filepath.Dir(j.Path))
-}
-
-func journalOwner(info os.FileInfo) bool {
-	st, ok := info.Sys().(*syscall.Stat_t)
-	return ok && st.Uid == uint32(os.Geteuid()) && (os.Geteuid() != 0 || st.Gid == 0)
 }

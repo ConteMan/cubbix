@@ -13,6 +13,7 @@ import (
 )
 
 var errLidDenied = errors.New("LidDenied")
+var errLidHelperUpdate = errors.New("LidHelperUpdate")
 
 type lidServiceStatus int
 
@@ -53,13 +54,15 @@ const (
 )
 
 type lidSnapshot struct {
-	state       lidState
-	reason      string
-	service     lidServiceStatus
-	online      bool
-	value       int
-	response    lid.Response
-	stale, ours bool
+	state                          lidState
+	reason                         string
+	service                        lidServiceStatus
+	online                         bool
+	value                          int
+	response                       lid.Response
+	lastCode, hello, helperVersion string
+	lastFailure                    *lid.Response
+	stale, ours                    bool
 }
 type lidController struct {
 	mu                 sync.Mutex
@@ -133,24 +136,33 @@ func (c *lidController) writeMarker(id string) error {
 func (c *lidController) connect() error {
 	if c.connection != nil {
 		if c.snapshotValue.response.Helper != lid.Version {
-			return errors.New("LidHelperUpdate")
+			return errLidHelperUpdate
 		}
 		return nil
 	}
 	conn, err := c.dial()
 	if err != nil {
+		c.snapshotValue.hello = "dial-failed"
 		return err
 	}
 	r, err := conn.Call(lid.Request{Op: "hello"})
 	if err != nil {
+		c.snapshotValue.hello = "call-failed"
 		conn.Close()
 		return err
 	}
 	c.connection = conn
+	c.snapshotValue.helperVersion = r.Helper
+	c.snapshotValue.hello = "ok"
 	c.apply(r)
 	if r.Helper != lid.Version {
+		c.snapshotValue.hello = "version-mismatch"
 		c.snapshotValue.reason = "LidHelperUpdate"
-		return errors.New("LidHelperUpdate")
+		return errLidHelperUpdate
+	}
+	if !r.OK {
+		c.snapshotValue.hello = "rejected"
+		return errors.New("LidServiceBroken")
 	}
 	return nil
 }
@@ -254,6 +266,10 @@ func (c *lidController) Inspect() {
 	c.readStale()
 	if err := c.connect(); err != nil {
 		c.snapshotValue.online = false
+		if errors.Is(err, errLidHelperUpdate) {
+			c.snapshotValue.state = lidBlocked
+			c.snapshotValue.reason = "LidHelperUpdate"
+		}
 		if c.snapshotValue.reason == "" && c.snapshotValue.service != svcNotRegistered {
 			c.snapshotValue.state = lidBlocked
 			c.snapshotValue.reason = "LidHelperNotRunning"
@@ -279,7 +295,10 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 	c.publish()
 	s.reason = ""
 	s.service = c.service.Status()
-	fail := func(key string) error {
+	fail := func(key, code string) error {
+		s.lastCode = code
+		r := s.response
+		s.lastFailure = &r
 		if wasOn && s.state != lidRestoreFailed {
 			if err := c.stopLocked(); err != nil {
 				return err
@@ -296,29 +315,29 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 		if key == "" {
 			key = "LidUnsupported"
 		}
-		return fail(key)
+		return fail(key, key)
 	}
 	if c.power != nil {
 		kind, p, err := c.power.Source()
 		if err != nil || p < 0 || p > 100 || kind == "battery" && p <= min {
-			return fail("LidBatteryTooLow")
+			return fail("LidBatteryTooLow", "LidBatteryTooLow")
 		}
 	}
 	// Refuse foreign values before presenting any authorization.
 	if value, err := c.read(); err != nil {
-		return fail("LidEnableFailed")
+		return fail("LidEnableFailed", "pmset-read-failed")
 	} else if value == 1 && s.state != lidOn && c.connection == nil {
 		c.readStale()
 		if !s.ours {
-			return fail("LidForeign")
+			return fail("LidForeign", "LidForeign")
 		}
 	}
 	if s.service == svcRequiresApproval {
-		return fail("LidAuthNeeded")
+		return fail("LidAuthNeeded", "LidAuthNeeded")
 	}
 	needsInstall := s.service == svcNotRegistered || s.service == svcBroken || s.service == svcNotRunning
 	if s.service == svcUnavailable {
-		return fail("LidUnsupported")
+		return fail("LidUnsupported", "LidUnsupported")
 	}
 	if s.service == svcEnabled {
 		if err := c.connect(); err != nil {
@@ -327,7 +346,10 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 	}
 	if needsInstall {
 		if !authorize {
-			return fail("LidAuthNeeded")
+			if s.hello == "version-mismatch" {
+				return fail("LidHelperUpdate", "helper-version-mismatch")
+			}
+			return fail("LidAuthNeeded", "LidAuthNeeded")
 		}
 		if c.connection != nil || c.markerExists() {
 			if err := c.stopLocked(); err != nil {
@@ -338,25 +360,29 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 			c.connection.Close()
 			c.connection = nil
 		}
+		if s.hello == "version-mismatch" {
+			s.reason = "LidHelperUpdate"
+			c.publish()
+		}
 		err := c.service.Register()
 		// Status is always reread, including cancelled/failed authorization.
 		s.service = c.service.Status()
 		if s.service == svcRequiresApproval {
-			return fail("LidAuthNeeded")
+			return fail("LidAuthNeeded", "LidAuthNeeded")
 		}
 		if err != nil {
 			if errors.Is(err, errLidDenied) {
 				s.service = svcDenied
-				return fail("LidDenied")
+				return fail("LidDenied", "LidDenied")
 			}
-			return fail("LidServiceBroken")
+			return fail("LidServiceBroken", "LidServiceBroken")
 		}
 		if err := c.waitForHelper(); err != nil {
-			return fail(err.Error())
+			return fail(err.Error(), err.Error())
 		}
 	}
 	if err := c.connect(); err != nil {
-		return fail("LidServiceBroken")
+		return fail("LidServiceBroken", "LidServiceBroken")
 	}
 	req := lid.Request{Op: "enable", MinPercent: min}
 	if !end.IsZero() {
@@ -366,7 +392,7 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 	r, err := c.connection.Call(req)
 	if err != nil {
 		c.lost()
-		return errors.New(s.reason)
+		return fail(s.reason, "enable-call-failed")
 	}
 	c.apply(r)
 	if !r.OK || r.State != "on-ours" || r.Value == nil || *r.Value != 1 {
@@ -379,16 +405,24 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 		case "restore-failed":
 			key = "LidRestoreFailed"
 		}
-		return fail(key)
+		code := "helper-" + r.Code
+		if r.Code == "" || r.Code == "ok" {
+			code = "helper-invalid-enable-response"
+		}
+		return fail(key, code)
 	}
 	if err = c.writeMarker(rand.Text()); err != nil {
 		// Do not leave an unmarked lease if the user directory cannot persist it.
-		c.stopLocked()
-		return fail("LidEnableFailed")
+		if stopErr := c.stopLocked(); stopErr != nil {
+			return fail("LidRestoreFailed", "marker-write-restore-failed")
+		}
+		return fail("LidEnableFailed", "marker-write-failed")
 	}
 	c.deadline = end
 	s.state = lidOn
 	s.reason = ""
+	s.lastCode = ""
+	s.lastFailure = nil
 	return nil
 }
 
@@ -431,7 +465,7 @@ func (c *lidController) stopLocked() error {
 		if !c.markerExists() && s.state != lidOn && s.state != lidRestoreFailed {
 			return nil
 		}
-		if err := c.connect(); err != nil {
+		if err := c.connect(); err != nil && !(errors.Is(err, errLidHelperUpdate) && c.connection != nil) {
 			c.lost()
 			return errors.New("LidRestoreFailed")
 		}

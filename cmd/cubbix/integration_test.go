@@ -173,6 +173,8 @@ func TestIntegrationCodes(t *testing.T) {
 		{cli.CodeQuitting, 3},
 		{cli.CodeDisabled, 4},
 		{"LidAuthNeeded", 4},
+		{"LidEnableFailed", 4},
+		{"LidHelperUpdate", 4},
 		{"LidNeedsMinutes", 4},
 		{"ProcessEnded", 4},
 		{"AwakeStartError", 4},

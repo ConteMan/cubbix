@@ -41,6 +41,8 @@ func (a *application) refreshAwake() {
 }
 func (a *application) startAwake(s awakeSession) error {
 	if a.lidBusy {
+		a.lidLastCode = "lid-busy"
+		a.lidMessage = "LidEnableFailed"
 		return fmt.Errorf("LidEnableFailed")
 	}
 	if !a.config.AwakeEnabled {

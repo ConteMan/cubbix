@@ -633,15 +633,28 @@ func TestLidAsyncQuietIsCaptured(t *testing.T) {
 				a.notifyBattery = func(string, string) { sent++ }
 				a.config.AwakeLid = false
 				yes := true
-				result := a.applyCLI(cli.Request{Op: cli.OpRun, Action: cli.ActionAwake, Arg: "1m", Lid: &yes, Notify: notify}, nil)
-				if !result.OK || a.quiet {
-					t.Fatalf("start = %+v, quiet=%t", result, a.quiet)
+				results := make(chan cli.Result, 1)
+				a.applyCLIAsync(cli.Request{Op: cli.OpRun, Action: cli.ActionAwake, Arg: "1m", Lid: &yes, Notify: notify}, nil, func(r cli.Result) { results <- r })
+				select {
+				case r := <-results:
+					t.Fatalf("answered before completion: %+v", r)
+				default:
+				}
+				if a.quiet {
+					t.Fatal("quiet leaked")
 				}
 				select {
 				case callback := <-callbacks:
 					callback()
 				case <-time.After(3 * time.Second):
 					t.Fatal("lid callback did not arrive")
+				}
+				result := <-results
+				if result.OK == fail || fail && result.Code != "LidBatteryTooLow" || result.State.Awake.Lid.State == "enabling" {
+					t.Fatalf("final result: %+v", result)
+				}
+				if !fail && result.State.Awake.Lid.State != "on" {
+					t.Fatal("success before lid on")
 				}
 				if svc.registers != 0 {
 					t.Fatal("CLI authorized the helper")
