@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.5 — 2026-11-04
+
+- Updating the lid helper is steadier: Cubbix now waits for the old helper to quit before starting the new one, so there is nothing to fix by hand.
+- If installing the helper ever fails, Cubbix notes which step it stopped at, which makes it easier to sort out.
+- The helper log is quieter and only records things that change.
+
 ## 0.5.4 — 2026-11-04
 
 - The Lid switch finally turns on! The helper refused to work because of a small folder permission issue, and now it fixes that itself. The first time after updating, you will see "Helper needs an update" and enter your admin password once.
