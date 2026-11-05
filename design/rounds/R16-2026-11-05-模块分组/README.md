@@ -1,6 +1,6 @@
 # R16 · 设置页按模块组织（2026-11-05）
 
-- 状态：第 2 版设计方向已批准；007 第 3 版工程定稿可开工，未实现、PR #67 不合并。规格见 [007](../../../docs/specs/007-设置按模块组织.md)。
+- 状态：第 2 版设计方向已批准；007 第 3 版工程定稿已实现（`feat/settings-modules`）。规格见 [007](../../../docs/specs/007-设置按模块组织.md)。
 - 设计源：`design/cubbix.pen` 的 `R16 round label` 与四张 `R16 <语言> <主题>` 板。
 - 导出：[zh-CN-light.png](zh-CN-light.png)、[zh-CN-dark.png](zh-CN-dark.png)、[en-light.png](en-light.png)、[en-dark.png](en-dark.png)（2×，pen.dev headless CLI 0.3.13）。
 

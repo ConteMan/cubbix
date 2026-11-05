@@ -245,7 +245,7 @@
   "CLIInstalled": "已安装：%s",
   "CLIInstallFailed": "无法安装命令行工具",
   "CLILinkConflict": "%s 已存在，未覆盖",
-  "CLILinkBroken": "链接已失效，关掉再打开可重建",
+  "CLILinkBroken": "链接目标不可用，可关闭移除；恢复应用后再开启",
   "CLITranslocated": "请先把 Cubbix 放进「应用程序」",
   "CLILinkHint": "在 ~/.local/bin/cubbix 建链接",
   "CLIStatusJSON": "JSON 窗口 %d",
@@ -295,5 +295,8 @@
   "LidStaleSetting": "上次的合盖保持没能恢复，合盖睡眠仍是关闭状态",
   "LidMaxDuration": "已到 12 小时上限，合盖保持已结束",
   "LidInstallNeeded": "合盖保持需要一次系统授权，之后就绪",
-  "LidHelperUpdate": "助手需要更新"
+  "LidHelperUpdate": "助手需要更新",
+  "UpdateScheduleOff": "自动检查已关闭",
+  "AwakeStopError": "常亮未能停止，请重试",
+  "ModuleBusy": "模块正在处理操作，请稍后重试"
 }
