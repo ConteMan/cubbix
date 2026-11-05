@@ -6,30 +6,30 @@
       "nodeId": "A0SIf",
       "file": "zh-CN-light.png",
       "scale": 2,
-      "sha256": "3700c755477b838abe36bde915800149def1b5b4d48b0f57e63810c29d0e8323"
+      "sha256": "79e7870b8f5daf710cb2d2057ed8e5e3a51399bc0915a6b4f3f124ca1620e6f5"
     },
     {
       "nodeId": "AoEVL",
       "file": "zh-CN-dark.png",
       "scale": 2,
-      "sha256": "d3246cc4d91632617cc5dd286931e2352586a2806a19f87ebe464a49bed2a317"
+      "sha256": "c1f53103995eb868cb05297d26d2e64db512d97a68e74fede9b0707e7fa0e210"
     },
     {
       "nodeId": "lwCvL",
       "file": "en-light.png",
       "scale": 2,
-      "sha256": "edb4e15fca992a583f33971da7bec7cbe967520fe5bc32ffda1f0b1c15b33d13"
+      "sha256": "ac818e6512ce8d66921e06d37a9e362b16f0f54f7015ec76aa5c4b3d7ae2de84"
     },
     {
       "nodeId": "FiZ1p",
       "file": "en-dark.png",
       "scale": 2,
-      "sha256": "c2a67d57ed93437846f75087207cbcd21503e13eb85f5b737f52313bdab71884"
+      "sha256": "8607581401c77ec6bf682d880cf357a519ac8c67c9401b0ecefef885de0dc4ee"
     }
   ],
   "nativeLayout": {
     "boards": 4,
-    "nodes": 512,
+    "nodes": 612,
     "problems": []
   },
   "passed": true

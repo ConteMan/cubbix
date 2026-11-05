@@ -1,6 +1,6 @@
 # Token 与 Go 标识符映射
 
-当前共 131 个样式 Token（颜色 38、数值 87、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」，快捷键反馈尺寸见「R11 追加」，面板外观与拖动参考线见「R14 追加」，命令面板打磨的键帽、滚动条槽位与占位符内缩见「R15 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+当前共 132 个样式 Token（颜色 39、数值 87、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」，快捷键反馈尺寸见「R11 追加」，面板外观与拖动参考线见「R14 追加」，命令面板打磨的键帽、滚动条外置距离与占位符内缩见「R15 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
@@ -183,11 +183,14 @@ ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代�
 | `SizeKeycapHeight` | number | `20` |
 | `SizeKeycapMinWidth` | number | `20` |
 | `SizeScrollbar` | number | `6` |
-| `SizePaletteScrollbarSlot` | number | `12` |
+| `SizePaletteScrollbarOverhang` | number | `9` |
 | `SizePalettePlaceholderInset` | number | `6` |
+| `ColorPaletteSearch` | color | `mode=light: #F0F0F0 / mode=dark: #464646` |
 
-键帽是快捷键的统一画法：每个键一个小圆角盒，圆角 `RadiusControl` 6，高 `SizeKeycapHeight` 20，最小宽 `SizeKeycapMinWidth` 20，内距 `Space6`，键与键之间 `Space4`。填充 `ColorKeycap`、1px 描边 `ColorKeycapStroke`、文字 `ColorKeycapText`（引用次要文字色，深浅主题对比度 6.01:1 与 4.68:1）；底色与描边按浅深各一份，浅色下是白光面加深描边，深色下比搜索行 `ColorControl` 略亮一档。键帽用在命令面板搜索行右侧的 ⌘K（两个键帽）与设置「快捷键」页的四行录制器（⌃⌥⌘K 四个键帽）。
+键帽是快捷键的统一画法：每个键一个小圆角盒，圆角 `RadiusControl` 6，高 `SizeKeycapHeight` 20，最小宽 `SizeKeycapMinWidth` 20，内距 `Space6`，键与键之间 `Space4`。填充 `ColorKeycap`、1px 描边 `ColorKeycapStroke`、文字 `ColorKeycapText`（引用次要文字色，深浅主题对比度 6.01:1 与 4.68:1）；底色与描边按浅深各一份，浅色下是白光面加深描边，深色下比搜索行 `ColorPaletteSearch` 略亮一档。键帽用在命令面板搜索行右侧的 ⌘K（两个键帽）与设置「快捷键」页的四行录制器（⌃⌥⌘K 四个键帽）。
 
-`SizeScrollbar` 6 是滚动条宽度，`applyTheme` 把它写进 `ui.Theme.ScrollbarWidth`，与框架默认值一致但从此由 Token 决定。`SizePaletteScrollbarSlot` 12 是命令面板列表右侧给滚动条留的槽位，等于「条宽 6 + 条右侧 3 + 行与条之间 3」：列表用 `Padding(0, slot, 0, 0)` 让行（含选中高亮）在槽位左侧结束，滚动条画在槽位里，因此任何文字都不会被压住。`SizePalettePlaceholderInset` 6 是占位文字的起始偏移：光标留在正文起点，占位文字右移 6，光标与第一个字之间留出空隙，输入正文时从光标处开始。
+`SizeScrollbar` 6 是滚动条宽度，`applyTheme` 把它写进 `ui.Theme.ScrollbarWidth`，与框架默认值一致但从此由 Token 决定。行不占滚动条的位置：列表用 `Padding(0, 0, 0, 0)` 铺满面板内容宽，选中高亮左右各内缩 `Space8`（与行内图标、参数提示到高亮边缘的距离相同），滚动条用 `ScrollbarInsets(0, -SizePaletteScrollbarOverhang, 0, 0)` 移到面板自己的外边距里，`9` = 条宽 6 + 条右侧间隙 3。框架只在悬停或拖动时画条，因此不滚动时右侧不留空档；滚动时条也在高亮之外，不遮文字。`SizePalettePlaceholderInset` 6 是占位文字的起始偏移：光标留在正文起点，占位文字右移 6，光标与第一个字之间留出空隙，输入正文时从光标处开始。
 
-八个 Token 已同步 `design/cubbix.pen` 变量、`design/tokens.json` 与 `tokens.go`；画板见 [R15 交付](rounds/R15-2026-11-05-命令面板打磨/README.md)。
+`ColorPaletteSearch` 是搜索行自己的底色，不共用 `ColorControl`：面板表面是半透明的 `ColorMenuSurface`，深色下 `ColorControl`（#3B3B3B）与面板几乎分不开。深色取 #464646 是占位文字仍达 AA 的上限（`ColorTextSecondary` 对 #464646 为 4.53:1），与深色面板的对比由 1.28:1 提到 1.49:1；浅色与 `ColorControl` 同值。
+
+九个 Token 已同步 `design/cubbix.pen` 变量、`design/tokens.json` 与 `tokens.go`（`SizePaletteScrollbarSlot` 12 在第二轮反馈中退役）；画板见 [R15 交付](rounds/R15-2026-11-05-命令面板打磨/README.md)。

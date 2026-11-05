@@ -103307,7 +103307,18 @@
                   "id": "h5rFb",
                   "name": "Copy / R15ListNote",
                   "fill": "$ColorTextSecondary",
-                  "content": "分类跟在标题后面，参数提示留在右侧；滚动条有自己的槽位",
+                  "content": "分类比标题小一号、底部对齐；参数提示留在右侧；滚动条不占行宽",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "KZqvu",
+                  "name": "Copy / R15ListNote2",
+                  "fill": "$ColorTextSecondary",
+                  "content": "未命名的 JSON 窗口标题就是功能名，分类不再重复它",
                   "lineHeight": "$LineHeightBody",
                   "fontFamily": "$FontFamily",
                   "fontSize": "$FontSizeSmall",
@@ -103353,7 +103364,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -103483,12 +103494,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -103542,26 +103548,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "aS56v",
-                                  "name": "Copy / PaletteAwakeStop",
-                                  "fill": "$ColorText",
-                                  "content": "停止常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "KFmUm",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "tMj4r",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "aS56v",
+                                      "name": "Copy / PaletteAwakeStop",
+                                      "fill": "$ColorText",
+                                      "content": "停止常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "KFmUm",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -103626,26 +103641,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "FZCH7",
-                                  "name": "Copy / R07NewWindow",
-                                  "fill": "$ColorText",
-                                  "content": "新建 JSON 窗口",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "r1MVMD",
-                                  "name": "Copy / JSON",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "JSON",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "h61wRg",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "FZCH7",
+                                      "name": "Copy / R07NewWindow",
+                                      "fill": "$ColorText",
+                                      "content": "新建 JSON 窗口",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "r1MVMD",
+                                      "name": "Copy / JSON",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "JSON",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -103684,26 +103708,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "iG6UA",
-                                  "name": "Copy / MenuSettings",
-                                  "fill": "$ColorText",
-                                  "content": "设置…",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "fVJ4Q",
-                                  "name": "Copy / R05App",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Cubbix",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "qjebb",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "iG6UA",
+                                      "name": "Copy / MenuSettings",
+                                      "fill": "$ColorText",
+                                      "content": "设置…",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "fVJ4Q",
+                                      "name": "Copy / R05App",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Cubbix",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -103768,26 +103801,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "Ftvo7",
-                                  "name": "Copy / R05Start",
-                                  "fill": "$ColorText",
-                                  "content": "开启常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "k3GYK",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "nQnPd",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "Ftvo7",
+                                      "name": "Copy / R05Start",
+                                      "fill": "$ColorText",
+                                      "content": "开启常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "k3GYK",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -103837,26 +103879,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "wYnQh",
-                                  "name": "Copy / R05Screen",
-                                  "fill": "$ColorText",
-                                  "content": "保持屏幕常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "w2ZCd",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "N2FPi4",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "wYnQh",
+                                      "name": "Copy / R05Screen",
+                                      "fill": "$ColorText",
+                                      "content": "保持屏幕常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "w2ZCd",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -103895,26 +103946,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "F3pBh",
-                                  "name": "Copy / PaletteResetPosition",
-                                  "fill": "$ColorText",
-                                  "content": "恢复默认位置",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "dEz62",
-                                  "name": "Copy / PaletteShortcutLabel",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "命令面板",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "h9fI5Y",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "F3pBh",
+                                      "name": "Copy / PaletteResetPosition",
+                                      "fill": "$ColorText",
+                                      "content": "恢复默认位置",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "dEz62",
+                                      "name": "Copy / PaletteShortcutLabel",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "命令面板",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -103926,6 +103986,44 @@
                                   "layout": "vertical"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "b4VE4",
+                              "name": "Command / JSONWindowName",
+                              "width": "fill_container",
+                              "height": 36,
+                              "fill": "$ColorTransparent",
+                              "cornerRadius": "$RadiusCard",
+                              "gap": "$Space8",
+                              "padding": [
+                                "$Space0",
+                                "$Space8"
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "TOCHX",
+                                  "name": "Icon / file-type",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "file-type",
+                                  "library": "lucide",
+                                  "fill": "$ColorTextSecondary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "QhT1O",
+                                  "name": "Copy / JSONWindowName",
+                                  "fill": "$ColorText",
+                                  "content": "JSON",
+                                  "lineHeight": "$LineHeightBody",
+                                  "fontFamily": "$FontFamily",
+                                  "fontSize": "$FontSizeBody",
+                                  "fontWeight": "$FontWeightRegular"
+                                }
+                              ]
                             }
                           ]
                         },
@@ -103933,7 +104031,7 @@
                           "type": "frame",
                           "id": "W72S3U",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -104032,7 +104130,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -104162,12 +104260,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -104455,7 +104548,7 @@
                           "type": "frame",
                           "id": "xXnNk",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -104702,6 +104795,185 @@
                 },
                 {
                   "type": "frame",
+                  "id": "MO7Np",
+                  "name": "Tile spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "dTMYM",
+                      "name": "Copy / R15SpecTile",
+                      "fill": "$ColorTextSecondary",
+                      "content": "分类比标题小一号并底部对齐",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EuQBG",
+                      "name": "Tile sample",
+                      "width": "fill_container",
+                      "height": 36,
+                      "fill": "$ColorAccentSoft",
+                      "cornerRadius": "$RadiusCard",
+                      "gap": "$Space8",
+                      "padding": [
+                        "$Space0",
+                        "$Space8"
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "Jf6gl",
+                          "name": "Icon / sun",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "sun",
+                          "library": "lucide",
+                          "fill": "$ColorTextSecondary"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "uPXTL",
+                          "name": "Title group",
+                          "gap": "$Space8",
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "bRRWl",
+                              "name": "Copy / R05Start",
+                              "fill": "$ColorText",
+                              "content": "开启常亮",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            },
+                            {
+                              "type": "text",
+                              "id": "A2lMN",
+                              "name": "Copy / Awake",
+                              "fill": "$ColorTextSecondary",
+                              "content": "常亮",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeSmall",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "NvYbx",
+                      "name": "Copy / R15SpecTileNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "标题 FontSizeBody 13，分类 FontSizeSmall 12、ColorTextSecondary，两者底部对齐",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DqV1P",
+                  "name": "Field spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "dgM6v",
+                      "name": "Copy / R15SpecField",
+                      "fill": "$ColorTextSecondary",
+                      "content": "搜索框有自己的底色",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tmGB0",
+                      "name": "Field sample",
+                      "width": "fill_container",
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
+                      "layout": "vertical",
+                      "padding": "$Space8",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "MOKbK",
+                          "name": "Field",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$ColorPaletteSearch",
+                          "cornerRadius": "$RadiusControl",
+                          "gap": "$Space8",
+                          "padding": [
+                            "$Space0",
+                            "$Space8"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "GS3u9",
+                              "name": "Icon / search",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "search",
+                              "library": "lucide",
+                              "fill": "$ColorTextSecondary"
+                            },
+                            {
+                              "type": "text",
+                              "id": "PmBtB",
+                              "name": "Copy / PaletteSearch",
+                              "fill": "$ColorTextSecondary",
+                              "content": "输入命令",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "z8Qsk",
+                      "name": "Copy / R15SpecFieldNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "ColorPaletteSearch 浅色 #F0F0F0、深色 #464646：在面板表面上仍看得出是输入框，占位文字仍达 AA",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "yJdki",
                   "name": "Slot spec",
                   "width": "fill_container",
@@ -104716,7 +104988,7 @@
                       "id": "u07snF",
                       "name": "Copy / R15SpecSlot",
                       "fill": "$ColorTextSecondary",
-                      "content": "滚动条槽位 12",
+                      "content": "滚动条落在面板外边距里",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -104727,14 +104999,11 @@
                       "id": "K1cBi2",
                       "name": "Slot sample",
                       "width": "fill_container",
-                      "height": 36,
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
                       "layout": "vertical",
-                      "padding": [
-                        "$Space0",
-                        "$SizePaletteScrollbarSlot",
-                        "$Space0",
-                        "$Space0"
-                      ],
+                      "padding": "$Space8",
                       "children": [
                         {
                           "type": "frame",
@@ -104789,8 +105058,8 @@
                           "type": "frame",
                           "id": "ELJEx",
                           "layoutPosition": "absolute",
-                          "x": 671,
-                          "y": 5,
+                          "x": 672,
+                          "y": 13,
                           "name": "Slot bar",
                           "width": 6,
                           "height": 26,
@@ -104805,7 +105074,7 @@
                       "id": "Tl3Uh",
                       "name": "Copy / R15SpecSlotNote",
                       "fill": "$ColorTextSecondary",
-                      "content": "行右边距 12 = 条宽 6 + 边距 3 + 间隙 3：文字与高亮都不进槽位",
+                      "content": "行宽＝面板内容宽，高亮左右各内缩 Space8；条落在面板外边距里，只在悬停时出现",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -104889,7 +105158,18 @@
                   "id": "a3oBnv",
                   "name": "Copy / R15ListNote",
                   "fill": "$ColorTextSecondary",
-                  "content": "分类跟在标题后面，参数提示留在右侧；滚动条有自己的槽位",
+                  "content": "分类比标题小一号、底部对齐；参数提示留在右侧；滚动条不占行宽",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "sM3HH",
+                  "name": "Copy / R15ListNote2",
+                  "fill": "$ColorTextSecondary",
+                  "content": "未命名的 JSON 窗口标题就是功能名，分类不再重复它",
                   "lineHeight": "$LineHeightBody",
                   "fontFamily": "$FontFamily",
                   "fontSize": "$FontSizeSmall",
@@ -104935,7 +105215,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -105065,12 +105345,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -105124,26 +105399,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "VACAa",
-                                  "name": "Copy / PaletteAwakeStop",
-                                  "fill": "$ColorText",
-                                  "content": "停止常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Xx799",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "zW3G9",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "VACAa",
+                                      "name": "Copy / PaletteAwakeStop",
+                                      "fill": "$ColorText",
+                                      "content": "停止常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Xx799",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -105208,26 +105492,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "ZAUwU",
-                                  "name": "Copy / R07NewWindow",
-                                  "fill": "$ColorText",
-                                  "content": "新建 JSON 窗口",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "SmFjV",
-                                  "name": "Copy / JSON",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "JSON",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "yYx8u",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "ZAUwU",
+                                      "name": "Copy / R07NewWindow",
+                                      "fill": "$ColorText",
+                                      "content": "新建 JSON 窗口",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "SmFjV",
+                                      "name": "Copy / JSON",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "JSON",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -105266,26 +105559,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "gEa5p",
-                                  "name": "Copy / MenuSettings",
-                                  "fill": "$ColorText",
-                                  "content": "设置…",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Us3Ra",
-                                  "name": "Copy / R05App",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Cubbix",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "IdcGi",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "gEa5p",
+                                      "name": "Copy / MenuSettings",
+                                      "fill": "$ColorText",
+                                      "content": "设置…",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Us3Ra",
+                                      "name": "Copy / R05App",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Cubbix",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -105350,26 +105652,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "RIYWG",
-                                  "name": "Copy / R05Start",
-                                  "fill": "$ColorText",
-                                  "content": "开启常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Xu3GZ",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "X7rhrD",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "RIYWG",
+                                      "name": "Copy / R05Start",
+                                      "fill": "$ColorText",
+                                      "content": "开启常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Xu3GZ",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -105419,26 +105730,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "wKXfr",
-                                  "name": "Copy / R05Screen",
-                                  "fill": "$ColorText",
-                                  "content": "保持屏幕常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "urNnx",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "常亮",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "DRMMr",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "wKXfr",
+                                      "name": "Copy / R05Screen",
+                                      "fill": "$ColorText",
+                                      "content": "保持屏幕常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "urNnx",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "常亮",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -105477,26 +105797,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "gkstn",
-                                  "name": "Copy / PaletteResetPosition",
-                                  "fill": "$ColorText",
-                                  "content": "恢复默认位置",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Yl5kd",
-                                  "name": "Copy / PaletteShortcutLabel",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "命令面板",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "TyFAl",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "gkstn",
+                                      "name": "Copy / PaletteResetPosition",
+                                      "fill": "$ColorText",
+                                      "content": "恢复默认位置",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Yl5kd",
+                                      "name": "Copy / PaletteShortcutLabel",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "命令面板",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -105508,6 +105837,44 @@
                                   "layout": "vertical"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ruSl0",
+                              "name": "Command / JSONWindowName",
+                              "width": "fill_container",
+                              "height": 36,
+                              "fill": "$ColorTransparent",
+                              "cornerRadius": "$RadiusCard",
+                              "gap": "$Space8",
+                              "padding": [
+                                "$Space0",
+                                "$Space8"
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "MU5PN",
+                                  "name": "Icon / file-type",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "file-type",
+                                  "library": "lucide",
+                                  "fill": "$ColorTextSecondary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "JjGr5",
+                                  "name": "Copy / JSONWindowName",
+                                  "fill": "$ColorText",
+                                  "content": "JSON",
+                                  "lineHeight": "$LineHeightBody",
+                                  "fontFamily": "$FontFamily",
+                                  "fontSize": "$FontSizeBody",
+                                  "fontWeight": "$FontWeightRegular"
+                                }
+                              ]
                             }
                           ]
                         },
@@ -105515,7 +105882,7 @@
                           "type": "frame",
                           "id": "JwuCh",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -105614,7 +105981,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -105744,12 +106111,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -106037,7 +106399,7 @@
                           "type": "frame",
                           "id": "X8326a",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -106284,6 +106646,185 @@
                 },
                 {
                   "type": "frame",
+                  "id": "bTzt1",
+                  "name": "Tile spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XNU47",
+                      "name": "Copy / R15SpecTile",
+                      "fill": "$ColorTextSecondary",
+                      "content": "分类比标题小一号并底部对齐",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DtOFU",
+                      "name": "Tile sample",
+                      "width": "fill_container",
+                      "height": 36,
+                      "fill": "$ColorAccentSoft",
+                      "cornerRadius": "$RadiusCard",
+                      "gap": "$Space8",
+                      "padding": [
+                        "$Space0",
+                        "$Space8"
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "u8l1zE",
+                          "name": "Icon / sun",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "sun",
+                          "library": "lucide",
+                          "fill": "$ColorTextSecondary"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "MBqxL",
+                          "name": "Title group",
+                          "gap": "$Space8",
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "AiwS5",
+                              "name": "Copy / R05Start",
+                              "fill": "$ColorText",
+                              "content": "开启常亮",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            },
+                            {
+                              "type": "text",
+                              "id": "eVJri",
+                              "name": "Copy / Awake",
+                              "fill": "$ColorTextSecondary",
+                              "content": "常亮",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeSmall",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "x8QRb",
+                      "name": "Copy / R15SpecTileNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "标题 FontSizeBody 13，分类 FontSizeSmall 12、ColorTextSecondary，两者底部对齐",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "aHflc",
+                  "name": "Field spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LAdq3",
+                      "name": "Copy / R15SpecField",
+                      "fill": "$ColorTextSecondary",
+                      "content": "搜索框有自己的底色",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dpr5V",
+                      "name": "Field sample",
+                      "width": "fill_container",
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
+                      "layout": "vertical",
+                      "padding": "$Space8",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "JmE2e",
+                          "name": "Field",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$ColorPaletteSearch",
+                          "cornerRadius": "$RadiusControl",
+                          "gap": "$Space8",
+                          "padding": [
+                            "$Space0",
+                            "$Space8"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "ST0CX",
+                              "name": "Icon / search",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "search",
+                              "library": "lucide",
+                              "fill": "$ColorTextSecondary"
+                            },
+                            {
+                              "type": "text",
+                              "id": "A8UBKo",
+                              "name": "Copy / PaletteSearch",
+                              "fill": "$ColorTextSecondary",
+                              "content": "输入命令",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "IEFvi",
+                      "name": "Copy / R15SpecFieldNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "ColorPaletteSearch 浅色 #F0F0F0、深色 #464646：在面板表面上仍看得出是输入框，占位文字仍达 AA",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "XRY27",
                   "name": "Slot spec",
                   "width": "fill_container",
@@ -106298,7 +106839,7 @@
                       "id": "D46d0X",
                       "name": "Copy / R15SpecSlot",
                       "fill": "$ColorTextSecondary",
-                      "content": "滚动条槽位 12",
+                      "content": "滚动条落在面板外边距里",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -106309,14 +106850,11 @@
                       "id": "eEjoq",
                       "name": "Slot sample",
                       "width": "fill_container",
-                      "height": 36,
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
                       "layout": "vertical",
-                      "padding": [
-                        "$Space0",
-                        "$SizePaletteScrollbarSlot",
-                        "$Space0",
-                        "$Space0"
-                      ],
+                      "padding": "$Space8",
                       "children": [
                         {
                           "type": "frame",
@@ -106371,8 +106909,8 @@
                           "type": "frame",
                           "id": "eVFMr",
                           "layoutPosition": "absolute",
-                          "x": 671,
-                          "y": 5,
+                          "x": 672,
+                          "y": 13,
                           "name": "Slot bar",
                           "width": 6,
                           "height": 26,
@@ -106387,7 +106925,7 @@
                       "id": "POmCU",
                       "name": "Copy / R15SpecSlotNote",
                       "fill": "$ColorTextSecondary",
-                      "content": "行右边距 12 = 条宽 6 + 边距 3 + 间隙 3：文字与高亮都不进槽位",
+                      "content": "行宽＝面板内容宽，高亮左右各内缩 Space8；条落在面板外边距里，只在悬停时出现",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -106471,7 +107009,18 @@
                   "id": "qVPa8",
                   "name": "Copy / R15ListNote",
                   "fill": "$ColorTextSecondary",
-                  "content": "The tile follows the title, the hint stays right, the bar has a slot",
+                  "content": "The tile is smaller than the title and on its baseline; the hint stays right; the bar takes no row width",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "TYipz",
+                  "name": "Copy / R15ListNote2",
+                  "fill": "$ColorTextSecondary",
+                  "content": "An unnamed JSON window is titled with its tile name, so the tile is not printed twice",
                   "lineHeight": "$LineHeightBody",
                   "fontFamily": "$FontFamily",
                   "fontSize": "$FontSizeSmall",
@@ -106517,7 +107066,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -106647,12 +107196,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -106706,26 +107250,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "dCYEN",
-                                  "name": "Copy / PaletteAwakeStop",
-                                  "fill": "$ColorText",
-                                  "content": "Stop keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "m6rWm8",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "vUm9e",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "dCYEN",
+                                      "name": "Copy / PaletteAwakeStop",
+                                      "fill": "$ColorText",
+                                      "content": "Stop keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "m6rWm8",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -106790,26 +107343,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "g5TtM",
-                                  "name": "Copy / R07NewWindow",
-                                  "fill": "$ColorText",
-                                  "content": "New JSON window",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "BFIrJ",
-                                  "name": "Copy / JSON",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "JSON",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "tCPHb",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "g5TtM",
+                                      "name": "Copy / R07NewWindow",
+                                      "fill": "$ColorText",
+                                      "content": "New JSON window",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "BFIrJ",
+                                      "name": "Copy / JSON",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "JSON",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -106848,26 +107410,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "K7dBF",
-                                  "name": "Copy / MenuSettings",
-                                  "fill": "$ColorText",
-                                  "content": "Settings…",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "yZYtw",
-                                  "name": "Copy / R05App",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Cubbix",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "abWqz",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "K7dBF",
+                                      "name": "Copy / MenuSettings",
+                                      "fill": "$ColorText",
+                                      "content": "Settings…",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "yZYtw",
+                                      "name": "Copy / R05App",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Cubbix",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -106932,26 +107503,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "kXSag",
-                                  "name": "Copy / R05Start",
-                                  "fill": "$ColorText",
-                                  "content": "Start keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "rN9EU",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "lPubn",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "kXSag",
+                                      "name": "Copy / R05Start",
+                                      "fill": "$ColorText",
+                                      "content": "Start keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "rN9EU",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -107001,26 +107581,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "AqO1J",
-                                  "name": "Copy / R05Screen",
-                                  "fill": "$ColorText",
-                                  "content": "Keep display awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Ve33k",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "R8yzv",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "AqO1J",
+                                      "name": "Copy / R05Screen",
+                                      "fill": "$ColorText",
+                                      "content": "Keep display awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Ve33k",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -107059,26 +107648,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "WgoYa",
-                                  "name": "Copy / PaletteResetPosition",
-                                  "fill": "$ColorText",
-                                  "content": "Reset position",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "a8jVv",
-                                  "name": "Copy / PaletteShortcutLabel",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Command palette",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "u7X1Yk",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "WgoYa",
+                                      "name": "Copy / PaletteResetPosition",
+                                      "fill": "$ColorText",
+                                      "content": "Reset position",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "a8jVv",
+                                      "name": "Copy / PaletteShortcutLabel",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Command palette",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -107090,6 +107688,44 @@
                                   "layout": "vertical"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Og2Rm",
+                              "name": "Command / JSONWindowName",
+                              "width": "fill_container",
+                              "height": 36,
+                              "fill": "$ColorTransparent",
+                              "cornerRadius": "$RadiusCard",
+                              "gap": "$Space8",
+                              "padding": [
+                                "$Space0",
+                                "$Space8"
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "V0K4P",
+                                  "name": "Icon / file-type",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "file-type",
+                                  "library": "lucide",
+                                  "fill": "$ColorTextSecondary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "V9vYxD",
+                                  "name": "Copy / JSONWindowName",
+                                  "fill": "$ColorText",
+                                  "content": "JSON",
+                                  "lineHeight": "$LineHeightBody",
+                                  "fontFamily": "$FontFamily",
+                                  "fontSize": "$FontSizeBody",
+                                  "fontWeight": "$FontWeightRegular"
+                                }
+                              ]
                             }
                           ]
                         },
@@ -107097,7 +107733,7 @@
                           "type": "frame",
                           "id": "MGg6P",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -107196,7 +107832,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -107326,12 +107962,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -107619,7 +108250,7 @@
                           "type": "frame",
                           "id": "l9TqNI",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -107866,6 +108497,185 @@
                 },
                 {
                   "type": "frame",
+                  "id": "VqJMz",
+                  "name": "Tile spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Ilp3i",
+                      "name": "Copy / R15SpecTile",
+                      "fill": "$ColorTextSecondary",
+                      "content": "the tile is a step smaller, on the title baseline",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "MrdSu",
+                      "name": "Tile sample",
+                      "width": "fill_container",
+                      "height": 36,
+                      "fill": "$ColorAccentSoft",
+                      "cornerRadius": "$RadiusCard",
+                      "gap": "$Space8",
+                      "padding": [
+                        "$Space0",
+                        "$Space8"
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "DWxiB",
+                          "name": "Icon / sun",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "sun",
+                          "library": "lucide",
+                          "fill": "$ColorTextSecondary"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "sGm78",
+                          "name": "Title group",
+                          "gap": "$Space8",
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "e0CfeG",
+                              "name": "Copy / R05Start",
+                              "fill": "$ColorText",
+                              "content": "Start keep awake",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            },
+                            {
+                              "type": "text",
+                              "id": "hUXss",
+                              "name": "Copy / Awake",
+                              "fill": "$ColorTextSecondary",
+                              "content": "Keep awake",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeSmall",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "D7uRb",
+                      "name": "Copy / R15SpecTileNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "title FontSizeBody 13, tile FontSizeSmall 12 in ColorTextSecondary, aligned to the title's bottom",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "jq6am",
+                  "name": "Field spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "b1AV6",
+                      "name": "Copy / R15SpecField",
+                      "fill": "$ColorTextSecondary",
+                      "content": "the field has a fill of its own",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "my4yt",
+                      "name": "Field sample",
+                      "width": "fill_container",
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
+                      "layout": "vertical",
+                      "padding": "$Space8",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "HkdEL",
+                          "name": "Field",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$ColorPaletteSearch",
+                          "cornerRadius": "$RadiusControl",
+                          "gap": "$Space8",
+                          "padding": [
+                            "$Space0",
+                            "$Space8"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "umszh",
+                              "name": "Icon / search",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "search",
+                              "library": "lucide",
+                              "fill": "$ColorTextSecondary"
+                            },
+                            {
+                              "type": "text",
+                              "id": "IrviL",
+                              "name": "Copy / PaletteSearch",
+                              "fill": "$ColorTextSecondary",
+                              "content": "Type a command",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "vALIe",
+                      "name": "Copy / R15SpecFieldNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "ColorPaletteSearch: #F0F0F0 light, #464646 dark, still a field on the panel surface, placeholder still AA",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "lwVn7",
                   "name": "Slot spec",
                   "width": "fill_container",
@@ -107880,7 +108690,7 @@
                       "id": "Un09O",
                       "name": "Copy / R15SpecSlot",
                       "fill": "$ColorTextSecondary",
-                      "content": "scroll bar slot 12",
+                      "content": "the bar lands in the panel margin",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -107891,14 +108701,11 @@
                       "id": "Gogpq",
                       "name": "Slot sample",
                       "width": "fill_container",
-                      "height": 36,
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
                       "layout": "vertical",
-                      "padding": [
-                        "$Space0",
-                        "$SizePaletteScrollbarSlot",
-                        "$Space0",
-                        "$Space0"
-                      ],
+                      "padding": "$Space8",
                       "children": [
                         {
                           "type": "frame",
@@ -107953,8 +108760,8 @@
                           "type": "frame",
                           "id": "H5ZFf6",
                           "layoutPosition": "absolute",
-                          "x": 671,
-                          "y": 5,
+                          "x": 672,
+                          "y": 13,
                           "name": "Slot bar",
                           "width": 6,
                           "height": 26,
@@ -107969,7 +108776,7 @@
                       "id": "W8yz5a",
                       "name": "Copy / R15SpecSlotNote",
                       "fill": "$ColorTextSecondary",
-                      "content": "rows end 12 before the edge: 6 bar, 3 margins either side, so no text goes under it",
+                      "content": "rows keep the panel content width, the highlight inset Space8 either side; the bar sits in the margin",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -108053,7 +108860,18 @@
                   "id": "rP5Xd",
                   "name": "Copy / R15ListNote",
                   "fill": "$ColorTextSecondary",
-                  "content": "The tile follows the title, the hint stays right, the bar has a slot",
+                  "content": "The tile is smaller than the title and on its baseline; the hint stays right; the bar takes no row width",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeSmall",
+                  "fontWeight": "$FontWeightRegular"
+                },
+                {
+                  "type": "text",
+                  "id": "Eb7N6",
+                  "name": "Copy / R15ListNote2",
+                  "fill": "$ColorTextSecondary",
+                  "content": "An unnamed JSON window is titled with its tile name, so the tile is not printed twice",
                   "lineHeight": "$LineHeightBody",
                   "fontFamily": "$FontFamily",
                   "fontSize": "$FontSizeSmall",
@@ -108099,7 +108917,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -108229,12 +109047,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -108288,26 +109101,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "M791NI",
-                                  "name": "Copy / PaletteAwakeStop",
-                                  "fill": "$ColorText",
-                                  "content": "Stop keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "uNkJx",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "TqseI",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "M791NI",
+                                      "name": "Copy / PaletteAwakeStop",
+                                      "fill": "$ColorText",
+                                      "content": "Stop keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "uNkJx",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -108372,26 +109194,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "pkBd2",
-                                  "name": "Copy / R07NewWindow",
-                                  "fill": "$ColorText",
-                                  "content": "New JSON window",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "ltddd",
-                                  "name": "Copy / JSON",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "JSON",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "FLXd3",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "pkBd2",
+                                      "name": "Copy / R07NewWindow",
+                                      "fill": "$ColorText",
+                                      "content": "New JSON window",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "ltddd",
+                                      "name": "Copy / JSON",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "JSON",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -108430,26 +109261,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "J2dKe",
-                                  "name": "Copy / MenuSettings",
-                                  "fill": "$ColorText",
-                                  "content": "Settings…",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "Yqju5",
-                                  "name": "Copy / R05App",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Cubbix",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "TDovY",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "J2dKe",
+                                      "name": "Copy / MenuSettings",
+                                      "fill": "$ColorText",
+                                      "content": "Settings…",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "Yqju5",
+                                      "name": "Copy / R05App",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Cubbix",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -108514,26 +109354,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "DKVRA",
-                                  "name": "Copy / R05Start",
-                                  "fill": "$ColorText",
-                                  "content": "Start keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "x4QmSd",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "lXbbD",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "DKVRA",
+                                      "name": "Copy / R05Start",
+                                      "fill": "$ColorText",
+                                      "content": "Start keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "x4QmSd",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -108583,26 +109432,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "mt6J3",
-                                  "name": "Copy / R05Screen",
-                                  "fill": "$ColorText",
-                                  "content": "Keep display awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "VINmP",
-                                  "name": "Copy / Awake",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Keep awake",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "BMv3C",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "mt6J3",
+                                      "name": "Copy / R05Screen",
+                                      "fill": "$ColorText",
+                                      "content": "Keep display awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "VINmP",
+                                      "name": "Copy / Awake",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Keep awake",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -108641,26 +109499,35 @@
                                   "fill": "$ColorTextSecondary"
                                 },
                                 {
-                                  "type": "text",
-                                  "id": "HMW7u",
-                                  "name": "Copy / PaletteResetPosition",
-                                  "fill": "$ColorText",
-                                  "content": "Reset position",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "aLoLR",
-                                  "name": "Copy / PaletteShortcutLabel",
-                                  "fill": "$ColorTextSecondary",
-                                  "content": "Command palette",
-                                  "lineHeight": "$LineHeightBody",
-                                  "fontFamily": "$FontFamily",
-                                  "fontSize": "$FontSizeBody",
-                                  "fontWeight": "$FontWeightRegular"
+                                  "type": "frame",
+                                  "id": "zkilg",
+                                  "name": "Title group",
+                                  "gap": "$Space8",
+                                  "alignItems": "end",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "HMW7u",
+                                      "name": "Copy / PaletteResetPosition",
+                                      "fill": "$ColorText",
+                                      "content": "Reset position",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeBody",
+                                      "fontWeight": "$FontWeightRegular"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "aLoLR",
+                                      "name": "Copy / PaletteShortcutLabel",
+                                      "fill": "$ColorTextSecondary",
+                                      "content": "Command palette",
+                                      "lineHeight": "$LineHeightBody",
+                                      "fontFamily": "$FontFamily",
+                                      "fontSize": "$FontSizeSmall",
+                                      "fontWeight": "$FontWeightRegular"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "frame",
@@ -108672,6 +109539,44 @@
                                   "layout": "vertical"
                                 }
                               ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "xg52a",
+                              "name": "Command / JSONWindowName",
+                              "width": "fill_container",
+                              "height": 36,
+                              "fill": "$ColorTransparent",
+                              "cornerRadius": "$RadiusCard",
+                              "gap": "$Space8",
+                              "padding": [
+                                "$Space0",
+                                "$Space8"
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "jsvEO",
+                                  "name": "Icon / file-type",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "file-type",
+                                  "library": "lucide",
+                                  "fill": "$ColorTextSecondary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "K3X3gR",
+                                  "name": "Copy / JSONWindowName",
+                                  "fill": "$ColorText",
+                                  "content": "JSON",
+                                  "lineHeight": "$LineHeightBody",
+                                  "fontFamily": "$FontFamily",
+                                  "fontSize": "$FontSizeBody",
+                                  "fontWeight": "$FontWeightRegular"
+                                }
+                              ]
                             }
                           ]
                         },
@@ -108679,7 +109584,7 @@
                           "type": "frame",
                           "id": "RcFvs",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -108778,7 +109683,7 @@
                           "name": "Search row",
                           "width": "fill_container",
                           "height": 36,
-                          "fill": "$ColorControl",
+                          "fill": "$ColorPaletteSearch",
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
@@ -108908,12 +109813,7 @@
                           "width": "fill_container",
                           "height": "fill_container",
                           "layout": "vertical",
-                          "padding": [
-                            "$Space0",
-                            "$SizePaletteScrollbarSlot",
-                            "$Space0",
-                            "$Space0"
-                          ],
+                          "padding": "$Space0",
                           "children": [
                             {
                               "type": "frame",
@@ -109201,7 +110101,7 @@
                           "type": "frame",
                           "id": "L65pD",
                           "layoutPosition": "absolute",
-                          "x": 623,
+                          "x": 631,
                           "y": 54,
                           "name": "Scroll bar",
                           "width": 6,
@@ -109448,6 +110348,185 @@
                 },
                 {
                   "type": "frame",
+                  "id": "dplj9",
+                  "name": "Tile spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ahMPf",
+                      "name": "Copy / R15SpecTile",
+                      "fill": "$ColorTextSecondary",
+                      "content": "the tile is a step smaller, on the title baseline",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "hmI2I",
+                      "name": "Tile sample",
+                      "width": "fill_container",
+                      "height": 36,
+                      "fill": "$ColorAccentSoft",
+                      "cornerRadius": "$RadiusCard",
+                      "gap": "$Space8",
+                      "padding": [
+                        "$Space0",
+                        "$Space8"
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "d4dLgT",
+                          "name": "Icon / sun",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "sun",
+                          "library": "lucide",
+                          "fill": "$ColorTextSecondary"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "hrcEc",
+                          "name": "Title group",
+                          "gap": "$Space8",
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "uYXG1",
+                              "name": "Copy / R05Start",
+                              "fill": "$ColorText",
+                              "content": "Start keep awake",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            },
+                            {
+                              "type": "text",
+                              "id": "c2eYnZ",
+                              "name": "Copy / Awake",
+                              "fill": "$ColorTextSecondary",
+                              "content": "Keep awake",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeSmall",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "FV6pa",
+                      "name": "Copy / R15SpecTileNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "title FontSizeBody 13, tile FontSizeSmall 12 in ColorTextSecondary, aligned to the title's bottom",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DEjFn",
+                  "name": "Field spec",
+                  "width": "fill_container",
+                  "fill": "$ColorControl",
+                  "cornerRadius": "$RadiusCard",
+                  "layout": "vertical",
+                  "gap": "$Space8",
+                  "padding": "$Space12",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wqqK4",
+                      "name": "Copy / R15SpecField",
+                      "fill": "$ColorTextSecondary",
+                      "content": "the field has a fill of its own",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "J0Rlr3",
+                      "name": "Field sample",
+                      "width": "fill_container",
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
+                      "layout": "vertical",
+                      "padding": "$Space8",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Kxw9r",
+                          "name": "Field",
+                          "width": "fill_container",
+                          "height": 36,
+                          "fill": "$ColorPaletteSearch",
+                          "cornerRadius": "$RadiusControl",
+                          "gap": "$Space8",
+                          "padding": [
+                            "$Space0",
+                            "$Space8"
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "ZhDqD",
+                              "name": "Icon / search",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "search",
+                              "library": "lucide",
+                              "fill": "$ColorTextSecondary"
+                            },
+                            {
+                              "type": "text",
+                              "id": "xPzrx",
+                              "name": "Copy / PaletteSearch",
+                              "fill": "$ColorTextSecondary",
+                              "content": "Type a command",
+                              "lineHeight": "$LineHeightBody",
+                              "fontFamily": "$FontFamily",
+                              "fontSize": "$FontSizeBody",
+                              "fontWeight": "$FontWeightRegular"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "YK3B0",
+                      "name": "Copy / R15SpecFieldNote",
+                      "fill": "$ColorTextSecondary",
+                      "content": "ColorPaletteSearch: #F0F0F0 light, #464646 dark, still a field on the panel surface, placeholder still AA",
+                      "lineHeight": "$LineHeightBody",
+                      "fontFamily": "$FontFamily",
+                      "fontSize": "$FontSizeSmall",
+                      "fontWeight": "$FontWeightRegular"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "beWzz",
                   "name": "Slot spec",
                   "width": "fill_container",
@@ -109462,7 +110541,7 @@
                       "id": "AJfPU",
                       "name": "Copy / R15SpecSlot",
                       "fill": "$ColorTextSecondary",
-                      "content": "scroll bar slot 12",
+                      "content": "the bar lands in the panel margin",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -109473,14 +110552,11 @@
                       "id": "OihQe",
                       "name": "Slot sample",
                       "width": "fill_container",
-                      "height": 36,
+                      "height": 52,
+                      "fill": "$ColorMenuSurface",
+                      "cornerRadius": "$RadiusCard",
                       "layout": "vertical",
-                      "padding": [
-                        "$Space0",
-                        "$SizePaletteScrollbarSlot",
-                        "$Space0",
-                        "$Space0"
-                      ],
+                      "padding": "$Space8",
                       "children": [
                         {
                           "type": "frame",
@@ -109535,8 +110611,8 @@
                           "type": "frame",
                           "id": "vlFpO",
                           "layoutPosition": "absolute",
-                          "x": 671,
-                          "y": 5,
+                          "x": 672,
+                          "y": 13,
                           "name": "Slot bar",
                           "width": 6,
                           "height": 26,
@@ -109551,7 +110627,7 @@
                       "id": "H9aA1l",
                       "name": "Copy / R15SpecSlotNote",
                       "fill": "$ColorTextSecondary",
-                      "content": "rows end 12 before the edge: 6 bar, 3 margins either side, so no text goes under it",
+                      "content": "rows keep the panel content width, the highlight inset Space8 either side; the bar sits in the margin",
                       "lineHeight": "$LineHeightBody",
                       "fontFamily": "$FontFamily",
                       "fontSize": "$FontSizeSmall",
@@ -109585,10 +110661,6 @@
     "language": [
       "zh-CN",
       "en"
-    ],
-    "accent": [
-      "blue",
-      "orange"
     ]
   },
   "variables": {
@@ -114239,10 +115311,6 @@
       "type": "number",
       "value": 6
     },
-    "SizePaletteScrollbarSlot": {
-      "type": "number",
-      "value": 12
-    },
     "SizePalettePlaceholderInset": {
       "type": "number",
       "value": 6
@@ -114302,13 +115370,13 @@
       "type": "string",
       "value": [
         {
-          "value": "分类跟在标题后面，参数提示留在右侧；滚动条有自己的槽位",
+          "value": "分类比标题小一号、底部对齐；参数提示留在右侧；滚动条不占行宽",
           "theme": {
             "language": "zh-CN"
           }
         },
         {
-          "value": "The tile follows the title, the hint stays right, the bar has a slot",
+          "value": "The tile is smaller than the title and on its baseline; the hint stays right; the bar takes no row width",
           "theme": {
             "language": "en"
           }
@@ -114438,13 +115506,13 @@
       "type": "string",
       "value": [
         {
-          "value": "滚动条槽位 12",
+          "value": "滚动条落在面板外边距里",
           "theme": {
             "language": "zh-CN"
           }
         },
         {
-          "value": "scroll bar slot 12",
+          "value": "the bar lands in the panel margin",
           "theme": {
             "language": "en"
           }
@@ -114455,13 +115523,13 @@
       "type": "string",
       "value": [
         {
-          "value": "行右边距 12 = 条宽 6 + 边距 3 + 间隙 3：文字与高亮都不进槽位",
+          "value": "行宽＝面板内容宽，高亮左右各内缩 Space8；条落在面板外边距里，只在悬停时出现",
           "theme": {
             "language": "zh-CN"
           }
         },
         {
-          "value": "rows end 12 before the edge: 6 bar, 3 margins either side, so no text goes under it",
+          "value": "rows keep the panel content width, the highlight inset Space8 either side; the bar sits in the margin",
           "theme": {
             "language": "en"
           }
@@ -114479,6 +115547,129 @@
         },
         {
           "value": "no divider between the search row and the list",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "ColorPaletteSearch": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F0F0F0",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#464646",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "SizePaletteScrollbarOverhang": {
+      "type": "number",
+      "value": 9
+    },
+    "R15ListNote2": {
+      "type": "string",
+      "value": [
+        {
+          "value": "未命名的 JSON 窗口标题就是功能名，分类不再重复它",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "An unnamed JSON window is titled with its tile name, so the tile is not printed twice",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R15SpecTile": {
+      "type": "string",
+      "value": [
+        {
+          "value": "分类比标题小一号并底部对齐",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "the tile is a step smaller, on the title baseline",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R15SpecTileNote": {
+      "type": "string",
+      "value": [
+        {
+          "value": "标题 FontSizeBody 13，分类 FontSizeSmall 12、ColorTextSecondary，两者底部对齐",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "title FontSizeBody 13, tile FontSizeSmall 12 in ColorTextSecondary, aligned to the title's bottom",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R15SpecField": {
+      "type": "string",
+      "value": [
+        {
+          "value": "搜索框有自己的底色",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "the field has a fill of its own",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "R15SpecFieldNote": {
+      "type": "string",
+      "value": [
+        {
+          "value": "ColorPaletteSearch 浅色 #F0F0F0、深色 #464646：在面板表面上仍看得出是输入框，占位文字仍达 AA",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "ColorPaletteSearch: #F0F0F0 light, #464646 dark, still a field on the panel surface, placeholder still AA",
+          "theme": {
+            "language": "en"
+          }
+        }
+      ]
+    },
+    "JSONWindowName": {
+      "type": "string",
+      "value": [
+        {
+          "value": "JSON",
+          "theme": {
+            "language": "zh-CN"
+          }
+        },
+        {
+          "value": "JSON",
           "theme": {
             "language": "en"
           }
