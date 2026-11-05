@@ -1,5 +1,7 @@
 # 组件索引
 
+R16 后设计源共 112 个 reusable、1770 个源稿 ref；R16 只组合既有组件，没有新增 reusable 母版（新增的页头卡片、分组标题、图标方块导航与三级说明行的构图见 [007](../docs/specs/007-设置按模块组织.md) §2–§3）。
+
 当前 R08 共 101 个 reusable、464 个源稿 ref；R07 为 100 个 reusable、452 个源稿 ref；R05B 阶段为 53 个 reusable、234 个源稿 ref。R04 基础组件保持原样，新增常亮组件见下方索引；四张双语主题样张见 [R05](rounds/R05-2026-10-29-常亮/README.md)。
 
 R05 新增可复用组件：原生菜单未开启／开启、模式／时长子菜单、自定义时长／时刻／进程窗口，以及格子／快捷键设置页。场景与交互约定见 [R05](rounds/R05-2026-10-29-常亮/README.md)。
@@ -148,3 +150,7 @@ R08 新增 `S8d6wZ`（R08 JSON split window）母版，保留统一窗口标题�
 | R09 Palette shell | `MSJBx` |
 | R09 Shortcuts | `I6d8xa` |
 | R09 Icon/star | `wVqfV` |
+
+## R16 设置页按模块组织
+
+[四张中英浅深评审板](rounds/R16-2026-11-05-模块分组/README.md) 全部用既有 reusable 组合：品牌 lockup `Mj9CO`、窗口控件 `aGCdB`、图标 `O4KJZC` / `lPkvC` / `Hvppf` / `H8TPWq` / `uTgqT` / `O8Imme` / `vjo7q` / `YeT0w` / `Faq6Y` / `bVN9P` / `MTEP9`。本轮没有新增母版，页面级构图（图标方块导航、头部卡片、分组标题、状态点、三级说明行）都以 inline frame 画出，规则写在 007 §2–§3 与 [design/README](../README.md#设置页按模块组织r16)；实现时这四处应各自落成一个视图函数，而不是复制节点。
