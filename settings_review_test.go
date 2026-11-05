@@ -393,3 +393,30 @@ func TestRecordingCancelPreservesConflictingIncumbent(t *testing.T) {
 		})
 	}
 }
+
+func TestUnavailableLidWithMarkerKeepsModuleOpen(t *testing.T) {
+	for _, marked := range []bool{false, true} {
+		t.Run(fmt.Sprint(marked), func(t *testing.T) {
+			a := awakeTestApp(t)
+			marker := filepath.Join(t.TempDir(), "restore-required")
+			if marked {
+				if err := os.WriteFile(marker, []byte("owned"), 0600); err != nil {
+					t.Fatal(err)
+				}
+			}
+			// prepareLid leaves IPC dependencies unset on unsupported builds.
+			a.lid = &lidController{marker: marker, capable: true, supported: false}
+			if err := a.startAwake(awakeSession{Mode: "screen"}); err != nil {
+				t.Fatal(err)
+			}
+			a.changeAwakeEnabled(false)
+			if marked {
+				if !a.config.AwakeEnabled || !a.awake.snapshot().Active || a.moduleError != "LidRestoreFailed" || !a.lid.markerExists() {
+					t.Fatal("an unavailable controller lost its recovery obligation")
+				}
+			} else if a.config.AwakeEnabled || a.awake.snapshot().Active {
+				t.Fatal("an unmarked unsupported controller blocked the ordinary close")
+			}
+		})
+	}
+}

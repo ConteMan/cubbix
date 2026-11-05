@@ -493,6 +493,14 @@ func (c *lidController) stopLocked() error {
 		if !c.markerExists() && s.state != lidOn && s.state != lidRestoreFailed {
 			return nil
 		}
+		// Unsupported/development builds do not wire a helper connection.
+		// An old marker still represents a recovery obligation: refuse the
+		// close safely rather than calling an uninitialized dialer.
+		if !c.Available() {
+			s.state = lidRestoreFailed
+			s.reason = "LidRestoreFailed"
+			return errors.New(s.reason)
+		}
 		if err := c.connect(); err != nil && !(errors.Is(err, errLidHelperUpdate) && c.connection != nil) {
 			c.lost()
 			return errors.New("LidRestoreFailed")
