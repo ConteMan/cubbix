@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.7 — 2026-11-05
+
+- Fixed the lid setting quietly turning off when you switched between keeping the display awake and keeping tasks awake.
+- A brief hiccup reading the power setting no longer ends the lid session, and even if the lid setting does fail, Keep Awake itself carries on so your tasks are not affected.
+- After updating, you will be asked once to update the helper with your admin password.
+
 ## 0.5.6 — 2026-11-05
 
 - Found the real reason the lid helper kept failing to install: the installer looked for a system command in the wrong place. Turn on the Lid switch and enter your admin password once, and it just works now.
