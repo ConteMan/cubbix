@@ -62,27 +62,36 @@ func (e *Engine) Start() error {
 	e.restore("ok")
 	return nil
 }
-func (e *Engine) refresh() {
+
+// Observation failures are transient; they must not overwrite a lease's
+// termination code and remain stuck after the next successful read.
+func (e *Engine) refresh() string {
 	if e.journal != nil {
-		return
+		return ""
 	}
 	value, err := e.Sleep.Read()
 	if err != nil {
 		e.state = "off"
-		e.code = "pmset-failed"
-		return
+		return "pmset-failed"
 	}
 	if value == 1 {
 		e.state = "on-foreign"
 		e.code = "foreign-setting"
 	} else {
 		e.state = "off"
+		if e.code == "foreign-setting" {
+			e.code = "ok"
+		}
 	}
+	return ""
 }
 func (e *Engine) response(id string, ok bool, code string) Response {
-	e.refresh()
+	observed := e.refresh()
 	if code == "" {
 		code = e.code
+		if observed != "" {
+			code = observed
+		}
 	}
 	r := Response{V: Protocol, ID: id, OK: ok, Protocol: Protocol, Helper: Version, State: e.state, Code: code, Detail: e.detail, MinPercent: 20, Power: "unknown"}
 	if v, err := e.Sleep.Read(); err == nil && (v == 0 || v == 1) {
@@ -115,7 +124,7 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 		if out.Value != nil {
 			state.value = *out.Value
 		}
-		if r.Op == "enable" || r.Op == "disable" || !out.OK || out.Code == "pmset-failed" || out.Code == "restore-failed" || e.logged == nil || *e.logged != state {
+		if (r.Op == "enable" || r.Op == "disable") && out.OK || e.logged == nil || *e.logged != state {
 			LogResponse(e.Logf, r.Op, out)
 		}
 		e.logged = &state

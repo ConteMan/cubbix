@@ -67,6 +67,7 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 	a.lidLastCode = ""
 	a.lidMessage = ""
 	a.lidNotice = ""
+	a.setSessionLid(true)
 	fromURL := a.lidURL
 	// The lid continues on a worker: capture the quiet flag now. The request
 	// that set it has long returned (and reset it) when the callback runs.

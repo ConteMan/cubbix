@@ -168,6 +168,107 @@ func TestPollingLogsOnlyChangesAndErrors(t *testing.T) {
 	}
 }
 
+func TestPollingDeduplicatesFailuresAndRecovers(t *testing.T) {
+	var logs bytes.Buffer
+	logf := func(f string, a ...any) { fmt.Fprintf(&logs, f+"\n", a...) }
+	for _, value := range []int{0, 1} {
+		t.Run(fmt.Sprint(value), func(t *testing.T) {
+			failed, malformed := true, false
+			p := &PMSet{Run: func(context.Context, string, ...string) ([]byte, error) {
+				if failed {
+					return nil, errors.New("read")
+				}
+				if malformed {
+					return []byte("invalid"), nil
+				}
+				return []byte(fmt.Sprint("SleepDisabled ", value)), nil
+			}, Logf: logf}
+			e, _, _, _ := fixture(t)
+			e.Sleep, e.Logf = p, logf
+			logs.Reset()
+			e.Handle(1, request("ping"))
+			logs.Reset()
+			for range 250 {
+				e.Handle(1, request("ping"))
+			}
+			if logs.Len() != 0 {
+				t.Fatal("identical failure flooded logs", logs.String())
+			}
+			failed, malformed = false, true
+			e.Handle(1, request("ping"))
+			if strings.Count(logs.String(), "result=parse-failed") != 1 {
+				t.Fatal("changed read failure was not logged once", logs.String())
+			}
+			logs.Reset()
+			malformed = false
+			r := e.Handle(1, request("ping"))
+			want := "ok"
+			if value == 1 {
+				want = "foreign-setting"
+			}
+			if !r.OK || r.Code != want || r.Value == nil || *r.Value != value {
+				t.Fatal("successful read retained failure", r)
+			}
+			if !strings.Contains(logs.String(), "pmset read result=ok") || !strings.Contains(logs.String(), "code="+want) {
+				t.Fatal("recovery was not logged", logs.String())
+			}
+			logs.Reset()
+			e.Handle(1, request("ping"))
+			if logs.Len() != 0 {
+				t.Fatal("stable recovery was noisy", logs.String())
+			}
+		})
+	}
+}
+
+func TestRepeatedNonOKResponsesLogOnlyTransitions(t *testing.T) {
+	e, _, _, _ := fixture(t)
+	var logs bytes.Buffer
+	e.Logf = func(f string, a ...any) { fmt.Fprintf(&logs, f+"\n", a...) }
+	r := request("ping")
+	r.V++
+	e.Handle(1, r)
+	logs.Reset()
+	for _, op := range []string{"ping", "hello", "status", "enable", "disable"} {
+		r.Op = op
+		for range 20 {
+			e.Handle(1, r)
+		}
+	}
+	if logs.Len() != 0 {
+		t.Fatal("repeated non-ok response was noisy", logs.String())
+	}
+	r.V = Protocol
+	r.ID = "!"
+	e.Handle(1, r)
+	if strings.Count(logs.String(), "code=bad-request") != 1 {
+		t.Fatal("missing changed failure code", logs.String())
+	}
+}
+
+func TestReadFailureClearsWithoutLosingTerminationCode(t *testing.T) {
+	for _, code := range []string{"ok", "battery-low", "battery-unknown", "max-duration"} {
+		t.Run(code, func(t *testing.T) {
+			failed := true
+			e, _, _, _ := fixture(t)
+			e.code = code
+			e.Sleep = &PMSet{Run: func(context.Context, string, ...string) ([]byte, error) {
+				if failed {
+					return nil, errors.New("read")
+				}
+				return []byte("SleepDisabled 0"), nil
+			}}
+			if r := e.Handle(1, request("ping")); r.Code != "pmset-failed" {
+				t.Fatal(r)
+			}
+			failed = false
+			if r := e.Handle(1, request("ping")); r.Code != code || r.Value == nil || *r.Value != 0 {
+				t.Fatal("read recovery lost the previous termination code", r)
+			}
+		})
+	}
+}
+
 // Group 80 is inherited from an admin-owned parent on macOS. All operations
 // below are injected; this test never changes real ownership or requires root.
 func TestJournalInheritedGroupRepair(t *testing.T) {
