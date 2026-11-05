@@ -45,7 +45,7 @@ LOCALE_KEYS = [
     'Language', 'System', 'Chinese', 'English', 'LaunchAtLogin', 'LaunchHint',
     'CLIName', 'CLILinkHint', 'LidBatteryLimit', 'LidBatteryHint',
     'Version', 'WhatsNew', 'AutomaticUpdates', 'UpdateSchedule', 'UpdateLastCheck',
-    'UpdateToday', 'CheckAction', 'TooltipSuccess',
+    'CheckAction', 'TooltipSuccess',
     'ModuleShortcutOff', 'FeedbackModeInfo', 'FeedbackPositionInfo',
 ]
 
@@ -60,6 +60,13 @@ COPY = [
     ('R16OtherPagesTitle', '快捷键页与关于页', 'Shortcuts page and About page'),
     ('R16ShortcutsCaption', '快捷键页：Cubbix 与反馈', 'Shortcuts: Cubbix and feedback'),
     ('R16AboutCaption', '关于页：更新', 'About: updates'),
+    ('R16BrandTitle', '品牌区：与导航对齐', 'Brand area: aligned with the navigation'),
+    ('R16BrandA', 'A（推荐）：猫标落在导航图标列，品牌与导航之间一条分隔线',
+     'A (recommended): mark in the icon column, hairline above the list'),
+    ('R16BrandB', 'B：品牌贴左边，只靠间距区分，无分隔线',
+     'B: brand flush left, separated by space only'),
+    ('R16BrandNote', '品牌从 y=40 开始（红绿灯下方），左边缘与导航项同一套规则',
+     'Brand starts at y=40 under the traffic lights and shares the list left edges'),
     ('R16GeneralTitle', '通用页：命令行工具', 'General page: command line tool'),
     ('R16CLIOff', '关闭：没有链接', 'Off: no link'),
     ('R16CLIOn', '开启：已建链接', 'On: linked'),
@@ -121,9 +128,16 @@ function ic(id, name) {
 function infoIcon(language, key) {
   return {...ic('uTgqT', 'info'), name: 'Info (tooltip: ' + key + ')'};
 }
+// The alert is the red line icon itself: R11's triangle-alert paths are
+// stroked, so the colour goes on each path, never on the ref frame.
 function alertIcon() {
-  return {...ic('bVN9P', 'triangle-alert'), fill: '$ColorDanger',
-          name: 'Alert (tooltip: reason)'};
+  const node = {...ic('bVN9P', 'triangle-alert'), name: 'Alert (tooltip: reason)'};
+  node.descendants = {
+    'U9Y0kM': {stroke: '$ColorDanger'},
+    'u8m4R': {stroke: '$ColorDanger'},
+    'YGLGO': {stroke: '$ColorDanger'},
+  };
+  return node;
 }
 function iconTile(id, name, size) {
   const tile = frame('Icon tile / ' + name, {
@@ -224,12 +238,22 @@ function singleLine(language, key, more = {}) {
                                              textGrowth: 'fixed-width', ...more})];
   return clip;
 }
+// Same clip, for copy the board composes at authoring time (schedule + time).
+function singleLineText(content, name) {
+  const clip = frame('Hint / ' + name, {
+    width: 'fill_container', height: N.FontSizeSmall * N.LineHeightBody, layout: 'vertical',
+  });
+  clip.clip = true;
+  clip.children = [literal(content, {fontSize: '$FontSizeSmall', fill: '$ColorTextSecondary',
+                                     width: 'fill_container', textGrowth: 'fixed-width'})];
+  return clip;
+}
 // One settings row at the level the spec assigns it.
 //   hintKey    -> level ① (inline small copy)
 //   lineKey    -> level ② (second line, height 64)
 //   infoKey    -> level ③ (info icon beside the title)
 function settingRow(language, titleKey, opts = {}) {
-  const level2 = Boolean(opts.lineKey);
+  const level2 = Boolean(opts.lineKey || opts.lineText);
   const node = row('Row / ' + titleKey, {
     width: 'fill_container', height: level2 ? N.SizeRowHeight + N.Space16 : N.SizeRowHeight,
     padding: [N.Space8, N.Space16], gap: N.Space8,
@@ -254,15 +278,29 @@ function settingRow(language, titleKey, opts = {}) {
     const line = row('Hint line', {width: 'fill_container', gap: 0});
     const lineKids = [];
     if (opts.iconId) lineKids.push(frame('Indent', {width: N.SizeIcon + N.Space8}));
-    lineKids.push(singleLine(language, opts.lineKey));
+    lineKids.push(opts.lineText ? singleLineText(opts.lineText, titleKey)
+                                : singleLine(language, opts.lineKey));
     line.children = lineKids;
     outer.children = [head, line];
     return outer;
   } else {
-    kids.push(title);
-    if (opts.infoKey) kids.push(infoIcon(language, opts.infoKey));
-    if (opts.hintKey) kids.push(singleLine(language, opts.hintKey));
-    else kids.push(spacer());
+    if (opts.hintKey) {
+      // One size smaller than the title and bottom-aligned with it: the hint
+      // reads as a caption of the title, not as a second title.
+      // The box is one point taller than the 13pt title so the bottom-aligned
+      // 12pt hint is not clipped by rounding.
+      const group = row('Title and hint', {gap: N.Space8, alignItems: 'end',
+                                           height: N.Space20 + N.Space2});
+      const groupKids = [title, smallCopy(language, opts.hintKey)];
+      if (opts.infoKey) groupKids.push(infoIcon(language, opts.infoKey));
+      group.children = groupKids;
+      kids.push(group);
+      kids.push(spacer());
+    } else {
+      kids.push(title);
+      if (opts.infoKey) kids.push(infoIcon(language, opts.infoKey));
+      kids.push(spacer());
+    }
   }
   if (opts.alert) kids.push(alertIcon());
   if (opts.statusKey) {
@@ -324,7 +362,7 @@ function navItem(language, labelKey, iconId, iconName, selected) {
                                              fontWeight: '$FontWeightMedium'})];
   return node;
 }
-function sidebar(language, page) {
+function navList(language, page) {
   const nav = frame('Navigation', {width: 'fill_container', layout: 'vertical', gap: N.Space4});
   nav.children = [
     navItem(language, 'General', 'O4KJZC', 'settings-2', page === 0),
@@ -333,17 +371,56 @@ function sidebar(language, page) {
     navItem(language, 'R05Shortcuts', 'H8TPWq', 'keyboard', page === 3),
     navItem(language, 'About', 'uTgqT', 'info', page === 1),
   ];
+  return nav;
+}
+// Brand area, scheme A (recommended): the mark sits in the nav icon column and
+// a hairline separates the brand from the module list.
+function brandRow(language, scheme) {
+  const node = row('Brand lockup', {
+    width: 'fill_container', height: N.Space20, gap: N.Space8, alignItems: 'center',
+    padding: [0, scheme === 'A' ? N.Space8 : 0],
+  });
+  const mark = {type: 'ref', ref: 'r2xEJ', name: 'Brand mark', width: N.SizeBrandMark,
+                height: N.SizeBrandMark};
+  if (scheme === 'A') {
+    // Same 28-wide icon cell as a nav item, so the mark centre and the name's
+    // left edge line up with the list below.
+    const cell = row('Brand mark cell', {
+      width: 28, height: N.Space20, justifyContent: 'center', alignItems: 'center'});
+    cell.children = [mark];
+    node.children = [cell,
+                     literal('Cubbix', {fontFamily: '$FontFamily', fontSize: '$FontSizeBody',
+                                        fontWeight: '$FontWeightSemibold', fill: '$ColorText',
+                                        lineHeight: '$LineHeightBody'})];
+  } else {
+    node.children = [mark,
+                     literal('Cubbix', {fontFamily: '$FontFamily', fontSize: '$FontSizeBody',
+                                        fontWeight: '$FontWeightSemibold', fill: '$ColorText',
+                                        lineHeight: '$LineHeightBody'})];
+  }
+  return node;
+}
+function brandDivider() {
+  const line = frame('Brand divider', {
+    width: 'fill_container', height: N.StrokeHairline, layout: 'vertical', padding: [0, N.Space8],
+  });
+  line.children = [frame('Separator', {width: 'fill_container', height: N.StrokeHairline,
+                                       fill: '$ColorSeparator'})];
+  return line;
+}
+function sidebar(language, page, scheme) {
+  const parts = [
+    frame('Traffic light slot', {width: 'fill_container', height: N.Space12}),
+    brandRow(language, scheme),
+  ];
+  if (scheme === 'A') parts.push(brandDivider());
+  parts.push(navList(language, page));
   return frame('Sidebar', {
-    width: N.SizeSidebarWidth, height: 'fill_container', layout: 'vertical', gap: N.Space24,
-    padding: [N.Space24, N.Space12], fill: '$ColorSidebar',
-    children: [
-      frame('Traffic light slot', {width: 'fill_container', height: N.Space12}),
-      {type: 'ref', ref: 'Mj9CO', name: 'Brand lockup'},
-      nav,
-    ],
+    width: N.SizeSidebarWidth, height: 'fill_container', layout: 'vertical', gap: N.Space16,
+    padding: N.Space12, fill: '$ColorSidebar', children: parts,
   });
 }
-function settingsWindow(language, page, name, content) {
+function settingsWindow(language, page, name, content, scheme) {
   const main = frame('Main', {
     width: 'fill_container', height: 'fill_container', layout: 'vertical',
     padding: N.Space24, alignItems: 'center',
@@ -353,7 +430,7 @@ function settingsWindow(language, page, name, content) {
   return frame(name, {
     width: N.SizeWindowWidth, height: WINDOW_HEIGHT, layout: 'horizontal',
     fill: '$ColorWindow', cornerRadius: '$RadiusWindow', clip: true,
-    children: [sidebar(language, page), main,
+    children: [sidebar(language, page, scheme || 'A'), main,
                {type: 'ref', ref: 'aGCdB', name: 'Window controls',
                 layoutPosition: 'absolute', x: N.Space12, y: N.Space12}],
   });
@@ -474,7 +551,9 @@ function aboutPage(language) {
   body.children.push(divider());
   body.children.push(settingRow(language, 'AutomaticUpdates', {
     iconId: 'YeT0w', iconName: 'refresh-cw',
-    lineKey: 'UpdateSchedule', control: toggle(true, 'Updates switch')}));
+    lineText: S[language].UpdateSchedule + ' · ' +
+              S[language].UpdateLastCheck.replace('%s', '13:20'),
+    control: toggle(true, 'Updates switch')}));
   return settingsWindow(language, 1, 'Window / ' + language + ' about', [
     pageHeader(language, {iconId: 'uTgqT', iconName: 'info', titleKey: 'About',
                           descKey: 'AboutPageDesc',
@@ -518,12 +597,32 @@ function tooltipStage(language) {
   stack.children = [smallCopy(language, 'R16TooltipLabel'), bubble];
   return stack;
 }
-function withCaption(language, captionKey, node) {
+function withCaption(language, captionKey, node, width) {
   const column = frame('Caption / ' + captionKey, {
-    width: N.SizeWindowWidth, layout: 'vertical', gap: N.Space8,
+    width: width || N.SizeWindowWidth, layout: 'vertical', gap: N.Space8,
   });
   column.children = [smallCopy(language, captionKey), node];
   return column;
+}
+// A 144-wide sidebar strip: the two brand-area schemes, side by side.
+function brandStage(language, scheme) {
+  const content = frame('Sidebar content', {
+    width: N.SizeSidebarWidth, height: 340, layout: 'vertical', gap: N.Space16,
+    padding: N.Space12,
+  });
+  const parts = [frame('Traffic light slot', {width: 'fill_container', height: N.Space12}),
+                 brandRow(language, scheme)];
+  if (scheme === 'A') parts.push(brandDivider());
+  parts.push(navList(language, -1));
+  content.children = parts;
+  const strip = frame('Brand strip / ' + scheme, {
+    width: N.SizeSidebarWidth, height: 340, layout: 'none', fill: '$ColorSidebar',
+    cornerRadius: '$RadiusWindow', clip: true,
+  });
+  strip.children = [content,
+                    {type: 'ref', ref: 'aGCdB', name: 'Window controls',
+                     layoutPosition: 'absolute', x: N.Space12, y: N.Space12}];
+  return strip;
 }
 function section(language, titleKey, noteKey, children) {
   const head = row('Section head', {width: 'fill_container', gap: N.Space8});
@@ -560,6 +659,10 @@ for (const [language, mode, index] of themes) {
     section(language, 'R16OtherPagesTitle', null, [
       withCaption(language, 'R16ShortcutsCaption', shortcutsPage(language)),
       withCaption(language, 'R16AboutCaption', aboutPage(language)),
+    ]),
+    section(language, 'R16BrandTitle', 'R16BrandNote', [
+      withCaption(language, 'R16BrandA', brandStage(language, 'A'), 440),
+      withCaption(language, 'R16BrandB', brandStage(language, 'B'), 440),
     ]),
     section(language, 'R16GeneralTitle', null, [
       withCaption(language, 'R16CLIOff', generalPage(language, 'off')),
