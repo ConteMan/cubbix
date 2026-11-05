@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/ConteMan/cubbix/internal/awake"
 	"math"
@@ -11,6 +12,11 @@ import (
 
 	"github.com/egoist/mygo"
 )
+
+// moduleStopTimeout bounds how long a close waits for the keep-awake child to
+// exit. A stop that cannot be confirmed keeps the module open instead of
+// pretending the session ended.
+var moduleStopTimeout = 3 * time.Second
 
 func (a *application) awakeChanged() {
 	a.syncLid()
@@ -40,6 +46,9 @@ func (a *application) refreshAwake() {
 	a.refreshMenubarPanel()
 }
 func (a *application) startAwake(s awakeSession) error {
+	if a.moduleClosing {
+		return errors.New("ModuleBusy")
+	}
 	if a.lidBusy {
 		a.lidLastCode = "lid-busy"
 		a.lidMessage = "LidEnableFailed"
@@ -82,7 +91,7 @@ func (a *application) startAwake(s awakeSession) error {
 // Settings. Shortcuts, panels and URL actions consume their returned errors.
 func (a *application) reportAwakeError(err error) {
 	if err != nil {
-		a.settingsError = "AwakeStartError"
+		a.moduleError = "AwakeStartError"
 		a.invalidateWindow()
 	}
 }
@@ -115,6 +124,10 @@ func (a *application) shortcutToggleAwake() {
 // toggleAwakeResult is the shared toggle. toggleAwake keeps the old signature
 // for silent callers (menu-style actions), which show the new state themselves.
 func (a *application) toggleAwakeResult() error {
+	// Nothing new may start while a close is still confirming the system state.
+	if a.moduleClosing {
+		return errors.New("ModuleBusy")
+	}
 	if !a.config.AwakeEnabled {
 		return nil
 	}
@@ -156,39 +169,216 @@ func (a *application) setDuration(minutes int) error {
 	a.refreshAwake()
 	return nil
 }
-func (a *application) changeAwakeEnabled() {
-	if !a.config.AwakeEnabled {
-		if err := a.stopAwake(); err != nil {
-			a.config.AwakeEnabled = true
-			a.settingsError = "LidRestoreFailed"
-			return
+
+// ownShortcut records the combination a slot really registered. A failed
+// attempt owns nothing, so a later close cannot release somebody else's keys.
+func (a *application) ownShortcut(target, acc string) {
+	if a.registeredShortcut == nil {
+		a.registeredShortcut = map[string]string{}
+	}
+	a.registeredShortcut[target] = acc
+}
+
+func (a *application) ownedShortcut(target string) string {
+	if a.registeredShortcut == nil {
+		return ""
+	}
+	return a.registeredShortcut[target]
+}
+
+// releaseOwnedShortcut unregisters exactly what this slot registered.
+func (a *application) releaseOwnedShortcut(target string) {
+	owned := a.ownedShortcut(target)
+	if owned == "" {
+		return
+	}
+	delete(a.registeredShortcut, target)
+	a.unregisterShortcut(owned)
+}
+
+// releaseShortcut releases a slot when it still holds the combination named by
+// its setting. During a recording every slot lets go, and a value that another
+// slot took over in the meantime must survive that.
+func (a *application) releaseShortcut(target, acc string) {
+	owned := a.ownedShortcut(target)
+	if owned == "" || !sameShortcut(owned, acc) {
+		return
+	}
+	a.releaseOwnedShortcut(target)
+}
+
+func (a *application) setSlotError(target, key string) {
+	switch target {
+	case "awake":
+		a.shortcutError = key
+	case "json":
+		a.jsonShortcutError = key
+	case "palette":
+		a.paletteShortcutError = key
+	case "panel":
+		a.panelShortcutError = key
+	}
+}
+
+// registerSlot is the one registration path. It owns what it registers and
+// never touches a combination another slot registered.
+func (a *application) registerSlot(target, acc string, enabled bool, callback func()) {
+	if !enabled {
+		a.releaseOwnedShortcut(target)
+		a.clearSlotError(target)
+		return
+	}
+	if owned := a.ownedShortcut(target); owned != "" && sameShortcut(owned, acc) {
+		a.clearSlotError(target)
+		return
+	}
+	a.releaseOwnedShortcut(target)
+	a.clearSlotError(target)
+	if reason := a.shortcutConflict(acc, target); reason != "" {
+		a.setSlotError(target, reason)
+		return
+	}
+	if err := a.registerShortcut(acc, callback); err != nil {
+		a.setSlotError(target, "ShortcutUnavailable")
+		return
+	}
+	a.ownShortcut(target, acc)
+}
+
+func (a *application) registerAwakeShortcut() {
+	a.registerSlot("awake", a.config.AwakeShortcut, a.config.AwakeEnabled, a.shortcutToggleAwake)
+}
+
+// moduleBusy reports a keep-awake operation that must settle first.
+func (a *application) moduleBusy() bool {
+	return a.moduleClosing || a.lidBusy || a.lidPolling
+}
+
+// changeAwakeEnabled applies a module switch target. Turning the module on only
+// restores its entry points; it never resumes the session the module had before.
+func (a *application) changeAwakeEnabled(target bool) {
+	// A recording would otherwise re-register the slot the change is about.
+	a.cancelShortcutRecording()
+	if a.moduleClosing {
+		a.moduleError = "ModuleBusy"
+		a.invalidateWindow()
+		return
+	}
+	if target == a.config.AwakeEnabled {
+		a.invalidateWindow()
+		return
+	}
+	a.moduleError = ""
+	if target {
+		a.config.AwakeEnabled = true
+		a.registerAwakeShortcut()
+		a.save()
+		a.refreshModuleSurfaces()
+		return
+	}
+	a.closeAwakeModule()
+}
+
+// closeAwakeModule restores the lid, confirms the plain assertion really
+// stopped, and only then uninstalls the helper and commits the closed state.
+// The order is 004's invariant: never stop keep-awake before the system sleep
+// setting is ours again.
+func (a *application) closeAwakeModule() {
+	if a.lidBusy || a.lidPolling {
+		// A running authorization or inspection owns the controller. Refusing
+		// here keeps the main thread free instead of waiting on its lock.
+		a.moduleError = "ModuleBusy"
+		a.invalidateWindow()
+		return
+	}
+	a.moduleClosing = true
+	a.moduleGeneration++
+	generation := a.moduleGeneration
+	a.moduleError = ""
+	a.invalidateWindow()
+
+	lid := a.lid
+	needService := false
+	if lid != nil && lid.Available() && lid.service != nil {
+		needService = lid.service.Status() != svcNotRegistered
+	}
+	run := func() error {
+		var failure error
+		if lid != nil {
+			failure = lid.stop()
 		}
-		if a.lid != nil && a.lid.Available() && a.lid.service.Status() != svcNotRegistered {
-			if err := a.lid.service.Unregister(); err != nil {
-				a.config.AwakeEnabled = true
-				a.settingsError = "LidRestoreFailed"
-				return
+		if failure == nil {
+			// The lid is already ours again, so the plain assertion stops
+			// without asking the controller to restore it a second time.
+			failure = a.awake.stopConfirmed(moduleStopTimeout)
+		}
+		if failure == nil && needService {
+			if err := lid.service.Unregister(); err != nil {
+				// The session is already safe; the helper is what is left.
+				failure = errors.New("LidRestoreFailed")
 			}
 		}
-		a.unregisterShortcut(a.config.AwakeShortcut)
-	} else {
-		a.registerAwakeShortcut()
+		return failure
 	}
-	a.save()
-	a.refreshAwake()
+	if !a.lidAsync {
+		// The helper talks over a socket, so only a native launch defers this
+		// to a worker. Without one, the close is short and runs in place.
+		a.finishAwakeClose(generation, run())
+		return
+	}
+	go func() {
+		failure := run()
+		a.urlDispatch(func() { a.finishAwakeClose(generation, failure) })
+	}()
 }
-func (a *application) registerAwakeShortcut() {
-	if !a.config.AwakeEnabled {
+
+// finishAwakeClose commits the close on the main thread. A failure never writes
+// the closed state: the switch goes back, the recovery entry stays, and no
+// already stopped session comes back to life.
+func (a *application) finishAwakeClose(generation uint64, failure error) {
+	if generation != a.moduleGeneration {
 		return
 	}
-	a.shortcutError = ""
-	if reason := a.shortcutConflict(a.config.AwakeShortcut, "awake"); reason != "" {
-		a.shortcutError = reason
+	a.moduleClosing = false
+	stopped := !a.awake.snapshot().Active
+	if stopped {
+		// A session that really ended is never remembered, whatever the rest
+		// of the transaction did: reopening the module must not resurrect it.
+		a.setSessionLid(false)
+		a.config.AwakeSession = nil
+	}
+	if failure != nil {
+		key := "LidRestoreFailed"
+		if failure.Error() == "AwakeStopError" {
+			key = "AwakeStopError"
+		} else if failure.Error() == "ModuleBusy" {
+			key = "ModuleBusy"
+		}
+		a.moduleError = key
+		if stopped {
+			// The file keeps the confirmed state, never the closed one.
+			a.save()
+		}
+		a.invalidateWindow()
+		a.refreshModuleSurfaces()
 		return
 	}
-	if err := a.registerShortcut(a.config.AwakeShortcut, a.shortcutToggleAwake); err != nil {
-		a.shortcutError = "ShortcutUnavailable"
-	}
+	a.setSessionLid(false)
+	a.config.AwakeEnabled = false
+	a.releaseOwnedShortcut("awake")
+	a.clearSlotError("awake")
+	a.moduleError = ""
+	a.requestModuleFocus()
+	a.save()
+	a.refreshModuleSurfaces()
+}
+
+// refreshModuleSurfaces refreshes every surface a module change reaches: the
+// settings window, the menu bar icon and tooltip, the card panel and the
+// command palette.
+func (a *application) refreshModuleSurfaces() {
+	a.refreshAwake()
+	a.invalidatePaletteAfterModuleChange()
 }
 
 // awakeMode names the mode a session runs in.

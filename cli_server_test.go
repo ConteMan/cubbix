@@ -788,13 +788,16 @@ func TestLidStateNames(t *testing.T) {
 
 func TestSettingsHeightGeneralPage(t *testing.T) {
 	token := tokens(false, "zh-CN")
-	want := int(3*token.SizeRowHeight + 2*token.StrokeHairline + 2*token.Space24)
+	// Header card, one group title, three rows (language, login, CLI hint).
+	want := int(token.SizePageHeader + token.Space8 + token.SizeGroupHeader + token.Space8 +
+		3*token.SizeRowHeight + 2*token.StrokeHairline + 2*token.Space24)
 	want = (want + int(token.Space4) - 1) / int(token.Space4) * int(token.Space4)
-	if want < int(token.SizeWindowMinHeight) {
-		want = int(token.SizeWindowMinHeight)
-	}
-	if got := settingsHeight(token, 0, false); got != want {
+	if got := settingsNaturalHeight(token, settingsGeneral, true, false, false, true, false); got != want {
 		t.Fatalf("general page height = %d, want %d", got, want)
+	}
+	// The window itself never drops below the shared floor.
+	if got := settingsHeight(token, settingsGeneral, true, false, false, true, false); got != 388 {
+		t.Fatalf("general window height = %d, want 388", got)
 	}
 }
 

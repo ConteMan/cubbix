@@ -17,7 +17,7 @@ func TestFeedbackSettingsRows(t *testing.T) {
 	for _, locale := range []string{"zh-CN", "en"} {
 		a := awakeTestApp(t)
 		a.page, a.notesPage = 3, false
-		tt := ui.NewTester(a.view, 720, 368)
+		tt := ui.NewTester(a.view, 720, 388)
 		tt.SetLocale(locale)
 		for _, key := range []string{"FeedbackMode", "FeedbackHint", "FeedbackNotification", "FeedbackOff", "FeedbackPosition"} {
 			if !tt.HasText(a.text(locale, key)) {
@@ -33,7 +33,7 @@ func TestFeedbackPositionControlInteraction(t *testing.T) {
 	h := testFeedback(a)
 	a.page = 3
 	a.feedbackMode = feedbackIndex(feedbackModes, "notification")
-	tt := ui.NewTester(a.view, 720, 368)
+	tt := ui.NewTester(a.view, 720, 388)
 	tt.SetLocale("en")
 	click := func(label string) {
 		t.Helper()
@@ -188,7 +188,7 @@ func TestFeedbackScreenshots(t *testing.T) {
 				a.feedbackMode = feedbackIndex(feedbackModes, state.mode)
 				a.feedback.denied = state.denied
 				a.page, a.notesPage = 3, false
-				capture("feedback-settings-"+state.name+suffix, a.view, 720, 368, locale, dark)
+				capture("feedback-settings-"+state.name+suffix, a.view, 720, 388, locale, dark)
 			}
 			a.feedback.denied = false
 		}

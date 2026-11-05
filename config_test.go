@@ -135,7 +135,7 @@ func TestWindowSizePersistsAndOldConfigStillLoads(t *testing.T) {
 		t.Fatal(err)
 	}
 	w, h := settingsSize(c.WindowWidth, c.WindowHeight)
-	if w != 720 || h != 368 || c.AutomaticUpdates {
+	if w != 720 || h != 388 || c.AutomaticUpdates {
 		t.Fatalf("old config: %+v", c)
 	}
 	c.WindowWidth, c.WindowHeight = 1000, 600

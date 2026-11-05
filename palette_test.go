@@ -363,9 +363,9 @@ func TestAwakeErrorsReturnWithoutSettingsSlot(t *testing.T) {
 	if a.settingsError != "" {
 		t.Fatalf("setDuration wrote the settings error: %q", a.settingsError)
 	}
-	// The menu path keeps reporting in the settings page.
+	// The menu path keeps reporting, on the module page that owns the module.
 	a.reportAwakeError(errors.New("launch failed"))
-	if a.settingsError != "AwakeStartError" {
-		t.Fatalf("menu path did not report: %q", a.settingsError)
+	if a.moduleError != "AwakeStartError" || a.settingsError != "" {
+		t.Fatalf("menu path did not report on the awake page: %q %q", a.moduleError, a.settingsError)
 	}
 }

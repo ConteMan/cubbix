@@ -273,8 +273,7 @@ func (a *application) systemCommands() []*command {
 	restartAvailable := func(a *application) bool { return a.updates.snapshot().Phase == updateReady }
 	openPage := func(page int) func(a *application, req request) error {
 		return func(a *application, req request) error {
-			a.page, a.notesPage = page, false
-			a.invalidateWindow()
+			a.selectSettingsPage(page)
 			a.show()
 			return nil
 		}
@@ -298,17 +297,29 @@ func (a *application) systemCommands() []*command {
 			Title:    localizedTitle("General"),
 			Keywords: []string{"设置", "通用", "general", "tongyong", "ty"},
 			Icon:     "settings-2",
-			Run:      openPage(0),
+			Run:      openPage(settingsGeneral),
 			Actions: func(a *application, req request) []paletteAction {
 				return favoriteActions(a, req.Command.ID)
 			},
 		},
 		{
+			// The persisted ID keeps opening the keep awake page: a favorite or a
+			// recent entry from before the rename must still work.
 			ID:       "settings.page.tiles",
-			Title:    localizedTitle("R05Tiles"),
-			Keywords: []string{"设置", "格子", "tiles", "gezi", "gz"},
-			Icon:     "settings-2",
-			Run:      openPage(2),
+			Title:    localizedTitle("Awake"),
+			Keywords: []string{"设置", "常亮", "awake", "changliang", "cl", "格子", "tiles", "gezi", "gz", "模块", "modules", "mokuai", "mk"},
+			Icon:     "sun",
+			Run:      openPage(settingsAwake),
+			Actions: func(a *application, req request) []paletteAction {
+				return favoriteActions(a, req.Command.ID)
+			},
+		},
+		{
+			ID:       "settings.page.json",
+			Title:    localizedTitle("JSON"),
+			Keywords: []string{"设置", "json", "模块", "modules", "mokuai", "mk"},
+			Icon:     "braces",
+			Run:      openPage(settingsJSON),
 			Actions: func(a *application, req request) []paletteAction {
 				return favoriteActions(a, req.Command.ID)
 			},
@@ -318,7 +329,7 @@ func (a *application) systemCommands() []*command {
 			Title:    localizedTitle("R05Shortcuts"),
 			Keywords: []string{"设置", "快捷键", "shortcuts", "kuaijie", "kjj"},
 			Icon:     "settings-2",
-			Run:      openPage(3),
+			Run:      openPage(settingsShortcuts),
 			Actions: func(a *application, req request) []paletteAction {
 				return favoriteActions(a, req.Command.ID)
 			},
@@ -328,7 +339,7 @@ func (a *application) systemCommands() []*command {
 			Title:    localizedTitle("About"),
 			Keywords: []string{"设置", "关于", "about", "guanyu", "gy"},
 			Icon:     "settings-2",
-			Run:      openPage(1),
+			Run:      openPage(settingsAbout),
 			Actions: func(a *application, req request) []paletteAction {
 				return favoriteActions(a, req.Command.ID)
 			},

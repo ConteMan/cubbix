@@ -49,8 +49,9 @@ func TestSidebarBrandLockup(t *testing.T) {
 		if !ok {
 			t.Fatalf("%s: missing the brand name: %v", locale, tester.Texts())
 		}
-		// The mark sits left of the name: 12 inset + 20 mark + Space8.
-		left := tk.Space12 + tk.SizeBrandMark + tk.Space8
+		// Scheme A: the mark sits in the same 28-wide column as the navigation
+		// icons, so the name starts after 12 inset + Space8 + 28 + Space8.
+		left := tk.Space12 + tk.Space8 + tk.SizeIconButton + tk.Space8
 		if name.X < left-0.5 || name.X > left+0.5 {
 			t.Fatalf("%s: brand name starts at %v, want %v", locale, name.X, left)
 		}
@@ -168,7 +169,7 @@ func TestLanguageAndPreferencesPersist(t *testing.T) {
 	}
 	var selectedLocale string
 	app.setLocale = func(locale string) { selectedLocale = locale }
-	tester := ui.NewTester(app.view, 720, 340)
+	tester := ui.NewTester(app.view, 720, 388)
 	tester.SetLocale("zh-CN")
 	if err := tester.Click("English"); err != nil {
 		t.Fatal(err)
@@ -179,8 +180,14 @@ func TestLanguageAndPreferencesPersist(t *testing.T) {
 	if err := tester.Click("关于"); err != nil {
 		t.Fatal(err)
 	}
-	tester.SetSize(720, settingsHeight(tokens(false, "zh-CN"), 1, false))
-	tester.ClickAt(672, 170)
+	tester.SetSize(720, settingsHeight(tokens(false, "zh-CN"), settingsAbout, true, false, false, false, false))
+	// The automatic update switch is the last row of the about card; the row
+	// title and the switch share one 28-high line, so its Y is the switch's.
+	title, ok := tester.Find("自动更新")
+	if !ok {
+		t.Fatalf("missing the automatic update row: %v", tester.Texts())
+	}
+	tester.ClickAt(cliSwitchX(tokens(false, "zh-CN")), title.Y+title.H/2)
 	loaded, err := loadConfig(path)
 	if err != nil || loaded.Language != "en" || loaded.AutomaticUpdates {
 		t.Fatalf("config=%+v err=%v", loaded, err)
@@ -189,15 +196,39 @@ func TestLanguageAndPreferencesPersist(t *testing.T) {
 
 func TestSettingsHeight(t *testing.T) {
 	tokens := tokens(false, "zh-CN")
-	// General: language, launch at login, command line tool = 3 rows.
-	if got := settingsHeight(tokens, 0, false); got != 196 {
-		t.Fatalf("general height = %d", got)
+	// Every page's natural height, with and without the states that add a
+	// row. They are measured in window DIPs, before any window floor.
+	cases := []struct {
+		name                                  string
+		page                                  int
+		awakeOn, showPlacement, fixed, hasCLI bool
+		ready                                 bool
+		natural                               int
+	}{
+		{"general with CLI", settingsGeneral, true, false, false, true, false, 292},
+		{"general four rows", settingsGeneral, true, true, false, true, false, 340},
+		{"general five rows", settingsGeneral, true, true, true, true, false, 388},
+		{"general without CLI", settingsGeneral, true, false, false, false, false, 244},
+		{"about", settingsAbout, true, false, false, false, false, 308},
+		{"about ready", settingsAbout, true, false, false, false, true, 388},
+		{"awake on", settingsAwake, true, false, false, false, false, 296},
+		{"awake off", settingsAwake, false, false, false, false, false, 192},
+		{"json", settingsJSON, true, false, false, false, false, 192},
+		{"shortcuts", settingsShortcuts, true, false, false, false, false, 380},
 	}
-	if got := settingsHeight(tokens, 1, false); got != 220 {
-		t.Fatalf("about height = %d", got)
+	for _, c := range cases {
+		if got := settingsNaturalHeight(tokens, c.page, c.awakeOn, c.showPlacement, c.fixed, c.hasCLI, c.ready); got != c.natural {
+			t.Fatalf("%s: natural height = %d, want %d", c.name, got, c.natural)
+		}
+		// The window itself never drops below the shared floor, whatever the
+		// page on screen needs.
+		if got := settingsHeight(tokens, c.page, c.awakeOn, c.showPlacement, c.fixed, c.hasCLI, c.ready); got != 388 {
+			t.Fatalf("%s: window height = %d, want 388", c.name, got)
+		}
 	}
-	if got := settingsHeight(tokens, 1, true); got != 244 {
-		t.Fatalf("about with error height = %d", got)
+	// The sidebar fits the same window: brand, separator and five 40-high items.
+	if got := sidebarNaturalHeight(tokens); got != 321 {
+		t.Fatalf("sidebar height = %v, want 321", got)
 	}
 }
 
@@ -285,10 +316,10 @@ func TestNotesStayInSettingsAndReturn(t *testing.T) {
 
 func TestSettingsMinimumAndWideContent(t *testing.T) {
 	minW, minH := settingsMinimumSize()
-	if minW != 720 || minH != 368 {
+	if minW != 720 || minH != 388 {
 		t.Fatalf("minimum=%dx%d", minW, minH)
 	}
-	for _, size := range [][2]int{{0, 0}, {-1, -1}, {719, 367}, {1000, 600}} {
+	for _, size := range [][2]int{{0, 0}, {-1, -1}, {719, 387}, {1000, 600}} {
 		w, h := settingsSize(size[0], size[1])
 		if w < minW || h < minH {
 			t.Fatal("size below minimum")

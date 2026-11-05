@@ -30,6 +30,9 @@ type updateState struct {
 	Notes        string
 	NotesLoading bool
 	NotesError   string
+	// CheckedAt is when the last check finished, successfully or not. It
+	// survives a restart through the optional configuration key.
+	CheckedAt time.Time
 }
 
 type updateCandidate struct {
@@ -54,11 +57,13 @@ type updateManager struct {
 	check       updateCheck
 	notes       func(context.Context) (string, error)
 	changed     func()
+	// now is the clock the check time is stamped with; tests replace it.
+	now func() time.Time
 }
 
 func newUpdateManager(check updateCheck, notes func(context.Context) (string, error), changed func()) *updateManager {
 	ctx, cancel := context.WithCancel(context.Background())
-	return &updateManager{ctx: ctx, stop: cancel, check: check, notes: notes, changed: changed}
+	return &updateManager{ctx: ctx, stop: cancel, check: check, notes: notes, changed: changed, now: time.Now}
 }
 
 func checkMyGoUpdate(ctx context.Context) (*updateCandidate, error) {
@@ -67,6 +72,41 @@ func checkMyGoUpdate(ctx context.Context) (*updateCandidate, error) {
 		return nil, err
 	}
 	return &updateCandidate{version: up.Version, install: func(ctx context.Context) error { return up.Install(ctx, nil) }}, nil
+}
+
+// lastCheck is the completion time of the last finished attempt.
+func (u *updateManager) lastCheck() time.Time {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	return u.state.CheckedAt
+}
+
+// nowTime reads the manager's clock.
+func (u *updateManager) nowTime() time.Time {
+	if u.now != nil {
+		return u.now()
+	}
+	return time.Now()
+}
+
+// restoreCheck re-injects the persisted check time at launch, even when
+// automatic updates are off. An unparsable record is simply not shown.
+func (u *updateManager) restoreCheck(value string, now time.Time) {
+	parsed, err := time.Parse(time.RFC3339Nano, value)
+	if err != nil || parsed.Before(time.Unix(0, 0)) || parsed.After(now) {
+		return
+	}
+	u.mu.Lock()
+	u.state.CheckedAt = parsed
+	u.mu.Unlock()
+}
+
+// recordCheck stamps a finished attempt. It runs under the manager lock so a
+// progress notification can never read a half-written time.
+func (u *updateManager) recordCheck(now time.Time) {
+	u.mu.Lock()
+	u.state.CheckedAt = now
+	u.mu.Unlock()
 }
 
 func (u *updateManager) snapshot() updateState {
@@ -131,6 +171,13 @@ func (u *updateManager) request(manual bool) {
 	go func() {
 		defer cancel()
 		up, err := u.check(ctx)
+		// A finished attempt is remembered, a cancelled one is not: turning
+		// automatic updates off, or quitting, must not invent a check time.
+		// A deadline is a finished failure and is remembered.
+		if !errors.Is(err, context.Canceled) {
+			u.recordCheck(u.nowTime())
+			u.notify()
+		}
 		installed := false
 		if err == nil && up != nil {
 			// Turning automatic updates off while checking also prevents the download.

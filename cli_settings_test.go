@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/egoist/mygo/ui"
@@ -153,59 +154,109 @@ func TestCLILinkAbsentAndTranslocated(t *testing.T) {
 	}
 }
 
-// The row draws every state without opening a window.
+// cliSwitchX is the centre of the switch column of a settings row. The content
+// column is 528 wide with a 16 inset, so the switch sits at its right edge.
+func cliSwitchX(t tokenValues) float32 {
+	return t.SizeWindowWidth - t.Space24 - t.Space16 - t.SizeSwitchWidth/2
+}
+
+// The row draws every state as a switch without opening a window.
 func TestCLISettingsRowStates(t *testing.T) {
-	for _, state := range []string{"missing", "installed", "conflict", "broken", "translocated"} {
-		paths, a := settingsTestPaths(t)
-		a.page = 0
-		switch state {
-		case "installed":
-			if err := installCLILink(paths); err != nil {
-				t.Fatal(err)
-			}
-		case "conflict":
-			if err := os.MkdirAll(filepath.Dir(paths.link), 0o755); err != nil {
-				t.Fatal(err)
-			}
-			if err := os.WriteFile(paths.link, []byte("x"), 0o600); err != nil {
-				t.Fatal(err)
-			}
-		case "broken":
-			if err := installCLILink(paths); err != nil {
-				t.Fatal(err)
-			}
-			if err := os.Remove(paths.target); err != nil {
-				t.Fatal(err)
-			}
-		case "translocated":
-			original := cliPathsFor
-			translocated := paths
-			translocated.bundle = "/private/var/folders/xy/AppTranslocation/1234/d/Cubbix.app"
-			cliPathsFor = func() (cliPaths, bool) { return translocated, true }
-			t.Cleanup(func() { cliPathsFor = original })
-		}
-		for _, locale := range []string{"zh-CN", "en"} {
-			tt := ui.NewTester(a.view, 720, 340)
-			tt.SetLocale(locale)
-			if !tt.HasText(a.text(locale, "CLIName")) {
-				t.Fatalf("%s: missing row: %v", state, tt.Texts())
-			}
-			want := map[string]string{
-				"missing": "CLIInstall", "installed": "CLIRemove", "conflict": "CLIRepair",
-				"broken": "CLIRepair", "translocated": "CLITranslocated",
-			}[state]
-			if state == "translocated" {
-				// The hint sits on the alert's tooltip, which a tester cannot see;
-				// the disabled button is the visible part.
-				_ = tt.Click(a.text(locale, "CLIInstall"))
-				if _, err := os.Lstat(paths.link); !os.IsNotExist(err) {
-					t.Fatal("a translocated bundle accepted the install click")
+	states := []string{"missing", "installed", "conflict", "broken", "translocated"}
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, state := range states {
+			paths, a := settingsTestPaths(t)
+			a.page = settingsGeneral
+			restore := func() {}
+			switch state {
+			case "installed":
+				if err := installCLILink(paths); err != nil {
+					t.Fatal(err)
 				}
-				continue
+			case "conflict":
+				if err := os.MkdirAll(filepath.Dir(paths.link), 0o755); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.WriteFile(paths.link, []byte("x"), 0o600); err != nil {
+					t.Fatal(err)
+				}
+			case "broken":
+				if err := installCLILink(paths); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Remove(paths.target); err != nil {
+					t.Fatal(err)
+				}
+			case "translocated":
+				original := cliPathsFor
+				translocated := paths
+				translocated.bundle = "/private/var/folders/xy/AppTranslocation/1234/d/Cubbix.app"
+				cliPathsFor = func() (cliPaths, bool) { return translocated, true }
+				restore = func() { cliPathsFor = original }
 			}
-			if !tt.HasText(a.text(locale, want)) {
-				t.Fatalf("%s/%s: missing %s: %v", state, locale, want, tt.Texts())
+			tt := ui.NewTester(a.view, 720, 388)
+			tt.SetLocale(locale)
+			if _, found := tt.Find(a.text(locale, "CLIName")); !found {
+				t.Fatalf("%s/%s: missing row: %v", state, locale, tt.Texts())
 			}
+			// Both fixed levels of the row are visible: the title and, at level
+			// one, the hint that says what the switch builds.
+			if !tt.HasText(a.text(locale, "CLILinkHint")) {
+				t.Fatalf("%s/%s: missing hint: %v", state, locale, tt.Texts())
+			}
+			// Only the failing states carry the reason. A missing or installed
+			// link is a normal state, not an error.
+			wantAlert := state == "broken" || state == "conflict" || state == "translocated"
+			reason := map[string]string{
+				"broken":       a.text(locale, "CLILinkBroken"),
+				"conflict":     strings.ReplaceAll(a.text(locale, "CLILinkConflict"), "%s", paths.link),
+				"translocated": a.text(locale, "CLITranslocated"),
+			}[state]
+			alert := reason != "" && tt.HasText(reason)
+			if alert != wantAlert {
+				t.Fatalf("%s/%s: alert shown=%v want=%v: %v", state, locale, alert, wantAlert, tt.Texts())
+			}
+			// Clicking the switch applies its target. Translocated is the only
+			// state whose switch cannot be used.
+			title, _ := tt.Find(a.text(locale, "CLIName"))
+			tt.ClickAt(cliSwitchX(tokens(false, "zh-CN")), title.Y+title.H/2)
+			tt.Frame()
+			switch state {
+			case "missing":
+				if paths.status() != cliInstalled {
+					t.Fatalf("%s/%s: the switch did not install", state, locale)
+				}
+			case "installed":
+				if paths.status() != cliMissing {
+					t.Fatalf("%s/%s: the switch did not remove", state, locale)
+				}
+			case "conflict":
+				// The foreign file survives and the failure reaches the header.
+				if data, _ := os.ReadFile(paths.link); string(data) != "x" {
+					t.Fatal("the foreign file was replaced")
+				}
+				if a.settingsError != "CLILinkConflict" {
+					t.Fatalf("%s/%s: missing failure: %q", state, locale, a.settingsError)
+				}
+			case "broken":
+				// Removing our broken link hides the row: the target is gone,
+				// so the next state is absent rather than missing.
+				if _, err := os.Lstat(paths.link); !os.IsNotExist(err) {
+					t.Fatalf("%s/%s: the broken link survived", state, locale)
+				}
+				tt.Frame()
+				if _, found := tt.Find(a.text(locale, "CLIName")); found {
+					t.Fatalf("%s/%s: the row outlived its target: %v", state, locale, tt.Texts())
+				}
+			case "translocated":
+				if _, err := os.Lstat(paths.link); !os.IsNotExist(err) {
+					t.Fatalf("%s/%s: a translocated bundle accepted the click", state, locale)
+				}
+				if a.settingsError != "" {
+					t.Fatalf("%s/%s: the disabled switch reported %q", state, locale, a.settingsError)
+				}
+			}
+			restore()
 		}
 	}
 }
@@ -225,21 +276,29 @@ func TestCLISettingsRowHiddenWithoutBinary(t *testing.T) {
 }
 
 // The install button works and reports failures through the settings error slot.
+// The switch installs and removes the link, and a failure stays in the error
+// slot instead of flipping the switch.
 func TestCLISettingsInstallClick(t *testing.T) {
 	paths, a := settingsTestPaths(t)
-	a.page = 0
-	tt := ui.NewTester(a.view, 720, 340)
+	a.page = settingsGeneral
+	tt := ui.NewTester(a.view, 720, 388)
 	tt.SetLocale("en")
-	if err := tt.Click(a.text("en", "CLIInstall")); err != nil {
-		t.Fatal(err)
+	title, ok := tt.Find(a.text("en", "CLIName"))
+	if !ok {
+		t.Fatal("missing the command line row")
 	}
+	x := cliSwitchX(tokens(false, "en"))
+	tt.ClickAt(x, title.Y+title.H/2)
+	tt.Frame()
 	if state := paths.status(); state != cliInstalled {
 		t.Fatalf("click did not install: %v", state)
 	}
-	tt.Frame()
-	if err := tt.Click(a.text("en", "CLIRemove")); err != nil {
-		t.Fatal(err)
+	if a.config.PaletteFavorites != nil {
+		t.Fatal("the switch wrote unrelated configuration")
 	}
+	title, _ = tt.Find(a.text("en", "CLIName"))
+	tt.ClickAt(x, title.Y+title.H/2)
+	tt.Frame()
 	if state := paths.status(); state != cliMissing {
 		t.Fatalf("click did not remove: %v", state)
 	}

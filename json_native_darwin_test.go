@@ -830,10 +830,13 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	// Disabling the tile closes the remaining window and releases the shortcut.
 	var registered, removed bool
 	mygo.RunOnMain(func() {
+		// The slot owns the combination first; only what this slot registered
+		// may be released by the close.
+		a.registerShortcut = func(string, func()) error { return nil }
+		a.registerJSONShortcut()
 		a.registerShortcut = func(string, func()) error { registered = true; return nil }
 		a.unregisterShortcut = func(string) { removed = true }
-		a.config.JSONEnabled = false
-		a.changeJSONEnabled()
+		a.changeJSONEnabled(false)
 	})
 	if len(a.jsonDocuments) != 0 || !other.window.IsDestroyed() || !removed || registered {
 		return fmt.Errorf("disable did not close windows or unregister shortcut")
@@ -851,7 +854,7 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 	if !mygo.GlobalShortcut.IsRegistered(a.config.JSONShortcut) {
 		return fmt.Errorf("native JSON shortcut was not registered")
 	}
-	mygo.RunOnMain(func() { a.config.JSONEnabled = false; a.changeJSONEnabled() })
+	mygo.RunOnMain(func() { a.changeJSONEnabled(false) })
 	if mygo.GlobalShortcut.IsRegistered(a.config.JSONShortcut) {
 		return fmt.Errorf("native JSON shortcut remained registered")
 	}
@@ -880,7 +883,7 @@ func TestJSONSettingsAndMenuScreenshots(t *testing.T) {
 				if kind == "shortcuts" {
 					// The shortcuts page is six rows and needs the window's
 					// minimum height, which it now sets.
-					a.page, h = 3, 368
+					a.page, h = 3, 388
 				}
 				tt := ui.NewTester(view, w, h)
 				tt.SetScale(2)

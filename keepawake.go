@@ -43,6 +43,7 @@ type awakeController struct {
 	mu         sync.Mutex
 	state      awakeState
 	child      awakeChild
+	childDone  chan struct{}
 	generation uint64
 	launch     func([]string) (awakeChild, error)
 	alive      func(int, string) bool
@@ -96,7 +97,37 @@ func (k *awakeController) stopLocked() {
 		_ = k.child.Kill()
 		k.child = nil
 	}
+	k.childDone = nil
 	k.state.Active = false
+}
+
+// stopConfirmed stops the ordinary assertion without touching the lid and
+// reports whether the child process really exited. A caller that already
+// restored the system sleep setting uses this instead of stop, so the lid
+// restore is never repeated from beforeStop.
+func (k *awakeController) stopConfirmed(timeout time.Duration) error {
+	k.mu.Lock()
+	k.generation++
+	child, done := k.child, k.childDone
+	k.child, k.childDone = nil, nil
+	k.state.Active = false
+	k.state.Error = ""
+	k.mu.Unlock()
+	if child != nil {
+		_ = child.Kill()
+	}
+	if done != nil {
+		timer := time.NewTimer(timeout)
+		defer timer.Stop()
+		select {
+		case <-done:
+		case <-timer.C:
+			k.notify()
+			return errors.New("AwakeStopError")
+		}
+	}
+	k.notify()
+	return nil
 }
 func (k *awakeController) setBeforeStop(fn func()) { k.mu.Lock(); k.beforeStop = fn; k.mu.Unlock() }
 func (k *awakeController) stop() {
@@ -132,10 +163,13 @@ func (k *awakeController) start(s awakeSession) error {
 		return err
 	}
 	k.child = child
+	done := make(chan struct{})
+	k.childDone = done
 	generation := k.generation
 	k.mu.Unlock()
 	k.notify()
 	go func() {
+		defer close(done)
 		err := child.Wait()
 		k.mu.Lock()
 		if generation != k.generation {
