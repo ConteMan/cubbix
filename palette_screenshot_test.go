@@ -35,6 +35,8 @@ func TestPaletteScreenshots(t *testing.T) {
 		tt.SetScale(2)
 		tt.SetLocale(locale)
 		tt.SetDark(dark)
+		// A frame first, so a setup can point at what the view laid out.
+		tt.Frame()
 		if setup != nil {
 			setup(tt)
 		}
@@ -76,6 +78,12 @@ func TestPaletteScreenshots(t *testing.T) {
 				} else {
 					tt.Type("常亮 45x")
 				}
+			})
+			capture("palette-scroll"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
+				// The list overflows, and pointing at it shows its scroll bar: no
+				// text and no highlight may reach under it.
+				list := a.palette.listBounds
+				tt.Move(list.X+list.W/2, list.Y+list.H/2)
 			})
 			capture("palette-actions"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {

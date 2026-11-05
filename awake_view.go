@@ -689,13 +689,11 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 			return false
 		})
 		e.Children(func() {
-			ui.Row(c).Fill().Gap(t.Space2).AlignItems(ui.Center).Children(func() {
+			ui.Row(c).Fill().AlignItems(ui.Center).Children(func() {
 				if active && a.shortcutDraft == "" {
 					ui.Text(c, text("R05Recording")).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
 				} else {
-					for _, symbol := range shortcutSymbols(acc) {
-						ui.Text(c, symbol).FontSize(t.FontSizeBody)
-					}
+					keycaps(c, t, shortcutSymbols(acc))
 				}
 			})
 		})

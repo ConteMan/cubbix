@@ -40,6 +40,7 @@ type paletteRow struct {
 	Key      string
 	Title    string
 	Group    string // resource key of a group header
+	Category string // the tile a command belongs to, after its title
 	Icon     string
 	Hint     string
 	ErrorKey string
@@ -487,7 +488,7 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		return awake.Arg{Kind: awake.KindDefault}
 	}
 	commandRow := func(cmd *command) paletteRow {
-		row := paletteRow{Kind: paletteRowCommand, Key: cmd.ID, Title: cmd.Title(a, locale), Icon: cmd.Icon, Command: cmd}
+		row := paletteRow{Kind: paletteRowCommand, Key: cmd.ID, Title: cmd.Title(a, locale), Category: a.text(locale, commandCategory(cmd)), Icon: cmd.Icon, Command: cmd}
 		if cmd.Param == paramAwake {
 			arg := argFor(cmd)
 			row.Hint = awakeHint(a, locale, arg)

@@ -1,0 +1,36 @@
+{
+  "cliVersion": "0.3.13",
+  "historicalRootsUnchanged": true,
+  "exports": [
+    {
+      "nodeId": "A0SIf",
+      "file": "zh-CN-light.png",
+      "scale": 2,
+      "sha256": "3700c755477b838abe36bde915800149def1b5b4d48b0f57e63810c29d0e8323"
+    },
+    {
+      "nodeId": "AoEVL",
+      "file": "zh-CN-dark.png",
+      "scale": 2,
+      "sha256": "d3246cc4d91632617cc5dd286931e2352586a2806a19f87ebe464a49bed2a317"
+    },
+    {
+      "nodeId": "lwCvL",
+      "file": "en-light.png",
+      "scale": 2,
+      "sha256": "edb4e15fca992a583f33971da7bec7cbe967520fe5bc32ffda1f0b1c15b33d13"
+    },
+    {
+      "nodeId": "FiZ1p",
+      "file": "en-dark.png",
+      "scale": 2,
+      "sha256": "c2a67d57ed93437846f75087207cbcd21503e13eb85f5b737f52313bdab71884"
+    }
+  ],
+  "nativeLayout": {
+    "boards": 4,
+    "nodes": 512,
+    "problems": []
+  },
+  "passed": true
+}

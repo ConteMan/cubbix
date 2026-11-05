@@ -61,6 +61,21 @@ func localizedTitle(key string) func(a *application, locale string) string {
 	return func(a *application, locale string) string { return a.text(locale, key) }
 }
 
+// commandCategory is the resource key of the tile a command belongs to, shown
+// as secondary text after its title. Feature tiles name themselves; general
+// commands belong to the app.
+func commandCategory(cmd *command) string {
+	switch cmd.Tile {
+	case "awake":
+		return "Awake"
+	case "json":
+		return "JSON"
+	case "palette":
+		return "PaletteShortcutLabel"
+	}
+	return "R05App"
+}
+
 // commands assembles the registry each time the palette shows: keep awake,
 // the open JSON windows, then the general commands. Availability is evaluated
 // once here; the panel is a short-lived overlay and does not refresh.
@@ -322,6 +337,7 @@ func (a *application) systemCommands() []*command {
 			ID:       "palette.position.reset",
 			Title:    localizedTitle("PaletteResetPosition"),
 			Keywords: []string{"位置", "归位", "居中", "position", "weizhi", "wz", "center", "reset"},
+			Tile:     "palette",
 			Icon:     "move",
 			Run: func(a *application, req request) error {
 				a.resetPalettePosition()

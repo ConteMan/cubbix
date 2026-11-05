@@ -565,6 +565,7 @@ func applyTheme(c *ui.Context) (string, tokenValues) {
 	theme.Inverse, theme.InverseText = ui.Hex(t.ColorTooltip), ui.Hex(t.ColorTooltipText)
 	theme.Success, theme.Warning, theme.Scrollbar = ui.Hex(t.ColorSuccess), ui.Hex(t.ColorDanger), ui.Hex(t.ColorTextSecondary)
 	theme.Radius, theme.Spacing, theme.FontSize = t.RadiusControl, t.Space4, t.FontSizeBody
+	theme.ScrollbarWidth = t.SizeScrollbar
 	theme.Font = t.FontFamily
 	c.SetTheme(&theme)
 	return locale, t
