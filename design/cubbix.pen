@@ -103357,7 +103357,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -103378,7 +103378,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -103423,7 +103423,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -103453,7 +103453,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -103484,10 +103484,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -103498,7 +103498,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -103526,7 +103526,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -103582,7 +103582,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -103610,7 +103610,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -103668,7 +103668,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -103724,7 +103724,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -103752,7 +103752,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -103821,7 +103821,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -103879,7 +103879,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -103939,7 +103939,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -104036,7 +104036,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -104057,7 +104057,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -104102,7 +104102,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -104132,7 +104132,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -104163,10 +104163,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -104177,7 +104177,7 @@
                               "height": 36,
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -104224,7 +104224,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -104271,7 +104271,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -104318,7 +104318,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -104365,7 +104365,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -104412,7 +104412,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -104461,7 +104461,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -104550,7 +104550,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -104580,7 +104580,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -104648,7 +104648,7 @@
                       "cornerRadius": "$RadiusControl",
                       "gap": "$Space8",
                       "padding": [
-                        0,
+                        "$Space0",
                         "$Space8"
                       ],
                       "alignItems": "center",
@@ -104667,7 +104667,7 @@
                           "id": "b50ofe",
                           "name": "Inset",
                           "width": "fill_container",
-                          "gap": 6,
+                          "gap": "$SizePalettePlaceholderInset",
                           "alignItems": "center",
                           "children": [
                             {
@@ -104730,10 +104730,10 @@
                       "height": 36,
                       "layout": "vertical",
                       "padding": [
-                        0,
-                        12,
-                        0,
-                        0
+                        "$Space0",
+                        "$SizePaletteScrollbarSlot",
+                        "$Space0",
+                        "$Space0"
                       ],
                       "children": [
                         {
@@ -104746,7 +104746,7 @@
                           "cornerRadius": "$RadiusCard",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -104795,7 +104795,7 @@
                           "width": 6,
                           "height": 26,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         }
                       ]
@@ -104939,7 +104939,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -104960,7 +104960,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -105005,7 +105005,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -105035,7 +105035,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -105066,10 +105066,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -105080,7 +105080,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -105108,7 +105108,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105164,7 +105164,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -105192,7 +105192,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105250,7 +105250,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105306,7 +105306,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -105334,7 +105334,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105403,7 +105403,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105461,7 +105461,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105521,7 +105521,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -105618,7 +105618,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -105639,7 +105639,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -105684,7 +105684,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -105714,7 +105714,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -105745,10 +105745,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -105759,7 +105759,7 @@
                               "height": 36,
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105806,7 +105806,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105853,7 +105853,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105900,7 +105900,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105947,7 +105947,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -105994,7 +105994,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -106043,7 +106043,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -106132,7 +106132,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -106162,7 +106162,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -106230,7 +106230,7 @@
                       "cornerRadius": "$RadiusControl",
                       "gap": "$Space8",
                       "padding": [
-                        0,
+                        "$Space0",
                         "$Space8"
                       ],
                       "alignItems": "center",
@@ -106249,7 +106249,7 @@
                           "id": "m7ZqA0",
                           "name": "Inset",
                           "width": "fill_container",
-                          "gap": 6,
+                          "gap": "$SizePalettePlaceholderInset",
                           "alignItems": "center",
                           "children": [
                             {
@@ -106312,10 +106312,10 @@
                       "height": 36,
                       "layout": "vertical",
                       "padding": [
-                        0,
-                        12,
-                        0,
-                        0
+                        "$Space0",
+                        "$SizePaletteScrollbarSlot",
+                        "$Space0",
+                        "$Space0"
                       ],
                       "children": [
                         {
@@ -106328,7 +106328,7 @@
                           "cornerRadius": "$RadiusCard",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -106377,7 +106377,7 @@
                           "width": 6,
                           "height": 26,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         }
                       ]
@@ -106521,7 +106521,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -106542,7 +106542,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -106587,7 +106587,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -106617,7 +106617,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -106648,10 +106648,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -106662,7 +106662,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -106690,7 +106690,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -106746,7 +106746,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -106774,7 +106774,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -106832,7 +106832,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -106888,7 +106888,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -106916,7 +106916,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -106985,7 +106985,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107043,7 +107043,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107103,7 +107103,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -107200,7 +107200,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -107221,7 +107221,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -107266,7 +107266,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -107296,7 +107296,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -107327,10 +107327,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -107341,7 +107341,7 @@
                               "height": 36,
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107388,7 +107388,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107435,7 +107435,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107482,7 +107482,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107529,7 +107529,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107576,7 +107576,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -107625,7 +107625,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -107714,7 +107714,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -107744,7 +107744,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -107812,7 +107812,7 @@
                       "cornerRadius": "$RadiusControl",
                       "gap": "$Space8",
                       "padding": [
-                        0,
+                        "$Space0",
                         "$Space8"
                       ],
                       "alignItems": "center",
@@ -107831,7 +107831,7 @@
                           "id": "d3831f",
                           "name": "Inset",
                           "width": "fill_container",
-                          "gap": 6,
+                          "gap": "$SizePalettePlaceholderInset",
                           "alignItems": "center",
                           "children": [
                             {
@@ -107894,10 +107894,10 @@
                       "height": 36,
                       "layout": "vertical",
                       "padding": [
-                        0,
-                        12,
-                        0,
-                        0
+                        "$Space0",
+                        "$SizePaletteScrollbarSlot",
+                        "$Space0",
+                        "$Space0"
                       ],
                       "children": [
                         {
@@ -107910,7 +107910,7 @@
                           "cornerRadius": "$RadiusCard",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -107959,7 +107959,7 @@
                           "width": 6,
                           "height": 26,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         }
                       ]
@@ -108103,7 +108103,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -108124,7 +108124,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -108169,7 +108169,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -108199,7 +108199,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -108230,10 +108230,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -108244,7 +108244,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -108272,7 +108272,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -108328,7 +108328,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -108356,7 +108356,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -108414,7 +108414,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -108470,7 +108470,7 @@
                               "height": 24,
                               "layout": "vertical",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "justifyContent": "center",
@@ -108498,7 +108498,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -108567,7 +108567,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -108625,7 +108625,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -108685,7 +108685,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -108782,7 +108782,7 @@
                           "cornerRadius": "$RadiusControl",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -108803,7 +108803,7 @@
                               "name": "Field",
                               "width": "fill_container",
                               "height": "fill_container",
-                              "gap": 6,
+                              "gap": "$SizePalettePlaceholderInset",
                               "alignItems": "center",
                               "children": [
                                 {
@@ -108848,7 +108848,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -108878,7 +108878,7 @@
                                   "stroke": "$ColorKeycapStroke",
                                   "strokeWidth": "$StrokeHairline",
                                   "padding": [
-                                    0,
+                                    "$Space0",
                                     "$Space6"
                                   ],
                                   "justifyContent": "center",
@@ -108909,10 +108909,10 @@
                           "height": "fill_container",
                           "layout": "vertical",
                           "padding": [
-                            0,
-                            12,
-                            0,
-                            0
+                            "$Space0",
+                            "$SizePaletteScrollbarSlot",
+                            "$Space0",
+                            "$Space0"
                           ],
                           "children": [
                             {
@@ -108923,7 +108923,7 @@
                               "height": 36,
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -108970,7 +108970,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -109017,7 +109017,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -109064,7 +109064,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -109111,7 +109111,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -109158,7 +109158,7 @@
                               "cornerRadius": "$RadiusCard",
                               "gap": "$Space8",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space8"
                               ],
                               "alignItems": "center",
@@ -109207,7 +109207,7 @@
                           "width": 6,
                           "height": 150,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         },
                         {
@@ -109296,7 +109296,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -109326,7 +109326,7 @@
                               "stroke": "$ColorKeycapStroke",
                               "strokeWidth": "$StrokeHairline",
                               "padding": [
-                                0,
+                                "$Space0",
                                 "$Space6"
                               ],
                               "justifyContent": "center",
@@ -109394,7 +109394,7 @@
                       "cornerRadius": "$RadiusControl",
                       "gap": "$Space8",
                       "padding": [
-                        0,
+                        "$Space0",
                         "$Space8"
                       ],
                       "alignItems": "center",
@@ -109413,7 +109413,7 @@
                           "id": "cvhLY",
                           "name": "Inset",
                           "width": "fill_container",
-                          "gap": 6,
+                          "gap": "$SizePalettePlaceholderInset",
                           "alignItems": "center",
                           "children": [
                             {
@@ -109476,10 +109476,10 @@
                       "height": 36,
                       "layout": "vertical",
                       "padding": [
-                        0,
-                        12,
-                        0,
-                        0
+                        "$Space0",
+                        "$SizePaletteScrollbarSlot",
+                        "$Space0",
+                        "$Space0"
                       ],
                       "children": [
                         {
@@ -109492,7 +109492,7 @@
                           "cornerRadius": "$RadiusCard",
                           "gap": "$Space8",
                           "padding": [
-                            0,
+                            "$Space0",
                             "$Space8"
                           ],
                           "alignItems": "center",
@@ -109541,7 +109541,7 @@
                           "width": 6,
                           "height": 26,
                           "fill": "$ColorTextSecondary",
-                          "cornerRadius": 3,
+                          "cornerRadius": "$RadiusControl",
                           "layout": "vertical"
                         }
                       ]

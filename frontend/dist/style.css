@@ -62,3 +62,6 @@ footer { flex-shrink: 0; display: flex; align-items: center; gap: var(--Space12)
 @media(prefers-reduced-motion: reduce) { .loader { animation: none; } }
 
 #tooltip { position: fixed; z-index: 10; max-width: calc(100vw - var(--Space24)); padding: var(--Space6) var(--Space8); border-radius: var(--RadiusControl); background: var(--ColorTooltip); color: var(--ColorTooltipText); font: var(--FontSizeSmall)/var(--LineHeightBody) var(--FontFamily), -apple-system, BlinkMacSystemFont, sans-serif; pointer-events: none; }
+#tooltip { display: flex; align-items: center; gap: var(--Space8); }
+.keycaps { display: inline-flex; flex-shrink: 0; align-items: center; gap: var(--Space4); }
+.keycap { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; height: var(--SizeKeycapHeight); min-width: var(--SizeKeycapMinWidth); padding: var(--Space0) var(--Space6); border: var(--StrokeHairline) solid var(--ColorKeycapStroke); border-radius: var(--RadiusControl); background: var(--ColorKeycap); color: var(--ColorKeycapText); font: inherit; }

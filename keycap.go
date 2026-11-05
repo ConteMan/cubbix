@@ -23,3 +23,23 @@ func keycaps(c *ui.Context, t tokenValues, keys []string) {
 		}
 	})
 }
+
+// shortcutTooltip uses the same keycaps as the palette and recorder. The
+// description stays plain text so assistive technology hears the shortcut.
+func shortcutTooltip(c *ui.Context, t tokenValues, anchor ui.Element, label, accelerator string) {
+	description := label
+	if accelerator != "" {
+		description += " (" + shortcutLabel(accelerator) + ")"
+	}
+	anchor.Description(description)
+	ui.TooltipBase(c, anchor, func(tip ui.Element) {
+		tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
+			ui.Row(c).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+				ui.Text(c, label).FontSize(t.FontSizeSmall)
+				if accelerator != "" {
+					keycaps(c, t, shortcutSymbols(accelerator))
+				}
+			})
+		})
+	})
+}

@@ -78,8 +78,8 @@ func (a *application) paletteView(c *ui.Context) {
 					input.OnShortcut(0, ui.KeyUp, func() { a.movePaletteSelection(-1) })
 					if p.query == "" && !input.Composing() {
 						// A hint, not a control: the pointer reaches the input under it.
-						ui.Row(c).Absolute().Left(t.SizePalettePlaceholderInset).Top(0).Bottom(0).AlignItems(ui.Center).PassThrough().Children(func() {
-							ui.Text(c, text("PaletteSearch")).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine().Ellipsis("…")
+						ui.Row(c).Absolute().Left(t.SizePalettePlaceholderInset).Right(0).Top(0).Bottom(0).AlignItems(ui.Center).PassThrough().Children(func() {
+							ui.Text(c, text("PaletteSearch")).Grow(1).MinWidth(0).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine().Ellipsis("…")
 						})
 					}
 				})
@@ -135,7 +135,9 @@ func (a *application) paletteRow(c *ui.Context, t tokenValues, locale string, p 
 	row := p.rows[index]
 	switch row.Kind {
 	case paletteRowHeader:
-		ui.Row(c).FillWidth().Height(t.SizePaletteGroupHeight).PaddingX(t.Space8).AlignItems(ui.Center).Background(ui.Hex(t.ColorMenuSurface)).Children(func() {
+		// Inherit the panel surface: painting its translucent color again
+		// changes the opacity and creates a band, especially in dark mode.
+		ui.Row(c).FillWidth().Height(t.SizePaletteGroupHeight).PaddingX(t.Space8).AlignItems(ui.Center).Children(func() {
 			ui.Text(c, a.text(locale, row.Group)).FontSize(t.FontSizeCaption).TextColor(ui.Hex(t.ColorTextDisabled))
 		})
 	case paletteRowSeparator:
@@ -174,14 +176,16 @@ func (a *application) paletteRow(c *ui.Context, t tokenValues, locale string, p 
 				}
 				// The title and the tile it belongs to sit together on the left; the
 				// title gives way first, the tile keeps its words.
-				ui.Row(c).Grow(1).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
+				ui.Row(c).Grow(1).MinWidth(0).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
 					ui.Text(c, row.Title).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).Shrink(1).SingleLine().Ellipsis("…").MinWidth(0)
 					if row.Category != "" {
-						ui.Text(c, row.Category).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+						ui.Text(c, row.Category).Shrink(0).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
 					}
 				})
 				if row.Hint != "" {
-					ui.Text(c, row.Hint).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+					// Invalid input is echoed here too; bound that untrusted text
+					// while keeping normal duration hints at their natural width.
+					ui.Text(c, row.Hint).Shrink(0).MaxWidth(t.SizePaletteWidth / 2).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine().Ellipsis("…")
 				}
 				if row.Checked {
 					ui.Icon(c, icon("check")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorText))

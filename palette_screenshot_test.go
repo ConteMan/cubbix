@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -84,6 +85,7 @@ func TestPaletteScreenshots(t *testing.T) {
 				// text and no highlight may reach under it.
 				list := a.palette.listBounds
 				tt.Move(list.X+list.W/2, list.Y+list.H/2)
+				tt.Scroll(list.X+list.W/2, list.Y+list.H/2, 0, 180)
 			})
 			capture("palette-actions"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {
@@ -108,5 +110,30 @@ func TestPaletteScreenshots(t *testing.T) {
 			})
 			a.guide = nil
 		}
+	}
+}
+
+// Optional extra review evidence shares the tests' settled frames. The
+// original evidence names stay unchanged in TestPaletteScreenshots.
+func paletteReviewScreenshot(t *testing.T, tt *ui.Tester, name, locale string, dark bool) {
+	t.Helper()
+	dir := os.Getenv("CUBBIX_PALETTE_REVIEW_EVIDENCE")
+	if dir == "" {
+		return
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	mode := "light"
+	if dark {
+		mode = "dark"
+	}
+	f, err := os.Create(filepath.Join(dir, fmt.Sprintf("%s-%s-%s.png", name, locale, mode)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if err := png.Encode(f, tt.Image()); err != nil {
+		t.Fatal(err)
 	}
 }

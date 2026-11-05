@@ -82,7 +82,7 @@ function add(parent, node) {
   for (const child of children) add(id, child);
   return id;
 }
-function frame(name, more = {}) { return {type: 'frame', name, layout: 'vertical', gap: 0, ...more}; }
+function frame(name, more = {}) { return {type: 'frame', name, layout: 'vertical', gap: '$Space0', ...more}; }
 function row(name, more = {}) { return frame(name, {layout: 'horizontal', alignItems: 'center', ...more}); }
 function copy(language, key, more = {}) {
   return {type: 'text', name: 'Copy / ' + key, content: S[language][key], fontFamily: '$FontFamily',
@@ -104,7 +104,7 @@ function shadow(color, y, blur) {
 // the smallest of two keys 20 wide.
 function keycap(content, width) {
   return frame('Keycap / ' + content, {
-    height: N.SizeKeycapHeight, width: width, layout: 'horizontal', padding: [0, '$Space6'],
+    height: N.SizeKeycapHeight, width: width, layout: 'horizontal', padding: ['$Space0', '$Space6'],
     justifyContent: 'center', alignItems: 'center', cornerRadius: '$RadiusControl',
     fill: '$ColorKeycap', stroke: '$ColorKeycapStroke', strokeWidth: '$StrokeHairline',
     children: [literal(content, {fontSize: '$FontSizeSmall', fill: '$ColorKeycapText'})],
@@ -119,11 +119,11 @@ function keycapPair() {
 // ⌘K keycaps. No divider follows it.
 function searchRow(language) {
   return row('Search row', {
-    width: 'fill_container', height: N.SizePaletteSearchHeight, padding: [0, '$Space8'], gap: '$Space8',
+    width: 'fill_container', height: N.SizePaletteSearchHeight, padding: ['$Space0', '$Space8'], gap: '$Space8',
     cornerRadius: '$RadiusControl', fill: '$ColorControl', children: [
       glyph('search'),
       row('Field', {
-        width: 'fill_container', height: 'fill_container', gap: N.SizePalettePlaceholderInset, children: [
+        width: 'fill_container', height: 'fill_container', gap: '$SizePalettePlaceholderInset', children: [
           frame('Caret', {width: 1, height: 16, fill: '$ColorText'}),
           copy(language, 'PaletteSearch', {width: 'fill_container', textGrowth: 'fixed-width', fill: '$ColorTextSecondary'}),
         ],
@@ -140,21 +140,21 @@ function commandRow(language, key, iconName, tile, hint, selected = false, showT
   children.push(frame('Spacer', {width: 'fill_container', height: 1, fill: '$ColorTransparent'}));
   if (hint) children.push(copy(language, hint, {fontSize: '$FontSizeSmall', fill: '$ColorTextSecondary'}));
   return row('Command / ' + key, {
-    width: 'fill_container', height: N.SizePaletteRowHeight, padding: [0, '$Space8'], gap: '$Space8',
+    width: 'fill_container', height: N.SizePaletteRowHeight, padding: ['$Space0', '$Space8'], gap: '$Space8',
     cornerRadius: '$RadiusCard', fill: selected ? '$ColorAccentSoft' : '$ColorTransparent', children,
   });
 }
 function groupHeader(language, key) {
   return frame('Group / ' + key, {
-    width: 'fill_container', height: N.SizePaletteGroupHeight, padding: [0, '$Space8'], justifyContent: 'center',
+    width: 'fill_container', height: N.SizePaletteGroupHeight, padding: ['$Space0', '$Space8'], justifyContent: 'center',
     children: [copy(language, key, {fontSize: '$FontSizeCaption', fill: '$ColorTextDisabled'})],
   });
 }
 // The list keeps its scroll bar slot on the right; the bar floats in it.
 function paletteBody(language, rows) {
   return frame('Body', {
-    width: 'fill_container', height: 'fill_container', padding: [0, N.SizePaletteScrollbarSlot, 0, 0],
-    gap: 0, children: rows,
+    width: 'fill_container', height: 'fill_container', padding: ['$Space0', '$SizePaletteScrollbarSlot', '$Space0', '$Space0'],
+    gap: '$Space0', children: rows,
   });
 }
 function scrollBar(height) {
@@ -164,7 +164,7 @@ function scrollBar(height) {
     layoutPosition: 'absolute',
     x: N.SizePaletteWidth - N.Space8 - N.SizeScrollbar - 3,
     y: N.Space8 + N.SizePaletteSearchHeight + N.Space8 + 2,
-    width: N.SizeScrollbar, height: height, cornerRadius: N.SizeScrollbar / 2, fill: '$ColorTextSecondary',
+    width: N.SizeScrollbar, height: height, cornerRadius: '$RadiusControl', fill: '$ColorTextSecondary',
   });
 }
 function paletteMock(language, mode) {
@@ -190,7 +190,7 @@ function paletteMock(language, mode) {
   } else {
     rows = [
       row('Action title', {
-        width: 'fill_container', height: N.SizePaletteRowHeight, padding: [0, '$Space8'], gap: '$Space8',
+        width: 'fill_container', height: N.SizePaletteRowHeight, padding: ['$Space0', '$Space8'], gap: '$Space8',
         children: [glyph('sun'), copy(language, 'R05Start')],
       }),
       frame('Title divider', {width: 'fill_container', height: 1, fill: '$ColorSeparator'}),
@@ -243,11 +243,11 @@ function specCell(language) {
     fill: '$ColorControl', children: [
       copy(language, 'R15SpecCaret', {fontSize: '$FontSizeSmall', fill: '$ColorTextSecondary'}),
       row('Caret sample', {
-        width: 'fill_container', height: N.SizePaletteSearchHeight, padding: [0, '$Space8'], gap: '$Space8',
+        width: 'fill_container', height: N.SizePaletteSearchHeight, padding: ['$Space0', '$Space8'], gap: '$Space8',
         cornerRadius: '$RadiusControl', fill: '$ColorMenuSurface', children: [
           frame('Caret', {width: 1, height: 16, fill: '$ColorText'}),
           row('Inset', {
-            gap: N.SizePalettePlaceholderInset, width: 'fill_container', children: [
+            gap: '$SizePalettePlaceholderInset', width: 'fill_container', children: [
               copy(language, 'PaletteSearch', {width: 'fill_container', textGrowth: 'fixed-width', fill: '$ColorTextSecondary'}),
             ],
           }),
@@ -261,15 +261,15 @@ function specCell(language) {
     fill: '$ColorControl', children: [
       copy(language, 'R15SpecSlot', {fontSize: '$FontSizeSmall', fill: '$ColorTextSecondary'}),
       frame('Slot sample', {
-        width: 'fill_container', height: N.SizePaletteRowHeight, padding: [0, N.SizePaletteScrollbarSlot, 0, 0],
+        width: 'fill_container', height: N.SizePaletteRowHeight, padding: ['$Space0', '$SizePaletteScrollbarSlot', '$Space0', '$Space0'],
         children: [row('Row sample', {
-          width: 'fill_container', height: 'fill_container', padding: [0, '$Space8'], gap: '$Space8',
+          width: 'fill_container', height: 'fill_container', padding: ['$Space0', '$Space8'], gap: '$Space8',
           cornerRadius: '$RadiusCard', fill: '$ColorAccentSoft',
           children: [glyph('sun'), copy(language, 'R05Start'), copy(language, 'Awake', {fill: '$ColorTextSecondary'})],
         }), frame('Slot bar', {
           layoutPosition: 'absolute', x: 704 - 2 * N.Space12 - N.SizeScrollbar - 3, y: 5,
           width: N.SizeScrollbar, height: N.SizePaletteRowHeight - 10,
-          cornerRadius: N.SizeScrollbar / 2, fill: '$ColorTextSecondary',
+          cornerRadius: '$RadiusControl', fill: '$ColorTextSecondary',
         })],
       }),
       copy(language, 'R15SpecSlotNote', {fontSize: '$FontSizeSmall', fill: '$ColorTextSecondary'}),
@@ -308,6 +308,32 @@ for (const [language, mode, index] of themes) {
 Print('R15_CREATED', true);
 '''
 
+# Repair existing R15 boards as well as keeping AUTHOR token-bound. RadiusControl
+# is clamped by the renderer to half the scrollbar's width.
+REPAIR = r'''
+const boards = Get((n,c) => { c.skipChildren(); return {id:n.id,name:n.name}; })
+  .filter(n => n.name.startsWith('R15 '));
+for (const board of boards) Get(board.id, (n,c) => {
+  const patch = {};
+  for (const key of ['gap', 'padding']) {
+    function bind(v) {
+      if (Array.isArray(v)) return v.map(bind);
+      if (v === 0) return '$Space0';
+      if (v === 6) return n.name === 'Field' ? '$SizePalettePlaceholderInset' : '$Space6';
+      if (v === 12) return '$SizePaletteScrollbarSlot';
+      return v;
+    }
+    if (n[key] !== undefined) {
+      const bound = bind(n[key]);
+      if (JSON.stringify(bound) !== JSON.stringify(n[key])) patch[key] = bound;
+    }
+  }
+  if (['Field', 'Inset'].includes(n.name)) patch.gap = '$SizePalettePlaceholderInset';
+  if (n.cornerRadius === 3) patch.cornerRadius = '$RadiusControl';
+  if (Object.keys(patch).length) Update(n.id, patch);
+});
+'''
+
 QA = r'''
 const boards = Get((n, c) => { c.skipChildren(); return {id: n.id, name: n.name, theme: n.theme}; })
   .filter(n => /^R15 (zh-CN|en) (light|dark)$/.test(n.name));
@@ -315,6 +341,10 @@ const qa = {boards: boards.length, nodes: 0, problems: []};
 for (const board of boards) {
   Get(board.id, (n, c) => {
     qa.nodes++;
+    for (const key of ['cornerRadius', 'fontSize', 'gap', 'padding']) {
+      const values = Array.isArray(n[key]) ? n[key].flat(Infinity) : [n[key]];
+      if (values.some(v => typeof v === 'number')) qa.problems.push({name:n.name, problem:'Literal ' + key});
+    }
     if (n.type === 'text' && typeof n.content === 'string' && n.content.startsWith('$')) {
       qa.problems.push({name: n.name, problem: 'Unresolved copy'});
     }
@@ -331,6 +361,12 @@ for (const board of boards) {
 }
 Print('R15_QA', qa);
 '''
+
+
+def walk_nodes(nodes):
+    for node in nodes:
+        yield node
+        yield from walk_nodes(node.get('children', []))
 
 
 def main():
@@ -359,6 +395,13 @@ def main():
     after = json.loads(SOURCE.read_text())
     for node in before['children']:
         assert node == next(n for n in after['children'] if n['id'] == node['id']), node['id']
+    run(REPAIR, SOURCE, save=True)
+    after = json.loads(SOURCE.read_text())
+    for node in before['children']:
+        if not node.get('name', '').startswith('R15 '):
+            assert node == next(n for n in after['children'] if n['id'] == node['id']), node['id']
+    if any(n.get('name', '').startswith('R15 ') for n in before['children']):
+        assert sum(1 for _ in walk_nodes(before['children'])) == sum(1 for _ in walk_nodes(after['children']))
     result = {'cliVersion': '0.3.13', 'historicalRootsUnchanged': True, 'exports': []}
     with tempfile.TemporaryDirectory(prefix='cubbix-r15-') as tmp:
         tmp = Path(tmp)

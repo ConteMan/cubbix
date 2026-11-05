@@ -699,18 +699,7 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 		})
 		if errorKey != "" {
 			alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(text(errorKey)).Description(text(errorKey))
-			ui.TooltipBase(c, alert, func(tip ui.Element) {
-				tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
-					ui.Row(c).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
-						ui.Row(c).Gap(t.Space2).AlignItems(ui.Center).Children(func() {
-							for _, symbol := range shortcutSymbols(acc) {
-								ui.Text(c, symbol).FontSize(t.FontSizeSmall)
-							}
-						})
-						ui.Text(c, text(a.shortcutReasonKey(errorKey, target, acc))).FontSize(t.FontSizeSmall)
-					})
-				})
-			})
+			shortcutTooltip(c, t, alert, text(a.shortcutReasonKey(errorKey, target, acc)), acc)
 		}
 	})
 }

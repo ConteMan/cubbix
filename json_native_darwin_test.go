@@ -228,6 +228,42 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 			if err := wait("document.documentElement.lang === '" + locale + "'"); err != nil {
 				return err
 			}
+			// DOM events exercise the real tooltip without moving the system
+			// pointer or showing/focusing this hidden WebKit window.
+			for _, button := range []string{"pin", "open", "copy"} {
+				if _, err := eval(fmt.Sprintf("document.getElementById(%q).dispatchEvent(new Event('pointerover', {bubbles:true}))", button)); err != nil {
+					return err
+				}
+				if err := wait(`!document.getElementById('tooltip').hidden`); err != nil {
+					return err
+				}
+				if err := want(fmt.Sprintf(`(()=>{
+				  const tip = document.getElementById('tooltip');
+				  const label = document.getElementById(%q).getAttribute('aria-label');
+				  const keys = [...tip.querySelectorAll('kbd')];
+				  const root = getComputedStyle(document.documentElement);
+				  const gap = parseFloat(root.getPropertyValue('--Space4'));
+				  return tip.getAttribute('aria-label') === label &&
+				    label.endsWith('(' + keys.map(k=>k.textContent).join('') + ')') &&
+				    keys.length >= 2 && keys.every((key,i)=>{
+				      const r = key.getBoundingClientRect(), css = getComputedStyle(key);
+				      return r.height === parseFloat(root.getPropertyValue('--SizeKeycapHeight')) &&
+				        r.width >= parseFloat(root.getPropertyValue('--SizeKeycapMinWidth')) &&
+				        css.fontFamily === getComputedStyle(tip).fontFamily &&
+				        (!i || r.left - keys[i-1].getBoundingClientRect().right >= gap - 0.5);
+				    });
+				})()`, button)); err != nil {
+					return err
+				}
+				if button == "pin" {
+					if err := capture("json-keycaps-" + locale + "-" + mode); err != nil {
+						return err
+					}
+				}
+				if _, err := eval("document.dispatchEvent(new Event('pointerout'))"); err != nil {
+					return err
+				}
+			}
 			if err := want("await window.cubbix.evaluate('.data.items.length').then(v=>v.kind==='number'&&v.text==='3')"); err != nil {
 				return err
 			}

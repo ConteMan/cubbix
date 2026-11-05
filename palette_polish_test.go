@@ -1,21 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 )
 
 // polishPalette frames the palette once, runs setup, and frames again, so the
 // checks read the geometry of a settled frame.
-func polishPalette(t *testing.T, setup func(*application, *ui.Tester)) (*application, *ui.Tester) {
+func polishPalette(t *testing.T, locale string, dark bool, setup func(*application, *ui.Tester)) (*application, *ui.Tester) {
 	t.Helper()
 	a := paletteTestApp(t)
 	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetScale(2)
-	tt.SetLocale("zh-CN")
+	tt.SetLocale(locale)
+	tt.SetDark(dark)
 	tt.Frame()
 	if setup != nil {
 		setup(a, tt)
@@ -58,10 +61,10 @@ func inkStart(tt *ui.Tester, x0, x1, y float32, background color.RGBA) float32 {
 // TestPaletteListKeepsAScrollbarSlot checks that the scroll bar shows in its
 // own slot and that neither a row nor the highlight of the selected row
 // reaches under it.
-func TestPaletteListKeepsAScrollbarSlot(t *testing.T) {
-	tk := tokens(false, "zh-CN")
+func testPaletteListKeepsAScrollbarSlot(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
 	var a *application
-	a, tt := polishPalette(t, func(a *application, tt *ui.Tester) {
+	a, tt := polishPalette(t, locale, dark, func(a *application, tt *ui.Tester) {
 		// Point at a row below the selected one: the list shows its bar and the
 		// selected row keeps its highlight.
 		list := a.palette.listBounds
@@ -73,7 +76,7 @@ func TestPaletteListKeepsAScrollbarSlot(t *testing.T) {
 	if barLeft < rowsRight {
 		t.Fatalf("the slot (%.0f) is narrower than the bar at %.0f", rowsRight, barLeft)
 	}
-	row, ok := tt.Find(a.text("zh-CN", "R05Start"))
+	row, ok := tt.Find(a.text(locale, "R05Start"))
 	if !ok {
 		t.Fatalf("the selected row is missing: %v", tt.Texts())
 	}
@@ -96,12 +99,12 @@ func TestPaletteListKeepsAScrollbarSlot(t *testing.T) {
 
 // TestPaletteHintStaysClearOfTheSlot checks that a row's hint ends before the
 // scroll bar's slot.
-func TestPaletteHintStaysClearOfTheSlot(t *testing.T) {
-	tk := tokens(false, "zh-CN")
-	a, tt := polishPalette(t, func(a *application, tt *ui.Tester) {
-		tt.Type(a.text("zh-CN", "R05Start") + " 45m")
+func testPaletteHintStaysClearOfTheSlot(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
+	a, tt := polishPalette(t, locale, dark, func(a *application, tt *ui.Tester) {
+		tt.Type(a.text(locale, "R05Start") + " 45m")
 	})
-	hint, ok := tt.Find("45 分钟")
+	hint, ok := tt.Find(fmt.Sprintf(a.text(locale, "PaletteMinutes"), 45))
 	if !ok {
 		t.Fatalf("the selected row shows no hint: %v", tt.Texts())
 	}
@@ -113,18 +116,18 @@ func TestPaletteHintStaysClearOfTheSlot(t *testing.T) {
 
 // TestPaletteRowsNameTheirTile checks the secondary text after each title: the
 // tile a command belongs to, one gap after the title's ink.
-func TestPaletteRowsNameTheirTile(t *testing.T) {
-	tk := tokens(false, "zh-CN")
-	a, tt := polishPalette(t, nil)
+func testPaletteRowsNameTheirTile(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
+	a, tt := polishPalette(t, locale, dark, nil)
 	list := a.palette.listBounds
-	row, ok := tt.Find(a.text("zh-CN", "R05Start"))
+	row, ok := tt.Find(a.text(locale, "R05Start"))
 	if !ok {
 		t.Fatalf("the selected row is missing: %v", tt.Texts())
 	}
-	category := a.text("zh-CN", "Awake")
+	category := a.text(locale, "Awake")
 	box, ok := tt.Find(category)
 	if !ok {
-		t.Fatalf("%q shows no category %q: %v", a.text("zh-CN", "R05Start"), category, tt.Texts())
+		t.Fatalf("%q shows no category %q: %v", a.text(locale, "R05Start"), category, tt.Texts())
 	}
 	if box.Y < row.Y || box.Y+box.H > row.Y+row.H {
 		t.Fatalf("the category at %.1f is not on the selected row %.1f", box.Y, row.Y)
@@ -143,22 +146,27 @@ func TestPaletteRowsNameTheirTile(t *testing.T) {
 		t.Fatalf("the category overflows the rows: %.1f", box.X+box.W)
 	}
 	// General commands belong to the app, not to a tile.
-	if !tt.HasText(a.text("zh-CN", "R05App")) || !tt.HasText(a.text("zh-CN", "JSON")) {
+	if !tt.HasText(a.text(locale, "R05App")) || !tt.HasText(a.text(locale, "JSON")) {
 		t.Fatalf("command categories are missing: %v", tt.Texts())
 	}
 }
 
 // TestPaletteLongTitleEllipsizes checks that a long title gives way, with an
 // ellipsis, before the category and the hint, and stays inside the rows.
-func TestPaletteLongTitleEllipsizes(t *testing.T) {
-	tk := tokens(false, "zh-CN")
+func testPaletteLongTitleEllipsizes(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
 	a := paletteTestApp(t)
 	long := strings.Repeat("very-long-json-document-name-", 8) + ".json"
 	a.addJSONDocument(`{}`, long, true)
 	a.palette.query, a.palette.lastQuery = long, ""
-	tt := ui.NewTester(a.paletteView, paletteWindowWidth(), paletteWindowHeight())
+	var categoryWidth float32
+	tt := ui.NewTester(func(c *ui.Context) {
+		a.paletteView(c)
+		categoryWidth, _ = c.MeasureText(0, ui.Span{Text: a.text(locale, "JSON"), Size: tk.FontSizeBody})
+	}, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetScale(2)
-	tt.SetLocale("zh-CN")
+	tt.SetLocale(locale)
+	tt.SetDark(dark)
 	tt.Frame()
 	row, ok := tt.Find(long)
 	if !ok {
@@ -166,7 +174,7 @@ func TestPaletteLongTitleEllipsizes(t *testing.T) {
 	}
 	list := a.palette.listBounds
 	right := list.X + list.W - tk.SizePaletteScrollbarSlot
-	category, ok := tt.Find(a.text("zh-CN", "JSON"))
+	category, ok := tt.Find(a.text(locale, "JSON"))
 	if !ok {
 		t.Fatalf("the long row shows no category: %v", tt.Texts())
 	}
@@ -187,13 +195,17 @@ func TestPaletteLongTitleEllipsizes(t *testing.T) {
 	if category.X+category.W > right+0.5 {
 		t.Fatalf("the category overflows the rows: %.1f", category.X+category.W)
 	}
+	if category.W < categoryWidth-0.5 {
+		t.Fatalf("category shrank to %.1f, need %.1f to show it in full", category.W, categoryWidth)
+	}
+	paletteReviewScreenshot(t, tt, "palette-long-title", locale, dark)
 }
 
 // TestPaletteKeycapsAreSeparateKeys checks that ⌘ and K are drawn in keycaps of
 // their own with a gap between them, not as one run of text.
-func TestPaletteKeycapsAreSeparateKeys(t *testing.T) {
-	tk := tokens(false, "zh-CN")
-	a, tt := polishPalette(t, nil)
+func testPaletteKeycapsAreSeparateKeys(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
+	a, tt := polishPalette(t, locale, dark, nil)
 	command, ok := tt.Find("⌘")
 	if !ok {
 		t.Fatalf("no ⌘ keycap: %v", tt.Texts())
@@ -222,8 +234,8 @@ func TestPaletteKeycapsAreSeparateKeys(t *testing.T) {
 
 // TestPaletteSearchHasNoDivider checks the band between the search row and the
 // list: the panel surface only, no separator line.
-func TestPaletteSearchHasNoDivider(t *testing.T) {
-	a, tt := polishPalette(t, nil)
+func testPaletteSearchHasNoDivider(t *testing.T, locale string, dark bool) {
+	a, tt := polishPalette(t, locale, dark, nil)
 	search, list := a.palette.searchBounds, a.palette.listBounds
 	if list.Y <= search.Y+search.H {
 		t.Fatalf("the list starts at %.1f, on the search row %.1f+%.1f", list.Y, search.Y, search.H)
@@ -240,9 +252,9 @@ func TestPaletteSearchHasNoDivider(t *testing.T) {
 
 // TestPalettePlaceholderClearsTheCaret checks the gap between the caret and
 // the placeholder, and that typed text starts where the caret is.
-func TestPalettePlaceholderClearsTheCaret(t *testing.T) {
-	tk := tokens(false, "zh-CN")
-	_, tt := polishPalette(t, nil)
+func testPalettePlaceholderClearsTheCaret(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
+	_, tt := polishPalette(t, locale, dark, nil)
 	caret, active := tt.TextCaret()
 	if !active {
 		t.Fatal("the search field does not take the keyboard")
@@ -267,5 +279,219 @@ func TestPalettePlaceholderClearsTheCaret(t *testing.T) {
 	}
 	if typedInk >= placeholderInk {
 		t.Fatalf("typed text starts at %.1f, at the placeholder's %.1f", typedInk, placeholderInk)
+	}
+}
+
+// Exercise geometry and pixels in both languages and themes, rather than
+// assuming the light Chinese rendering represents all appearances.
+func TestPalettePolish(t *testing.T) {
+	checks := []struct {
+		name string
+		run  func(*testing.T, string, bool)
+	}{
+		{"ListKeepsAScrollbarSlot", testPaletteListKeepsAScrollbarSlot},
+		{"HintStaysClearOfTheSlot", testPaletteHintStaysClearOfTheSlot},
+		{"RowsNameTheirTile", testPaletteRowsNameTheirTile},
+		{"LongTitleEllipsizes", testPaletteLongTitleEllipsizes},
+		{"KeycapsAreSeparateKeys", testPaletteKeycapsAreSeparateKeys},
+		{"SearchHasNoDivider", testPaletteSearchHasNoDivider},
+		{"PlaceholderClearsTheCaret", testPalettePlaceholderClearsTheCaret},
+		{"ThemeSurfaces", testPaletteThemeSurfaces},
+		{"EmptyComposition", testPaletteEmptyComposition},
+		{"CommandCategories", testPaletteCommandCategories},
+		{"LongTitleWithHint", testPaletteLongTitleWithHint},
+	}
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, dark := range []bool{false, true} {
+			for _, check := range checks {
+				t.Run(fmt.Sprintf("%s/dark=%v/%s", locale, dark, check.name), func(t *testing.T) {
+					check.run(t, locale, dark)
+				})
+			}
+		}
+	}
+}
+
+func testPaletteLongTitleWithHint(t *testing.T, locale string, dark bool) {
+	for _, invalid := range []bool{false, true} {
+		a := paletteTestApp(t)
+		tk := tokens(dark, locale)
+		category := a.text(locale, "Awake")
+		hint := fmt.Sprintf(a.text(locale, "PaletteMinutes"), 45)
+		if invalid {
+			hint = strings.Repeat("invalid-argument-", 80)
+		}
+		p := &paletteState{rows: []paletteRow{{Kind: paletteRowCommand, Key: "long", Title: strings.Repeat("long command ", 80), Category: category, Hint: hint}}}
+		var categoryWidth, hintWidth float32
+		tt := ui.NewTester(func(c *ui.Context) {
+			applyTheme(c)
+			categoryWidth, _ = c.MeasureText(0, ui.Span{Text: category, Size: tk.FontSizeBody})
+			hintWidth, _ = c.MeasureText(0, ui.Span{Text: hint, Size: tk.FontSizeSmall})
+			ui.Column(c).Fill().Padding(tk.SizePaletteShadowMargin + tk.Space8).Children(func() {
+				ui.Column(c).FillWidth().Padding(0, tk.SizePaletteScrollbarSlot, 0, 0).Children(func() {
+					a.paletteRow(c, tk, locale, p, 0)
+				})
+			})
+		}, paletteWindowWidth(), paletteWindowHeight())
+		tt.SetLocale(locale)
+		tt.SetDark(dark)
+		tt.Frame()
+		cat, ok := tt.Find(category)
+		if !ok || cat.W < categoryWidth-0.5 {
+			t.Fatalf("category compressed with hint: %+v, want %.1f", cat, categoryWidth)
+		}
+		h, ok := tt.Find(hint)
+		right := float32(paletteWindowWidth()) - tk.SizePaletteShadowMargin - 2*tk.Space8 - tk.SizePaletteScrollbarSlot
+		if !ok || h.X < cat.X+cat.W+tk.Space8-0.5 || h.X+h.W > right+0.5 {
+			t.Fatalf("hint overlaps the category or scrollbar slot: category=%+v hint=%+v right=%.1f", cat, h, right)
+		}
+		if !invalid && h.W < hintWidth-0.5 {
+			t.Fatalf("normal duration hint compressed: %.1f, want %.1f", h.W, hintWidth)
+		}
+	}
+}
+
+func testPaletteThemeSurfaces(t *testing.T, locale string, dark bool) {
+	a, tt := polishPalette(t, locale, dark, func(a *application, tt *ui.Tester) {
+		a.config.PaletteFavorites = []string{"json.new"}
+		a.config.PaletteRecents = []string{"settings.page.shortcuts"}
+	})
+	tk := tokens(dark, locale)
+	list, panel, search := a.palette.listBounds, a.palette.panelBounds, a.palette.searchBounds
+	y := list.Y
+	groups := 0
+	for _, row := range a.palette.rows {
+		if row.Kind == paletteRowHeader {
+			groups++
+			probeY := y + tk.SizePaletteGroupHeight/2
+			base := pixelOf(tt, panel.X+tk.Space4, probeY)
+			if got := pixelOf(tt, list.X+list.W-tk.SizePaletteScrollbarSlot-tk.Space8, probeY); got != base {
+				t.Fatalf("%s paints a separate band: %v, panel %v", row.Group, got, base)
+			}
+			y += tk.SizePaletteGroupHeight
+		} else {
+			y += tk.SizePaletteRowHeight
+		}
+	}
+	if groups != 3 {
+		t.Fatalf("want all three group surfaces, got %d", groups)
+	}
+	if a.palette.list.Header != nil {
+		t.Fatal("transparent labels must scroll with rows, not overlap them")
+	}
+	control := ui.Hex(tk.ColorControl)
+	want := color.RGBA{control.R, control.G, control.B, control.A}
+	if got := pixelOf(tt, search.X+search.W/2, search.Y+tk.Space4); got != want {
+		t.Fatalf("search background = %v, want ColorControl %v", got, want)
+	}
+	if pixelOf(tt, panel.X+tk.Space4, search.Y+tk.Space4) == want {
+		t.Fatal("search surface merges into panel")
+	}
+	tt.Type(a.text(locale, "R05Start"))
+	tt.Key(ui.Cmd, ui.KeyK)
+	if a.palette.mode != paletteActionMode || len(a.palette.rows) < 3 || a.palette.rows[1].Kind != paletteRowSeparator {
+		t.Fatal("action title lost its intentional separator")
+	}
+	// The line is visible below the action title, not below the search field.
+	y = a.palette.listBounds.Y + tk.SizePaletteRowHeight
+	if pixelOf(tt, list.X+list.W/2, y) == pixelOf(tt, list.X+list.W/2, y-tk.Space4) {
+		t.Fatal("action title separator is not painted")
+	}
+}
+
+func testPaletteEmptyComposition(t *testing.T, locale string, dark bool) {
+	a, tt := polishPalette(t, locale, dark, nil)
+	// Texts includes the input's accessible name as well as the visible hint.
+	countHint := func() int {
+		count := 0
+		for _, text := range tt.Texts() {
+			if text == a.text(locale, "PaletteSearch") {
+				count++
+			}
+		}
+		return count
+	}
+	before := countHint()
+	tt.Compose("pinyin", 6)
+	if a.palette.query != "" || countHint() != before-1 {
+		t.Fatal("empty query shows its placeholder over uncommitted composition")
+	}
+	if active, noIME := tt.TextInputActive(); !active || noIME {
+		t.Fatal("composition disabled text input")
+	}
+	paletteReviewScreenshot(t, tt, "palette-composition", locale, dark)
+	tt.Compose("", 0)
+	if countHint() != before {
+		t.Fatal("cancelling composition did not restore the placeholder")
+	}
+	tt.Compose("pinyin", 6)
+	tt.Type("拼音")
+	if a.palette.query != "拼音" || countHint() != before-1 {
+		t.Fatal("composition commit lost text or restored the hint")
+	}
+}
+
+func testPaletteCommandCategories(t *testing.T, locale string, dark bool) {
+	a, tt := polishPalette(t, locale, dark, nil)
+	a.addJSONDocument(`{}`, "document.json", true)
+	if err := a.awake.start(awakeSession{Mode: "screen"}); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	seen := map[string]bool{}
+	for _, row := range a.palette.rows {
+		if row.Kind == paletteRowCommand {
+			want := a.text(locale, commandCategory(row.Command))
+			if row.Category == "" || row.Category != want {
+				t.Fatalf("%s has no localized category: %q", row.Key, row.Category)
+			}
+			seen[row.Key] = true
+		}
+	}
+	for _, cmd := range a.commands() {
+		if !seen[cmd.ID] {
+			t.Fatalf("command %s is absent from categorized rows", cmd.ID)
+		}
+	}
+}
+
+func TestShortcutTooltipKeycaps(t *testing.T) {
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, dark := range []bool{false, true} {
+			for _, key := range []string{"JSONShortcutLabel", "PaletteShortcutLabel"} {
+				t.Run(fmt.Sprintf("%s/dark=%v/%s", locale, dark, key), func(t *testing.T) {
+					a := panelTestApp(t)
+					a.config.JSONShortcut, a.config.PaletteShortcut = "Ctrl+Alt+Shift+Cmd+F12", "Ctrl+Alt+Shift+Cmd+F12"
+					tt := panelView(a, locale)
+					tt.SetDark(dark)
+					label := a.text(locale, key)
+					anchor := label
+					if key == "PaletteShortcutLabel" {
+						anchor = a.menubarPanelTooltip(locale, key, a.config.PaletteShortcut)
+					}
+					r, ok := tt.Find(anchor)
+					if !ok {
+						t.Fatal("shortcut button missing")
+					}
+					tt.Move(r.X+r.W/2, r.Y+r.H/2)
+					tt.Advance(time.Second)
+					if !tt.HasText(label) {
+						t.Fatal("tooltip label missing")
+					}
+					var previous ui.Rect
+					for _, symbol := range shortcutSymbols(a.config.PaletteShortcut) {
+						cap, ok := tt.Find(symbol)
+						if !ok || cap.X < 0 || cap.X+cap.W > 320 || cap.Y < 0 || cap.Y+cap.H > float32(a.menubarPanelHeight(tokens(dark, locale))) {
+							t.Fatalf("keycap %s missing or clipped: %+v", symbol, cap)
+						}
+						if previous.W > 0 && cap.X-previous.X-previous.W < tokens(dark, locale).Space4 {
+							t.Fatal("tooltip keys overlap")
+						}
+						previous = cap
+					}
+					paletteReviewScreenshot(t, tt, "tooltip-"+key, locale, dark)
+				})
+			}
+		}
 	}
 }
