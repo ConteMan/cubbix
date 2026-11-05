@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.8 — 2026-11-06
+
+- The command palette looks better and is easier to scan: each command now shows the module it belongs to in small gray text, like "Turn on Keep Awake  Keep Awake".
+- Shortcut hints are now separate little keycaps, so ⌘ and K no longer run together.
+- The scroll bar no longer covers text, the selected row is balanced on both sides, the line under the search field is gone, and there is a little room between the cursor and the placeholder.
+- The search field stands out better in dark mode.
+
 ## 0.5.7 — 2026-11-05
 
 - Fixed the lid setting quietly turning off when you switched between keeping the display awake and keeping tasks awake.

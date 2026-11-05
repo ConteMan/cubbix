@@ -23,7 +23,7 @@ var assets embed.FS
 //go:embed frontend/dist/*
 var jsonAssets embed.FS
 
-const appVersion = "0.5.7"
+const appVersion = "0.5.8"
 
 type application struct {
 	lidCompletion func(error)
