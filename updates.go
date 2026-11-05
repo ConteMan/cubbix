@@ -171,6 +171,11 @@ func (u *updateManager) request(manual bool) {
 	go func() {
 		defer cancel()
 		up, err := u.check(ctx)
+		// A checker can return a transport error (or even a result) after
+		// cancellation. The request context still owns the cancellation.
+		if ctx.Err() != nil {
+			err = ctx.Err()
+		}
 		// A finished attempt is remembered, a cancelled one is not: turning
 		// automatic updates off, or quitting, must not invent a check time.
 		// A deadline is a finished failure and is remembered.

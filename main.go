@@ -92,9 +92,13 @@ type application struct {
 	// close may only release the combination it registered, never one another
 	// slot took over in the meantime.
 	registeredShortcut map[string]string
+	// suspendedShortcut preserves the real owners across recorder suspension.
+	// Failed slots may remember the same key, but cannot take it on resume.
+	suspendedShortcut map[string]string
 	// moduleClosing is true while a keep-awake close runs on a worker. New
 	// requests are refused until it settles; the committed state stays on.
 	moduleClosing bool
+	moduleAsync   bool
 	moduleError   string
 	// moduleGeneration lets a late completion see it no longer owns the state.
 	moduleGeneration uint64
@@ -133,7 +137,7 @@ func newApplication(path string) (*application, error) {
 	if err != nil {
 		return nil, err
 	}
-	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
+	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), moduleAsync: true, notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
 	a.createPaletteWindow = a.buildPaletteWindow
 	a.createPaletteGuide = a.buildPaletteGuideWindow
 	a.paletteDisplays = mygo.Screen.Displays

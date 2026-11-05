@@ -17,7 +17,7 @@ func (a *application) panelLid(c *ui.Context, t tokenValues, locale string) {
 	ui.Row(c).FillWidth().Height(t.SizeNavHeight).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
 		ui.Icon(c, icon("laptop")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).Tooltip(tip)
 		ui.Box(c).Grow(1)
-		if a.lidBusy || s.state == lidEnabling || s.state == lidStopping {
+		if a.moduleBusy() || s.state == lidEnabling || s.state == lidStopping {
 			ui.Icon(c, icon("loader-circle")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).Label(text("R05Lid"))
 			return
 		}
@@ -62,7 +62,7 @@ func (a *application) lidBatteryRow(c *ui.Context, t tokenValues, locale string,
 	opts := settingsRowOpts{icon: "gauge", level: 2, hint: text("LidBatteryHint")}
 	a.settingsRow(c, t, text("LidBatteryLimit"), opts, func() {
 		parts := ui.SegmentedBase(c.Key("lid-battery-limit"), &index, 3)
-		track := parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("LidBatteryLimit"))
+		track := parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("LidBatteryLimit")).Description(text("LidBatteryHint"))
 		if disabled {
 			track = track.Disabled(true).Opacity(t.OpacityDisabled)
 		} else {

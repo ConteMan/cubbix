@@ -312,17 +312,19 @@ func TestAwakeCloseRefusesWhileLidIsBusy(t *testing.T) {
 	}
 }
 
-// stuckChild never reports its exit, so a stop can only time out.
-type stuckChild struct{}
+// stuckChild reports its exit only when the test explicitly releases it.
+type stuckChild struct{ done chan error }
 
-func (stuckChild) Wait() error { select {} }
-func (stuckChild) Kill() error { return nil }
+func (f stuckChild) Wait() error { return <-f.done }
+func (stuckChild) Kill() error   { return nil }
 
 func TestAwakeCloseReportsAnUnconfirmedStop(t *testing.T) {
 	a := awakeTestApp(t)
 	defer func(previous time.Duration) { moduleStopTimeout = previous }(moduleStopTimeout)
 	moduleStopTimeout = 50 * time.Millisecond
-	a.awake.launch = func([]string) (awakeChild, error) { return stuckChild{}, nil }
+	child := stuckChild{done: make(chan error)}
+	t.Cleanup(func() { close(child.done) })
+	a.awake.launch = func([]string) (awakeChild, error) { return child, nil }
 	if err := a.startAwake(awakeSession{Mode: "screen", End: time.Now().Add(time.Hour)}); err != nil {
 		t.Fatal(err)
 	}
@@ -330,8 +332,14 @@ func TestAwakeCloseReportsAnUnconfirmedStop(t *testing.T) {
 	if !a.config.AwakeEnabled || a.moduleError != "AwakeStopError" {
 		t.Fatalf("unconfirmed stop = enabled %v error %q", a.config.AwakeEnabled, a.moduleError)
 	}
-	if a.config.AwakeSession != nil {
-		t.Fatal("a session that did stop was remembered")
+	if !a.awake.snapshot().Active || a.config.AwakeSession == nil {
+		t.Fatal("an unconfirmed child was reported as stopped")
+	}
+	// Retrying before the child exits must not turn the previous timeout
+	// into a successful close simply because the controller lost its handle.
+	a.changeAwakeEnabled(false)
+	if !a.config.AwakeEnabled || a.moduleError != "AwakeStopError" {
+		t.Fatal("a retry forgot the still unconfirmed child")
 	}
 }
 

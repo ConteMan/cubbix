@@ -197,7 +197,7 @@ func (l settingsLayout) height(t tokenValues) float32 {
 // settingsRowOpts describes one settings row. The zero value is a plain row:
 // no icon, no hint, no tooltip, no status.
 type settingsRowOpts struct {
-	icon     string // leading Lucide icon, level 2 only
+	icon     string // optional leading Lucide icon
 	hint     string // level 1 inline hint or level 2 second line
 	level    int    // 0 plain, 1 inline hint, 2 second line, 3 info tooltip
 	tooltip  string // level 3 explanation, also the accessible description
@@ -269,6 +269,9 @@ func (a *application) settingsRow(c *ui.Context, t tokenValues, label string, o 
 		return
 	case 1:
 		ui.Row(c).FillWidth().Height(t.SizeRowHeight).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
+			if o.icon != "" {
+				ui.Icon(c, icon(o.icon)).Size(t.SizeIcon, t.SizeIcon).Shrink(0).TextColor(ui.Hex(t.ColorTextSecondary))
+			}
 			// The two texts share one line box and sit on the same bottom edge;
 			// the row itself stays SpaceRowHeight high and centres them.
 			group := ui.Row(c).Grow(1).Height(t.FontSizeBody * t.LineHeightBody).MinWidth(0).AlignItems(ui.End).Gap(t.Space8)
@@ -497,10 +500,12 @@ func (a *application) awakeModulePage(c *ui.Context, t tokenValues, locale strin
 			a.changeAwakeEnabled(!a.config.AwakeEnabled)
 		}, "", busy)
 		if a.focusModuleSwitch {
-			// The group under the switch may have gone; take the focus back
-			// once, rather than every frame.
+			// Recover a lost focus once. A user who moved to the sidebar or
+			// another control during the async close keeps that focus.
 			a.focusModuleSwitch = false
-			sw.Focus()
+			if !c.Root().FocusWithin() {
+				sw.Focus()
+			}
 		}
 	})
 	// A closed module hides its own settings, but never its shortcut: the row
@@ -611,6 +616,7 @@ func (a *application) updateScheduleHint(locale string) string {
 // adds the year. yesterday uses AddDate so a daylight saving change cannot
 // shift the day.
 func (a *application) checkedAtText(locale string, checked, now time.Time) string {
+	checked = checked.In(now.Location())
 	year, month, day := now.Date()
 	checkedYear, checkedMonth, checkedDay := checked.Date()
 	yesterday := now.AddDate(0, 0, -1)
@@ -634,7 +640,7 @@ func (a *application) checkedAtText(locale string, checked, now time.Time) strin
 
 // requestModuleFocus asks for the module switch once. A closed module removes
 // the group that held the focus, so the switch has to take it back.
-func (a *application) requestModuleFocus() { a.focusModuleSwitch = true }
+func (a *application) requestModuleFocus() { a.focusModuleSwitch = a.page == settingsAwake }
 
 // updateIndicator is the version row's right side: a failure alert first, then
 // a loader, then the neutral dot that means "up to date".
@@ -711,6 +717,7 @@ func (a *application) sidebar(c *ui.Context, t tokenValues, locale string) {
 // first.
 func (a *application) selectSettingsPage(page int) {
 	a.cancelShortcutRecording()
+	a.focusModuleSwitch = false
 	a.page, a.notesPage = page, false
 	a.invalidateWindow()
 }

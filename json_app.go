@@ -146,6 +146,9 @@ func (a *application) newJSONWindowBlank() {
 // openJSONText opens a document whose text arrives in a cubbix:// URL. It
 // never reads the clipboard and never evaluates the text.
 func (a *application) openJSONText(text string) {
+	if !a.config.JSONEnabled {
+		return
+	}
 	if a.paletteOpenJSON != nil {
 		a.paletteOpenJSON(text)
 		return

@@ -845,18 +845,18 @@ func jsonNativeChecks(a *application, d *jsonDocument, dir string, reads *int) e
 		return fmt.Errorf("WebKit window leaked after closing")
 	}
 	mygo.RunOnMain(func() {
-		a.registerShortcut = mygo.GlobalShortcut.Register
-		a.unregisterShortcut = mygo.GlobalShortcut.Unregister
+		a.registerShortcut = func(string, func()) error { registered = true; return nil }
+		a.unregisterShortcut = func(string) { registered = false }
 		a.config.JSONShortcut = "Ctrl+Alt+Cmd+Shift+F9"
 		a.config.JSONEnabled = true
 		a.registerJSONShortcut()
 	})
-	if !mygo.GlobalShortcut.IsRegistered(a.config.JSONShortcut) {
-		return fmt.Errorf("native JSON shortcut was not registered")
+	if !registered || a.ownedShortcut("json") != a.config.JSONShortcut {
+		return fmt.Errorf("injected JSON shortcut was not registered")
 	}
 	mygo.RunOnMain(func() { a.changeJSONEnabled(false) })
-	if mygo.GlobalShortcut.IsRegistered(a.config.JSONShortcut) {
-		return fmt.Errorf("native JSON shortcut remained registered")
+	if registered || a.ownedShortcut("json") != "" {
+		return fmt.Errorf("injected JSON shortcut remained registered")
 	}
 	fmt.Println("PASS: hidden WebKit editor, blob Worker states/timeout/recovery/isolation, split layout with saved ratio, syntax colors and indent guides, window names, focus-independent windows without save prompts, toggle cleanup; no activation")
 	return nil

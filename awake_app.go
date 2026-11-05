@@ -137,6 +137,9 @@ func (a *application) toggleAwakeResult() error {
 	return a.startAwake(a.selectedSession())
 }
 func (a *application) setMode(mode string) error {
+	if a.moduleClosing {
+		return errors.New("ModuleBusy")
+	}
 	if mode != "screen" && mode != "tasks" {
 		return fmt.Errorf("invalid mode: %q", mode)
 	}
@@ -194,17 +197,6 @@ func (a *application) releaseOwnedShortcut(target string) {
 	}
 	delete(a.registeredShortcut, target)
 	a.unregisterShortcut(owned)
-}
-
-// releaseShortcut releases a slot when it still holds the combination named by
-// its setting. During a recording every slot lets go, and a value that another
-// slot took over in the meantime must survive that.
-func (a *application) releaseShortcut(target, acc string) {
-	owned := a.ownedShortcut(target)
-	if owned == "" || !sameShortcut(owned, acc) {
-		return
-	}
-	a.releaseOwnedShortcut(target)
 }
 
 func (a *application) setSlotError(target, key string) {
@@ -295,7 +287,7 @@ func (a *application) closeAwakeModule() {
 	a.moduleGeneration++
 	generation := a.moduleGeneration
 	a.moduleError = ""
-	a.invalidateWindow()
+	a.refreshModuleSurfaces()
 
 	lid := a.lid
 	needService := false
@@ -320,9 +312,9 @@ func (a *application) closeAwakeModule() {
 		}
 		return failure
 	}
-	if !a.lidAsync {
-		// The helper talks over a socket, so only a native launch defers this
-		// to a worker. Without one, the close is short and runs in place.
+	if !a.moduleAsync && !a.lidAsync {
+		// Tests can run synchronously with injected controllers. Production
+		// always uses a worker, including ordinary caffeinate-only sessions.
 		a.finishAwakeClose(generation, run())
 		return
 	}
@@ -336,7 +328,7 @@ func (a *application) closeAwakeModule() {
 // the closed state: the switch goes back, the recovery entry stays, and no
 // already stopped session comes back to life.
 func (a *application) finishAwakeClose(generation uint64, failure error) {
-	if generation != a.moduleGeneration {
+	if generation != a.moduleGeneration || a.quitting {
 		return
 	}
 	a.moduleClosing = false

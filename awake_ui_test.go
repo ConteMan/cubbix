@@ -22,6 +22,7 @@ func awakeTestApp(t *testing.T) *application {
 	}
 	a.registerShortcut = func(string, func()) error { return nil }
 	a.unregisterShortcut = func(string) {}
+	a.moduleAsync = false
 	a.awake, _ = fakeAwake(time.Now())
 	a.awake.changed = a.awakeChanged
 	// No test opens a hint window or asks for notification permission.

@@ -97,11 +97,13 @@ func TestModuleSettingsScreenshots(t *testing.T) {
 		for _, dark := range []bool{false, true} {
 			// General: the switch in every link state, including the two that
 			// carry a red outline alert.
-			for _, state := range []string{"missing", "installed", "conflict", "broken", "translocated"} {
+			for _, state := range []string{"absent", "missing", "installed", "conflict", "broken", "translocated"} {
 				state := state
 				capture("general-cli-"+state, locale, dark, func(a *application, paths cliPaths) {
 					a.page = settingsGeneral
 					switch state {
+					case "absent":
+						_ = os.Remove(paths.target)
 					case "installed":
 						_ = installCLILink(paths)
 					case "conflict":
@@ -120,6 +122,12 @@ func TestModuleSettingsScreenshots(t *testing.T) {
 			// Awake module: open, and closed with its released shortcut.
 			capture("awake-on", locale, dark, func(a *application, paths cliPaths) {
 				a.page = settingsAwake
+			}, nil)
+			capture("awake-closing", locale, dark, func(a *application, paths cliPaths) {
+				a.page, a.moduleClosing = settingsAwake, true
+			}, nil)
+			capture("awake-stop-error", locale, dark, func(a *application, paths cliPaths) {
+				a.page, a.moduleError = settingsAwake, "AwakeStopError"
 			}, nil)
 			capture("awake-off", locale, dark, func(a *application, paths cliPaths) {
 				a.page = settingsAwake
@@ -148,6 +156,24 @@ func TestModuleSettingsScreenshots(t *testing.T) {
 			capture("about", locale, dark, func(a *application, paths cliPaths) {
 				a.page = settingsAbout
 			}, nil)
+			for _, age := range []string{"today", "yesterday", "same-year", "previous-year"} {
+				capture("about-checked-"+age, locale, dark, func(a *application, paths cliPaths) {
+					a.page = settingsAbout
+					now := time.Date(2026, 11, 6, 13, 20, 0, 0, time.FixedZone("QA", 8*60*60))
+					checked := now.Add(-time.Hour)
+					switch age {
+					case "yesterday":
+						checked = now.AddDate(0, 0, -1)
+					case "same-year":
+						checked = now.AddDate(0, -1, 0)
+					case "previous-year":
+						checked = now.AddDate(-1, 0, 0)
+					}
+					a.updates.now = func() time.Time { return now }
+					// Exercise the UTC form restored from configuration, too.
+					a.updates.state.CheckedAt = checked.UTC()
+				}, nil)
+			}
 			capture("about-error", locale, dark, func(a *application, paths cliPaths) {
 				a.page = settingsAbout
 				a.updates.mu.Lock()

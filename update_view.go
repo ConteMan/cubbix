@@ -23,12 +23,14 @@ func (a *application) syncUpdateCheck() {
 	if a.config.UpdateLastCheck == value {
 		return
 	}
-	a.config.UpdateLastCheck = value
-	if err := saveConfig(a.path, a.config); err != nil {
+	config := a.config
+	config.UpdateLastCheck = value
+	if err := saveConfig(a.path, config); err != nil {
 		a.settingsError = "ConfigError"
 		log.Print(err)
 		return
 	}
+	a.config.UpdateLastCheck = value
 	if a.settingsError == "ConfigError" {
 		a.settingsError = ""
 	}
@@ -40,7 +42,7 @@ func (a *application) changeAutomaticUpdates() {
 }
 
 func (a *application) restartUpdate() {
-	if a.updates.snapshot().Phase != updateReady || a.relaunch == nil {
+	if a.moduleClosing || a.updates.snapshot().Phase != updateReady || a.relaunch == nil {
 		return
 	}
 	s := a.awake.snapshot()

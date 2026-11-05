@@ -107,14 +107,23 @@ func (k *awakeController) stopLocked() {
 // restore is never repeated from beforeStop.
 func (k *awakeController) stopConfirmed(timeout time.Duration) error {
 	k.mu.Lock()
-	k.generation++
 	child, done := k.child, k.childDone
-	k.child, k.childDone = nil, nil
-	k.state.Active = false
-	k.state.Error = ""
+	generation := k.generation
+	k.state.Session.Lid = false
 	k.mu.Unlock()
 	if child != nil {
-		_ = child.Kill()
+		if err := child.Kill(); err != nil {
+			// Wait may already have observed an exit. Otherwise retain the
+			// child and its active state so another close can retry the kill.
+			select {
+			case <-done:
+			default:
+				return errors.New("AwakeStopError")
+			}
+		}
+		if done == nil {
+			return errors.New("AwakeStopError")
+		}
 	}
 	if done != nil {
 		timer := time.NewTimer(timeout)
@@ -122,10 +131,19 @@ func (k *awakeController) stopConfirmed(timeout time.Duration) error {
 		select {
 		case <-done:
 		case <-timer.C:
-			k.notify()
 			return errors.New("AwakeStopError")
 		}
 	}
+	k.mu.Lock()
+	if k.generation != generation {
+		k.mu.Unlock()
+		return errors.New("AwakeStopError")
+	}
+	k.generation++
+	k.child, k.childDone = nil, nil
+	k.state.Active = false
+	k.state.Error = ""
+	k.mu.Unlock()
 	k.notify()
 	return nil
 }
@@ -169,8 +187,10 @@ func (k *awakeController) start(s awakeSession) error {
 	k.mu.Unlock()
 	k.notify()
 	go func() {
-		defer close(done)
 		err := child.Wait()
+		// Signal process exit before notification: the main thread may be
+		// confirming this stop while changed is waiting for RunOnMain.
+		close(done)
 		k.mu.Lock()
 		if generation != k.generation {
 			k.mu.Unlock()

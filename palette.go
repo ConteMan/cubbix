@@ -170,7 +170,6 @@ func (a *application) invalidatePaletteAfterModuleChange() {
 			p.mode = paletteCommandMode
 			p.actionsCommand = nil
 			p.actionsRequest = request{}
-			p.actionsRequest = request{}
 			p.runError = ""
 			p.selectionKey = ""
 			p.scrollSelection = true
@@ -358,6 +357,15 @@ func (a *application) runPalette() {
 	}
 	p.runError = ""
 	if p.mode == paletteActionMode {
+		if p.actionsCommand != nil && findCommand(a.commands(), p.actionsCommand.ID) == nil {
+			a.invalidatePaletteAfterModuleChange()
+			return
+		}
+		if a.moduleClosing && p.actionsCommand != nil && p.actionsCommand.Tile == "awake" {
+			p.runError, p.errorKey = "ModuleBusy", "ModuleBusy"
+			a.invalidatePalette()
+			return
+		}
 		action := p.selectedAction()
 		if action == nil || action.Run == nil {
 			return
@@ -395,6 +403,11 @@ func (a *application) runPalette() {
 	if live := findCommand(a.commands(), cmd.ID); live == nil {
 		p.runError = ""
 		p.selectionKey = ""
+		a.invalidatePalette()
+		return
+	}
+	if a.moduleClosing && cmd.Tile == "awake" {
+		p.runError, p.errorKey = "ModuleBusy", "ModuleBusy"
 		a.invalidatePalette()
 		return
 	}
@@ -865,7 +878,7 @@ func (a *application) handleURL(raw string) {
 		a.urlDispatch(func() {
 			// A deep link stays silent: a module that is off, or is closing,
 			// drops the request instead of opening the settings window.
-			if a.quitting || strings.HasPrefix(request.Kind, "awake") && !a.config.AwakeEnabled || request.Kind == "json.new" && !a.config.JSONEnabled {
+			if a.quitting || strings.HasPrefix(request.Kind, "awake") && (!a.config.AwakeEnabled || a.moduleClosing) || request.Kind == "json.new" && !a.config.JSONEnabled {
 				return
 			}
 			if err := a.runURL(request); err != nil {

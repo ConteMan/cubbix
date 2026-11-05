@@ -412,6 +412,13 @@ func knownShortcutConflict(acc string) string {
 	return ""
 }
 func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
+	if !a.shortcutRecording {
+		return
+	}
+	if a.moduleClosing {
+		a.cancelShortcutRecording()
+		return
+	}
 	if key == ui.KeyEscape {
 		a.cancelShortcutRecording()
 		return
@@ -546,18 +553,22 @@ func (a *application) beginShortcutRecording() { a.beginTileShortcutRecording("a
 // released, so opening the recorder is refused instead of writing a value that
 // could never register.
 func (a *application) beginTileShortcutRecording(target string) {
-	if !a.shortcutSlotEnabled(target) {
+	if a.moduleClosing || !a.shortcutSlotEnabled(target) {
 		return
 	}
 	if a.shortcutRecording {
 		a.cancelShortcutRecording()
 	}
 	a.moduleCancelRecording()
+	a.suspendedShortcut = make(map[string]string)
 	for _, slot := range a.shortcutSlots() {
 		if !slot.Enabled {
 			continue
 		}
-		a.releaseShortcut(slot.Target, slot.Acc)
+		if owned := a.ownedShortcut(slot.Target); owned != "" {
+			a.suspendedShortcut[slot.Target] = owned
+		}
+		a.releaseOwnedShortcut(slot.Target)
 	}
 	a.shortcutSuspended = true
 	a.shortcutTarget = target
@@ -599,10 +610,40 @@ func (a *application) cancelShortcutRecording() {
 // that no longer holds its combination (because another slot took it over)
 // keeps its diagnostic and never steals the registration back.
 func (a *application) restoreShortcuts() {
-	a.registerAwakeShortcut()
-	a.registerJSONShortcut()
-	a.registerPaletteShortcut()
-	a.registerPanelShortcut()
+	suspended := a.suspendedShortcut
+	a.suspendedShortcut = nil
+	slots := a.shortcutSlots()
+	resumed := make(map[string]bool)
+	// Restore actual incumbents before retrying slots that merely remember
+	// the same combination. Otherwise both configs appear to conflict and
+	// canceling an unrelated recording can silently release the incumbent.
+	for _, slot := range slots {
+		acc := suspended[slot.Target]
+		if acc == "" || !slot.Enabled || !sameShortcut(acc, slot.Acc) || a.ownedShortcut(slot.Target) != "" {
+			continue
+		}
+		resumed[slot.Target] = true
+		a.clearSlotError(slot.Target)
+		taken := false
+		for _, owned := range a.registeredShortcut {
+			if sameShortcut(acc, owned) {
+				taken = true
+				break
+			}
+		}
+		if taken {
+			a.setSlotError(slot.Target, "JSONShortcutConflict")
+		} else if err := a.registerShortcut(acc, slot.Callback); err != nil {
+			a.setSlotError(slot.Target, "ShortcutUnavailable")
+		} else {
+			a.ownShortcut(slot.Target, acc)
+		}
+	}
+	for _, slot := range slots {
+		if !resumed[slot.Target] {
+			a.registerSlot(slot.Target, slot.Acc, slot.Enabled, slot.Callback)
+		}
+	}
 }
 
 func (a *application) shortcutSlotEnabled(target string) bool {
@@ -686,6 +727,7 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 		acc = a.config.PanelShortcut
 	}
 	enabled := a.shortcutSlotEnabled(target)
+	recordable := enabled && !a.moduleClosing
 	active := a.shortcutRecording && a.shortcutTarget == target
 	errorKey := ""
 	if a.shortcutTarget == target || a.shortcutTarget == "" && target == "awake" {
@@ -705,22 +747,25 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 		// A released shortcut says so; a stale conflict is no longer true.
 		reason = fmt.Sprintf(text("ModuleShortcutOff"), text(moduleKey))
 		errorKey = ""
+	} else if a.moduleClosing {
+		reason = text("ModuleBusy")
+		errorKey = ""
 	} else if errorKey != "" {
 		reason = text(a.shortcutReasonKey(errorKey, target, shown))
 	}
-	opts := settingsRowOpts{level: 3, tooltip: reason, disabled: !enabled}
+	opts := settingsRowOpts{level: 3, tooltip: reason, disabled: !recordable}
 	a.settingsRow(c, t, text(label), opts, func() {
 		if active && a.shortcutDraft != "" {
 			acc = a.shortcutDraft
 		}
 		e := ui.ButtonBase(c.Key(target+"-recorder")).Size(t.SizeR05RecorderWidth, t.SizeSegmentHeight).PaddingX(t.Space12).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).FocusRing(true).Label(text(recordKey))
-		if enabled {
+		if recordable {
 			e = e.OnClick(func() { a.beginTileShortcutRecording(target) })
 		} else {
 			e = e.Disabled(true).Opacity(t.OpacityDisabled)
 		}
 		e.HandleInput(func(ev ui.InputEvent) bool {
-			if active && enabled && ev.Kind == ui.InputKeyDown {
+			if active && recordable && ev.Kind == ui.InputKeyDown {
 				a.recordShortcut(ev.Mods, ev.Key)
 				return true
 			}
