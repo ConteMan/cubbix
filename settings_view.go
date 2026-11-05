@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"slices"
 	"strings"
 	"time"
 
@@ -390,7 +391,7 @@ func (a *application) settingsAlert(locale string, page int) string {
 	text := func(key string) string { return a.text(locale, key) }
 	var keys []string
 	add := func(key string) {
-		if key == "" || slicesContains(keys, key) {
+		if key == "" || slices.Contains(keys, key) {
 			return
 		}
 		keys = append(keys, key)
@@ -399,11 +400,15 @@ func (a *application) settingsAlert(locale string, page int) string {
 		add(a.moduleError)
 		if a.lid != nil {
 			// Recovery and helper failures belong to the module that owns the
-			// lid, not to the general page.
-			if a.lid.snapshot().state == lidRestoreFailed {
+			// lid, not to the general page. An idle or working state keeps no
+			// stale reason on screen.
+			snapshot := a.lid.snapshot()
+			switch snapshot.state {
+			case lidRestoreFailed:
 				add("LidRestoreFailed")
+			case lidHelperGone, lidError, lidBlocked, lidStopping:
+				add(snapshot.reason)
 			}
-			add(a.lid.snapshot().reason)
 		}
 		add(a.awake.snapshot().Error)
 	}
@@ -424,21 +429,12 @@ func (a *application) settingsAlert(locale string, page int) string {
 				message = text("CLIInstallFailed")
 			}
 		}
-		if message == "" || slicesContains(parts, message) {
+		if message == "" || slices.Contains(parts, message) {
 			continue
 		}
 		parts = append(parts, message)
 	}
 	return strings.Join(parts, " · ")
-}
-
-func slicesContains(list []string, value string) bool {
-	for _, item := range list {
-		if item == value {
-			return true
-		}
-	}
-	return false
 }
 
 // settingsContent builds the page named by the layout.

@@ -748,3 +748,47 @@ func TestAwakeCloseStopsWhenTheHelperIsUnreachable(t *testing.T) {
 		t.Fatal("the helper is reported as holding the setting")
 	}
 }
+
+func TestSettingsRowSecondLineStaysOneLine(t *testing.T) {
+	a := awakeTestApp(t)
+	long := strings.Repeat("a long rule that must not wrap ", 6)
+	view := func(c *ui.Context) {
+		_, tk := applyTheme(c)
+		a.settingsRow(c, tk, "automatic updates", settingsRowOpts{icon: "refresh-cw", level: 2, hint: long}, func() {
+			ui.Box(c).Size(tk.SizeSwitchWidth, tk.SizeSwitchHeight)
+		})
+	}
+	tt := ui.NewTester(view, 300, 200)
+	tt.SetLocale("en")
+	tt.Frame()
+	hint, ok := tt.Find(long)
+	if !ok {
+		t.Fatal("the long hint is missing")
+	}
+	if hint.H > 18.5 {
+		t.Fatalf("the second line wrapped: %v", hint)
+	}
+	if hint.W > 300 {
+		t.Fatalf("the second line escaped the card: %v", hint)
+	}
+	// The full text stays available even when the line is cut.
+	if !hasAccessibleText(tt, long) {
+		t.Fatal("the truncated line lost its full text")
+	}
+}
+
+func TestCLIRowHiddenWhenPathsCannotBeProbed(t *testing.T) {
+	a := awakeTestApp(t)
+	original := cliPathsFor
+	cliPathsFor = func() (cliPaths, bool) { return cliPaths{}, false }
+	t.Cleanup(func() { cliPathsFor = original })
+	a.page = settingsGeneral
+	tt := ui.NewTester(a.view, 720, 388)
+	tt.SetLocale("en")
+	if _, found := tt.Find(a.text("en", "CLIName")); found {
+		t.Fatal("the command line row was drawn without paths")
+	}
+	if l := newSettingsLayout(a, settingsGeneral); l.hasCLI {
+		t.Fatal("the layout claimed a CLI row")
+	}
+}

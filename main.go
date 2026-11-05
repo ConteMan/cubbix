@@ -595,7 +595,9 @@ func (a *application) switchControl(c *ui.Context, t tokenValues, key, label str
 	}
 	base := ui.SwitchBase(c.Key(key), value).Size(t.SizeSwitchWidth, t.SizeSwitchHeight).Radius(t.RadiusControl).Background(ui.Hex(background)).Padding(t.Space2).Justify(align).AlignItems(ui.Center).Label(label).FocusRing(true)
 	if tip != "" {
-		base = base.Tooltip(tip)
+		// The tooltip is also the accessible description: a truncated level-2
+		// line must never lose its full text.
+		base = base.Tooltip(tip).Description(tip)
 	}
 	if disabled {
 		base = base.Disabled(true).Opacity(t.OpacityDisabled)
