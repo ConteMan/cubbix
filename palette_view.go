@@ -48,7 +48,9 @@ func (a *application) paletteView(c *ui.Context) {
 			return !a.paletteContentHit(ev, p.panelBounds)
 		}))
 		panel.Children(func() {
-			searchRow := ui.Row(c).FillWidth().Height(t.SizePaletteSearchHeight).PaddingX(t.Space8).Gap(t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center)
+			// The field has a fill of its own: the panel is translucent, so the
+			// control color tuned for opaque cards reads as the panel itself.
+			searchRow := ui.Row(c).FillWidth().Height(t.SizePaletteSearchHeight).PaddingX(t.Space8).Gap(t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorPaletteSearch)).AlignItems(ui.Center)
 			p.searchBounds = searchRow.Bounds()
 			searchRow.Children(func() {
 				grab := ui.Box(c.Key("palette-grab")).Size(t.SizePaletteSearchHeight, t.SizePaletteSearchHeight).KeepFocus()
@@ -106,12 +108,15 @@ func (a *application) paletteView(c *ui.Context) {
 				if p.mode == paletteActionMode {
 					label = text("PaletteActions")
 				}
-				// The list keeps a slot on its right for the scroll bar, which the
-				// framework draws over the last few DIPs of the box: rows end short
-				// of it, so neither their text nor their highlight goes under it.
+				// Rows fill the panel's content box, so the selected row's highlight
+				// keeps the same inset on both sides. The scroll bar keeps out of
+				// their way: ScrollbarInsets moves it out by the overhang, past the
+				// panel's padding, into the margin around the rows, so it covers
+				// neither the highlight nor a row's hint.
 				list := ui.List(c.Key("palette-list"), &p.list, len(p.rows), func(index int) {
 					a.paletteRow(c, t, locale, p, index)
-				}).FillWidth().Grow(1).Gap(0).Padding(0, t.SizePaletteScrollbarSlot, 0, 0).Label(label)
+				}).FillWidth().Grow(1).Gap(0).Label(label).
+					ScrollbarInsets(0, -t.SizePaletteScrollbarOverhang, 0, 0)
 				p.listBounds = list.Bounds()
 			}
 		})
@@ -175,11 +180,17 @@ func (a *application) paletteRow(c *ui.Context, t tokenValues, locale string, p 
 					ui.Icon(c, icon(row.Icon)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 				}
 				// The title and the tile it belongs to sit together on the left; the
-				// title gives way first, the tile keeps its words.
-				ui.Row(c).Grow(1).MinWidth(0).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
+				// title gives way first, the tile keeps its words. The tile is a
+				// step smaller than the title and sits on the title's baseline, so
+				// the pair reads as one line rather than as two centred boxes.
+				align := ui.Center
+				if row.Category != "" {
+					align = ui.Baseline
+				}
+				ui.Row(c).Grow(1).MinWidth(0).AlignItems(align).Gap(t.Space8).Children(func() {
 					ui.Text(c, row.Title).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).Shrink(1).SingleLine().Ellipsis("…").MinWidth(0)
 					if row.Category != "" {
-						ui.Text(c, row.Category).Shrink(0).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+						ui.Text(c, row.Category).Shrink(0).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
 					}
 				})
 				if row.Hint != "" {

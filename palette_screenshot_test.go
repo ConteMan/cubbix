@@ -87,6 +87,20 @@ func TestPaletteScreenshots(t *testing.T) {
 				tt.Move(list.X+list.W/2, list.Y+list.H/2)
 				tt.Scroll(list.X+list.W/2, list.Y+list.H/2, 0, 180)
 			})
+			capture("palette-scroll-selected"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
+				// Scrolled, with the bar showing and the selected row in view.
+				list := a.palette.listBounds
+				tt.Move(list.X+list.W/2, list.Y+list.H/2)
+				tt.Scroll(list.X+list.W/2, list.Y+list.H/2, 0, 160)
+				for i := 0; i < 4; i++ {
+					tt.Key(0, ui.KeyDown)
+				}
+			})
+			capture("palette-json-windows"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
+				// An unnamed window is titled with its tile's own name; it must
+				// not repeat that name in the category.
+				tt.Type("json")
+			})
 			capture("palette-actions"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {
 					tt.Type("awake")

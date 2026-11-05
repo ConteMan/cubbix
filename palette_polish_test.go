@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"math"
 	"strings"
 	"testing"
 	"time"
@@ -58,48 +59,198 @@ func inkStart(tt *ui.Tester, x0, x1, y float32, background color.RGBA) float32 {
 	return -1
 }
 
-// TestPaletteListKeepsAScrollbarSlot checks that the scroll bar shows in its
-// own slot and that neither a row nor the highlight of the selected row
-// reaches under it.
-func testPaletteListKeepsAScrollbarSlot(t *testing.T, locale string, dark bool) {
-	tk := tokens(dark, locale)
-	var a *application
-	a, tt := polishPalette(t, locale, dark, func(a *application, tt *ui.Tester) {
-		// Point at a row below the selected one: the list shows its bar and the
-		// selected row keeps its highlight.
-		list := a.palette.listBounds
-		tt.Move(list.X+list.W/2, list.Y+24+36*2+18)
-	})
-	list := a.palette.listBounds
-	rowsRight := list.X + list.W - tk.SizePaletteScrollbarSlot
-	barLeft := list.X + list.W - tk.SizeScrollbar - 3
-	if barLeft < rowsRight {
-		t.Fatalf("the slot (%.0f) is narrower than the bar at %.0f", rowsRight, barLeft)
+// inkEnd returns the last DIP of x0 up to x1 at y whose colour is not
+// background, or -1.
+func inkEnd(tt *ui.Tester, x0, x1, y float32, background color.RGBA) float32 {
+	for x := x1; x > x0; x -= 0.5 {
+		if pixelOf(tt, x, y) != background {
+			return x
+		}
 	}
+	return -1
+}
+
+// luminance is the WCAG relative luminance of a colour.
+func luminance(c color.RGBA) float64 {
+	channel := func(v uint8) float64 {
+		s := float64(v) / 255
+		if s <= 0.03928 {
+			return s / 12.92
+		}
+		return math.Pow((s+0.055)/1.055, 2.4)
+	}
+	return 0.2126*channel(c.R) + 0.7152*channel(c.G) + 0.0722*channel(c.B)
+}
+
+// contrastRatio is the WCAG ratio between two colours.
+func contrastRatio(a, b color.RGBA) float64 {
+	first, second := luminance(a), luminance(b)
+	if first < second {
+		first, second = second, first
+	}
+	return (first + 0.05) / (second + 0.05)
+}
+
+// rowsRight is where the rows end: the list fills the panel's content box, so
+// it is one panel padding short of the panel's right edge.
+func rowsRight(a *application) float32 {
+	list := a.palette.listBounds
+	return list.X + list.W
+}
+
+// firstOf returns the first DIP of x0 up to x1 at y whose colour is want, or
+// -1.
+func firstOf(tt *ui.Tester, x0, x1, y float32, want color.RGBA) float32 {
+	for x := x0; x < x1; x += 0.5 {
+		if pixelOf(tt, x, y) == want {
+			return x
+		}
+	}
+	return -1
+}
+
+// lastOf returns the last DIP of x0 up to x1 at y whose colour is want, or -1.
+func lastOf(tt *ui.Tester, x0, x1, y float32, want color.RGBA) float32 {
+	for x := x1; x > x0; x -= 0.5 {
+		if pixelOf(tt, x, y) == want {
+			return x
+		}
+	}
+	return -1
+}
+
+// inkBottom returns the lowest DIP between y0 and y1 that shows ink at some x
+// between x0 and x1, or y0-1.
+func inkBottom(tt *ui.Tester, x0, x1, y0, y1 float32, background color.RGBA) float32 {
+	lowest := y0 - 1
+	for y := y0; y < y1; y += 0.5 {
+		if inkStart(tt, x0, x1, y, background) >= 0 {
+			lowest = y
+		}
+	}
+	return lowest
+}
+
+// testPaletteHighlightIsSymmetric checks the selected row's highlight with the
+// scroll bar hidden: the same inset from the panel on both sides, and the row's
+// icon and hint the same distance inside it.
+func testPaletteHighlightIsSymmetric(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
+	a, tt := polishPalette(t, locale, dark, nil)
+	panel, list := a.palette.panelBounds, a.palette.listBounds
 	row, ok := tt.Find(a.text(locale, "R05Start"))
 	if !ok {
 		t.Fatalf("the selected row is missing: %v", tt.Texts())
 	}
 	y := row.Y + row.H/2
-	highlight := pixelOf(tt, rowsRight-60, y)
-	if highlight == pixelOf(tt, rowsRight+1, y) {
-		t.Fatalf("the selected row's highlight already shows past the rows' edge at %.0f", y)
+	highlight := pixelOf(tt, list.X+tk.Space2, y)
+	left := firstOf(tt, panel.X+tk.Space2, list.X+tk.Space8, y, highlight)
+	right := lastOf(tt, list.X, panel.X+panel.W, y, highlight)
+	if left < 0 || right < 0 {
+		t.Fatalf("no highlight at %.1f: %v", y, tt.Texts())
 	}
-	for _, probe := range []float32{rowsRight + 0.5, rowsRight + 2.5, barLeft - 0.5} {
-		if pixelOf(tt, probe, y) == highlight {
-			t.Fatalf("the selected row's highlight shows at %.0f,%.0f, under the scroll bar", probe, y)
-		}
+	leftInset, rightInset := left-panel.X, panel.X+panel.W-right
+	if leftInset < tk.Space8 || rightInset < tk.Space8 {
+		t.Fatalf("the highlight runs into the panel's padding: left %.1f, right %.1f", leftInset, rightInset)
 	}
-	// The bar itself is there, a colour of its own between the rows and the
-	// list's edge.
-	if pixelOf(tt, barLeft+3, y) == pixelOf(tt, barLeft-1, y) {
-		t.Fatalf("no scroll bar in the slot at %.0f", y)
+	if math.Abs(float64(leftInset-rightInset)) > 1 {
+		t.Fatalf("the highlight is lopsided: %.1f in from the left, %.1f from the right", leftInset, rightInset)
+	}
+	// Nothing is reserved on the right for the scroll bar: at rest the panel's
+	// own surface shows beside the rows.
+	barLeft := rowsRight(a) + tk.SizePaletteScrollbarOverhang - tk.SizeScrollbar - 3
+	if got, surface := pixelOf(tt, barLeft+tk.SizeScrollbar/2, y), pixelOf(tt, panel.X+tk.Space2, y); got != surface {
+		t.Fatalf("a scroll bar shows beside the rows at rest: %v, panel %v", got, surface)
+	}
+	// The row's own insets match: the icon starts and the hint ends one
+	// Space8 inside the highlight.
+	icon := inkStart(tt, left+0.5, left+tk.Space8+tk.SizeIcon+2, y, highlight)
+	if icon < 0 {
+		t.Fatalf("the row shows no icon ink at %.1f", y)
+	}
+	entry := a.palette.rows[a.palette.selected]
+	hint, ok := tt.Find(entry.Hint)
+	if entry.Hint == "" || !ok {
+		t.Fatalf("the selected row shows no hint %q: %v", entry.Hint, tt.Texts())
+	}
+	inner, outer := icon-left, right-(hint.X+hint.W)
+	if math.Abs(float64(inner-outer)) > 1.5 {
+		t.Fatalf("the row's insets are %.1f inside the icon, %.1f after the hint", inner, outer)
 	}
 }
 
-// TestPaletteHintStaysClearOfTheSlot checks that a row's hint ends before the
-// scroll bar's slot.
-func testPaletteHintStaysClearOfTheSlot(t *testing.T, locale string, dark bool) {
+// testPaletteScrollbarStaysClearOfRows checks the bar while the list is hovered
+// and scrolled: it sits in the panel's margin, past the highlight and past the
+// hint, and the rows keep their full width.
+func testPaletteScrollbarStaysClearOfRows(t *testing.T, locale string, dark bool) {
+	tk := tokens(dark, locale)
+	a, tt := polishPalette(t, locale, dark, func(a *application, tt *ui.Tester) {
+		// Walk down the long list: the choice scrolls into view, the list
+		// overflows, and the pointer on it shows the bar.
+		list := a.palette.listBounds
+		tt.Move(list.X+list.W/2, list.Y+list.H/2)
+		for i := 0; i < 12; i++ {
+			tt.Key(0, ui.KeyDown)
+		}
+	})
+	panel, list := a.palette.panelBounds, a.palette.listBounds
+	right := rowsRight(a)
+	barLeft := right + tk.SizePaletteScrollbarOverhang - tk.SizeScrollbar - 3
+	barRight := barLeft + tk.SizeScrollbar
+	if barLeft < right-0.5 {
+		t.Fatalf("the bar starts at %.1f, inside the rows ending at %.1f", barLeft, right)
+	}
+	if barRight > panel.X+panel.W-1 {
+		t.Fatalf("the bar ends at %.1f, past the panel's %.1f", barRight, panel.X+panel.W)
+	}
+	entry := a.palette.rows[a.palette.selected]
+	if entry.Kind != paletteRowCommand {
+		t.Fatalf("the choice landed on a %v row", entry.Kind)
+	}
+	row, ok := tt.Find(entry.Title)
+	if !ok || row.Y < list.Y || row.Y+row.H > list.Y+list.H {
+		t.Fatalf("the chosen row %q is not in view: %+v, list %+v", entry.Title, row, list)
+	}
+	y := row.Y + row.H/2
+	surface := pixelOf(tt, panel.X+tk.Space2, y)
+	highlight := pixelOf(tt, list.X+tk.Space2, y)
+	// The rows and their highlight end where the panel's padding starts, and
+	// the bar begins there rather than over them.
+	last := lastOf(tt, list.X, panel.X+panel.W, y, highlight)
+	if last > barLeft {
+		t.Fatalf("the highlight reaches %.1f, under the bar at %.1f", last, barLeft)
+	}
+	if last < right-1 {
+		t.Fatalf("the highlight ends at %.1f, short of the rows' edge %.1f", last, right)
+	}
+	// The bar is there, in the margin: the thumb's column shows its colour
+	// somewhere beside the rows.
+	bar := float32(-1)
+	for probe := list.Y + 2; probe < list.Y+list.H-2; probe += 1 {
+		if pixelOf(tt, barLeft+tk.SizeScrollbar/2, probe) != surface {
+			bar = probe
+			break
+		}
+	}
+	if bar < 0 {
+		t.Fatalf("no scroll bar in the margin beside the rows: %v", tt.Texts())
+	}
+	// A hint ends a whole Space8 before the rows' edge, so the bar cannot
+	// cover it.
+	if entry.Hint != "" {
+		hint, ok := tt.Find(entry.Hint)
+		if !ok {
+			t.Fatalf("the chosen row shows no hint %q: %v", entry.Hint, tt.Texts())
+		}
+		if hint.X+hint.W > right-tk.Space8+0.5 {
+			t.Fatalf("the hint reaches %.1f, into the row's right padding at %.1f", hint.X+hint.W, right-tk.Space8)
+		}
+	}
+}
+
+// testPaletteHintStaysInsideTheHighlight checks that a row's hint ends inside
+// the highlight's right padding, as far from the edge as the icon on the left.
+func testPaletteHintStaysInsideTheHighlight(t *testing.T, locale string, dark bool) {
 	tk := tokens(dark, locale)
 	a, tt := polishPalette(t, locale, dark, func(a *application, tt *ui.Tester) {
 		tt.Type(a.text(locale, "R05Start") + " 45m")
@@ -108,9 +259,8 @@ func testPaletteHintStaysClearOfTheSlot(t *testing.T, locale string, dark bool) 
 	if !ok {
 		t.Fatalf("the selected row shows no hint: %v", tt.Texts())
 	}
-	list := a.palette.listBounds
-	if right := list.X + list.W - tk.SizePaletteScrollbarSlot; hint.X+hint.W > right+0.5 {
-		t.Fatalf("the hint reaches %.1f, past the rows' edge %.1f", hint.X+hint.W, right)
+	if right := rowsRight(a) - tk.Space8; hint.X+hint.W > right+0.5 {
+		t.Fatalf("the hint reaches %.1f, past the row's padding edge %.1f", hint.X+hint.W, right)
 	}
 }
 
@@ -133,7 +283,7 @@ func testPaletteRowsNameTheirTile(t *testing.T, locale string, dark bool) {
 		t.Fatalf("the category at %.1f is not on the selected row %.1f", box.Y, row.Y)
 	}
 	y := box.Y + box.H/2
-	highlight := pixelOf(tt, list.X+list.W-tk.SizePaletteScrollbarSlot-60, row.Y+row.H/2)
+	highlight := pixelOf(tt, rowsRight(a)-60, row.Y+row.H/2)
 	last, found := inkBefore(tt, list.X+tk.Space8+tk.SizeIcon+tk.Space8, box.X-0.5, y, highlight)
 	if !found {
 		t.Fatal("the row shows no title ink")
@@ -142,8 +292,34 @@ func testPaletteRowsNameTheirTile(t *testing.T, locale string, dark bool) {
 		t.Fatalf("the title ends %.1f before its category, want %.0f", gap, tk.Space8)
 	}
 	// The category keeps its words and stays inside the rows.
-	if box.X+box.W > list.X+list.W-tk.SizePaletteScrollbarSlot+0.5 {
+	if box.X+box.W > rowsRight(a)+0.5 {
 		t.Fatalf("the category overflows the rows: %.1f", box.X+box.W)
+	}
+	// It is a step smaller than the title, so the pair reads as two levels.
+	var small, body float32
+	measuring := ui.NewTester(func(c *ui.Context) {
+		applyTheme(c)
+		small, _ = c.MeasureText(0, ui.Span{Text: category, Size: tk.FontSizeSmall})
+		body, _ = c.MeasureText(0, ui.Span{Text: category, Size: tk.FontSizeBody})
+	}, paletteWindowWidth(), paletteWindowHeight())
+	measuring.SetScale(2)
+	measuring.SetLocale(locale)
+	measuring.Frame()
+	if small >= body {
+		t.Fatalf("the small size measures %.1f, not less than the body's %.1f", small, body)
+	}
+	if math.Abs(float64(box.W-small)) > 0.5 {
+		t.Fatalf("the category is %.1f wide, the small size's %.1f, the body's %.1f", box.W, small, body)
+	}
+	// It sits on the title's baseline, not centred on it: the last ink of the
+	// two lines is at the same height.
+	titleBottom := inkBottom(tt, list.X+tk.Space8+tk.SizeIcon+tk.Space8, box.X-tk.Space8-1, row.Y, row.Y+row.H, highlight)
+	categoryBottom := inkBottom(tt, box.X, box.X+box.W, row.Y, row.Y+row.H, highlight)
+	if titleBottom < 0 || categoryBottom < 0 {
+		t.Fatalf("the row shows no ink: title %.1f, category %.1f", titleBottom, categoryBottom)
+	}
+	if math.Abs(float64(titleBottom-categoryBottom)) > 1.5 {
+		t.Fatalf("the category ends at %.1f, the title at %.1f: not on one baseline", categoryBottom, titleBottom)
 	}
 	// General commands belong to the app, not to a tile.
 	if !tt.HasText(a.text(locale, "R05App")) || !tt.HasText(a.text(locale, "JSON")) {
@@ -162,7 +338,7 @@ func testPaletteLongTitleEllipsizes(t *testing.T, locale string, dark bool) {
 	var categoryWidth float32
 	tt := ui.NewTester(func(c *ui.Context) {
 		a.paletteView(c)
-		categoryWidth, _ = c.MeasureText(0, ui.Span{Text: a.text(locale, "JSON"), Size: tk.FontSizeBody})
+		categoryWidth, _ = c.MeasureText(0, ui.Span{Text: a.text(locale, "JSON"), Size: tk.FontSizeSmall})
 	}, paletteWindowWidth(), paletteWindowHeight())
 	tt.SetScale(2)
 	tt.SetLocale(locale)
@@ -173,7 +349,7 @@ func testPaletteLongTitleEllipsizes(t *testing.T, locale string, dark bool) {
 		t.Fatalf("the long title is not listed: %v", tt.Texts())
 	}
 	list := a.palette.listBounds
-	right := list.X + list.W - tk.SizePaletteScrollbarSlot
+	right := rowsRight(a)
 	category, ok := tt.Find(a.text(locale, "JSON"))
 	if !ok {
 		t.Fatalf("the long row shows no category: %v", tt.Texts())
@@ -289,8 +465,11 @@ func TestPalettePolish(t *testing.T) {
 		name string
 		run  func(*testing.T, string, bool)
 	}{
-		{"ListKeepsAScrollbarSlot", testPaletteListKeepsAScrollbarSlot},
-		{"HintStaysClearOfTheSlot", testPaletteHintStaysClearOfTheSlot},
+		{"HighlightIsSymmetric", testPaletteHighlightIsSymmetric},
+		{"ScrollbarStaysClearOfRows", testPaletteScrollbarStaysClearOfRows},
+		{"HintStaysInsideTheHighlight", testPaletteHintStaysInsideTheHighlight},
+		{"JSONWindowTitleIsNotRepeated", testPaletteJSONWindowName},
+		{"SearchSurfaceReadsAsAField", testPaletteSearchSurface},
 		{"RowsNameTheirTile", testPaletteRowsNameTheirTile},
 		{"LongTitleEllipsizes", testPaletteLongTitleEllipsizes},
 		{"KeycapsAreSeparateKeys", testPaletteKeycapsAreSeparateKeys},
@@ -325,12 +504,10 @@ func testPaletteLongTitleWithHint(t *testing.T, locale string, dark bool) {
 		var categoryWidth, hintWidth float32
 		tt := ui.NewTester(func(c *ui.Context) {
 			applyTheme(c)
-			categoryWidth, _ = c.MeasureText(0, ui.Span{Text: category, Size: tk.FontSizeBody})
+			categoryWidth, _ = c.MeasureText(0, ui.Span{Text: category, Size: tk.FontSizeSmall})
 			hintWidth, _ = c.MeasureText(0, ui.Span{Text: hint, Size: tk.FontSizeSmall})
 			ui.Column(c).Fill().Padding(tk.SizePaletteShadowMargin + tk.Space8).Children(func() {
-				ui.Column(c).FillWidth().Padding(0, tk.SizePaletteScrollbarSlot, 0, 0).Children(func() {
-					a.paletteRow(c, tk, locale, p, 0)
-				})
+				a.paletteRow(c, tk, locale, p, 0)
 			})
 		}, paletteWindowWidth(), paletteWindowHeight())
 		tt.SetLocale(locale)
@@ -341,9 +518,9 @@ func testPaletteLongTitleWithHint(t *testing.T, locale string, dark bool) {
 			t.Fatalf("category compressed with hint: %+v, want %.1f", cat, categoryWidth)
 		}
 		h, ok := tt.Find(hint)
-		right := float32(paletteWindowWidth()) - tk.SizePaletteShadowMargin - 2*tk.Space8 - tk.SizePaletteScrollbarSlot
+		right := float32(paletteWindowWidth()) - tk.SizePaletteShadowMargin - 2*tk.Space8
 		if !ok || h.X < cat.X+cat.W+tk.Space8-0.5 || h.X+h.W > right+0.5 {
-			t.Fatalf("hint overlaps the category or scrollbar slot: category=%+v hint=%+v right=%.1f", cat, h, right)
+			t.Fatalf("hint overlaps the category or leaves the row: category=%+v hint=%+v right=%.1f", cat, h, right)
 		}
 		if !invalid && h.W < hintWidth-0.5 {
 			t.Fatalf("normal duration hint compressed: %.1f, want %.1f", h.W, hintWidth)
@@ -365,7 +542,7 @@ func testPaletteThemeSurfaces(t *testing.T, locale string, dark bool) {
 			groups++
 			probeY := y + tk.SizePaletteGroupHeight/2
 			base := pixelOf(tt, panel.X+tk.Space4, probeY)
-			if got := pixelOf(tt, list.X+list.W-tk.SizePaletteScrollbarSlot-tk.Space8, probeY); got != base {
+			if got := pixelOf(tt, list.X+list.W-tk.Space8-1, probeY); got != base {
 				t.Fatalf("%s paints a separate band: %v, panel %v", row.Group, got, base)
 			}
 			y += tk.SizePaletteGroupHeight
@@ -379,10 +556,10 @@ func testPaletteThemeSurfaces(t *testing.T, locale string, dark bool) {
 	if a.palette.list.Header != nil {
 		t.Fatal("transparent labels must scroll with rows, not overlap them")
 	}
-	control := ui.Hex(tk.ColorControl)
+	control := ui.Hex(tk.ColorPaletteSearch)
 	want := color.RGBA{control.R, control.G, control.B, control.A}
 	if got := pixelOf(tt, search.X+search.W/2, search.Y+tk.Space4); got != want {
-		t.Fatalf("search background = %v, want ColorControl %v", got, want)
+		t.Fatalf("search background = %v, want ColorPaletteSearch %v", got, want)
 	}
 	if pixelOf(tt, panel.X+tk.Space4, search.Y+tk.Space4) == want {
 		t.Fatal("search surface merges into panel")
@@ -442,8 +619,11 @@ func testPaletteCommandCategories(t *testing.T, locale string, dark bool) {
 	for _, row := range a.palette.rows {
 		if row.Kind == paletteRowCommand {
 			want := a.text(locale, commandCategory(row.Command))
-			if row.Category == "" || row.Category != want {
-				t.Fatalf("%s has no localized category: %q", row.Key, row.Category)
+			if row.Category != "" && row.Category != want {
+				t.Fatalf("%s names %q, want %q", row.Key, row.Category, want)
+			}
+			if row.Category == "" && !strings.EqualFold(strings.TrimSpace(row.Title), strings.TrimSpace(want)) {
+				t.Fatalf("%s dropped its category %q, which its title does not repeat", row.Key, want)
 			}
 			seen[row.Key] = true
 		}
@@ -452,6 +632,68 @@ func testPaletteCommandCategories(t *testing.T, locale string, dark bool) {
 		if !seen[cmd.ID] {
 			t.Fatalf("command %s is absent from categorized rows", cmd.ID)
 		}
+	}
+}
+
+// testPaletteJSONWindowName checks an unnamed JSON window's row: its title is
+// the tile's own name, so the category would only repeat it and is dropped.
+func testPaletteJSONWindowName(t *testing.T, locale string, dark bool) {
+	a, tt := polishPalette(t, locale, dark, nil)
+	a.addJSONDocument(`{}`, "", true)
+	a.addJSONDocument(`{}`, "items.json", true)
+	tt.Frame()
+	json := a.text(locale, "JSON")
+	unnamed, named, created := false, false, false
+	for _, row := range a.palette.rows {
+		if row.Kind != paletteRowCommand {
+			continue
+		}
+		switch {
+		case row.Title == a.text(locale, "JSONWindowName"):
+			unnamed = true
+			if row.Category != "" {
+				t.Fatalf("the unnamed window repeats %q after its title", row.Category)
+			}
+		case row.Title == "items.json":
+			named = true
+			if row.Category != json {
+				t.Fatalf("the named window shows %q, want %q", row.Category, json)
+			}
+		case row.Key == "json.new":
+			created = true
+			if row.Category != json {
+				t.Fatalf("the new-window command shows %q, want %q", row.Category, json)
+			}
+		}
+	}
+	if !unnamed || !named || !created {
+		t.Fatalf("the JSON rows are missing: unnamed=%v named=%v new=%v, %v", unnamed, named, created, tt.Texts())
+	}
+}
+
+// testPaletteSearchSurface checks the field against the panel in both themes:
+// the dark fill separates at least as much as the light one, and the
+// placeholder keeps WCAG AA on either.
+func testPaletteSearchSurface(t *testing.T, locale string, dark bool) {
+	separations := map[bool]float64{}
+	for _, mode := range []bool{false, true} {
+		tk := tokens(mode, locale)
+		a, tt := polishPalette(t, locale, mode, nil)
+		panel, search := a.palette.panelBounds, a.palette.searchBounds
+		field := pixelOf(tt, search.X+search.W/2, search.Y+tk.Space4)
+		surface := pixelOf(tt, panel.X+tk.Space4, search.Y+tk.Space4)
+		separations[mode] = contrastRatio(field, surface)
+		secondary := ui.Hex(tk.ColorTextSecondary)
+		placeholder := color.RGBA{secondary.R, secondary.G, secondary.B, 0xFF}
+		if ratio := contrastRatio(placeholder, field); ratio < 4.5 {
+			t.Fatalf("dark=%v: the placeholder on the field is %.2f:1, want 4.5:1 at least", mode, ratio)
+		}
+	}
+	if separations[true] < separations[false] {
+		t.Fatalf("the field stands out by %.2f:1 in dark against %.2f:1 in light", separations[true], separations[false])
+	}
+	if separations[true] < 1.45 {
+		t.Fatalf("the field stands out by %.2f:1 from the dark panel, want 1.45:1 at least", separations[true])
 	}
 }
 

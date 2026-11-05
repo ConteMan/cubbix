@@ -488,7 +488,13 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		return awake.Arg{Kind: awake.KindDefault}
 	}
 	commandRow := func(cmd *command) paletteRow {
-		row := paletteRow{Kind: paletteRowCommand, Key: cmd.ID, Title: cmd.Title(a, locale), Category: a.text(locale, commandCategory(cmd)), Icon: cmd.Icon, Command: cmd}
+		title, category := cmd.Title(a, locale), a.text(locale, commandCategory(cmd))
+		if strings.EqualFold(strings.TrimSpace(title), strings.TrimSpace(category)) {
+			// An unnamed JSON window is titled with its tile's own name: printing
+			// that name twice says nothing the title has not said already.
+			category = ""
+		}
+		row := paletteRow{Kind: paletteRowCommand, Key: cmd.ID, Title: title, Category: category, Icon: cmd.Icon, Command: cmd}
 		if cmd.Param == paramAwake {
 			arg := argFor(cmd)
 			row.Hint = awakeHint(a, locale, arg)
