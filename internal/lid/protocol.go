@@ -11,7 +11,7 @@ const (
 	Protocol = 1
 	// Version is the helper implementation revision, independent of Protocol.
 	// Bump it whenever helper behavior changes so installed copies get replaced.
-	Version             = "3"
+	Version             = "4"
 	SocketPath          = "/var/run/com.conteman.cubbix.helper.sock"
 	JournalPath         = "/Library/Application Support/com.conteman.cubbix.helper/session.json"
 	ClientRequirement   = `anchor apple generic and certificate leaf[subject.OU] = "P93GN4N3DC" and identifier "com.conteman.cubbix"`
@@ -22,6 +22,10 @@ const (
 	HardLimit           = 12 * time.Hour
 	BatteryInterval     = 30 * time.Second
 	batteryUnknownLimit = 3
+	readFailureLimit    = 3
+	ReadTimeout         = 5 * time.Second
+	// Allow a bounded read, a queued request and response serialization.
+	CallTimeout = 14 * time.Second
 )
 
 type Request struct {

@@ -33,6 +33,7 @@ type Engine struct {
 	owner                             uint64
 	lastRequest, lastBattery, retryAt time.Time
 	failures, unknown                 int
+	readFailures                      int
 	state, code                       string
 	detail                            string
 	Logf                              func(string, ...any)
@@ -65,14 +66,32 @@ func (e *Engine) Start() error {
 
 // Observation failures are transient; they must not overwrite a lease's
 // termination code and remain stuck after the next successful read.
-func (e *Engine) refresh() string {
-	if e.journal != nil {
-		return ""
-	}
+func (e *Engine) refresh() (int, string) {
 	value, err := e.Sleep.Read()
-	if err != nil {
-		e.state = "off"
-		return "pmset-failed"
+	if err != nil || value != 0 && value != 1 {
+		if e.journal != nil && e.state == "on-ours" {
+			e.readFailures++
+			if e.readFailures >= readFailureLimit {
+				e.detail = "poll-read-failed"
+				e.restore("pmset-failed")
+				if e.journal == nil {
+					return 0, "pmset-failed"
+				}
+				return -1, "restore-failed"
+			}
+		} else if e.journal == nil {
+			e.state = "off"
+		}
+		return -1, "pmset-failed"
+	}
+	e.readFailures = 0
+	if e.journal != nil {
+		if e.state == "on-ours" && value != 1 {
+			e.detail = "poll-readback-mismatch"
+			e.restore("pmset-failed")
+			return value, "pmset-failed"
+		}
+		return value, ""
 	}
 	if value == 1 {
 		e.state = "on-foreign"
@@ -83,19 +102,25 @@ func (e *Engine) refresh() string {
 			e.code = "ok"
 		}
 	}
-	return ""
+	return value, ""
 }
 func (e *Engine) response(id string, ok bool, code string) Response {
-	observed := e.refresh()
+	value, observed := e.refresh()
 	if code == "" {
 		code = e.code
 		if observed != "" {
 			code = observed
 		}
 	}
-	r := Response{V: Protocol, ID: id, OK: ok, Protocol: Protocol, Helper: Version, State: e.state, Code: code, Detail: e.detail, MinPercent: 20, Power: "unknown"}
-	if v, err := e.Sleep.Read(); err == nil && (v == 0 || v == 1) {
-		r.Value = &v
+	return e.responseValue(id, ok, code, value)
+}
+
+// Mutation paths pass their confirmed readback, avoiding a redundant read
+// that could fail after the write has already been verified successfully.
+func (e *Engine) responseValue(id string, ok bool, code string, value int) Response {
+	r := Response{V: Protocol, ID: id, OK: ok && e.state != "restore-failed", Protocol: Protocol, Helper: Version, State: e.state, Code: code, Detail: e.detail, MinPercent: 20, Power: "unknown"}
+	if value == 0 || value == 1 {
+		r.Value = &value
 	}
 	kind, p, err := e.Power.Source()
 	r.Power = kind
@@ -133,6 +158,13 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 	if code := r.Validate(now); code != "" {
 		return e.response(r.ID, false, code)
 	}
+	// A bounded request in flight is not an idle/disconnected owner. Do not
+	// charge its pmset execution time against the next heartbeat's lease.
+	defer func() {
+		if e.journal != nil && e.owner == owner {
+			e.lastRequest = e.Now()
+		}
+	}()
 	e.tick(now)
 	if e.owner == owner {
 		e.lastRequest = now
@@ -156,13 +188,9 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 			}
 			e.journal = &j
 			e.lastRequest = now
-			v, err := e.Sleep.Read()
-			if err != nil || v != 1 {
-				e.detail = "renew-readback-failed"
-				e.restore("pmset-failed")
-				return e.response(r.ID, false, e.code)
-			}
-			return e.response(r.ID, true, "ok")
+			// A saved renewal owns the same lease. Observe once using the
+			// polling grace period rather than restoring on a single error.
+			return e.response(r.ID, true, "")
 		}
 		value, err := e.Sleep.Read()
 		if err != nil {
@@ -205,12 +233,17 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 		}
 		e.state = "on-ours"
 		e.code = "ok"
+		e.readFailures = 0
+		return e.responseValue(r.ID, true, "ok", value)
 	case "disable":
 		if e.journal != nil && e.owner != 0 && e.owner != owner {
 			return e.response(r.ID, false, "busy")
 		}
 		if e.journal != nil {
 			e.restore("ok")
+			if e.journal == nil {
+				return e.responseValue(r.ID, true, e.code, 0)
+			}
 		}
 	}
 	// Select the current code after response refreshes the observed setting.
@@ -253,6 +286,7 @@ func (e *Engine) restore(code string) {
 	e.code = code
 	e.failures = 0
 	e.unknown = 0
+	e.readFailures = 0
 }
 func (e *Engine) Disconnect(owner uint64) {
 	e.mu.Lock()

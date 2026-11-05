@@ -161,11 +161,7 @@ func (c *Client) Call(req Request) (Response, error) {
 	c.id++
 	req.V = Protocol
 	req.ID = time.Now().UTC().Format("20060102T150405") + "_" + stringID(c.id)
-	timeout := 5 * time.Second
-	if req.Op == "hello" {
-		timeout = 2 * time.Second
-	}
-	c.conn.SetDeadline(time.Now().Add(timeout))
+	c.conn.SetDeadline(time.Now().Add(CallTimeout))
 	if err := json.NewEncoder(c.conn).Encode(req); err != nil {
 		return Response{}, err
 	}

@@ -71,7 +71,7 @@ func (a *application) prepareLid() {
 		return lidAdminResult(output, err)
 	}
 	c.read = func() (int, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), lid.ReadTimeout)
 		defer cancel()
 		b, err := exec.CommandContext(ctx, "/usr/bin/pmset", "-g").Output()
 		if err != nil {

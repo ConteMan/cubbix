@@ -85,7 +85,7 @@ func TestLidEnableFailureDiagnosticsSurvivePolling(t *testing.T) {
 
 func TestLidOldHelperRequiresManualUpdate(t *testing.T) {
 	a, sleep, _, svc, conn := lidTestApp(t)
-	conn.helloVersion = "1"
+	conn.helloVersion = "3"
 	a.lid.Inspect()
 	if a.lidReason() != "LidHelperUpdate" || a.lid.snapshot().state != lidBlocked || svc.registers != 0 {
 		t.Fatal(a.lid.snapshot())
@@ -94,7 +94,7 @@ func TestLidOldHelperRequiresManualUpdate(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := a.cliState().Awake.Lid
-	if s.Hello != "version-mismatch" || s.HelperVersion != "1" || s.LastCode != "helper-version-mismatch" || len(sleep.writes) != 0 || svc.registers != 0 {
+	if s.Hello != "version-mismatch" || s.HelperVersion != "3" || s.LastCode != "helper-version-mismatch" || len(sleep.writes) != 0 || svc.registers != 0 {
 		t.Fatalf("quiet update: %+v", s)
 	}
 	svc.onRegister = func() {

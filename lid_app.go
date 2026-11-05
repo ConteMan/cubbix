@@ -195,7 +195,9 @@ func (a *application) finishLidPoll() {
 	state := a.awake.snapshot()
 	if state.Active && state.Session.Lid && s.state != lidOn {
 		a.setSessionLid(false)
-		a.awake.stop()
+		// A lid failure only removes the lid extension. The ordinary
+		// assertion keeps its deadline, mode and followed process.
+		a.awakeChanged()
 	}
 	a.notifyLid(s.reason)
 	a.refreshAwake()

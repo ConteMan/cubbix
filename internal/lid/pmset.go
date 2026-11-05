@@ -32,7 +32,7 @@ func ParseSleep(data []byte) (int, error) {
 	return -1, errors.New("sleep setting unavailable")
 }
 func (p *PMSet) Read() (int, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ReadTimeout)
 	defer cancel()
 	data, err := p.Run(ctx, "/usr/bin/pmset", "-g")
 	if err != nil {
