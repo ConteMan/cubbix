@@ -40,6 +40,7 @@ type paletteRow struct {
 	Key      string
 	Title    string
 	Group    string // resource key of a group header
+	Category string // the tile a command belongs to, after its title
 	Icon     string
 	Hint     string
 	ErrorKey string
@@ -487,7 +488,13 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		return awake.Arg{Kind: awake.KindDefault}
 	}
 	commandRow := func(cmd *command) paletteRow {
-		row := paletteRow{Kind: paletteRowCommand, Key: cmd.ID, Title: cmd.Title(a, locale), Icon: cmd.Icon, Command: cmd}
+		title, category := cmd.Title(a, locale), a.text(locale, commandCategory(cmd))
+		if strings.EqualFold(strings.TrimSpace(title), strings.TrimSpace(category)) {
+			// An unnamed JSON window is titled with its tile's own name: printing
+			// that name twice says nothing the title has not said already.
+			category = ""
+		}
+		row := paletteRow{Kind: paletteRowCommand, Key: cmd.ID, Title: title, Category: category, Icon: cmd.Icon, Command: cmd}
 		if cmd.Param == paramAwake {
 			arg := argFor(cmd)
 			row.Hint = awakeHint(a, locale, arg)
@@ -551,9 +558,10 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		appendGroup("PaletteAll", rest)
 	}
 	p.rows = rows
-	p.list.Header = func(index int) bool {
-		return index >= 0 && index < len(p.rows) && p.rows[index].Kind == paletteRowHeader
-	}
+	// Group labels scroll with their rows. A sticky header needs an opaque
+	// backing to hide the rows under it; that would introduce a separate
+	// surface over the translucent panel. Selection already skips headers.
+	p.list.Header = nil
 
 	// Keep the chosen command if it is still listed; otherwise choose the
 	// default for this query.

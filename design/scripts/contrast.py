@@ -50,6 +50,10 @@ def audit():
     if 'ColorMenuSurface' in variables:
         for foreground in ('ColorText', 'ColorTextSecondary'):
             text_pairs.append((foreground + ' on native menu', foreground, 'ColorMenuSurface'))
+    if 'ColorKeycap' in variables:
+        text_pairs.append(('keycap label', 'ColorKeycapText', 'ColorKeycap'))
+    if 'ColorPaletteSearch' in variables:
+        text_pairs.append(('command palette placeholder', 'ColorTextSecondary', 'ColorPaletteSearch'))
     for syntax_token in ('ColorSyntaxKey', 'ColorSyntaxString', 'ColorSyntaxNumber', 'ColorSyntaxBool', 'ColorSyntaxNull'):
         if syntax_token in variables:
             text_pairs.append((syntax_token + ' on ColorCard', syntax_token, 'ColorCard'))

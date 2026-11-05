@@ -6,6 +6,7 @@ import { history, defaultKeymap, historyKeymap, indentWithTab } from '@codemirro
 import { tags } from '@lezer/highlight';
 import { largeDocument, DEBOUNCE_MS } from './limits.js';
 import { startJob } from './evaluator.js';
+import { renderShortcutTooltip } from './keycaps.js';
 
 const $ = id => document.getElementById(id);
 const bridge = (method, ...args) => window.mygo.call('JSON.' + method, ...args);
@@ -80,7 +81,7 @@ function showTooltip(element) {
   tipTimer = setTimeout(() => {
     tipOwner = element;
     const tip = $('tooltip');
-    tip.textContent = element.dataset.tooltip;
+    renderShortcutTooltip(tip, element.dataset.tooltip);
     tip.hidden = false;
     element.setAttribute('aria-describedby', 'tooltip');
     const bounds = element.getBoundingClientRect();

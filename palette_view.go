@@ -4,7 +4,7 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// paletteView draws the whole panel: search row, group list, ⌘K keycap,
+// paletteView draws the whole panel: search row, group list, the ⌘K keycaps,
 // action list and inline errors. All colors and sizes come from tokens.go
 // through applyTheme.
 //
@@ -48,7 +48,9 @@ func (a *application) paletteView(c *ui.Context) {
 			return !a.paletteContentHit(ev, p.panelBounds)
 		}))
 		panel.Children(func() {
-			searchRow := ui.Row(c).FillWidth().Height(t.SizePaletteSearchHeight).PaddingX(t.Space8).Gap(t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center)
+			// The field has a fill of its own: the panel is translucent, so the
+			// control color tuned for opaque cards reads as the panel itself.
+			searchRow := ui.Row(c).FillWidth().Height(t.SizePaletteSearchHeight).PaddingX(t.Space8).Gap(t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorPaletteSearch)).AlignItems(ui.Center)
 			p.searchBounds = searchRow.Bounds()
 			searchRow.Children(func() {
 				grab := ui.Box(c.Key("palette-grab")).Size(t.SizePaletteSearchHeight, t.SizePaletteSearchHeight).KeepFocus()
@@ -59,19 +61,30 @@ func (a *application) paletteView(c *ui.Context) {
 						ui.Icon(c, icon("search")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 					})
 				})
-				input := ui.TextInput(c.Key("palette-search"), &p.query).Grow(1).FillHeight().Padding(0).Border(0, ui.Hex(t.ColorTransparent)).Background(ui.Hex(t.ColorTransparent)).FontSize(t.FontSizeBody).Placeholder(text("PaletteSearch")).Label(text("PaletteSearch")).FocusRing(true)
-				input.Focus()
-				input.OnChange(func() {
-					// Editing leaves the action list and clears the last error.
-					p.mode = paletteCommandMode
-					p.actionsCommand = nil
-					p.actionSelection = ""
-					p.errorKey = ""
-					p.runError = ""
+				// The field keeps the input and draws the placeholder itself: the
+				// input's own would sit on the caret.
+				field := ui.Box(c.Key("palette-field")).Grow(1).FillHeight()
+				field.Children(func() {
+					input := ui.TextInput(c.Key("palette-search"), &p.query).Fill().Padding(0).Border(0, ui.Hex(t.ColorTransparent)).Background(ui.Hex(t.ColorTransparent)).FontSize(t.FontSizeBody).Label(text("PaletteSearch")).FocusRing(true)
+					input.Focus()
+					input.OnChange(func() {
+						// Editing leaves the action list and clears the last error.
+						p.mode = paletteCommandMode
+						p.actionsCommand = nil
+						p.actionSelection = ""
+						p.errorKey = ""
+						p.runError = ""
+					})
+					input.OnSubmit(a.runPalette)
+					input.OnShortcut(0, ui.KeyDown, func() { a.movePaletteSelection(1) })
+					input.OnShortcut(0, ui.KeyUp, func() { a.movePaletteSelection(-1) })
+					if p.query == "" && !input.Composing() {
+						// A hint, not a control: the pointer reaches the input under it.
+						ui.Row(c).Absolute().Left(t.SizePalettePlaceholderInset).Right(0).Top(0).Bottom(0).AlignItems(ui.Center).PassThrough().Children(func() {
+							ui.Text(c, text("PaletteSearch")).Grow(1).MinWidth(0).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine().Ellipsis("…")
+						})
+					}
 				})
-				input.OnSubmit(a.runPalette)
-				input.OnShortcut(0, ui.KeyDown, func() { a.movePaletteSelection(1) })
-				input.OnShortcut(0, ui.KeyUp, func() { a.movePaletteSelection(-1) })
 				if p.errorKey != "" {
 					label := text(p.errorKey)
 					alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(label).Description(label)
@@ -81,11 +94,8 @@ func (a *application) paletteView(c *ui.Context) {
 						})
 					})
 				}
-				ui.Row(c).Height(t.Space20).PaddingX(t.Space6).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).AlignItems(ui.Center).Children(func() {
-					ui.Text(c, "⌘K").FontSize(t.FontSizeCaption).TextColor(ui.Hex(t.ColorTextDisabled))
-				})
+				keycaps(c, t, paletteActionKeys)
 			})
-			ui.Box(c).FillWidth().Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
 			if empty {
 				// Nothing to pick: the whole body drags.
 				p.listBounds = ui.Rect{}
@@ -98,9 +108,15 @@ func (a *application) paletteView(c *ui.Context) {
 				if p.mode == paletteActionMode {
 					label = text("PaletteActions")
 				}
+				// Rows fill the panel's content box, so the selected row's highlight
+				// keeps the same inset on both sides. The scroll bar keeps out of
+				// their way: ScrollbarInsets moves it out by the overhang, past the
+				// panel's padding, into the margin around the rows, so it covers
+				// neither the highlight nor a row's hint.
 				list := ui.List(c.Key("palette-list"), &p.list, len(p.rows), func(index int) {
 					a.paletteRow(c, t, locale, p, index)
-				}).FillWidth().Grow(1).Gap(0).Label(label)
+				}).FillWidth().Grow(1).Gap(0).Label(label).
+					ScrollbarInsets(0, -t.SizePaletteScrollbarOverhang, 0, 0)
 				p.listBounds = list.Bounds()
 			}
 		})
@@ -124,7 +140,9 @@ func (a *application) paletteRow(c *ui.Context, t tokenValues, locale string, p 
 	row := p.rows[index]
 	switch row.Kind {
 	case paletteRowHeader:
-		ui.Row(c).FillWidth().Height(t.SizePaletteGroupHeight).PaddingX(t.Space8).AlignItems(ui.Center).Background(ui.Hex(t.ColorMenuSurface)).Children(func() {
+		// Inherit the panel surface: painting its translucent color again
+		// changes the opacity and creates a band, especially in dark mode.
+		ui.Row(c).FillWidth().Height(t.SizePaletteGroupHeight).PaddingX(t.Space8).AlignItems(ui.Center).Children(func() {
 			ui.Text(c, a.text(locale, row.Group)).FontSize(t.FontSizeCaption).TextColor(ui.Hex(t.ColorTextDisabled))
 		})
 	case paletteRowSeparator:
@@ -161,9 +179,24 @@ func (a *application) paletteRow(c *ui.Context, t tokenValues, locale string, p 
 				if row.Icon != "" {
 					ui.Icon(c, icon(row.Icon)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 				}
-				ui.Text(c, row.Title).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).Grow(1).SingleLine().Ellipsis("…").MinWidth(0)
+				// The title and the tile it belongs to sit together on the left; the
+				// title gives way first, the tile keeps its words. The tile is a
+				// step smaller than the title and sits on the title's baseline, so
+				// the pair reads as one line rather than as two centred boxes.
+				align := ui.Center
+				if row.Category != "" {
+					align = ui.Baseline
+				}
+				ui.Row(c).Grow(1).MinWidth(0).AlignItems(align).Gap(t.Space8).Children(func() {
+					ui.Text(c, row.Title).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).Shrink(1).SingleLine().Ellipsis("…").MinWidth(0)
+					if row.Category != "" {
+						ui.Text(c, row.Category).Shrink(0).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+					}
+				})
 				if row.Hint != "" {
-					ui.Text(c, row.Hint).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+					// Invalid input is echoed here too; bound that untrusted text
+					// while keeping normal duration hints at their natural width.
+					ui.Text(c, row.Hint).Shrink(0).MaxWidth(t.SizePaletteWidth / 2).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine().Ellipsis("…")
 				}
 				if row.Checked {
 					ui.Icon(c, icon("check")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorText))

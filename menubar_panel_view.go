@@ -175,12 +175,12 @@ func (a *application) panelStatus(c *ui.Context, t tokenValues, locale string) {
 // to open a window from the card.
 func (a *application) panelJSONCard(c *ui.Context, t tokenValues, locale string, rows menubarPanelRows) {
 	text := func(key string) string { return a.text(locale, key) }
-	newTip := a.menubarPanelTooltip(locale, "JSONShortcutLabel", a.config.JSONShortcut)
 	ui.Column(c).FillWidth().Padding(t.Space10).Gap(t.Space8).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
 		ui.Row(c).FillWidth().Height(t.SizeNavHeight).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
 			ui.Icon(c, icon("braces")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorText))
 			ui.Text(c, text("JSON")).FontSize(t.FontSizeBody).FontWeight(fontWeight(t.FontWeightSemibold)).TextColor(ui.Hex(t.ColorText)).Grow(1)
-			button := ui.ButtonBase(c.Key("panel-json-new")).Size(t.SizeIconButton, t.SizeIconButton).Radius(t.RadiusControl).FocusRing(true).Label(text("JSONShortcutLabel")).Tooltip(newTip).OnClick(a.panelNewJSON)
+			button := ui.ButtonBase(c.Key("panel-json-new")).Size(t.SizeIconButton, t.SizeIconButton).Radius(t.RadiusControl).FocusRing(true).Label(text("JSONShortcutLabel")).OnClick(a.panelNewJSON)
+			shortcutTooltip(c, t, button, text("JSONShortcutLabel"), a.config.JSONShortcut)
 			if button.Hovered() {
 				button.Background(ui.Hex(t.ColorControlHover))
 			}
@@ -247,7 +247,7 @@ func (a *application) panelFooter(c *ui.Context, t tokenValues, locale string) {
 		ui.Box(c).FillWidth().Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
 		ui.Row(c).FillWidth().Height(t.SizeNavHeight).AlignItems(ui.Center).Children(func() {
 			ui.Text(c, "Cubbix v"+runningVersion()).FontSize(t.FontSizeCaption).TextColor(ui.Hex(t.ColorTextDisabled)).Grow(1).SingleLine()
-			a.panelIconButton(c, t, "panel-palette", "command", a.menubarPanelTooltip(locale, "PaletteShortcutLabel", a.config.PaletteShortcut), a.showPalette)
+			a.panelShortcutButton(c, t, locale)
 			a.panelIconButton(c, t, "panel-settings", "settings-2", text("MenuSettings"), func() {
 				a.hideMenubarPanel()
 				a.show()
@@ -257,12 +257,23 @@ func (a *application) panelFooter(c *ui.Context, t tokenValues, locale string) {
 	})
 }
 
+func (a *application) panelShortcutButton(c *ui.Context, t tokenValues, locale string) {
+	label := a.menubarPanelTooltip(locale, "PaletteShortcutLabel", a.config.PaletteShortcut)
+	button := a.panelButton(c, t, "panel-palette", "command", label, a.showPalette)
+	shortcutTooltip(c, t, button, a.text(locale, "PaletteShortcutLabel"), a.config.PaletteShortcut)
+}
+
 func (a *application) panelIconButton(c *ui.Context, t tokenValues, key, glyph, label string, onclick func()) {
-	button := ui.ButtonBase(c.Key(key)).Size(t.SizeIconButton, t.SizeIconButton).Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label).OnClick(onclick)
+	a.panelButton(c, t, key, glyph, label, onclick).Tooltip(label)
+}
+
+func (a *application) panelButton(c *ui.Context, t tokenValues, key, glyph, label string, onclick func()) ui.Element {
+	button := ui.ButtonBase(c.Key(key)).Size(t.SizeIconButton, t.SizeIconButton).Radius(t.RadiusControl).FocusRing(true).Label(label).OnClick(onclick)
 	if button.Hovered() {
 		button.Background(ui.Hex(t.ColorControlHover))
 	}
 	button.Children(func() {
 		ui.Icon(c, icon(glyph)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 	})
+	return button
 }

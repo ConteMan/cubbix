@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -35,6 +36,8 @@ func TestPaletteScreenshots(t *testing.T) {
 		tt.SetScale(2)
 		tt.SetLocale(locale)
 		tt.SetDark(dark)
+		// A frame first, so a setup can point at what the view laid out.
+		tt.Frame()
 		if setup != nil {
 			setup(tt)
 		}
@@ -77,6 +80,27 @@ func TestPaletteScreenshots(t *testing.T) {
 					tt.Type("常亮 45x")
 				}
 			})
+			capture("palette-scroll"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
+				// The list overflows, and pointing at it shows its scroll bar: no
+				// text and no highlight may reach under it.
+				list := a.palette.listBounds
+				tt.Move(list.X+list.W/2, list.Y+list.H/2)
+				tt.Scroll(list.X+list.W/2, list.Y+list.H/2, 0, 180)
+			})
+			capture("palette-scroll-selected"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
+				// Scrolled, with the bar showing and the selected row in view.
+				list := a.palette.listBounds
+				tt.Move(list.X+list.W/2, list.Y+list.H/2)
+				tt.Scroll(list.X+list.W/2, list.Y+list.H/2, 0, 160)
+				for i := 0; i < 4; i++ {
+					tt.Key(0, ui.KeyDown)
+				}
+			})
+			capture("palette-json-windows"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
+				// An unnamed window is titled with its tile's own name; it must
+				// not repeat that name in the category.
+				tt.Type("json")
+			})
 			capture("palette-actions"+suffix, locale, dark, a.paletteView, paletteWindowWidth(), paletteWindowHeight(), func(tt *ui.Tester) {
 				if locale == "en" {
 					tt.Type("awake")
@@ -100,5 +124,30 @@ func TestPaletteScreenshots(t *testing.T) {
 			})
 			a.guide = nil
 		}
+	}
+}
+
+// Optional extra review evidence shares the tests' settled frames. The
+// original evidence names stay unchanged in TestPaletteScreenshots.
+func paletteReviewScreenshot(t *testing.T, tt *ui.Tester, name, locale string, dark bool) {
+	t.Helper()
+	dir := os.Getenv("CUBBIX_PALETTE_REVIEW_EVIDENCE")
+	if dir == "" {
+		return
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	mode := "light"
+	if dark {
+		mode = "dark"
+	}
+	f, err := os.Create(filepath.Join(dir, fmt.Sprintf("%s-%s-%s.png", name, locale, mode)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if err := png.Encode(f, tt.Image()); err != nil {
+		t.Fatal(err)
 	}
 }
