@@ -12,11 +12,11 @@ import (
 
 type CommandRunner func(context.Context, string, ...string) ([]byte, error)
 type PMSet struct {
-	Run       CommandRunner
-	Logf      func(string, ...any)
-	mu        sync.Mutex
-	readKnown bool
-	readValue int
+	Run        CommandRunner
+	Logf       func(string, ...any)
+	mu         sync.Mutex
+	readResult string
+	readValue  int
 }
 
 func ParseSleep(data []byte) (int, error) {
@@ -32,7 +32,7 @@ func ParseSleep(data []byte) (int, error) {
 	return -1, errors.New("sleep setting unavailable")
 }
 func (p *PMSet) Read() (int, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ReadTimeout)
 	defer cancel()
 	data, err := p.Run(ctx, "/usr/bin/pmset", "-g")
 	if err != nil {
@@ -50,10 +50,10 @@ func (p *PMSet) Read() (int, error) {
 func (p *PMSet) logRead(result string, v int) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.Logf != nil && (result != "ok" || !p.readKnown || p.readValue != v) {
+	if p.Logf != nil && (p.readResult != result || p.readValue != v) {
 		p.Logf("pmset read result=%s value=%d", result, v)
 	}
-	p.readKnown, p.readValue = result == "ok", v
+	p.readResult, p.readValue = result, v
 }
 func (p *PMSet) Set(v int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)

@@ -67,6 +67,7 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 	a.lidLastCode = ""
 	a.lidMessage = ""
 	a.lidNotice = ""
+	a.setSessionLid(true)
 	fromURL := a.lidURL
 	// The lid continues on a worker: capture the quiet flag now. The request
 	// that set it has long returned (and reset it) when the callback runs.
@@ -194,7 +195,9 @@ func (a *application) finishLidPoll() {
 	state := a.awake.snapshot()
 	if state.Active && state.Session.Lid && s.state != lidOn {
 		a.setSessionLid(false)
-		a.awake.stop()
+		// A lid failure only removes the lid extension. The ordinary
+		// assertion keeps its deadline, mode and followed process.
+		a.awakeChanged()
 	}
 	a.notifyLid(s.reason)
 	a.refreshAwake()

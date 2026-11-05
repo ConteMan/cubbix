@@ -352,7 +352,7 @@ func TestLidCombinedLifecycle(t *testing.T) {
 			case "disconnect":
 				conn.gone = true
 				a.pollLid()
-				if a.awake.snapshot().Active || !a.lid.markerExists() || !a.lid.canForce() {
+				if !a.awake.snapshot().Active || a.awake.snapshot().Session.Lid || !a.lid.markerExists() || !a.lid.canForce() {
 					t.Fatal("disconnect liability")
 				}
 				return
@@ -379,7 +379,7 @@ func TestLidCombinedLifecycle(t *testing.T) {
 						a.pollLid()
 					}
 				}
-				if a.awake.snapshot().Active || a.lid.snapshot().response.Code != end {
+				if !a.awake.snapshot().Active || a.awake.snapshot().Session.Lid || a.lid.snapshot().response.Code != end {
 					t.Fatalf("helper termination not propagated: %+v", a.lid.snapshot())
 				}
 

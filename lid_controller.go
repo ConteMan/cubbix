@@ -175,6 +175,12 @@ func (c *lidController) apply(r lid.Response) {
 	if r.Value != nil {
 		s.value = *r.Value
 	}
+	// An unknown observation is not evidence that an owned lease ended.
+	// Keep the last confirmed state and recovery marker until the helper
+	// reports a terminal reason or a confirmed value/state transition.
+	if s.state == lidOn && s.value != 0 && s.value != 1 && (r.Code == "ok" || r.Code == "pmset-failed") && (r.State == "on-ours" || r.State == "off") {
+		return
+	}
 	if s.value == 0 {
 		c.removeMarker()
 		s.stale = false
@@ -197,6 +203,10 @@ func (c *lidController) apply(r lid.Response) {
 		s.reason = ""
 	}
 	switch r.Code {
+	case "pmset-failed":
+		if s.state != lidOn && s.state != lidRestoreFailed {
+			s.reason = "LidEnableFailed"
+		}
 	case "battery-low":
 		s.reason = "LidBatteryLow"
 	case "battery-unknown":
@@ -264,8 +274,8 @@ func (c *lidController) Inspect() {
 		c.snapshotValue.reason = "LidHelperNotRunning"
 	}
 	c.publish()
-	c.readStale()
 	if err := c.connect(); err != nil {
+		c.readStale()
 		c.snapshotValue.online = false
 		if errors.Is(err, errLidHelperUpdate) {
 			c.snapshotValue.state = lidBlocked
@@ -410,7 +420,10 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 		return fail(s.reason, "enable-call-failed")
 	}
 	c.apply(r)
-	if !r.OK || r.State != "on-ours" || r.Value == nil || *r.Value != 1 {
+	// A renewal already saved by the helper may have an unknown readback
+	// during its grace period. Initial enable still requires confirmed 1.
+	grace := wasOn && r.OK && r.State == "on-ours" && r.Code == "pmset-failed" && (r.Value == nil || *r.Value == -1)
+	if !r.OK || r.State != "on-ours" || !grace && (r.Value == nil || *r.Value != 1) {
 		key := "LidEnableFailed"
 		switch r.Code {
 		case "foreign-setting":

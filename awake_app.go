@@ -64,12 +64,13 @@ func (a *application) startAwake(s awakeSession) error {
 			a.setSessionLid(false)
 		}
 	}
-	s.Lid = wanted && current.Active && current.Session.Lid
+	// Lid belongs to this selection, not to the previous assertion's state.
+	// Keep it through asynchronous enable and the existing-lease fast path.
 	if err := a.awake.start(s); err != nil {
 		return err
 	}
 	if wanted {
-		if a.lid.snapshot().state == lidOn && (s.End.Equal(a.lid.deadline) || !s.End.IsZero() && !a.lid.deadline.IsZero() && s.End.Before(a.lid.deadline)) {
+		if a.lid.snapshot().state == lidOn && (a.lid.deadline.IsZero() || !s.End.IsZero() && !s.End.After(a.lid.deadline)) {
 			return nil
 		}
 		return a.enableLid(s.End, a.lidAuthorize && !a.lidURL)

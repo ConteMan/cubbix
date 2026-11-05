@@ -26,7 +26,7 @@ func main() {
 	log.Printf("helper start revision=%s", lid.Version)
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
-	stopWatchdog := helperExitWatchdog(ctx, 12*time.Second, func() {
+	stopWatchdog := helperExitWatchdog(ctx, 20*time.Second, func() {
 		log.Print("helper shutdown timed out; journal retained")
 		os.Exit(1)
 	})
