@@ -1,0 +1,36 @@
+{
+  "cliVersion": "0.3.13",
+  "historicalRootsUnchanged": true,
+  "exports": [
+    {
+      "nodeId": "GVoax",
+      "file": "zh-CN-light.png",
+      "scale": 2,
+      "sha256": "fca5756e23c609fb4836fce01d2f6f0125c7dde3713ff35ea8f76fed6f425b02"
+    },
+    {
+      "nodeId": "tqcui",
+      "file": "zh-CN-dark.png",
+      "scale": 2,
+      "sha256": "bcf9d9e9f53f72ed25d02b5af8b13d50e83d7a113bfb2a1d93909824d8855beb"
+    },
+    {
+      "nodeId": "ZOLxm",
+      "file": "en-light.png",
+      "scale": 2,
+      "sha256": "3d6403f0e82bef9e02f2fc189202d4cc217324e1bbe7a9b8bf4892038a7bc563"
+    },
+    {
+      "nodeId": "CwtGk",
+      "file": "en-dark.png",
+      "scale": 2,
+      "sha256": "5c41e79d9a10e1852f299f170973c05b4db72fdf3eab7e72428d1701accdaa46"
+    }
+  ],
+  "nativeLayout": {
+    "boards": 4,
+    "nodes": 4876,
+    "problems": []
+  },
+  "passed": true
+}
