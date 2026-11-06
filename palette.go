@@ -227,20 +227,21 @@ func (a *application) placePalette() {
 	if p == nil {
 		return
 	}
-	display := paletteDisplayNearest(a.paletteDisplaysNow(), a.paletteCursorPoint())
+	size := a.palettePanelSize()
+	display := displayNearest(a.paletteDisplaysNow(), a.paletteCursorPoint())
 	position := a.paletteDefaultPoint(display)
-	if seat, ok := a.config.PalettePositions[paletteSeatKeyFor(display)]; ok {
-		remembered := palettePanelFromSeat(seat, display.WorkArea)
+	if stored, ok := (seatTable{seats: &a.config.PalettePositions}).lookup(display); ok {
+		remembered := seatPoint(stored, display.WorkArea)
 		// Clamp cannot fit an oversized panel. Keep the default fallback on
 		// those axes so a formerly valid offset cannot leave it off-screen.
-		if display.WorkArea.Width >= a.paletteSize().Width {
+		if display.WorkArea.Width >= size.Width {
 			position.X = remembered.X
 		}
-		if display.WorkArea.Height >= a.paletteSize().Height {
+		if display.WorkArea.Height >= size.Height {
 			position.Y = remembered.Y
 		}
 	}
-	a.movePalettePanelTo(paletteClamp(position, a.paletteSize(), display.WorkArea))
+	a.movePalettePanelTo(clampToWorkArea(position, size, display.WorkArea))
 }
 
 // palettePosition centers the panel on a display's work area, near its top,

@@ -40,7 +40,7 @@ func nativePalettePositionChecks(a *application, nsapp objc.ID) error {
 		return fmt.Errorf("hidden palette shadow window size = %dx%d", width, height)
 	}
 	guide.SetBounds(work)
-	for _, point := range []palettePoint{{X: 400, Y: 121}, {X: -1000, Y: 160}} {
+	for _, point := range []screenPoint{{X: 400, Y: 121}, {X: -1000, Y: 160}} {
 		a.movePalettePanelTo(point)
 		if a.palettePanelPoint() != point || p.window.IsVisible() || guide.IsVisible() || p.window.IsFocused() || guide.IsFocused() || objc.Send[bool](nsapp, objc.RegisterName("isActive")) {
 			return fmt.Errorf("hidden positioning changed focus, visibility or geometry")

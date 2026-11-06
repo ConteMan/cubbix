@@ -25,6 +25,21 @@ type jsonDocument struct {
 	text, path, custom           string
 	revision                     uint64
 	dirty, pinned, ready, closed bool
+	// place is this window's own move observation, and frameForTest replaces
+	// the native frame in tests so no case creates a window.
+	place        windowPlaceState
+	frameForTest placementWindow
+}
+
+// frame is the window placement works on: the native one, or a fake.
+func (d *jsonDocument) frame() placementWindow {
+	if d.frameForTest != nil {
+		return d.frameForTest
+	}
+	if d.window == nil {
+		return nil
+	}
+	return d.window
 }
 
 type jsonSnapshot struct {
@@ -79,6 +94,9 @@ func (a *application) addJSONDocument(text, path string, clean bool) *jsonDocume
 
 func (a *application) removeJSONDocument(d *jsonDocument) {
 	d.closed = true
+	// The window is already gone: its place was read and saved before Close or
+	// Destroy, and nothing here may read geometry again.
+	d.place = windowPlaceState{}
 	for i, candidate := range a.jsonDocuments {
 		if candidate == d {
 			a.jsonDocuments = append(a.jsonDocuments[:i:i], a.jsonDocuments[i+1:]...)
