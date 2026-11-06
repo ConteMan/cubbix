@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1 — 2026-11-06
+
+- With more than one display, choose in General where the Settings window opens: follow the pointer, or always on a display you pick. Each display remembers where the window was last time.
+- New JSON windows open on the display your pointer is on, and several of them are offset a little instead of stacking on top of each other.
+- Unplug a display or change its resolution, and windows move back to where you can see them.
+
 ## 0.6.0 — 2026-11-06
 
 - Settings are reorganized: Keep Awake and JSON each get their own page with their settings and shortcuts together, so "Low battery limit" now lives on the Keep Awake page.
