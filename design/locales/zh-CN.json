@@ -298,5 +298,11 @@
   "LidHelperUpdate": "助手需要更新",
   "UpdateScheduleOff": "自动检查已关闭",
   "AwakeStopError": "常亮未能停止，请重试",
-  "ModuleBusy": "模块正在处理操作，请稍后重试"
+  "ModuleBusy": "模块正在处理操作，请稍后重试",
+  "WindowPlacement": "窗口位置",
+  "WindowPlacementCursor": "跟随鼠标",
+  "WindowPlacementDisplay": "固定屏幕",
+  "WindowDisplay": "屏幕",
+  "WindowPlacementInfo": "按屏幕记住位置，无记录时居中。更改在下次打开时生效。",
+  "WindowDisplayMissing": "无法识别选中的屏幕，下次打开将使用主屏幕"
 }

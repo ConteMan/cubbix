@@ -59,7 +59,10 @@ func TestModuleSettingsScreenshots(t *testing.T) {
 		if prepare != nil {
 			prepare(a, paths)
 		}
-		height := settingsHeight(tokens(dark, locale), a.page, a.config.AwakeEnabled, false, false, true, true)
+		// The page height and the view read the same layout state, as the app
+		// does: a state that grows the page grows the drawn window too.
+		l := newSettingsLayout(a, a.page)
+		height := settingsHeight(tokens(dark, locale), a.page, l.awakeOn, l.showPlacement, l.fixedDisplay, l.hasCLI, l.ready)
 		tt := ui.NewTester(a.view, 720, height)
 		tt.SetScale(2)
 		tt.SetLocale(locale)
@@ -119,6 +122,39 @@ func TestModuleSettingsScreenshots(t *testing.T) {
 					}
 				}, nil)
 			}
+			// General: the window-place group in its three states. One display
+			// hides it, two display it in pointer mode and in fixed mode, and a
+			// fixed choice that is gone adds the fallback alert.
+			capture("general-window-single-display", locale, dark, func(a *application, paths cliPaths) {
+				a.page = settingsGeneral
+				a.knownDisplays = placementScreens()[:1]
+				a.config.WindowPlacement = "cursor"
+				_ = installCLILink(paths)
+			}, nil)
+			capture("general-window-follow-pointer", locale, dark, func(a *application, paths cliPaths) {
+				a.page = settingsGeneral
+				a.knownDisplays = placementScreens()
+				a.config.WindowPlacement = "cursor"
+				_ = installCLILink(paths)
+			}, nil)
+			capture("general-window-fixed-display", locale, dark, func(a *application, paths cliPaths) {
+				a.page = settingsGeneral
+				a.knownDisplays = placementScreens()
+				a.config.WindowPlacement = "display"
+				a.config.WindowDisplayID = 2
+				a.config.WindowDisplay = "Studio Display"
+				a.config.WindowDisplaySize = "1920x1080"
+				_ = installCLILink(paths)
+			}, nil)
+			capture("general-window-display-missing", locale, dark, func(a *application, paths cliPaths) {
+				a.page = settingsGeneral
+				a.knownDisplays = placementScreens()
+				a.config.WindowPlacement = "display"
+				a.config.WindowDisplayID = 99
+				a.config.WindowDisplay = "Gone Display"
+				a.config.WindowDisplaySize = "1280x720"
+				_ = installCLILink(paths)
+			}, nil)
 			// Awake module: open, and closed with its released shortcut.
 			capture("awake-on", locale, dark, func(a *application, paths cliPaths) {
 				a.page = settingsAwake

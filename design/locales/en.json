@@ -298,5 +298,11 @@
   "LidHelperUpdate": "The helper needs an update",
   "UpdateScheduleOff": "Automatic checks are off",
   "AwakeStopError": "Could not stop keep-awake. Try again",
-  "ModuleBusy": "The module is busy. Try again shortly"
+  "ModuleBusy": "The module is busy. Try again shortly",
+  "WindowPlacement": "Window position",
+  "WindowPlacementCursor": "Follow pointer",
+  "WindowPlacementDisplay": "Fixed display",
+  "WindowDisplay": "Display",
+  "WindowPlacementInfo": "Remembers a position per display; centres it if none is saved. Changes apply the next time the window opens.",
+  "WindowDisplayMissing": "The selected display could not be identified. The next opening will use the primary display."
 }

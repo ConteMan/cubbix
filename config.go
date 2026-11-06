@@ -74,13 +74,24 @@ type Config struct {
 	RestoreAwake       bool            `toml:"restore_awake,omitempty"`
 	WindowWidth        int             `toml:"window_width,omitempty"`
 	WindowHeight       int             `toml:"window_height,omitempty"`
+	// WindowPlacement is "cursor" (follow the pointer) or "display" (stay on
+	// the chosen screen). The three display fields are the user's own choice,
+	// kept even while the window follows the pointer.
+	WindowPlacement   string `toml:"window_placement,omitempty"`
+	WindowDisplayID   int64  `toml:"window_display_id,omitempty"`
+	WindowDisplay     string `toml:"window_display,omitempty"`
+	WindowDisplaySize string `toml:"window_display_size,omitempty"`
+	// WindowPositions and JSONPositions remember one seat per display, by
+	// display number, for the settings window and the JSON tool windows.
+	WindowPositions map[string]seat `toml:"window_positions,omitempty"`
+	JSONPositions   map[string]seat `toml:"json_positions,omitempty"`
 	// UpdateLastCheck is the UTC RFC3339Nano time of the last finished update
 	// check. It is optional: an older config simply has none.
 	UpdateLastCheck string `toml:"update_last_check,omitempty"`
 }
 
 func defaultConfig() Config {
-	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right"}
+	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right", WindowPlacement: "cursor"}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -121,6 +132,14 @@ func loadConfig(path string) (Config, error) {
 	case "top-left", "top-right", "bottom-left", "bottom-right", "center":
 	default:
 		return Config{}, fmt.Errorf("unsupported feedback corner: %q", config.FeedbackCorner)
+	}
+	// A window placement this version cannot draw returns to following the
+	// pointer; a missing key keeps the default, and an unknown one is not an
+	// error worth blocking the launch for.
+	switch config.WindowPlacement {
+	case "cursor", "display":
+	default:
+		config.WindowPlacement = "cursor"
 	}
 	if config.JSONSplit == 0 {
 		config.JSONSplit = jsonSplitDefault

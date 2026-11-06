@@ -50,13 +50,25 @@ type application struct {
 	palette              *paletteState
 	paletteShortcutError string
 	panelShortcutError   string
-	// displays, cursorPoint, paletteWindowPosition and
-	// setPaletteWindowPosition are seams: tests place and drag the panel
-	// without an app, a real screen or a native window.
+	// displays and cursorPoint are the shared screen seams: the palette and
+	// every window placement read them, and tests replace them so no case
+	// needs a real display or the pointer. paletteWindowPosition and
+	// setPaletteWindowPosition are seams too, so a drag needs no native window.
 	displays                 func() []mygo.Display
 	cursorPoint              func() mygo.Point
 	paletteWindowPosition    func() screenPoint
 	setPaletteWindowPosition func(screenPoint)
+	// settingsFrame is a seam: tests drive show and placement with a fake
+	// frame instead of a native settings window.
+	settingsFrame func() placementWindow
+	// knownDisplays is the last display snapshot the notification handler
+	// saw; settingsPlace and the JSON documents keep their own as well.
+	knownDisplays []mygo.Display
+	settingsPlace windowPlaceState
+	moveSeq       uint64
+	// jsonCommitted is the move sequence each display already has in its JSON
+	// seat, for this run only: a later close of an older window cannot win.
+	jsonCommitted map[int64]uint64
 	// createPaletteGuide is a seam too: tests never open the overlay.
 	createPaletteGuide func(*paletteGuideState)
 	guide              *paletteGuideState
@@ -265,11 +277,17 @@ func (a *application) visibility(visible bool) {
 
 func (a *application) hide() {
 	a.cancelShortcutRecording()
-	if a.window == nil {
+	w := a.settingsPlacementWindow()
+	if w == nil {
 		return
 	}
 	a.rememberWindowSize()
-	a.window.Hide()
+	// The place is read while the window is still alive: after Hide, or after
+	// a change of the display layout, the frame no longer means anything.
+	if a.rememberSettingsPlace() {
+		a.save()
+	}
+	w.Hide()
 	a.visibility(false)
 }
 
@@ -311,13 +329,25 @@ func (a *application) showContextMenu() {
 	a.tray.PopUpMenu()
 }
 
+// show opens the settings window. An already visible window is only shown and
+// focused again: it never re-places itself, so a second shortcut or menu item
+// cannot move the window under the user's pointer.
 func (a *application) show() {
-	if a.window == nil {
+	w := a.settingsPlacementWindow()
+	if w == nil {
 		return
 	}
+	if w.IsMinimized() {
+		w.Restore()
+		// Coming back from the Dock repairs a changed display layout, but does
+		// not follow the pointer.
+		a.reconcileSettingsDisplayIfNeeded()
+	} else if !w.IsVisible() {
+		a.placeSettingsWindow()
+	}
 	a.visibility(true)
-	a.window.Show()
-	a.window.Focus()
+	w.Show()
+	w.Focus()
 }
 
 func (a *application) applicationMenu(locale string) *mygo.Menu {
@@ -369,6 +399,7 @@ func (a *application) createSettingsWindow() {
 	a.window.OnHide(func() { a.cancelShortcutRecording(); a.visibility(false) })
 	a.window.OnClosed(func() { a.visibility(false) })
 	a.window.OnResize(a.rememberWindowSize)
+	a.window.OnMove(a.observeSettingsMove)
 
 	a.window.OnClose(func(event *mygo.CloseEvent) {
 		if !a.quitting {
@@ -399,6 +430,9 @@ func (a *application) ready() {
 	}
 	a.changeLanguage()
 	a.config.OpenAtLogin = mygo.App.OpenAtLogin()
+	// The first display snapshot: frames draw from it, and only window
+	// placement and display changes take a new one.
+	a.knownDisplays = a.displaysNow()
 	a.createSettingsWindow()
 	mygo.App.SetMenu(a.applicationMenu(mygo.App.Locale()))
 	mygo.App.OnActivate(func(visible bool) {
@@ -453,7 +487,7 @@ func (a *application) ready() {
 		log.Print(err)
 	}
 	mygo.Screen.OnDisplaysChanged(func() {
-		mygo.RunOnMain(a.paletteDisplaysChanged)
+		mygo.RunOnMain(a.displaysChanged)
 	})
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnBeforeQuit(a.beforeQuit)
@@ -482,6 +516,9 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	}
 	// JSON windows are tools: quitting never asks about unsaved text.
 	a.quitting = true
+	// One save for every window that moved: the settings seat and the newest
+	// JSON seat of each display. Windows are still alive here.
+	a.saveWindowPlacesOnQuit()
 	a.cli.stop()
 	a.hidePalette()
 	a.hidePaletteGuides()

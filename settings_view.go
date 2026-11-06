@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -56,18 +58,33 @@ type settingsLayout struct {
 	hasCLI                 bool
 	cli                    cliPaths
 	cliState               cliLinkState
+	// displays is this frame's display snapshot: the placement rows and their
+	// height conditions both come from it, never from a second read.
+	displays []mygo.Display
+	// display is the screen the fixed choice resolved to, and displayMissing
+	// says it was not found, so the window will fall back.
+	display        mygo.Display
+	displayMissing bool
 }
 
-// newSettingsLayout takes the same snapshot the frame draws. The placement
-// fields belong to 008 and stay false until that page lands.
+// newSettingsLayout takes the same snapshot the frame draws, displays
+// included: the two placement rows and the page height read one snapshot.
 func newSettingsLayout(a *application, page int) settingsLayout {
+	displays := a.displaySnapshot()
 	l := settingsLayout{
-		page:    page,
-		awakeOn: a.config.AwakeEnabled,
-		jsonOn:  a.config.JSONEnabled,
-		ready:   a.updates.snapshot().Phase == updateReady,
-		// 008 owns the placement rows; until it lands they are never drawn.
-		fixedDisplay: false,
+		page:     page,
+		awakeOn:  a.config.AwakeEnabled,
+		jsonOn:   a.config.JSONEnabled,
+		ready:    a.updates.snapshot().Phase == updateReady,
+		displays: displays,
+		// A single display needs no choice, so the whole group stays hidden
+		// and the stored choice is kept for when a second one returns.
+		showPlacement: len(displays) >= 2,
+		fixedDisplay:  a.config.WindowPlacement == "display",
+	}
+	if l.showPlacement && l.fixedDisplay {
+		display, matched := fixedDisplay(displays, a.config)
+		l.display, l.displayMissing = display, !matched
 	}
 	if paths, ok := cliPathsFor(); ok {
 		l.cli = paths
@@ -485,6 +502,108 @@ func (a *application) generalPage(c *ui.Context, t tokenValues, locale string, l
 			ui.Divider(c)
 			a.cliSettingsRow(c, t, locale, l)
 		}
+		if l.showPlacement {
+			ui.Divider(c)
+			a.windowPlacementRow(c, t, locale)
+			if l.fixedDisplay {
+				ui.Divider(c)
+				a.windowDisplayRow(c, t, locale, l)
+			}
+		}
+	})
+}
+
+// windowPlacementRow chooses how the window picks its display. Neither choice
+// moves the window that is already open: the change applies the next time it
+// opens.
+func (a *application) windowPlacementRow(c *ui.Context, t tokenValues, locale string) {
+	text := func(key string) string { return a.text(locale, key) }
+	modes := []string{"cursor", "display"}
+	keys := []string{"WindowPlacementCursor", "WindowPlacementDisplay"}
+	index := 0
+	if a.config.WindowPlacement == "display" {
+		index = 1
+	}
+	a.settingsRow(c, t, text("WindowPlacement"), settingsRowOpts{level: 3, tooltip: text("WindowPlacementInfo")}, func() {
+		// The value lives in this frame's index; the callback writes the mode
+		// back through changeWindowPlacement.
+		parts := ui.SegmentedBase(c.Key("window-placement"), &index, len(modes))
+		parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).
+			Background(ui.Hex(t.ColorControl)).Label(text("WindowPlacement")).
+			OnChange(func() { a.changeWindowPlacement(modes[index]) }).Children(func() {
+			for segment, key := range keys {
+				color, background := t.ColorText, t.ColorTransparent
+				if segment == index {
+					color, background = t.ColorOnAccent, t.ColorAccent
+				}
+				parts.Segment(segment).Grow(1).FillHeight().Radius(t.RadiusControl).
+					Background(ui.Hex(background)).FocusRing(true).Label(text(key)).Children(func() {
+					ui.Text(c, text(key)).FontSize(t.FontSizeBody).TextColor(ui.Hex(color)).SingleLine()
+				})
+			}
+		})
+	})
+}
+
+// maxDisplayMenuRows bounds the display menu: more rows scroll instead of
+// growing past the window.
+const maxDisplayMenuRows = 6
+
+// windowDisplayRow chooses the fixed display. A choice that can no longer be
+// identified keeps the fallback on screen next to an alert: the stored choice
+// is read again only when the user picks a display.
+func (a *application) windowDisplayRow(c *ui.Context, t tokenValues, locale string, l settingsLayout) {
+	text := func(key string) string { return a.text(locale, key) }
+	choices := displayChoices(l.displays)
+	current := ""
+	for _, choice := range choices {
+		if choice.Value == strconv.FormatInt(l.display.ID, 10) {
+			current = choice.Label
+		}
+	}
+	if current == "" && len(choices) > 0 {
+		current = choices[0].Label
+	}
+	a.settingsRow(c, t, text("WindowDisplay"), settingsRowOpts{level: 0}, func() {
+		if l.displayMissing {
+			a.alertIcon(c, t, text("WindowDisplayMissing"))
+		}
+		selected := strconv.FormatInt(a.config.WindowDisplayID, 10)
+		sel := ui.SelectBase(c.Key("window-display"), &selected)
+		sel.Trigger.Width(t.SizeLanguageSelectorWidth).Height(t.SizeSegmentHeight).PaddingX(t.Space8).
+			Radius(t.RadiusControl).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
+			Background(ui.Hex(t.ColorControl)).FocusRing(true).
+			Label(text("WindowDisplay")).Tooltip(current).
+			OnChange(func() { a.commitWindowDisplayID(selected) }).Children(func() {
+			ui.Text(c, current).FontSize(t.FontSizeBody).SingleLine().Grow(1).MinWidth(0)
+			ui.Icon(c, icon("chevron-down")).Size(t.SizeIcon, t.SizeIcon).
+				TextColor(ui.Hex(t.ColorTextSecondary)).Shrink(0)
+		})
+		sel.Popup(func(panel ui.Element) {
+			panel.Padding(t.Space4).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
+				Background(ui.Hex(t.ColorCard))
+			listHeight := float32(min(len(choices), maxDisplayMenuRows)) * t.SizeRowHeight
+			if _, windowHeight := c.Size(); windowHeight > 0 {
+				listHeight = min(listHeight, max(t.SizeRowHeight, windowHeight-2*t.Space24))
+			}
+			ui.Scroll(c).Width(t.SizeLanguageSelectorWidth).Height(listHeight).Children(func() {
+				for _, choice := range choices {
+					item := sel.Item(choice.Value).Height(t.SizeRowHeight).PaddingX(t.Space8).
+						Radius(t.RadiusControl).Label(choice.Title)
+					if item.Highlighted() {
+						item.Background(ui.Hex(t.ColorAccentSoft))
+					}
+					if item.Clicked() {
+						// Picking the display already shown as the fallback must
+						// still store it: this path is not a value change.
+						a.commitWindowDisplayID(choice.Value)
+					}
+					item.Children(func() {
+						ui.Text(c, choice.Label).FontSize(t.FontSizeBody).SingleLine().Tooltip(choice.Title)
+					})
+				}
+			})
+		})
 	})
 }
 

@@ -106,6 +106,14 @@ func (a *application) buildJSONWindow(d *jsonDocument) {
 	d.window.Page().OnPageTitleUpdated(func(e *mygo.TitleEvent) { e.PreventDefault() })
 	// Showing is explicit: the app never gains windows by activation or focus.
 	d.window.OnHide(func() { a.visibility(false) })
+	// A tool window remembers its place when it closes, while the frame is
+	// still readable, and never re-places itself when it is only focused.
+	d.window.OnClose(func(*mygo.CloseEvent) {
+		if a.rememberJSONPlace(d) {
+			a.save()
+		}
+	})
+	d.window.OnMove(func() { a.observeJSONMove(d) })
 	d.window.OnClosed(func() { a.removeJSONDocument(d); a.visibility(false); a.refreshAwake() })
 	d.window.OnResize(func() {
 		width, height := d.window.Size()
@@ -120,6 +128,10 @@ func (a *application) buildJSONWindow(d *jsonDocument) {
 		path := e.Paths[0]
 		a.replaceJSONFile(d, path)
 	})
+	// A new window is placed while it is hidden, before the page loads: the
+	// display under the pointer, its remembered seat, and the first stagger
+	// slot no live window of that display uses.
+	a.placeJSONWindow(d)
 	_ = d.window.Page().LoadURL("/")
 }
 
@@ -197,6 +209,11 @@ func (a *application) focusJSONWindow(d *jsonDocument) {
 	d.window.Focus()
 }
 func (a *application) destroyJSON(d *jsonDocument) {
+	// Destroy emits no OnClose, so the place is read here, before the window
+	// is gone; a document without a frame has nothing to read.
+	if a.rememberJSONPlace(d) {
+		a.save()
+	}
 	if d.window != nil {
 		d.window.Destroy()
 	} else {
