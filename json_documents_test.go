@@ -132,18 +132,16 @@ func TestJSONToggleAndShortcutRecorder(t *testing.T) {
 	a.unregisterShortcut = func(acc string) { delete(registry, acc) }
 	a.registerAwakeShortcut()
 	a.registerJSONShortcut()
-	a.config.JSONEnabled = false
-	a.changeJSONEnabled()
+	a.changeJSONEnabled(false)
 	if registry[a.config.JSONShortcut] || len(a.applicationMenu("en").Items()) != 2 {
 		t.Fatal("disabled tile kept entry or shortcut")
 	}
 	if !registry[a.config.AwakeShortcut] {
 		t.Fatal("JSON disabled awake shortcut")
 	}
-	a.config.JSONEnabled = true
-	a.changeJSONEnabled()
-	a.page = 3
-	tt := ui.NewTester(a.view, 720, 368)
+	a.changeJSONEnabled(true)
+	a.page = settingsJSON
+	tt := ui.NewTester(a.view, 720, 388)
 	tt.SetLocale("en")
 	if err := tt.Click("Record JSON shortcut"); err != nil {
 		t.Fatal(err)

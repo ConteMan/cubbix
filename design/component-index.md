@@ -153,9 +153,9 @@ R08 新增 `S8d6wZ`（R08 JSON split window）母版，保留统一窗口标题�
 
 ## R16 设置页按模块组织
 
-[四张中英浅深评审板](rounds/R16-2026-11-05-模块分组/README.md) 全部用既有 reusable 组合：品牌 lockup `Mj9CO`、窗口控件 `aGCdB`、图标 `O4KJZC` / `lPkvC` / `Hvppf` / `H8TPWq` / `uTgqT` / `O8Imme` / `vjo7q` / `YeT0w` / `Faq6Y` / `bVN9P` / `MTEP9`。本轮没有新增母版，页面级构图（图标方块导航、头部卡片、分组标题、状态点、三级说明行）都以 inline frame 画出，规则写在 007 §2–§3 与 [design/README](../README.md#设置页按模块组织r16)；实现时这四处应各自落成一个视图函数，而不是复制节点。
+[四张中英浅深评审板](rounds/R16-2026-11-05-模块分组/README.md) 全部用既有 reusable 组合：品牌 lockup `Mj9CO`、窗口控件 `aGCdB`、图标 `O4KJZC` / `lPkvC` / `Hvppf` / `H8TPWq` / `uTgqT` / `O8Imme` / `vjo7q` / `YeT0w` / `Faq6Y` / `bVN9P` / `MTEP9`。本轮没有新增母版，页面级构图（图标方块导航、头部卡片、分组标题、状态点、三级说明行）都以 inline frame 画出，规则写在 007 §2–§3 与 [design/README](../README.md#设置页按模块组织r16)；实现时这四处各自落在 `settings_view.go` 的视图函数里（`pageHeader`、`groupTitle`、`statusDot`、`settingsRow`），不是复制节点。
 
 
 ### 第3版工程实现补充
 
-007第3版已将②说明行定为通用 `settingsRow`／`rowHeight` 组件：64 DIP，首行固定28、第二行18、间距2、上下各8；可选前置图标与任意右控件，说明跨控件下方，长句省略且提供全文tooltip／Description。008可复用这一API，其当前位置行仍按008使用③。禁用主体与可聚焦info为兄弟节点。实现尺寸用720×388，覆盖008五行和关于就绪卡片；三条新Size Token在实施时统一增加。本次未改pen、未新增reusable或改变ref计数。
+007第3版已将②说明行定为通用 `settingsRow`／`rowHeight` 组件：64 DIP，首行固定28、第二行18、间距2、上下各8；可选前置图标与任意右控件，说明跨控件下方，长句省略且提供全文tooltip／Description。008可复用这一API，其当前位置行仍按008使用③。禁用主体与可聚焦info为兄弟节点。实现尺寸用720×388，覆盖008五行和关于就绪卡片；三条新 Size Token（`SizePageHeader` 56、`SizeGroupHeader` 24、`SizeNavItem` 40）已写入 `tokens.json`、`tokens.go` 与 `cubbix.pen` 变量，共 126 条，R16 画板本身不重绘。没有新增 reusable 或改变 ref 计数。

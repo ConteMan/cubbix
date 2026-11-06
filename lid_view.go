@@ -17,7 +17,7 @@ func (a *application) panelLid(c *ui.Context, t tokenValues, locale string) {
 	ui.Row(c).FillWidth().Height(t.SizeNavHeight).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
 		ui.Icon(c, icon("laptop")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).Tooltip(tip)
 		ui.Box(c).Grow(1)
-		if a.lidBusy || s.state == lidEnabling || s.state == lidStopping {
+		if a.moduleBusy() || s.state == lidEnabling || s.state == lidStopping {
 			ui.Icon(c, icon("loader-circle")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).Label(text("R05Lid"))
 			return
 		}
@@ -47,7 +47,11 @@ func (a *application) lidRecoveryControls(c *ui.Context, t tokenValues, locale s
 		})
 	}
 }
-func (a *application) lidBatteryRow(c *ui.Context, t tokenValues, locale string) {
+
+// lidBatteryRow is the only setting of the keep awake module. Its rule needs a
+// second line: it is longer than one glance and the control is wide.
+func (a *application) lidBatteryRow(c *ui.Context, t tokenValues, locale string, disabled bool) {
+	text := func(key string) string { return a.text(locale, key) }
 	value := a.config.AwakeLidBatteryMin
 	index := 1
 	for i, n := range []int{10, 20, 30} {
@@ -55,15 +59,27 @@ func (a *application) lidBatteryRow(c *ui.Context, t tokenValues, locale string)
 			index = i
 		}
 	}
-	a.row(c, t, a.text(locale, "LidBatteryLimit"), func() {
+	opts := settingsRowOpts{icon: "gauge", level: 2, hint: text("LidBatteryHint")}
+	a.settingsRow(c, t, text("LidBatteryLimit"), opts, func() {
 		parts := ui.SegmentedBase(c.Key("lid-battery-limit"), &index, 3)
-		parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(a.text(locale, "LidBatteryLimit")).OnChange(func() { a.config.AwakeLidBatteryMin = []int{10, 20, 30}[index]; a.save() }).Children(func() {
+		track := parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("LidBatteryLimit")).Description(text("LidBatteryHint"))
+		if disabled {
+			track = track.Disabled(true).Opacity(t.OpacityDisabled)
+		} else {
+			track = track.OnChange(func() {
+				a.config.AwakeLidBatteryMin = []int{10, 20, 30}[index]
+				a.save()
+			})
+		}
+		track.Children(func() {
 			for i, label := range []string{"10%", "20%", "30%"} {
 				bg, color := t.ColorTransparent, t.ColorText
 				if i == index {
 					bg, color = t.ColorAccent, t.ColorOnAccent
 				}
-				parts.Segment(i).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(bg)).FocusRing(true).Label(label).Children(func() { ui.Text(c, label).FontSize(t.FontSizeBody).TextColor(ui.Hex(color)) })
+				parts.Segment(i).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(bg)).FocusRing(true).Label(label).Children(func() {
+					ui.Text(c, label).FontSize(t.FontSizeBody).TextColor(ui.Hex(color))
+				})
 			}
 		})
 	})

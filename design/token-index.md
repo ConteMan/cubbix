@@ -1,6 +1,6 @@
 # Token 与 Go 标识符映射
 
-当前共 132 个样式 Token（颜色 39、数值 87、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」，快捷键反馈尺寸见「R11 追加」，面板外观与拖动参考线见「R14 追加」，命令面板打磨的键帽、滚动条外置距离与占位符内缩见「R15 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
+当前共 135 个样式 Token（颜色 39、数值 90、字体 6），R04 的 74 项保留；JSON 语法色与分栏尺寸见「R07 追加」，命令面板尺寸见「R09 追加」，卡片面板尺寸见「R10 追加」，快捷键反馈尺寸见「R11 追加」，面板外观与拖动参考线见「R14 追加」，命令面板打磨的键帽、滚动条外置距离与占位符内缩见「R15 追加」，设置页按模块组织见「R16 追加」。名称保留为合法 Go 导出标识符；cubbix.pen 为设计事实源，tokens.json 为可审计快照。
 
 ## 黑白灰 accent 组
 
@@ -194,3 +194,13 @@ ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代�
 `ColorPaletteSearch` 是搜索行自己的底色，不共用 `ColorControl`：面板表面是半透明的 `ColorMenuSurface`，深色下 `ColorControl`（#3B3B3B）与面板几乎分不开。深色取 #464646 是占位文字仍达 AA 的上限（`ColorTextSecondary` 对 #464646 为 4.53:1），与深色面板的对比由 1.28:1 提到 1.49:1；浅色与 `ColorControl` 同值。
 
 九个 Token 已同步 `design/cubbix.pen` 变量、`design/tokens.json` 与 `tokens.go`（`SizePaletteScrollbarSlot` 12 在第二轮反馈中退役）；画板见 [R15 交付](rounds/R15-2026-11-05-命令面板打磨/README.md)。
+## R16 追加
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `SizePageHeader` | number | `56` |
+| `SizeGroupHeader` | number | `24` |
+| `SizeNavItem` | number | `40` |
+
+设置页按「模块」重组见 [规格 007](../docs/specs/007-设置按模块组织.md) 与 [R16 交付](rounds/R16-2026-11-05-模块分组/README.md)。头部卡片 56 高：28 图标方块 + 名称 13/600 与页面说明 12 上下排（19.5 + 2 + 18 = 39.5，加 `2 × Space8`），向上留足 56。分组标题 24 高、12/500 次要色。导航项 40 高（图标方块 28 + `2 × Space6` 的上下留白），不复用 32 高的 `SizeNavHeight`（历史设计仍引用旧值）。三个 Token 已同步 `design/cubbix.pen` 变量、`design/tokens.json` 与 `tokens.go`；R16 第 2 版画板按组合几何绘制，不重绘。
+>

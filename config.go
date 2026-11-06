@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pelletier/go-toml/v2"
 )
@@ -81,6 +82,9 @@ type Config struct {
 	RestoreAwake       bool                   `toml:"restore_awake,omitempty"`
 	WindowWidth        int                    `toml:"window_width,omitempty"`
 	WindowHeight       int                    `toml:"window_height,omitempty"`
+	// UpdateLastCheck is the UTC RFC3339Nano time of the last finished update
+	// check. It is optional: an older config simply has none.
+	UpdateLastCheck string `toml:"update_last_check,omitempty"`
 }
 
 func defaultConfig() Config {
@@ -139,9 +143,25 @@ func loadConfig(path string) (Config, error) {
 	if config.AwakeLidBatteryMin != 10 && config.AwakeLidBatteryMin != 20 && config.AwakeLidBatteryMin != 30 {
 		config.AwakeLidBatteryMin = 20
 	}
+	config.UpdateLastCheck = normalizeCheckedAt(config.UpdateLastCheck, time.Now())
 	config.PaletteFavorites = normalizePaletteFavorites(config.PaletteFavorites)
 	config.PaletteRecents = normalizePaletteRecents(config.PaletteRecents)
 	return config, nil
+}
+
+// normalizeCheckedAt accepts only a plausible completion time. An invalid,
+// pre-epoch or future value is dropped in memory; the file is left untouched
+// and the next save rewrites it.
+func normalizeCheckedAt(value string, now time.Time) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	parsed, err := time.Parse(time.RFC3339Nano, value)
+	if err != nil || parsed.Before(time.Unix(0, 0)) || parsed.After(now) {
+		return ""
+	}
+	return parsed.UTC().Format(time.RFC3339Nano)
 }
 
 // putPaletteSeat remembers where the palette sits on a display. An older

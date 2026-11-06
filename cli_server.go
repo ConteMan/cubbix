@@ -371,6 +371,11 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 	}
 	switch req.Action {
 	case cli.ActionAwake, cli.ActionAwakeStop, cli.ActionAwakeToggle:
+		// A close in flight is busy, not disabled: the module is still on until
+		// the transaction has confirmed the system is safe.
+		if a.moduleClosing {
+			return cli.Failure(cli.CodeBusy)
+		}
 		if !a.config.AwakeEnabled {
 			return cli.Failure(cli.CodeDisabled)
 		}
@@ -410,6 +415,9 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 	result := cli.Result{V: cli.Protocol, OK: err == nil}
 	if err != nil {
 		result.Code = cliErrorKey(err)
+		if err.Error() == "ModuleBusy" {
+			result.Code = cli.CodeBusy
+		}
 		result.Message = a.text(locale, result.Code)
 	} else {
 		result.Message = a.cliMessage(locale, req.Action)
@@ -544,19 +552,22 @@ func lidStateName(state lidState) string {
 	return "off"
 }
 
-// settingsPageIndex maps the page name to the app's page number.
+// settingsPageIndex maps the page name to the app's page number. "tiles" is
+// kept as an alias for the keep awake page; it is part of the protocol.
 func settingsPageIndex(page string, a *application) (int, bool) {
 	switch page {
 	case "", "general":
-		return 0, true
+		return settingsGeneral, true
 	case "about":
-		return 1, true
-	case "tiles":
-		return 2, true
+		return settingsAbout, true
+	case "awake", "tiles":
+		return settingsAwake, true
+	case "json":
+		return settingsJSON, true
 	case "shortcuts":
-		return 3, true
+		return settingsShortcuts, true
 	}
-	return 0, false
+	return settingsGeneral, false
 }
 
 // applyCLIAsync installs a completion only for this request. enableLid captures

@@ -52,39 +52,39 @@ func (a *application) setupJSON() {
 }
 
 func (a *application) registerJSONShortcut() {
-	if !a.config.JSONEnabled {
-		return
-	}
-	a.jsonShortcutError = ""
-	if reason := a.shortcutConflict(a.config.JSONShortcut, "json"); reason != "" {
-		a.jsonShortcutError = reason
-		return
-	}
-	if err := a.registerShortcut(a.config.JSONShortcut, a.newJSONWindow); err != nil {
-		a.jsonShortcutError = "ShortcutUnavailable"
-	}
+	a.registerSlot("json", a.config.JSONShortcut, a.config.JSONEnabled, a.newJSONWindow)
 }
 
-func (a *application) changeJSONEnabled() {
-	if a.config.JSONEnabled {
+// changeJSONEnabled closes or opens the JSON module. A close releases only the
+// shortcut this slot registered, removes the window menu, then destroys every
+// window; unsaved text goes with it, as tool windows always do.
+func (a *application) changeJSONEnabled(target bool) {
+	a.cancelShortcutRecording()
+	if target == a.config.JSONEnabled {
+		a.invalidateWindow()
+		return
+	}
+	if target {
+		a.config.JSONEnabled = true
 		a.registerJSONShortcut()
 		if a.refreshApplicationMenu != nil {
 			a.refreshApplicationMenu()
 		}
 		a.save()
-		a.refreshAwake()
+		a.refreshModuleSurfaces()
 		return
 	}
 	a.config.JSONEnabled = false
+	a.releaseOwnedShortcut("json")
+	a.clearSlotError("json")
 	if a.refreshApplicationMenu != nil {
 		a.refreshApplicationMenu()
 	}
-	a.unregisterShortcut(a.config.JSONShortcut)
 	for _, d := range append([]*jsonDocument(nil), a.jsonDocuments...) {
 		a.destroyJSON(d)
 	}
 	a.save()
-	a.refreshAwake()
+	a.refreshModuleSurfaces()
 }
 
 func (a *application) buildJSONWindow(d *jsonDocument) {
@@ -146,6 +146,9 @@ func (a *application) newJSONWindowBlank() {
 // openJSONText opens a document whose text arrives in a cubbix:// URL. It
 // never reads the clipboard and never evaluates the text.
 func (a *application) openJSONText(text string) {
+	if !a.config.JSONEnabled {
+		return
+	}
 	if a.paletteOpenJSON != nil {
 		a.paletteOpenJSON(text)
 		return
@@ -339,8 +342,13 @@ type jsonBridge struct{ app *application }
 func (b *jsonBridge) document(ctx context.Context) (*jsonDocument, error) {
 	var d *jsonDocument
 	mygo.RunOnMain(func() {
+		// A closed module has no documents: a late bridge call must not
+		// resurrect a window that the module close already destroyed.
+		if !b.app.config.JSONEnabled {
+			return
+		}
 		d = b.app.jsonForWindow(mygo.CallerWindow(ctx))
-		if d != nil && mygo.CallerPage(ctx) != d.window.Page() {
+		if d != nil && (d.closed || mygo.CallerPage(ctx) != d.window.Page()) {
 			d = nil
 		}
 	})

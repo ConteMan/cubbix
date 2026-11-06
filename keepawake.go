@@ -43,6 +43,7 @@ type awakeController struct {
 	mu         sync.Mutex
 	state      awakeState
 	child      awakeChild
+	childDone  chan struct{}
 	generation uint64
 	launch     func([]string) (awakeChild, error)
 	alive      func(int, string) bool
@@ -96,7 +97,55 @@ func (k *awakeController) stopLocked() {
 		_ = k.child.Kill()
 		k.child = nil
 	}
+	k.childDone = nil
 	k.state.Active = false
+}
+
+// stopConfirmed stops the ordinary assertion without touching the lid and
+// reports whether the child process really exited. A caller that already
+// restored the system sleep setting uses this instead of stop, so the lid
+// restore is never repeated from beforeStop.
+func (k *awakeController) stopConfirmed(timeout time.Duration) error {
+	k.mu.Lock()
+	child, done := k.child, k.childDone
+	generation := k.generation
+	k.state.Session.Lid = false
+	k.mu.Unlock()
+	if child != nil {
+		if err := child.Kill(); err != nil {
+			// Wait may already have observed an exit. Otherwise retain the
+			// child and its active state so another close can retry the kill.
+			select {
+			case <-done:
+			default:
+				return errors.New("AwakeStopError")
+			}
+		}
+		if done == nil {
+			return errors.New("AwakeStopError")
+		}
+	}
+	if done != nil {
+		timer := time.NewTimer(timeout)
+		defer timer.Stop()
+		select {
+		case <-done:
+		case <-timer.C:
+			return errors.New("AwakeStopError")
+		}
+	}
+	k.mu.Lock()
+	if k.generation != generation {
+		k.mu.Unlock()
+		return errors.New("AwakeStopError")
+	}
+	k.generation++
+	k.child, k.childDone = nil, nil
+	k.state.Active = false
+	k.state.Error = ""
+	k.mu.Unlock()
+	k.notify()
+	return nil
 }
 func (k *awakeController) setBeforeStop(fn func()) { k.mu.Lock(); k.beforeStop = fn; k.mu.Unlock() }
 func (k *awakeController) stop() {
@@ -132,11 +181,16 @@ func (k *awakeController) start(s awakeSession) error {
 		return err
 	}
 	k.child = child
+	done := make(chan struct{})
+	k.childDone = done
 	generation := k.generation
 	k.mu.Unlock()
 	k.notify()
 	go func() {
 		err := child.Wait()
+		// Signal process exit before notification: the main thread may be
+		// confirming this stop while changed is waiting for RunOnMain.
+		close(done)
 		k.mu.Lock()
 		if generation != k.generation {
 			k.mu.Unlock()

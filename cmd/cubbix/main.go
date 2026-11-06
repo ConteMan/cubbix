@@ -243,9 +243,9 @@ func fallbackMessage(code, command string) string {
 		return "Cubbix is quitting."
 	case cli.CodeDisabled:
 		if strings.HasPrefix(command, "json") {
-			return "The JSON tile is disabled."
+			return "The JSON module is disabled."
 		}
-		return "The keep-awake tile is disabled."
+		return "The keep-awake module is disabled."
 	case cli.CodeBusy:
 		return "Cubbix is busy with another request."
 	}

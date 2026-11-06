@@ -245,7 +245,7 @@
   "CLIInstalled": "Installed: %s",
   "CLIInstallFailed": "Couldn't install the command line tool",
   "CLILinkConflict": "%s already exists; not replaced",
-  "CLILinkBroken": "The link is broken. Turn it off and on to rebuild it",
+  "CLILinkBroken": "The link target is unavailable. Turn it off to remove it, then restore the app before enabling it again",
   "CLITranslocated": "Move Cubbix to Applications first",
   "CLILinkHint": "Symlinks ~/.local/bin/cubbix",
   "CLIStatusJSON": "JSON windows: %d",
@@ -295,5 +295,8 @@
   "LidStaleSetting": "The last lid session did not restore sleep on lid close.",
   "LidMaxDuration": "Reached the 12-hour limit. The lid session ended.",
   "LidInstallNeeded": "Lid sessions need one system authorization.",
-  "LidHelperUpdate": "The helper needs an update"
+  "LidHelperUpdate": "The helper needs an update",
+  "UpdateScheduleOff": "Automatic checks are off",
+  "AwakeStopError": "Could not stop keep-awake. Try again",
+  "ModuleBusy": "The module is busy. Try again shortly"
 }

@@ -248,19 +248,9 @@ func nativeWindowChecks(a *application, dir string) error {
 			return fmt.Errorf("native card panel close left stale application state")
 		}
 		a.tray = nil
-		const shortcut = "Ctrl+Alt+Cmd+Shift+F10"
-		if err := mygo.GlobalShortcut.Register(shortcut, func() {}); err != nil {
-			return fmt.Errorf("native global shortcut registration: %w", err)
-		}
-		defer mygo.GlobalShortcut.Unregister(shortcut)
-		if !mygo.GlobalShortcut.IsRegistered(shortcut) {
-			return fmt.Errorf("global shortcut not registered")
-		}
-		mygo.GlobalShortcut.Unregister(shortcut)
-		if mygo.GlobalShortcut.IsRegistered(shortcut) {
-			return fmt.Errorf("global shortcut not released")
-		}
-		fmt.Println("PASS: three hidden frameless dialogs; a hidden card panel flyout anchored to the tray with a content-driven size; native template icon swapping with no bound tray menu; global shortcut registered and released")
+		// Shortcut ownership is covered by injected registries in unit tests.
+		// Hidden native checks must never claim a real global combination.
+		fmt.Println("PASS: three hidden frameless dialogs; a hidden card panel flyout anchored to the tray with a content-driven size; native template icon swapping with no bound tray menu; no global shortcut registration")
 		a.window.Close()
 		return policy(1)
 	}); err != nil {

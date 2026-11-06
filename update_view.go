@@ -1,11 +1,40 @@
 package main
 
 import (
+	"log"
 	"os"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/markdown"
 )
+
+// syncUpdateCheck persists the completion time of the last check. The manager
+// records it on a worker; only the main thread writes configuration, and only
+// when the stored value really differs. A save failure keeps the in-memory time
+// and shows ConfigError on the window, so the header never claims a restart
+// would find it.
+func (a *application) syncUpdateCheck() {
+	checked := a.updates.lastCheck()
+	if checked.IsZero() {
+		return
+	}
+	value := checked.UTC().Format(time.RFC3339Nano)
+	if a.config.UpdateLastCheck == value {
+		return
+	}
+	config := a.config
+	config.UpdateLastCheck = value
+	if err := saveConfig(a.path, config); err != nil {
+		a.settingsError = "ConfigError"
+		log.Print(err)
+		return
+	}
+	a.config.UpdateLastCheck = value
+	if a.settingsError == "ConfigError" {
+		a.settingsError = ""
+	}
+}
 
 func (a *application) changeAutomaticUpdates() {
 	a.save()
@@ -13,17 +42,20 @@ func (a *application) changeAutomaticUpdates() {
 }
 
 func (a *application) restartUpdate() {
-	if a.updates.snapshot().Phase != updateReady || a.relaunch == nil {
+	if a.moduleClosing || a.updates.snapshot().Phase != updateReady || a.relaunch == nil {
 		return
 	}
 	s := a.awake.snapshot()
 	if a.lid != nil {
 		if err := a.lid.stop(); err != nil {
-			a.settingsError = "LidRestoreFailed"
+			a.moduleError = "LidRestoreFailed"
 			a.notifyLid("LidRestoreFailed")
 			return
 		}
 	}
+	// The user asked for the restart, so a check that just finished is saved
+	// before the process goes away.
+	a.syncUpdateCheck()
 	a.config.RestoreAwake = s.Active
 	a.config.AwakeSession = nil
 	if s.Active {
@@ -38,21 +70,6 @@ func (a *application) restartUpdate() {
 	// Relaunch runs the normal quit sequence after persisting awake state.
 	a.quitting = true
 	a.relaunch()
-}
-
-func (a *application) updateIndicator(c *ui.Context, t tokenValues, update updateState, text func(string) string) {
-	switch {
-	case update.ErrorKey != "":
-		ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(update.ErrorKey))
-	case update.Phase == updateChecking || update.Phase == updateDownloading:
-		key := "TooltipChecking"
-		if update.Phase == updateDownloading {
-			key = "UpdateDownloading"
-		}
-		ui.Spinner(c).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).Tooltip(text(key))
-	case update.Phase == updateCurrent:
-		ui.Icon(c, icon("check")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorText)).Tooltip(text("TooltipSuccess"))
-	}
 }
 
 func (a *application) readyCard(c *ui.Context, t tokenValues, text func(string) string) {

@@ -133,6 +133,9 @@ type tokenValues struct {
 	SizeScrollbar                float32
 	SizePaletteScrollbarOverhang float32
 	SizePalettePlaceholderInset  float32
+	SizePageHeader               float32
+	SizeGroupHeader              float32
+	SizeNavItem                  float32
 }
 
 func tokens(dark bool, language string) tokenValues {
@@ -264,6 +267,9 @@ func tokens(dark bool, language string) tokenValues {
 		SizeScrollbar:                6,
 		SizePaletteScrollbarOverhang: 9,
 		SizePalettePlaceholderInset:  6,
+		SizePageHeader:               56,
+		SizeGroupHeader:              24,
+		SizeNavItem:                  40,
 	}
 	if dark {
 		t.ColorWindow = "#202020"

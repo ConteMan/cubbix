@@ -154208,6 +154208,18 @@
       "type": "number",
       "value": 32
     },
+    "SizeNavItem": {
+      "type": "number",
+      "value": 40
+    },
+    "SizeGroupHeader": {
+      "type": "number",
+      "value": 24
+    },
+    "SizePageHeader": {
+      "type": "number",
+      "value": 56
+    },
     "SizeSegmentHeight": {
       "type": "number",
       "value": 28

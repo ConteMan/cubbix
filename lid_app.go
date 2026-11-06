@@ -111,7 +111,7 @@ func (a *application) enableLid(end time.Time, authorize bool) error {
 	return nil
 }
 func (a *application) toggleLid() {
-	if a.lid == nil || a.lidBusy {
+	if a.lid == nil || a.lidBusy || a.moduleClosing || !a.config.AwakeEnabled {
 		return
 	}
 	if a.lid.snapshot().state == lidOn {
@@ -143,7 +143,7 @@ func (a *application) toggleLid() {
 
 // syncLid is the common convergence point, including child exits and polling.
 func (a *application) syncLid() {
-	if a.lid == nil {
+	if a.lid == nil || a.moduleClosing {
 		return
 	}
 	state := a.awake.snapshot()
@@ -156,6 +156,9 @@ func (a *application) syncLid() {
 	}
 }
 func (a *application) stopAwake() error {
+	if a.moduleClosing {
+		return errors.New("ModuleBusy")
+	}
 	if a.lid != nil {
 		if err := a.lid.stop(); err != nil {
 			a.notifyLid("LidRestoreFailed")
@@ -168,7 +171,7 @@ func (a *application) stopAwake() error {
 	return nil
 }
 func (a *application) pollLid() {
-	if a.lid == nil || !a.lid.Available() || a.lidBusy || a.lidPolling {
+	if a.lid == nil || !a.lid.Available() || a.lidBusy || a.lidPolling || a.moduleClosing {
 		return
 	}
 	if a.lidAsync {
@@ -217,7 +220,7 @@ func (a *application) notifyLid(key string) {
 	}
 }
 func (a *application) forceLid() {
-	if a.lid == nil || a.lidBusy {
+	if a.lid == nil || a.lidBusy || a.moduleClosing {
 		return
 	}
 	err := a.lid.force()

@@ -412,6 +412,13 @@ func knownShortcutConflict(acc string) string {
 	return ""
 }
 func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
+	if !a.shortcutRecording {
+		return
+	}
+	if a.moduleClosing {
+		a.cancelShortcutRecording()
+		return
+	}
 	if key == ui.KeyEscape {
 		a.cancelShortcutRecording()
 		return
@@ -420,94 +427,55 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 	if acc == "" {
 		return
 	}
+	slot := a.shortcutSlotFor(a.shortcutTarget)
+	if !a.shortcutSlotEnabled(slot.Target) {
+		// The module closed while its recorder listened: drop the draft and
+		// save nothing, so a released combination never reaches the config.
+		a.cancelShortcutRecording()
+		return
+	}
 	a.shortcutDraft = acc
 	if reason := knownShortcutConflict(acc); reason != "" {
 		a.shortcutError = reason
 		return
 	}
-	slot := a.shortcutSlotFor(a.shortcutTarget)
 	if reason := a.shortcutConflict(acc, slot.Target); reason != "" {
 		a.shortcutError = reason
 		return
 	}
-	if slot.Enabled {
-		if err := a.registerShortcut(acc, slot.Callback); err != nil {
-			a.shortcutError = "ShortcutUnavailable"
-			return
-		}
-		if acc != slot.Acc && !a.shortcutSuspended {
-			a.unregisterShortcut(slot.Acc)
-		}
+	// The combination has to register before it is stored: a slot the system
+	// refuses keeps the value it had, and the recorder stays open to retry.
+	if err := a.registerShortcut(acc, slot.Callback); err != nil {
+		a.shortcutError = "ShortcutUnavailable"
+		return
 	}
+	a.ownShortcut(slot.Target, acc)
 	switch slot.Target {
 	case "json":
 		a.config.JSONShortcut = acc
-		a.jsonShortcutError = ""
 	case "palette":
 		a.config.PaletteShortcut = acc
-		a.paletteShortcutError = ""
 	case "panel":
 		a.config.PanelShortcut = acc
-		a.panelShortcutError = ""
 	default:
 		a.config.AwakeShortcut = acc
-		a.shortcutError = ""
 	}
-	if slot.Target != "awake" {
-		a.registerAwakeShortcut()
-	}
-	if slot.Target != "json" {
-		a.registerJSONShortcut()
-	}
-	if slot.Target != "palette" {
-		a.registerPaletteShortcut()
-	}
-	if slot.Target != "panel" {
-		a.registerPanelShortcut()
-	}
-	a.shortcutSuspended = false
+	// Every slot let go when the recording started, so the commit re-registers
+	// all of them; a combination that no longer registers keeps its diagnostic.
 	a.shortcutRecording = false
-	a.shortcutError = ""
+	a.shortcutSuspended = false
 	a.shortcutDraft = ""
+	a.shortcutTarget = ""
+	a.clearSlotError(slot.Target)
+	a.restoreShortcuts()
 	a.save()
 	a.refreshAwake()
-	if a.refreshApplicationMenu != nil {
-		a.refreshApplicationMenu()
-	}
-}
-func (a *application) awakeSettings(c *ui.Context, t tokenValues, locale string) {
-	text := func(key string) string { return a.text(locale, key) }
-	if a.page == 2 {
-		a.row(c, t, text("Awake"), func() {
-			a.switchControl(c, t, "awake-enabled", text("Awake"), &a.config.AwakeEnabled, a.changeAwakeEnabled)
-		})
-		ui.Divider(c)
-		a.lidBatteryRow(c, t, locale)
-		ui.Divider(c)
-		a.row(c, t, text("JSON"), func() {
-			a.switchControl(c, t, "json-enabled", text("JSON"), &a.config.JSONEnabled, a.changeJSONEnabled)
-		})
-	} else {
-		a.shortcutSettingsRow(c, t, locale, "awake")
-		ui.Divider(c)
-		a.shortcutSettingsRow(c, t, locale, "json")
-		ui.Divider(c)
-		a.shortcutSettingsRow(c, t, locale, "palette")
-		ui.Divider(c)
-		a.shortcutSettingsRow(c, t, locale, "panel")
-		ui.Divider(c)
-		a.feedbackModeRow(c, t, locale)
-		ui.Divider(c)
-		a.feedbackPositionRow(c, t, locale)
-	}
+	a.refreshMenuAfterShortcut()
 }
 
-// feedbackModeRow picks the feedback channel: an on-screen hint, a system
-// notification, or nothing. A refused notification shows an alert beside the
-// notification segment without changing the stored choice.
 func (a *application) feedbackModeRow(c *ui.Context, t tokenValues, locale string) {
 	text := func(key string) string { return a.text(locale, key) }
-	a.row(c, t, text("FeedbackMode"), func() {
+	a.settingsRow(c, t, text("FeedbackMode"), settingsRowOpts{level: 3, tooltip: text("FeedbackModeInfo")}, func() {
 		parts := ui.SegmentedBase(c.Key("feedback-mode"), &a.feedbackMode, 3)
 		parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("FeedbackMode")).OnChange(a.changeFeedbackMode).Children(func() {
 			for index, key := range []string{"FeedbackHint", "FeedbackNotification", "FeedbackOff"} {
@@ -521,13 +489,7 @@ func (a *application) feedbackModeRow(c *ui.Context, t tokenValues, locale strin
 			}
 		})
 		if a.feedback != nil && a.feedback.denied && a.feedbackModeName() == "notification" {
-			reason := text("FeedbackDenied")
-			alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(reason).Description(reason)
-			ui.TooltipBase(c, alert, func(tip ui.Element) {
-				tip.Padding(t.Space6, t.Space8).Radius(t.RadiusControl).Background(ui.Hex(t.ColorTooltip)).TextColor(ui.Hex(t.ColorTooltipText)).Children(func() {
-					ui.Text(c, reason).FontSize(t.FontSizeSmall)
-				})
-			})
+			a.alertIcon(c, t, text("FeedbackDenied"))
 		}
 	})
 }
@@ -538,16 +500,11 @@ func (a *application) feedbackModeRow(c *ui.Context, t tokenValues, locale strin
 func (a *application) feedbackPositionRow(c *ui.Context, t tokenValues, locale string) {
 	text := func(key string) string { return a.text(locale, key) }
 	editable := a.feedbackPositionEditable()
-	row := ui.Row(c).FillWidth().Height(t.SizeRowHeight).AlignItems(ui.Center).Gap(t.Space8)
-	if !editable {
-		row = row.Disabled(true).Opacity(t.OpacityDisabled)
-	}
-	row.Children(func() {
-		ui.Text(c, text("FeedbackPosition")).FontSize(t.FontSizeBody).Grow(1)
+	a.settingsRow(c, t, text("FeedbackPosition"), settingsRowOpts{level: 3, tooltip: text("FeedbackPositionInfo"), disabled: !editable}, func() {
 		parts := ui.SegmentedBase(c.Key("feedback-position"), &a.feedbackCorner, 5)
 		track := parts.Track.Size(t.SizeFeedbackPositionWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("FeedbackPosition"))
 		if !editable {
-			track = track.Disabled(true)
+			track = track.Disabled(true).Opacity(t.OpacityDisabled)
 		} else {
 			track = track.OnChange(a.changeFeedbackCorner)
 		}
@@ -590,25 +547,50 @@ func (a *application) feedbackPositionGlyph(c *ui.Context, t tokenValues, index 
 }
 
 func (a *application) beginShortcutRecording() { a.beginTileShortcutRecording("awake") }
+
+// beginTileShortcutRecording takes every registered combination away so the
+// recorder can hear any key. A closed module has nothing to record: its slot is
+// released, so opening the recorder is refused instead of writing a value that
+// could never register.
 func (a *application) beginTileShortcutRecording(target string) {
+	if a.moduleClosing || !a.shortcutSlotEnabled(target) {
+		return
+	}
 	if a.shortcutRecording {
 		a.cancelShortcutRecording()
 	}
-	// Recording listens for any combination, so every slot must let go first.
+	a.moduleCancelRecording()
+	a.suspendedShortcut = make(map[string]string)
 	for _, slot := range a.shortcutSlots() {
-		if slot.Enabled {
-			a.unregisterShortcut(slot.Acc)
+		if !slot.Enabled {
+			continue
 		}
+		if owned := a.ownedShortcut(slot.Target); owned != "" {
+			a.suspendedShortcut[slot.Target] = owned
+		}
+		a.releaseOwnedShortcut(slot.Target)
 	}
 	a.shortcutSuspended = true
 	a.shortcutTarget = target
 	a.shortcutRecording = true
 	a.shortcutDraft = ""
 	a.shortcutError = ""
-	if a.refreshApplicationMenu != nil {
-		a.refreshApplicationMenu()
-	}
+	a.refreshMenuAfterShortcut()
 }
+
+// moduleCancelRecording ends a recording without restoring it when the module
+// it belongs to is about to change. The change itself restores what survives.
+func (a *application) moduleCancelRecording() {
+	if !a.shortcutRecording {
+		return
+	}
+	a.shortcutRecording = false
+	a.shortcutSuspended = false
+	a.shortcutDraft = ""
+	a.shortcutError = ""
+	a.shortcutTarget = ""
+}
+
 func (a *application) cancelShortcutRecording() {
 	if !a.shortcutRecording {
 		return
@@ -616,13 +598,65 @@ func (a *application) cancelShortcutRecording() {
 	a.shortcutRecording = false
 	a.shortcutDraft = ""
 	a.shortcutError = ""
+	a.shortcutTarget = ""
 	if a.shortcutSuspended {
-		a.registerAwakeShortcut()
-		a.registerJSONShortcut()
-		a.registerPaletteShortcut()
-		a.registerPanelShortcut()
+		a.restoreShortcuts()
 	}
 	a.shortcutSuspended = false
+	a.refreshMenuAfterShortcut()
+}
+
+// restoreShortcuts re-registers every slot that should own one now. A slot
+// that no longer holds its combination (because another slot took it over)
+// keeps its diagnostic and never steals the registration back.
+func (a *application) restoreShortcuts() {
+	suspended := a.suspendedShortcut
+	a.suspendedShortcut = nil
+	slots := a.shortcutSlots()
+	resumed := make(map[string]bool)
+	// Restore actual incumbents before retrying slots that merely remember
+	// the same combination. Otherwise both configs appear to conflict and
+	// canceling an unrelated recording can silently release the incumbent.
+	for _, slot := range slots {
+		acc := suspended[slot.Target]
+		if acc == "" || !slot.Enabled || !sameShortcut(acc, slot.Acc) || a.ownedShortcut(slot.Target) != "" {
+			continue
+		}
+		resumed[slot.Target] = true
+		a.clearSlotError(slot.Target)
+		taken := false
+		for _, owned := range a.registeredShortcut {
+			if sameShortcut(acc, owned) {
+				taken = true
+				break
+			}
+		}
+		if taken {
+			a.setSlotError(slot.Target, "JSONShortcutConflict")
+		} else if err := a.registerShortcut(acc, slot.Callback); err != nil {
+			a.setSlotError(slot.Target, "ShortcutUnavailable")
+		} else {
+			a.ownShortcut(slot.Target, acc)
+		}
+	}
+	for _, slot := range slots {
+		if !resumed[slot.Target] {
+			a.registerSlot(slot.Target, slot.Acc, slot.Enabled, slot.Callback)
+		}
+	}
+}
+
+func (a *application) shortcutSlotEnabled(target string) bool {
+	switch target {
+	case "awake":
+		return a.config.AwakeEnabled
+	case "json":
+		return a.config.JSONEnabled
+	}
+	return true
+}
+
+func (a *application) refreshMenuAfterShortcut() {
 	if a.refreshApplicationMenu != nil {
 		a.refreshApplicationMenu()
 	}
@@ -646,12 +680,42 @@ func (a *application) shortcutReasonKey(errorKey, target, acc string) string {
 	return errorKey
 }
 
+// slotError is the diagnostic stored for one slot.
+func (a *application) slotError(target string) string {
+	switch target {
+	case "awake":
+		return a.shortcutError
+	case "json":
+		return a.jsonShortcutError
+	case "palette":
+		return a.paletteShortcutError
+	case "panel":
+		return a.panelShortcutError
+	}
+	return ""
+}
+
+func (a *application) clearSlotError(target string) {
+	switch target {
+	case "awake":
+		a.shortcutError = ""
+	case "json":
+		a.jsonShortcutError = ""
+	case "palette":
+		a.paletteShortcutError = ""
+	case "panel":
+		a.panelShortcutError = ""
+	}
+}
+
+// shortcutSettingsRow draws one shortcut: the recorder, and a level-3 anchor
+// that explains either a conflict or why the shortcut is released.
 func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, target string) {
 	text := func(key string) string { return a.text(locale, key) }
-	label, recordKey := "R05ShortcutLabel", "ShortcutRecordAction"
+	label, recordKey, moduleKey := "R05ShortcutLabel", "ShortcutRecordAction", "Awake"
 	acc := a.config.AwakeShortcut
 	if target == "json" {
-		label, recordKey = "JSONShortcutLabel", "JSONRecordShortcut"
+		label, recordKey, moduleKey = "JSONShortcutLabel", "JSONRecordShortcut", "JSON"
 		acc = a.config.JSONShortcut
 	}
 	if target == "palette" {
@@ -662,27 +726,46 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 		label, recordKey = "PanelShortcutLabel", "PanelRecordShortcut"
 		acc = a.config.PanelShortcut
 	}
+	enabled := a.shortcutSlotEnabled(target)
+	recordable := enabled && !a.moduleClosing
 	active := a.shortcutRecording && a.shortcutTarget == target
 	errorKey := ""
 	if a.shortcutTarget == target || a.shortcutTarget == "" && target == "awake" {
 		errorKey = a.shortcutError
 	}
-	if target == "json" && errorKey == "" {
-		errorKey = a.jsonShortcutError
+	if errorKey == "" {
+		errorKey = a.slotError(target)
 	}
-	if target == "palette" && errorKey == "" {
-		errorKey = a.paletteShortcutError
+	// The reason must name the slot the recorder is showing, not the stored
+	// value it has not committed yet.
+	shown := acc
+	if active && a.shortcutDraft != "" {
+		shown = a.shortcutDraft
 	}
-	if target == "panel" && errorKey == "" {
-		errorKey = a.panelShortcutError
+	reason := ""
+	if !enabled {
+		// A released shortcut says so; a stale conflict is no longer true.
+		reason = fmt.Sprintf(text("ModuleShortcutOff"), text(moduleKey))
+		errorKey = ""
+	} else if a.moduleClosing {
+		reason = text("ModuleBusy")
+		errorKey = ""
+	} else if errorKey != "" {
+		reason = text(a.shortcutReasonKey(errorKey, target, shown))
 	}
-	a.row(c, t, text(label), func() {
+	opts := settingsRowOpts{level: 3, tooltip: reason, disabled: !recordable}
+	a.settingsRow(c, t, text(label), opts, func() {
 		if active && a.shortcutDraft != "" {
 			acc = a.shortcutDraft
 		}
-		e := ui.ButtonBase(c.Key(target+"-recorder")).Size(t.SizeR05RecorderWidth, t.SizeSegmentHeight).PaddingX(t.Space12).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).FocusRing(true).Label(text(recordKey)).OnClick(func() { a.beginTileShortcutRecording(target) })
+		e := ui.ButtonBase(c.Key(target+"-recorder")).Size(t.SizeR05RecorderWidth, t.SizeSegmentHeight).PaddingX(t.Space12).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).FocusRing(true).Label(text(recordKey))
+		if recordable {
+			e = e.OnClick(func() { a.beginTileShortcutRecording(target) })
+		} else {
+			e = e.Disabled(true).Opacity(t.OpacityDisabled)
+		}
 		e.HandleInput(func(ev ui.InputEvent) bool {
-			if active && ev.Kind == ui.InputKeyDown {
+			if active && recordable && ev.Kind == ui.InputKeyDown {
 				a.recordShortcut(ev.Mods, ev.Key)
 				return true
 			}
@@ -698,8 +781,12 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 			})
 		})
 		if errorKey != "" {
-			alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().Label(text(errorKey)).Description(text(errorKey))
-			shortcutTooltip(c, t, alert, text(a.shortcutReasonKey(errorKey, target, acc)), acc)
+			// The alert is labelled with the combination and the cause, so
+			// assistive technology hears the same sentence the row explains.
+			// Its bubble uses the shared keycap style.
+			alert := ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Focusable().
+				Label(strings.Join(shortcutSymbols(acc), " ") + " " + reason)
+			shortcutTooltip(c, t, alert, reason, acc)
 		}
 	})
 }

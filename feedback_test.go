@@ -94,22 +94,19 @@ func testFeedback(a *application) *feedbackHarness {
 	return h
 }
 
-// The shortcuts page grew to six rows; both tiles pages must still fit the
-// minimum window without changing its height when switched.
+// The shortcuts page has two groups of two rows; both module pages must still
+// fit the shared minimum window without resizing when the page switches.
 func TestFeedbackShortcutsPageHeight(t *testing.T) {
 	tk := tokens(false, "zh-CN")
-	if content := 6*tk.SizeRowHeight + 5*tk.StrokeHairline; content != 293 {
-		t.Fatalf("six rows take %v; want 293", content)
-	}
-	shortcuts := settingsHeight(tk, 3, false)
-	if shortcuts != 344 {
-		t.Fatalf("shortcuts page = %d; want 344", shortcuts)
+	shortcuts := settingsNaturalHeight(tk, settingsShortcuts, true, false, false, false, false)
+	if shortcuts != 380 {
+		t.Fatalf("shortcuts page = %d; want 380", shortcuts)
 	}
 	// The window keeps its own minimum size, so switching to a shorter page
-	// never resizes it, and six rows fit inside that minimum.
+	// never resizes it, and the shortcuts page fits inside that minimum.
 	width, minimum := settingsMinimumSize()
-	if width != 720 || minimum < shortcuts {
-		t.Fatalf("minimum window = %dx%d; six rows need %d", width, minimum, shortcuts)
+	if width != 720 || minimum < shortcuts || minimum != 388 {
+		t.Fatalf("minimum window = %dx%d; shortcuts need %d", width, minimum, shortcuts)
 	}
 }
 

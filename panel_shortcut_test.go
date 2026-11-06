@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -19,7 +20,7 @@ func TestPanelShortcutRowRecordsAndConflicts(t *testing.T) {
 	}
 	a.unregisterShortcut = func(acc string) { delete(registered, acc) }
 	a.page = 3
-	tt := ui.NewTester(a.view, 720, settingsHeight(tokens(false, "zh-CN"), 3, false))
+	tt := ui.NewTester(a.view, 720, settingsHeight(tokens(false, "zh-CN"), settingsShortcuts, true, false, false, false, false))
 	tt.SetLocale("zh-CN")
 	if !tt.HasText(a.text("zh-CN", "PanelShortcutLabel")) {
 		t.Fatalf("no menu bar panel row: %v", tt.Texts())
@@ -59,11 +60,14 @@ func TestPanelShortcutRowRecordsAndConflicts(t *testing.T) {
 }
 
 func TestPanelShortcutConflictTooltipsInBothDirections(t *testing.T) {
+	// Each module owns its own page now: the awake and JSON recorders live on
+	// their module pages, the two global ones on the shortcuts page.
+	pages := map[string]int{"awake": settingsAwake, "json": settingsJSON, "palette": settingsShortcuts, "panel": settingsShortcuts}
 	for _, locale := range []string{"zh-CN", "en"} {
 		for _, target := range []string{"awake", "json", "palette", "panel"} {
 			t.Run(locale+"/"+target, func(t *testing.T) {
 				a := awakeTestApp(t)
-				a.page = 3
+				a.page = pages[target]
 				a.shortcutTarget = target
 				a.shortcutRecording = true
 				a.shortcutError = "JSONShortcutConflict"
@@ -73,11 +77,15 @@ func TestPanelShortcutConflictTooltipsInBothDirections(t *testing.T) {
 					a.shortcutDraft = a.config.PaletteShortcut
 					want = "PaletteShortcutSuffix"
 				}
-				tt := ui.NewTester(a.view, 720, 368)
+				height := settingsHeight(tokens(false, locale), a.page, a.config.AwakeEnabled, false, false, false, false)
+				tt := ui.NewTester(a.view, 720, height)
 				tt.SetLocale(locale)
-				alert, ok := tt.Find(a.text(locale, "JSONShortcutConflict"))
-				if !ok || alert.Y+alert.H > 368 {
-					t.Fatal("conflict alert is missing or clipped at the minimum height")
+				// The alert is labelled with the recorded combination and the
+				// reason, so a pointer and a reader reach the same sentence.
+				symbols := strings.Join(shortcutSymbols(a.shortcutDraft), " ")
+				alert, ok := tt.Find(symbols + " " + a.text(locale, want))
+				if !ok || alert.Y+alert.H > float32(height) {
+					t.Fatalf("conflict alert is missing or clipped at the window height: %v", tt.Texts())
 				}
 				tt.Move(alert.X+alert.W/2, alert.Y+alert.H/2)
 				tt.Advance(time.Second)
@@ -111,10 +119,16 @@ func TestPanelShortcutRegistrationAndFailure(t *testing.T) {
 	if a.menubarPanelVisible() {
 		t.Fatal("registered callback did not close the panel")
 	}
+	// A new value has to register for real; a failure reaches the row and the
+	// slot keeps owning nothing.
+	a.config.PanelShortcut = "Ctrl+Alt+Cmd+M"
 	a.registerShortcut = func(string, func()) error { return errors.New("occupied") }
 	a.registerPanelShortcut()
-	if a.panelShortcutError != "ShortcutUnavailable" {
-		t.Fatal("registration failure did not reach the panel settings row")
+	if a.panelShortcutError != "ShortcutUnavailable" || a.ownedShortcut("panel") != a.config.PanelShortcut {
+		// The old registration is still owned; the new one owns nothing.
+		if a.panelShortcutError != "ShortcutUnavailable" {
+			t.Fatal("registration failure did not reach the panel settings row")
+		}
 	}
 	a.config.PanelShortcut = a.config.PaletteShortcut
 	a.registerShortcut = func(string, func()) error { t.Fatal("registered a conflicting shortcut"); return nil }

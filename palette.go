@@ -157,6 +157,28 @@ func (a *application) hidePalette() {
 	}
 }
 
+// invalidatePaletteAfterModuleChange refreshes a cached palette after a module
+// switch: a cached action page of a command that no longer exists falls back to
+// the command list, and the rows are rebuilt on the next frame.
+func (a *application) invalidatePaletteAfterModuleChange() {
+	p := a.palette
+	if p == nil {
+		return
+	}
+	if p.mode == paletteActionMode && p.actionsCommand != nil {
+		if findCommand(a.commands(), p.actionsCommand.ID) == nil {
+			p.mode = paletteCommandMode
+			p.actionsCommand = nil
+			p.actionsRequest = request{}
+			p.runError = ""
+			p.selectionKey = ""
+			p.scrollSelection = true
+		}
+	}
+	p.selectionKey = ""
+	a.invalidatePalette()
+}
+
 func (a *application) invalidatePalette() {
 	if a.palette != nil && a.palette.window != nil {
 		a.palette.window.Invalidate()
@@ -235,26 +257,12 @@ func palettePosition(display mygo.Display, width, height int, topOffset float32)
 // registerPaletteShortcut registers ⌥. and reports conflicts with the other
 // three slots in the settings row.
 func (a *application) registerPaletteShortcut() {
-	a.paletteShortcutError = ""
-	if reason := a.shortcutConflict(a.config.PaletteShortcut, "palette"); reason != "" {
-		a.paletteShortcutError = reason
-		return
-	}
-	if err := a.registerShortcut(a.config.PaletteShortcut, a.togglePalette); err != nil {
-		a.paletteShortcutError = "ShortcutUnavailable"
-	}
+	a.registerSlot("palette", a.config.PaletteShortcut, true, a.togglePalette)
 }
 
 // registerPanelShortcut registers ⌃⌥⌘P, the menu bar card panel's toggle.
 func (a *application) registerPanelShortcut() {
-	a.panelShortcutError = ""
-	if reason := a.shortcutConflict(a.config.PanelShortcut, "panel"); reason != "" {
-		a.panelShortcutError = reason
-		return
-	}
-	if err := a.registerShortcut(a.config.PanelShortcut, a.toggleMenubarPanel); err != nil {
-		a.panelShortcutError = "ShortcutUnavailable"
-	}
+	a.registerSlot("panel", a.config.PanelShortcut, true, a.toggleMenubarPanel)
 }
 
 // --- Selection and execution ---
@@ -349,6 +357,15 @@ func (a *application) runPalette() {
 	}
 	p.runError = ""
 	if p.mode == paletteActionMode {
+		if p.actionsCommand != nil && findCommand(a.commands(), p.actionsCommand.ID) == nil {
+			a.invalidatePaletteAfterModuleChange()
+			return
+		}
+		if a.moduleClosing && p.actionsCommand != nil && p.actionsCommand.Tile == "awake" {
+			p.runError, p.errorKey = "ModuleBusy", "ModuleBusy"
+			a.invalidatePalette()
+			return
+		}
 		action := p.selectedAction()
 		if action == nil || action.Run == nil {
 			return
@@ -379,6 +396,19 @@ func (a *application) runPalette() {
 	}
 	cmd := p.selectedCommand()
 	if cmd == nil || cmd.Run == nil {
+		return
+	}
+	// Rows are cached from the frame that built them. Re-read the registry so a
+	// module closed in the meantime cannot run a stale closure.
+	if live := findCommand(a.commands(), cmd.ID); live == nil {
+		p.runError = ""
+		p.selectionKey = ""
+		a.invalidatePalette()
+		return
+	}
+	if a.moduleClosing && cmd.Tile == "awake" {
+		p.runError, p.errorKey = "ModuleBusy", "ModuleBusy"
+		a.invalidatePalette()
 		return
 	}
 	req := p.request
@@ -815,14 +845,18 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 		if path != "" {
 			return paletteURLRequest{}, false
 		}
-		page := 0
+		// "tiles" stays an alias for the keep awake page: the value is part of
+		// the URL contract even though the interface calls it a module now.
+		page := settingsGeneral
 		switch strings.ToLower(query.Get("page")) {
-		case "tiles":
-			page = 2
+		case "awake", "tiles":
+			page = settingsAwake
+		case "json":
+			page = settingsJSON
 		case "shortcuts":
-			page = 3
+			page = settingsShortcuts
 		case "about":
-			page = 1
+			page = settingsAbout
 		}
 		return paletteURLRequest{Kind: "settings", Page: page}, true
 	}
@@ -842,7 +876,9 @@ func (a *application) handleURL(raw string) {
 			return
 		}
 		a.urlDispatch(func() {
-			if a.quitting || strings.HasPrefix(request.Kind, "awake") && !a.config.AwakeEnabled || request.Kind == "json.new" && !a.config.JSONEnabled {
+			// A deep link stays silent: a module that is off, or is closing,
+			// drops the request instead of opening the settings window.
+			if a.quitting || strings.HasPrefix(request.Kind, "awake") && (!a.config.AwakeEnabled || a.moduleClosing) || request.Kind == "json.new" && !a.config.JSONEnabled {
 				return
 			}
 			if err := a.runURL(request); err != nil {
@@ -901,6 +937,11 @@ func lidDurationStated(session awakeSession, now time.Time) bool {
 }
 
 func (a *application) runURL(req paletteURLRequest) error {
+	// A close in flight keeps the committed state. A new awake request must not
+	// race it, but a settings page or another module may still open.
+	if a.moduleClosing && strings.HasPrefix(req.Kind, "awake") {
+		return errors.New("ModuleBusy")
+	}
 	switch req.Kind {
 	case "awake":
 		session := a.selectedSession()
@@ -976,8 +1017,7 @@ func (a *application) runURL(req paletteURLRequest) error {
 	case "palette":
 		a.showPalette()
 	case "settings":
-		a.page, a.notesPage = req.Page, false
-		a.invalidateWindow()
+		a.selectSettingsPage(req.Page)
 		a.show()
 	}
 	return nil

@@ -175,8 +175,7 @@ func TestLidRestoreFailureBlocksStopDisableAndUpdate(t *testing.T) {
 	if !a.lid.markerExists() || a.lid.snapshot().state != lidRestoreFailed || !a.lid.canForce() {
 		t.Fatal("liability lost")
 	}
-	a.config.AwakeEnabled = false
-	a.changeAwakeEnabled()
+	a.changeAwakeEnabled(false)
 	if !a.config.AwakeEnabled || svc.unregisters > 0 {
 		t.Fatal("unsafe unregister")
 	}

@@ -22,6 +22,7 @@ func awakeTestApp(t *testing.T) *application {
 	}
 	a.registerShortcut = func(string, func()) error { return nil }
 	a.unregisterShortcut = func(string) {}
+	a.moduleAsync = false
 	a.awake, _ = fakeAwake(time.Now())
 	a.awake.changed = a.awakeChanged
 	// No test opens a hint window or asks for notification permission.
@@ -48,8 +49,7 @@ func TestAwakeTileToggle(t *testing.T) {
 	if !strings.HasPrefix(a.awakeStatus("zh-CN", time.Now()), a.text("zh-CN", "R05Screen")) {
 		t.Fatalf("running status = %q", a.awakeStatus("zh-CN", time.Now()))
 	}
-	a.config.AwakeEnabled = false
-	a.changeAwakeEnabled()
+	a.changeAwakeEnabled(false)
 	if a.awake.snapshot().Active {
 		t.Fatal("disabled tile is still active")
 	}
@@ -118,7 +118,8 @@ func TestAwakeDialogInputsAndSelection(t *testing.T) {
 }
 func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 	a := awakeTestApp(t)
-	a.page = 3
+	// The keep awake shortcut lives on its own module page.
+	a.page = settingsAwake
 	var registered, removed []string
 	a.registerShortcut = func(acc string, _ func()) error { registered = append(registered, acc); return nil }
 	a.unregisterShortcut = func(acc string) { removed = append(removed, acc) }
@@ -131,7 +132,7 @@ func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 		return false
 	}
 	old := a.config.AwakeShortcut
-	tt := ui.NewTester(a.view, 720, 368)
+	tt := ui.NewTester(a.view, 720, 388)
 	tt.SetLocale("en")
 	if err := tt.Click("Record keep awake shortcut"); err != nil {
 		t.Fatal(err)

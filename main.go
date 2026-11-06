@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
-	"math"
 	"os"
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+	"time"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/i18n"
@@ -88,24 +88,40 @@ type application struct {
 	shortcutRecording      bool
 	shortcutDraft          string
 	shortcutError          string
-	stopAwakeServices      context.CancelFunc
-	notifyBattery          func(string, string)
-	policy                 mygo.ActivationPolicy
-	config                 Config
-	path                   string
-	catalog                *i18n.Catalog
-	window                 *mygo.Window
-	tray                   *mygo.Tray
-	page                   int
-	language               int
-	updates                *updateManager
-	notesPage              bool
-	relaunch               func()
-	settingsError          string
-	quitting               bool
-	quitGuard              *quitWatchdog
-	setLogin               func(bool) error
-	setLocale              func(string)
+	// registeredShortcut records the combination each slot really owns. A
+	// close may only release the combination it registered, never one another
+	// slot took over in the meantime.
+	registeredShortcut map[string]string
+	// suspendedShortcut preserves the real owners across recorder suspension.
+	// Failed slots may remember the same key, but cannot take it on resume.
+	suspendedShortcut map[string]string
+	// moduleClosing is true while a keep-awake close runs on a worker. New
+	// requests are refused until it settles; the committed state stays on.
+	moduleClosing bool
+	moduleAsync   bool
+	moduleError   string
+	// moduleGeneration lets a late completion see it no longer owns the state.
+	moduleGeneration uint64
+	// focusModuleSwitch asks the next frame to focus the module switch once.
+	focusModuleSwitch bool
+	stopAwakeServices context.CancelFunc
+	notifyBattery     func(string, string)
+	policy            mygo.ActivationPolicy
+	config            Config
+	path              string
+	catalog           *i18n.Catalog
+	window            *mygo.Window
+	tray              *mygo.Tray
+	page              int
+	language          int
+	updates           *updateManager
+	notesPage         bool
+	relaunch          func()
+	settingsError     string
+	quitting          bool
+	quitGuard         *quitWatchdog
+	setLogin          func(bool) error
+	setLocale         func(string)
 }
 
 func newApplication(path string) (*application, error) {
@@ -121,7 +137,7 @@ func newApplication(path string) (*application, error) {
 	if err != nil {
 		return nil, err
 	}
-	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
+	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), moduleAsync: true, notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
 	a.createPaletteWindow = a.buildPaletteWindow
 	a.createPaletteGuide = a.buildPaletteGuideWindow
 	a.paletteDisplays = mygo.Screen.Displays
@@ -199,42 +215,6 @@ func (a *application) changeLogin() {
 		}
 	}
 	a.save()
-}
-
-func settingsHeight(t tokenValues, page int, hasError bool) int {
-	content := 3*t.SizeRowHeight + 2*t.StrokeHairline // general: language, login, CLI
-	if page == 1 {
-		content = t.FontSizeSmall*t.LineHeightBody + t.Space8 + 3*t.SizeRowHeight + 2*t.StrokeHairline
-	}
-	if page == 2 {
-		content = 3*t.SizeRowHeight + 2*t.StrokeHairline
-	}
-	if page == 3 {
-		// Shortcuts: awake, JSON, command palette, menu bar panel, feedback,
-		// hint position.
-		rows := float32(6)
-		content = rows*t.SizeRowHeight + (rows-1)*t.StrokeHairline
-	}
-	if hasError {
-		content += t.Space8 + t.SizeIcon
-	}
-	height := max(t.SizeWindowMinHeight, content+2*t.Space24)
-	return int(math.Ceil(float64(height/t.Space4)) * float64(t.Space4))
-}
-
-// The ready card and a settings error are the tallest non-scrolling page,
-// unless the six-row shortcuts page with an error icon is taller: that one is
-// wider than the window may get, so the minimum follows it.
-func settingsMinimumSize() (int, int) {
-	t := tokens(false, "zh-CN")
-	height := settingsHeight(t, 3, true)
-	height = max(height, settingsHeight(t, 1, true)+int(2*t.Space24+t.SizeRowHeight))
-	return int(t.SizeWindowWidth), height
-}
-
-func settingsSize(width, height int) (int, int) {
-	minWidth, minHeight := settingsMinimumSize()
-	return max(minWidth, width), max(minHeight, height)
 }
 
 func (a *application) invalidateWindow() {
@@ -451,12 +431,16 @@ func (a *application) ready() {
 	})
 	a.updates.changed = func() {
 		mygo.RunOnMain(func() {
+			// The check time is recorded on a worker; only the main thread
+			// writes configuration, and only when the stored value differs.
+			a.syncUpdateCheck()
 			if a.quitting {
 				return
 			}
 			a.invalidateWindow()
 		})
 	}
+	a.updates.restoreCheck(a.config.UpdateLastCheck, time.Now())
 	a.prepareLid()
 	a.startAwakeServices()
 	a.registerJSONShortcut()
@@ -513,6 +497,8 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	a.awake.setBeforeStop(nil)
 	a.awake.stop()
 	mygo.GlobalShortcut.UnregisterAll()
+	// A check that finished just before quitting is still worth remembering.
+	a.syncUpdateCheck()
 	a.updates.close()
 }
 
@@ -573,8 +559,6 @@ func applyTheme(c *ui.Context) (string, tokenValues) {
 
 func (a *application) view(c *ui.Context) {
 	locale, t := applyTheme(c)
-	update := a.updates.snapshot()
-	text := func(key string) string { return a.text(locale, key) }
 	if !a.shortcutRecording {
 		c.OnShortcut(ui.Cmd, ui.KeyW, a.hide)
 	}
@@ -583,112 +567,14 @@ func (a *application) view(c *ui.Context) {
 		c.OnShortcut(ui.Cmd, ui.KeyQ, func() { mygo.App.Quit() })
 	}
 	ui.Row(c).Fill().Background(ui.Hex(t.ColorWindow)).Children(func() {
-		ui.Column(c).Width(t.SizeSidebarWidth).FillHeight().Padding(t.Space12).Gap(t.Space16).Background(ui.Hex(t.ColorSidebar)).DragWindow().Children(func() {
-			// The native traffic lights own the first 12 high slot inside the
-			// sidebar padding; the brand follows one Space16 below them.
-			ui.Box(c).Height(t.Space12)
-			// The mark sits left of the name, both on one 20-high line.
-			ui.Row(c).Height(t.Space20).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
-				ui.Icon(c, brand(t.ColorText)).Size(t.SizeBrandMark, t.SizeBrandMark).TextColor(ui.Hex(t.ColorText))
-				ui.Text(c, "Cubbix").FontSize(t.FontSizeBody).FontWeight(fontWeight(t.FontWeightSemibold)).LineHeight(t.LineHeightBody)
-			})
-			ui.Column(c).FillWidth().Gap(t.Space4).Children(func() {
-				for _, navIndex := range []int{0, 2, 3, 1} {
-					item := []struct{ key, glyph string }{{"General", "settings-2"}, {"About", "info"}, {"R05Tiles", "blocks"}, {"R05Shortcuts", "keyboard"}}[navIndex]
-					index := navIndex
-					selected := index == a.page
-					background := ui.Hex(t.ColorTransparent)
-					if selected {
-						background = ui.Hex(t.ColorAccentSoft)
-					}
-					button := ui.ButtonBase(c.Key(item.key)).Height(t.SizeNavHeight).FillWidth().Radius(t.RadiusCard).FocusRing(true)
-					if !selected && button.Hovered() {
-						background = ui.Hex(t.ColorNavHover)
-					}
-					button.Background(background).OnClick(func() {
-						a.cancelShortcutRecording()
-						a.page, a.notesPage = index, false
-						a.invalidateWindow()
-					}).Children(func() {
-						ui.Row(c).Fill().AlignItems(ui.Center).PaddingX(t.Space8).Gap(t.Space8).Children(func() {
-							ui.Icon(c, icon(item.glyph)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-							ui.Text(c, text(item.key)).FontSize(t.FontSizeBody)
-						})
-					})
-				}
-			})
-		})
+		a.sidebar(c, t, locale)
 		ui.Column(c).Grow(1).FillHeight().Padding(t.Space24).AlignItems(ui.Center).DragWindow().Children(func() {
-			ui.Column(c).FillWidth().MaxWidth(t.SizeContentMaxWidth).FillHeight().Gap(t.Space8).Children(func() {
+			ui.Column(c).FillWidth().MaxWidth(t.SizeContentMaxWidth).FillHeight().Children(func() {
 				if a.notesPage {
 					a.notesView(c)
 					return
 				}
-				if a.page == 1 {
-					ui.Text(c, text("UpdateGroup")).Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary))
-				}
-				ui.Column(c).FillWidth().PaddingX(t.Space16).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
-					if a.page >= 2 {
-						a.awakeSettings(c, t, locale)
-					} else if a.page == 0 {
-						a.row(c, t, text("Language"), func() {
-							parts := ui.SegmentedBase(c.Key("language"), &a.language, 3)
-							parts.Track.Size(t.SizeLanguageSelectorWidth, t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("Language")).OnChange(a.changeLanguage).Children(func() {
-								for index, label := range []string{text("System"), text("Chinese"), text("English")} {
-									color, background := t.ColorText, t.ColorTransparent
-									if index == a.language {
-										color, background = t.ColorOnAccent, t.ColorAccent
-									}
-									parts.Segment(index).Grow(1).FillHeight().Radius(t.RadiusControl).Background(ui.Hex(background)).FocusRing(true).Children(func() { ui.Text(c, label).FontSize(t.FontSizeBody).TextColor(ui.Hex(color)) })
-								}
-							})
-						})
-						ui.Divider(c)
-						a.row(c, t, text("LaunchAtLogin"), func() { a.switchControl(c, t, "login", text("LaunchAtLogin"), &a.config.OpenAtLogin, a.changeLogin) })
-						a.cliSettingsRow(c, t, locale)
-					} else {
-						a.row(c, t, text("Version"), func() {
-							ui.Text(c, version()).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorTextSecondary))
-							ui.ButtonBase(c.Key("check")).Size(t.SizeIconButton, t.SizeIconButton).Disabled(update.Phase == updateChecking || update.Phase == updateDownloading || update.Phase == updateReady).Label(text("CheckAction")).Tooltip(text("CheckAction")).OnClick(func() { a.updates.request(true) }).Children(func() {
-								ui.Icon(c, icon("refresh-cw")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-							})
-							a.updateIndicator(c, t, update, text)
-						})
-						ui.Divider(c)
-						ui.ButtonBase(c.Key("notes")).FillWidth().Height(t.SizeRowHeight).FocusRing(true).OnClick(a.showNotes).Children(func() {
-							ui.Row(c).Fill().AlignItems(ui.Center).Gap(t.Space8).Children(func() {
-								ui.Text(c, text("WhatsNew")).FontSize(t.FontSizeBody).Grow(1)
-								ui.Icon(c, icon("chevron-right")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).Tooltip(text("WhatsNew"))
-								if update.NotesError != "" {
-									ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(text(update.NotesError))
-								}
-							})
-						})
-						ui.Divider(c)
-						a.row(c, t, text("AutomaticUpdates"), func() {
-							a.switchControl(c, t, "auto", text("AutomaticUpdates"), &a.config.AutomaticUpdates, a.changeAutomaticUpdates)
-						})
-					}
-				})
-				if a.page == 1 && update.Phase == updateReady {
-					ui.Box(c).Height(t.Space8)
-					a.readyCard(c, t, text)
-				}
-				errorKey := a.settingsError
-				if errorKey == "" {
-					errorKey = a.awake.snapshot().Error
-				}
-				if errorKey != "" {
-					message := text(errorKey)
-					if errorKey == "CLILinkConflict" {
-						if paths, ok := cliPathsFor(); ok {
-							message = strings.ReplaceAll(message, "%s", paths.link)
-						} else {
-							message = text("CLIInstallFailed")
-						}
-					}
-					ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).Tooltip(message)
-				}
+				a.settingsView(c, t, locale)
 			})
 		})
 	})
@@ -703,20 +589,27 @@ func (a *application) view(c *ui.Context) {
 	}
 }
 
-func (a *application) switchControl(c *ui.Context, t tokenValues, key, label string, value *bool, changed func()) {
+// switchControl draws one switch. The caller binds a value for this frame only:
+// a module switch never writes the config before its transaction commits. It
+// returns its element so a caller can ask for the focus once.
+func (a *application) switchControl(c *ui.Context, t tokenValues, key, label string, value *bool, changed func(), tip string, disabled bool) ui.Element {
 	background, thumb, align := t.ColorControl, t.ColorTextSecondary, ui.Start
 	if *value {
 		background, thumb, align = t.ColorAccent, t.ColorThumb, ui.End
 	}
-	ui.SwitchBase(c.Key(key), value).Size(t.SizeSwitchWidth, t.SizeSwitchHeight).Radius(t.RadiusControl).Background(ui.Hex(background)).Padding(t.Space2).Justify(align).AlignItems(ui.Center).Label(label).FocusRing(true).OnChange(changed).Children(func() {
+	base := ui.SwitchBase(c.Key(key), value).Size(t.SizeSwitchWidth, t.SizeSwitchHeight).Radius(t.RadiusControl).Background(ui.Hex(background)).Padding(t.Space2).Justify(align).AlignItems(ui.Center).Label(label).FocusRing(true)
+	if tip != "" {
+		// The tooltip is also the accessible description: a truncated level-2
+		// line must never lose its full text.
+		base = base.Tooltip(tip).Description(tip)
+	}
+	if disabled {
+		base = base.Disabled(true).Opacity(t.OpacityDisabled)
+	} else {
+		base = base.OnChange(changed)
+	}
+	return base.Children(func() {
 		ui.Box(c).Size(t.SizeSwitchThumb, t.SizeSwitchThumb).Radius(t.SizeSwitchThumb / 2).Background(ui.Hex(thumb))
-	})
-}
-
-func (a *application) row(c *ui.Context, t tokenValues, label string, right func()) {
-	ui.Row(c).FillWidth().Height(t.SizeRowHeight).AlignItems(ui.Center).Gap(t.Space8).Children(func() {
-		ui.Text(c, label).FontSize(t.FontSizeBody).Grow(1)
-		right()
 	})
 }
 

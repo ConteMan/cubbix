@@ -65,7 +65,7 @@ func (a *application) panelAwakeCard(c *ui.Context, t tokenValues, locale string
 				background, thumb, align = t.ColorAccent, t.ColorThumb, ui.End
 				label = text("R05Stop")
 			}
-			ui.SwitchBase(c.Key("panel-awake"), &on).Size(t.SizeSwitchWidth, t.SizeSwitchHeight).Radius(t.RadiusControl).Background(ui.Hex(background)).Padding(t.Space2).Justify(align).AlignItems(ui.Center).Label(label).FocusRing(true).OnChange(a.panelToggleAwake).Children(func() {
+			ui.SwitchBase(c.Key("panel-awake"), &on).Size(t.SizeSwitchWidth, t.SizeSwitchHeight).Radius(t.RadiusControl).Background(ui.Hex(background)).Padding(t.Space2).Justify(align).AlignItems(ui.Center).Label(label).FocusRing(true).Disabled(a.moduleBusy()).OnChange(a.panelToggleAwake).Children(func() {
 				ui.Box(c).Size(t.SizeSwitchThumb, t.SizeSwitchThumb).Radius(t.SizeSwitchThumb / 2).Background(ui.Hex(thumb))
 			})
 		})
@@ -95,7 +95,7 @@ func (a *application) panelModeSwitch(c *ui.Context, t tokenValues, locale strin
 		mode = 1
 	}
 	parts := ui.SegmentedBase(c.Key("panel-mode"), &mode, 2)
-	parts.Track.FillWidth().Height(t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("Awake")).OnChange(func() {
+	parts.Track.FillWidth().Height(t.SizeSegmentHeight).Padding(t.Space2).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("Awake")).Disabled(a.moduleBusy()).OnChange(func() {
 		a.panelSetMode(mode)
 	}).Children(func() {
 		for index, label := range []string{text("R05Screen"), text("R05Tasks")} {
@@ -116,7 +116,7 @@ func (a *application) panelPills(c *ui.Context, t tokenValues, locale string) {
 	text := func(key string) string { return a.text(locale, key) }
 	preset, presetOK := a.panelPreset(time.Now())
 	running := a.awake.snapshot().Active
-	row := ui.Row(c).FillWidth().Height(t.SizeButtonHeight).Gap(t.Space6).FocusGroup(ui.Horizontal)
+	row := ui.Row(c).FillWidth().Height(t.SizeButtonHeight).Gap(t.Space6).FocusGroup(ui.Horizontal).Disabled(a.moduleBusy())
 	row.Children(func() {
 		for _, pill := range []struct {
 			minutes int
@@ -163,7 +163,7 @@ func (a *application) panelStatus(c *ui.Context, t tokenValues, locale string) {
 		}
 		ui.Text(c, a.menubarPanelStatusLine(locale, time.Now())).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).Grow(1).MinWidth(0).SingleLine().Ellipsis("…")
 		if a.lidCapable() && a.awake.snapshot().Active && !a.awake.snapshot().Session.Lid {
-			ui.ButtonBase(c.Key("lid-hint")).Size(t.SizeIcon, t.SizeIcon).Label(a.text(locale, "R05LidHint")).Tooltip(a.text(locale, "R05LidHint")).FocusRing(true).OnClick(a.toggleLid).Children(func() {
+			ui.ButtonBase(c.Key("lid-hint")).Size(t.SizeIcon, t.SizeIcon).Label(a.text(locale, "R05LidHint")).Tooltip(a.text(locale, "R05LidHint")).FocusRing(true).Disabled(a.moduleBusy()).OnClick(a.toggleLid).Children(func() {
 				ui.Icon(c, icon("laptop")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 			})
 		}

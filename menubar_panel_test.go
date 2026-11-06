@@ -398,14 +398,12 @@ func TestMenubarPanelTileToggles(t *testing.T) {
 	if tt.HasText(a.text("en", "Awake")) || tt.HasText(a.text("en", "JSONShortcutLabel")) {
 		t.Fatal("a disabled tile still draws")
 	}
-	a.config.AwakeEnabled = true
-	a.changeAwakeEnabled()
+	a.changeAwakeEnabled(true)
 	tt.Frame()
 	if !tt.HasText(a.text("en", "Awake")) || tt.HasText(a.text("en", "PanelEmpty")) {
 		t.Fatalf("the awake tile did not come back: %v", tt.Texts())
 	}
-	a.config.JSONEnabled = true
-	a.changeJSONEnabled()
+	a.changeJSONEnabled(true)
 	tt.Frame()
 	if !tt.HasText(a.text("en", "JSONShortcutLabel")) {
 		t.Fatalf("the JSON tile did not come back: %v", tt.Texts())

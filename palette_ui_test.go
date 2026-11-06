@@ -123,17 +123,33 @@ func TestPaletteViewArrowKeysSkipHeaders(t *testing.T) {
 	if a.palette.selectionKey != "json.new" {
 		t.Fatalf("default selection = %q", a.palette.selectionKey)
 	}
-	tt.Key(0, ui.KeyUp)
-	if a.palette.selectionKey != "json.window.2" {
-		t.Fatalf("Up selection = %q", a.palette.selectionKey)
+	// Up walks the command rows that are listed above the selection and never
+	// stops on a group title.
+	tt.Frame()
+	var keys []string
+	for _, row := range a.palette.rows {
+		if row.Kind == paletteRowCommand {
+			keys = append(keys, row.Key)
+		}
 	}
-	tt.Key(0, ui.KeyUp)
-	if a.palette.selectionKey != "json.window.1" {
-		t.Fatalf("Up selection = %q", a.palette.selectionKey)
+	index := -1
+	for i, key := range keys {
+		if key == "json.new" {
+			index = i
+		}
 	}
-	// It does not land on a group title.
+	if index <= 0 {
+		t.Fatalf("json.new is not below another command row: %v", keys)
+	}
+	for i := index - 1; i >= 0; i-- {
+		tt.Key(0, ui.KeyUp)
+		if a.palette.selectionKey != keys[i] {
+			t.Fatalf("Up selection = %q, want %q", a.palette.selectionKey, keys[i])
+		}
+	}
+	// At the first command row it stays there instead of landing on a header.
 	tt.Key(0, ui.KeyUp)
-	if a.palette.selectionKey != "json.window.1" {
+	if a.palette.selectionKey != keys[0] {
 		t.Fatalf("selection left the command rows: %q", a.palette.selectionKey)
 	}
 }

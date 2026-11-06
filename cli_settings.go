@@ -167,52 +167,57 @@ func (a *application) cliLinkResult(err error) {
 	a.invalidateWindow()
 }
 
-// cliSettingsRow draws the command line row of the general page. It draws
-// nothing when the bundle ships no tool.
-func (a *application) cliSettingsRow(c *ui.Context, t tokenValues, locale string) {
-	paths, ok := cliPathsFor()
-	if !ok {
-		return
-	}
-	state := paths.status()
+// cliSettingsRow draws the command line tool as a switch: on builds the link,
+// off removes it. Only App Translocation cannot even try, because a link into
+// a random read-only path would break on the next launch.
+func (a *application) cliSettingsRow(c *ui.Context, t tokenValues, locale string, l settingsLayout) {
+	text := func(key string) string { return a.text(locale, key) }
+	paths, state := l.cli, l.cliState
 	if state == cliAbsent {
 		return
 	}
-	text := func(key string) string { return a.text(locale, key) }
-	ui.Divider(c)
-	a.row(c, t, text("CLIName"), func() {
-		install := func() { a.cliLinkResult(installCLILink(paths)) }
-		remove := func() { a.cliLinkResult(removeCLILink(paths)) }
-		switch state {
-		case cliInstalled:
-			ui.Icon(c, icon("check")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary)).
-				Tooltip(strings.ReplaceAll(text("CLIInstalled"), "%s", paths.link))
-			ui.ButtonBase(c.Key("cli-remove")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("CLIRemove")).Tooltip(text("CLIRemove")).OnClick(remove).Children(func() {
-				ui.Icon(c, icon("x")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-			})
-		case cliBroken, cliConflict:
-			reason := strings.ReplaceAll(text("CLILinkConflict"), "%s", paths.link)
-			if state == cliBroken {
-				reason = text("CLILinkBroken")
-			}
-			ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).
-				Focusable().Label(reason).Description(reason).Tooltip(reason)
-			ui.ButtonBase(c.Key("cli-install")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("CLIRepair")).Tooltip(text("CLIRepair")).OnClick(install).Children(func() {
-				ui.Icon(c, icon("terminal")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-			})
-		default:
-			button := ui.ButtonBase(c.Key("cli-install")).Size(t.SizeIconButton, t.SizeIconButton).Label(text("CLIInstall")).Tooltip(text("CLIInstall"))
-			if state == cliTranslocated {
-				button = button.Disabled(true).Opacity(t.OpacityDisabled)
-				reason := text("CLITranslocated")
-				ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger)).
-					Focusable().Label(reason).Description(reason).Tooltip(reason)
-			} else {
-				button.OnClick(install)
-			}
-			button.Children(func() {
-				ui.Icon(c, icon("terminal")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
-			})
+	on := state == cliInstalled || state == cliBroken
+	tip := ""
+	switch state {
+	case cliMissing:
+		tip = text("CLIInstall")
+	case cliInstalled:
+		tip = strings.ReplaceAll(text("CLIInstalled"), "%s", paths.link)
+	case cliBroken:
+		tip = text("CLILinkBroken")
+	case cliConflict:
+		tip = strings.ReplaceAll(text("CLILinkConflict"), "%s", paths.link)
+	case cliTranslocated:
+		tip = text("CLITranslocated")
+	}
+	alert := ""
+	if state == cliBroken || state == cliConflict || state == cliTranslocated {
+		alert = tip
+	}
+	opts := settingsRowOpts{icon: "terminal", level: 1, hint: text("CLILinkHint")}
+	a.settingsRow(c, t, text("CLIName"), opts, func() {
+		if alert != "" {
+			// The alert is its own enabled node, so the reason stays readable
+			// even when the switch beside it cannot be used.
+			a.alertIcon(c, t, alert)
 		}
+		value := on
+		a.switchControl(c, t, "cli-link", text("CLIName"), &value, func() {
+			// The switch already wrote the target into value. Re-read the paths
+			// and the state now: the file system may have changed since the frame.
+			want := value
+			current, ok := cliPathsFor()
+			if !ok {
+				a.cliLinkResult(errors.New("CLIInstallFailed"))
+				return
+			}
+			var err error
+			if want {
+				err = installCLILink(current)
+			} else {
+				err = removeCLILink(current)
+			}
+			a.cliLinkResult(err)
+		}, tip, state == cliTranslocated)
 	})
 }

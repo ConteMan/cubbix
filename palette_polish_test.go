@@ -648,13 +648,16 @@ func testPaletteJSONWindowName(t *testing.T, locale string, dark bool) {
 		if row.Kind != paletteRowCommand {
 			continue
 		}
+		// A settings command is also called "JSON", so match the window rows by
+		// their stable ID rather than by their title.
+		isWindow := strings.HasPrefix(row.Key, "json.window.")
 		switch {
-		case row.Title == a.text(locale, "JSONWindowName"):
+		case isWindow && row.Title == a.text(locale, "JSONWindowName"):
 			unnamed = true
 			if row.Category != "" {
 				t.Fatalf("the unnamed window repeats %q after its title", row.Category)
 			}
-		case row.Title == "items.json":
+		case isWindow && row.Title == "items.json":
 			named = true
 			if row.Category != json {
 				t.Fatalf("the named window shows %q, want %q", row.Category, json)
