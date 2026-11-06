@@ -159,9 +159,10 @@ func displayByID(displays []mygo.Display, id int64) (mygo.Display, bool) {
 // that follow: the settings rows and their height read this one.
 func (a *application) refreshDisplaySnapshot() []mygo.Display {
 	displays := a.displaysNow()
-	if len(displays) > 0 {
-		a.knownDisplays = displays
+	if !sameDisplays(a.knownDisplays, displays) {
+		a.displayRevision++
 	}
+	a.knownDisplays = slices.Clone(displays)
 	return a.knownDisplays
 }
 
@@ -179,7 +180,7 @@ func sameDisplays(before, after []mygo.Display) bool {
 	for index, d := range before {
 		next := after[index]
 		if d.ID != next.ID || d.Label != next.Label || d.Bounds != next.Bounds ||
-			d.WorkArea != next.WorkArea || d.ScaleFactor != next.ScaleFactor {
+			d.WorkArea != next.WorkArea || d.ScaleFactor != next.ScaleFactor || d.Primary != next.Primary {
 			return false
 		}
 	}
@@ -246,18 +247,29 @@ func (a *application) reconcileSettingsDisplayIfNeeded() {
 	if w == nil {
 		return
 	}
-	displays := a.refreshDisplaySnapshot()
-	if len(displays) == 0 {
+	a.reconcilePlacementIfNeeded(&a.settingsPlace, w, a.refreshDisplaySnapshot(), a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
+}
+
+// reconcileJSONDisplayIfNeeded runs on Restore as well as explicit open, so a
+// minimized tool window can wait for restoration before repairing its frame.
+func (a *application) reconcileJSONDisplayIfNeeded(d *jsonDocument) {
+	if w := d.frame(); w != nil {
+		a.reconcilePlacementIfNeeded(&d.place, w, a.displaysNow(), a.jsonReselect, seatTable{seats: &a.config.JSONPositions})
+	}
+}
+
+func (a *application) reconcilePlacementIfNeeded(state *windowPlaceState, w placementWindow, displays []mygo.Display, reselect func([]mygo.Display) (mygo.Display, bool), table seatTable) {
+	if len(displays) == 0 || state.placing {
 		return
 	}
-	if !a.settingsPlace.observed {
-		observeBaseline(&a.settingsPlace, w, displays)
+	if !state.observed {
+		observeBaseline(state, w, displays)
 		return
 	}
-	if !a.settingsPlace.needsRepair && !a.topologyChanged(&a.settingsPlace, displays) {
-		return
+	_, reachable := windowDisplayMatching(displays, w.Bounds())
+	if state.needsRepair || a.topologyChanged(state, displays) || !reachable {
+		a.repairPlacement(state, w, displays, reselect, table)
 	}
-	a.repairPlacement(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
 }
 
 // settingsReselect answers which display the settings window should reopen on.
@@ -347,8 +359,8 @@ func (a *application) observeMove(state *windowPlaceState, w placementWindow, di
 	if w == nil || state.placing || len(displays) == 0 {
 		return
 	}
-	if a.topologyChanged(state, displays) {
-		a.repairPlacement(state, w, displays, reselect, table)
+	if state.needsRepair || a.topologyChanged(state, displays) {
+		a.repairOrDeferPlacement(state, w, displays, reselect, table)
 		return
 	}
 	bounds := w.Bounds()
@@ -374,34 +386,6 @@ func (a *application) observeMove(state *windowPlaceState, w placementWindow, di
 	state.pending, state.pendingID, state.seq = &value, display.ID, a.nextMoveSeq()
 }
 
-// captureSeat reads a live frame into the pending seat when the window has
-// moved since the last observation. The save paths call it first, so a last
-// move whose notification never arrived is still remembered. A changed
-// topology drops the pending seat instead: a system restore is not the user's
-// position.
-func (a *application) captureSeat(state *windowPlaceState, w placementWindow, displays []mygo.Display) {
-	if w == nil || state.placing || len(displays) == 0 {
-		return
-	}
-	if a.topologyChanged(state, displays) {
-		state.pending, state.pendingID = nil, 0
-		return
-	}
-	bounds := w.Bounds()
-	origin := screenPoint{X: bounds.X, Y: bounds.Y}
-	if state.observed && origin == state.origin {
-		return
-	}
-	display, ok := windowDisplayMatching(displays, bounds)
-	if !ok {
-		state.observed, state.origin = true, origin
-		return
-	}
-	value := seatOffset(origin, display.WorkArea)
-	state.pending, state.pendingID, state.seq = &value, display.ID, a.nextMoveSeq()
-	state.observed, state.origin, state.display = true, origin, display
-}
-
 // takePending removes the cached seat, if any.
 func takePending(state *windowPlaceState) (int64, seat, uint64, bool) {
 	if state.pending == nil {
@@ -425,7 +409,12 @@ func (a *application) rememberSettingsPlace() bool {
 		return false
 	}
 	displays := a.displaysNow()
-	a.captureSeat(&a.settingsPlace, w, displays)
+	if len(displays) == 0 {
+		return false
+	}
+	// Use the same observation rules as OnMove, including hidden/minimized
+	// filtering, to capture a final drag whose notification has not arrived.
+	a.observeMove(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
 	id, value, _, ok := takePending(&a.settingsPlace)
 	if !ok {
 		return false
@@ -444,7 +433,11 @@ func (a *application) rememberJSONPlace(d *jsonDocument) bool {
 	if w == nil {
 		return false
 	}
-	a.captureSeat(&d.place, w, a.displaysNow())
+	displays := a.displaysNow()
+	if len(displays) == 0 {
+		return false
+	}
+	a.observeMove(&d.place, w, displays, a.jsonReselect, seatTable{seats: &a.config.JSONPositions})
 	id, value, seq, ok := takePending(&d.place)
 	if !ok {
 		return false
@@ -464,9 +457,12 @@ func (a *application) rememberJSONPlace(d *jsonDocument) bool {
 // settings seat, plus the newest seat of each display among the JSON windows.
 func (a *application) saveWindowPlacesOnQuit() {
 	displays := a.displaysNow()
+	if len(displays) == 0 {
+		return
+	}
 	changed := false
 	if w := a.settingsPlacementWindow(); w != nil {
-		a.captureSeat(&a.settingsPlace, w, displays)
+		a.observeMove(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
 		if id, value, _, ok := takePending(&a.settingsPlace); ok {
 			table := seatTable{seats: &a.config.WindowPositions}
 			if table.storeSeat(id, value) {
@@ -481,7 +477,7 @@ func (a *application) saveWindowPlacesOnQuit() {
 	newest := map[int64]latest{}
 	for _, d := range a.jsonDocuments {
 		if w := d.frame(); w != nil {
-			a.captureSeat(&d.place, w, displays)
+			a.observeMove(&d.place, w, displays, a.jsonReselect, seatTable{seats: &a.config.JSONPositions})
 		}
 		id, value, seq, ok := takePending(&d.place)
 		if !ok {
@@ -513,15 +509,10 @@ func (a *application) saveWindowPlacesOnQuit() {
 // handling, then every settings and JSON window keeps or repairs its place.
 func (a *application) displaysChanged() {
 	a.paletteDisplaysChanged()
-	displays := a.displaysNow()
-	if len(displays) == 0 {
-		// Keep the last valid state; the next valid snapshot does the work.
-		a.invalidateWindow()
-		return
-	}
-	previous := a.knownDisplays
-	a.knownDisplays = displays
-	if !sameDisplays(previous, displays) {
+	displays := a.refreshDisplaySnapshot()
+	if len(displays) > 0 {
+		// Each window owns its last valid geometry. Opening settings may have
+		// refreshed the UI snapshot before this notification arrived.
 		a.repairWindowPlaces(displays)
 	}
 	a.invalidateWindow()
@@ -531,23 +522,30 @@ func (a *application) displaysChanged() {
 // window moves at once; a hidden or minimized one only records that it needs
 // the repair, so nothing shows, focuses or writes in the background.
 func (a *application) repairWindowPlaces(displays []mygo.Display) {
+	if len(displays) == 0 {
+		return
+	}
 	if w := a.settingsPlacementWindow(); w != nil && a.topologyChanged(&a.settingsPlace, displays) {
-		if w.IsVisible() && !w.IsMinimized() {
-			a.repairPlacement(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
-		} else {
-			cancelPending(&a.settingsPlace)
-			a.settingsPlace.needsRepair = true
-		}
+		a.repairOrDeferPlacement(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
 	}
 	for _, d := range a.jsonDocuments {
 		w := d.frame()
 		if w == nil || d.closed || !a.topologyChanged(&d.place, displays) {
 			continue
 		}
-		// A JSON window has no restore hook, so a minimized one is repaired
-		// in place: setting the frame neither shows nor focuses it.
-		a.repairPlacement(&d.place, w, displays, a.jsonReselect, seatTable{seats: &a.config.JSONPositions})
+		a.repairOrDeferPlacement(&d.place, w, displays, a.jsonReselect, seatTable{seats: &a.config.JSONPositions})
 	}
+}
+
+// Preserve the old display and origin until restoration: an AppKit move while
+// minimized must not replace the snapshot needed to map the old seat.
+func (a *application) repairOrDeferPlacement(state *windowPlaceState, w placementWindow, displays []mygo.Display, reselect func([]mygo.Display) (mygo.Display, bool), table seatTable) {
+	cancelPending(state)
+	if !w.IsVisible() || w.IsMinimized() {
+		state.needsRepair = true
+		return
+	}
+	a.repairPlacement(state, w, displays, reselect, table)
 }
 
 // How far each additional JSON window on one display moves away from the seat
@@ -610,7 +608,14 @@ func (a *application) jsonOccupied(displays []mygo.Display, target mygo.Display,
 func jsonStaggerTarget(base screenPoint, size screenSize, work mygo.Rectangle, occupied []mygo.Rectangle) screenPoint {
 	var candidates []screenPoint
 	for k := 0; k < jsonStaggerSlots; k++ {
-		candidate := clampToWorkArea(screenPoint{X: base.X + k*jsonStaggerStep, Y: base.Y + k*jsonStaggerStep}, size, work)
+		candidate := base
+		if size.Width <= work.Width {
+			candidate.X += k * jsonStaggerStep
+		}
+		if size.Height <= work.Height {
+			candidate.Y += k * jsonStaggerStep
+		}
+		candidate = clampToWorkArea(candidate, size, work)
 		if !slices.Contains(candidates, candidate) {
 			candidates = append(candidates, candidate)
 		}

@@ -568,17 +568,22 @@ func (a *application) windowDisplayRow(c *ui.Context, t tokenValues, locale stri
 		if l.displayMissing {
 			a.alertIcon(c, t, text("WindowDisplayMissing"))
 		}
-		selected := strconv.FormatInt(a.config.WindowDisplayID, 10)
-		sel := ui.SelectBase(c.Key("window-display"), &selected)
+		// Bind the persisted ID so explicitly choosing its resolved fallback also
+		// produces OnChange for keyboard activation.
+		selected := seatKey(a.config.WindowDisplayID)
+		// A changed snapshot gets a fresh select state, closing any popup whose
+		// highlight and option IDs described the previous topology.
+		sel := ui.SelectBase(c.Key(fmt.Sprintf("window-display-%d", a.displayRevision)), &selected)
 		sel.Trigger.Width(t.SizeLanguageSelectorWidth).Height(t.SizeSegmentHeight).PaddingX(t.Space8).
 			Radius(t.RadiusControl).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
 			Background(ui.Hex(t.ColorControl)).FocusRing(true).
-			Label(text("WindowDisplay")).Tooltip(current).
+			Label(text("WindowDisplay") + ": " + current).Tooltip(current).
 			OnChange(func() { a.commitWindowDisplayID(selected) }).Children(func() {
 			ui.Text(c, current).FontSize(t.FontSizeBody).SingleLine().Grow(1).MinWidth(0)
 			ui.Icon(c, icon("chevron-down")).Size(t.SizeIcon, t.SizeIcon).
 				TextColor(ui.Hex(t.ColorTextSecondary)).Shrink(0)
 		})
+		highlighted := false
 		sel.Popup(func(panel ui.Element) {
 			panel.Padding(t.Space4).Radius(t.RadiusCard).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
 				Background(ui.Hex(t.ColorCard))
@@ -591,19 +596,22 @@ func (a *application) windowDisplayRow(c *ui.Context, t tokenValues, locale stri
 					item := sel.Item(choice.Value).Height(t.SizeRowHeight).PaddingX(t.Space8).
 						Radius(t.RadiusControl).Label(choice.Title)
 					if item.Highlighted() {
+						highlighted = true
 						item.Background(ui.Hex(t.ColorAccentSoft))
 					}
-					if item.Clicked() {
-						// Picking the display already shown as the fallback must
-						// still store it: this path is not a value change.
-						a.commitWindowDisplayID(choice.Value)
-					}
+					// Explicit same-value selection is still a user choice.
+					item.OnClick(func() { a.commitWindowDisplayID(choice.Value) })
 					item.Children(func() {
 						ui.Text(c, choice.Label).FontSize(t.FontSizeBody).SingleLine().Tooltip(choice.Title)
 					})
 				}
 			})
 		})
+		if sel.Open() && !highlighted {
+			// The stored ID may be offline or resolved by name. Start keyboard
+			// navigation on the display actually shown by the trigger.
+			sel.Highlight(seatKey(l.display.ID))
+		}
 	})
 }
 

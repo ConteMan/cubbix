@@ -63,9 +63,10 @@ type application struct {
 	settingsFrame func() placementWindow
 	// knownDisplays is the last display snapshot the notification handler
 	// saw; settingsPlace and the JSON documents keep their own as well.
-	knownDisplays []mygo.Display
-	settingsPlace windowPlaceState
-	moveSeq       uint64
+	knownDisplays   []mygo.Display
+	displayRevision uint64 // invalidates display-menu state after a topology change
+	settingsPlace   windowPlaceState
+	moveSeq         uint64
 	// jsonCommitted is the move sequence each display already has in its JSON
 	// seat, for this run only: a later close of an older window cannot win.
 	jsonCommitted map[int64]uint64
@@ -400,6 +401,7 @@ func (a *application) createSettingsWindow() {
 	a.window.OnClosed(func() { a.visibility(false) })
 	a.window.OnResize(a.rememberWindowSize)
 	a.window.OnMove(a.observeSettingsMove)
+	a.window.OnRestore(a.reconcileSettingsDisplayIfNeeded)
 
 	a.window.OnClose(func(event *mygo.CloseEvent) {
 		if !a.quitting {

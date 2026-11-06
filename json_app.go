@@ -114,6 +114,7 @@ func (a *application) buildJSONWindow(d *jsonDocument) {
 		}
 	})
 	d.window.OnMove(func() { a.observeJSONMove(d) })
+	d.window.OnRestore(func() { a.reconcileJSONDisplayIfNeeded(d) })
 	d.window.OnClosed(func() { a.removeJSONDocument(d); a.visibility(false); a.refreshAwake() })
 	d.window.OnResize(func() {
 		width, height := d.window.Size()
@@ -201,12 +202,17 @@ func (a *application) showJSON(d *jsonDocument) {
 }
 
 func (a *application) focusJSONWindow(d *jsonDocument) {
-	if d.window == nil {
+	w := d.frame()
+	if w == nil {
 		return
 	}
+	if w.IsMinimized() {
+		w.Restore()
+	}
+	a.reconcileJSONDisplayIfNeeded(d)
 	a.visibility(true)
-	d.window.Show()
-	d.window.Focus()
+	w.Show()
+	w.Focus()
 }
 func (a *application) destroyJSON(d *jsonDocument) {
 	// Destroy emits no OnClose, so the place is read here, before the window
