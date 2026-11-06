@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 — 2026-11-06
+
+- Settings are reorganized: Keep Awake and JSON each get their own page with their settings and shortcuts together, so "Low battery limit" now lives on the Keep Awake page.
+- Turning a module off also turns off its shortcuts, so they no longer hold on to system shortcuts, and they come back when you turn it on. If Keep Awake or the lid setting is running, Cubbix lets your Mac sleep normally again before turning it off.
+- Every page starts with a short description, hints are clearer, and Automatic updates shows how often it checks and when it last did.
+- The command-line tool is now a single switch: turn it on to install it, and you will see a hint if something is wrong.
+
 ## 0.5.8 — 2026-11-06
 
 - The command palette looks better and is easier to scan: each command now shows the module it belongs to in small gray text, like "Turn on Keep Awake  Keep Awake".
