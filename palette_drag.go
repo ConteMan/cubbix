@@ -16,28 +16,25 @@ const paletteDragDeadZone = 3
 type paletteDrag struct {
 	down         bool // a drag handler took the press
 	active       bool // the pointer went past the dead zone
-	pressScreen  palettePoint
-	panel        palettePoint // the panel's position at the press
-	displayID    int64        // the display the panel is on now, recomputed per move
-	snap         paletteSnap  // what this frame snapped to
-	guides       bool         // the guide overlay is showing
-	outsideClick bool         // a double click's press: its release closes nothing
+	pressScreen  screenPoint
+	panel        screenPoint // the panel's position at the press
+	displayID    int64       // the display the panel is on now, recomputed per move
+	snap         paletteSnap // what this frame snapped to
+	guides       bool        // the guide overlay is showing
+	outsideClick bool        // a double click's press: its release closes nothing
 }
 
 // paletteCursorPoint is where the pointer is, as the palette sees it: the
 // display under it is the one the panel opens on.
 func (a *application) paletteCursorPoint() mygo.Point {
-	if a.paletteCursor == nil {
-		return mygo.Point{}
-	}
-	return a.paletteCursor()
+	return a.cursorNow()
 }
 
-// paletteSize is the panel's size in DIPs, from the tokens: the window is
-// bigger by the shadow margin.
-func (a *application) paletteSize() paletteSize {
+// palettePanelSize is the panel's size in DIPs, from the tokens: the window
+// is bigger by the shadow margin.
+func (a *application) palettePanelSize() screenSize {
 	t := tokens(false, "zh-CN")
-	return paletteSize{Width: int(t.SizePaletteWidth), Height: int(t.SizePaletteHeight)}
+	return screenSize{Width: int(t.SizePaletteWidth), Height: int(t.SizePaletteHeight)}
 }
 
 // paletteMargin is the transparent room the window keeps around the panel for
@@ -52,41 +49,39 @@ func (a *application) paletteTopOffset() int {
 }
 
 // palettePanelPoint is where the panel's top-left corner sits on screen.
-func (a *application) palettePanelPoint() palettePoint {
+func (a *application) palettePanelPoint() screenPoint {
 	window := a.paletteWindowPosition()
 	margin := a.paletteMargin()
-	return palettePoint{X: window.X + margin, Y: window.Y + margin}
+	return screenPoint{X: window.X + margin, Y: window.Y + margin}
 }
 
 // movePalettePanelTo puts the panel's top-left corner at p.
-func (a *application) movePalettePanelTo(p palettePoint) {
+func (a *application) movePalettePanelTo(p screenPoint) {
 	margin := a.paletteMargin()
-	a.setPaletteWindowPosition(palettePoint{X: p.X - margin, Y: p.Y - margin})
+	a.setPaletteWindowPosition(screenPoint{X: p.X - margin, Y: p.Y - margin})
 }
 
 // paletteDisplays returns the screens the palette places itself on.
 func (a *application) paletteDisplaysNow() []mygo.Display {
-	if a.paletteDisplays == nil {
-		return nil
-	}
-	return a.paletteDisplays()
+	return a.displaysNow()
 }
 
 // paletteDefaultPoint is where the panel opens on a display when that display
 // remembers no position: centred across the work area, near its top, and
 // pulled up when the work area is too short.
-func (a *application) paletteDefaultPoint(display mygo.Display) palettePoint {
-	size := a.paletteSize()
+func (a *application) paletteDefaultPoint(display mygo.Display) screenPoint {
+	size := a.palettePanelSize()
 	x, y := palettePosition(display, size.Width, size.Height, float32(a.paletteTopOffset()))
-	return palettePoint{X: x, Y: y}
+	return screenPoint{X: x, Y: y}
 }
 
-// paletteSeatKeyFor is the config key of a display.
-func paletteSeatKeyFor(display mygo.Display) string { return paletteSeatKey(display.ID) }
+// seatKeyFor is the config key of a display.
+func seatKeyFor(display mygo.Display) string { return seatKey(display.ID) }
 
-// storePaletteSeat remembers the panel's place on a display.
-func (a *application) storePaletteSeat(display mygo.Display, panel palettePoint) {
-	a.config.putPaletteSeat(paletteSeatKeyFor(display), paletteSeatFor(panel, display.WorkArea))
+// storePaletteSeat remembers the panel's place on a display. It commits on
+// release only, and the shared table never saves by itself.
+func (a *application) storePaletteSeat(display mygo.Display, panel screenPoint) {
+	seatTable{seats: &a.config.PalettePositions}.store(display, panel)
 	a.save()
 }
 
@@ -94,10 +89,10 @@ func (a *application) storePaletteSeat(display mygo.Display, panel palettePoint)
 // puts it back where it opens by default.
 func (a *application) resetPalettePosition() {
 	displays := a.paletteDisplaysNow()
-	display := paletteDisplayMatching(displays, paletteRect(a.palettePanelPoint(), a.paletteSize()))
-	delete(a.config.PalettePositions, paletteSeatKeyFor(display))
+	display := displayMatching(displays, screenRect(a.palettePanelPoint(), a.palettePanelSize()))
+	seatTable{seats: &a.config.PalettePositions}.forget(display)
 	a.save()
-	a.movePalettePanelTo(paletteClamp(a.paletteDefaultPoint(display), a.paletteSize(), display.WorkArea))
+	a.movePalettePanelTo(clampToWorkArea(a.paletteDefaultPoint(display), a.palettePanelSize(), display.WorkArea))
 }
 
 // paletteContentHit reports whether a press landed on the search row or the
@@ -166,7 +161,7 @@ func (a *application) beginPaletteDrag(base ui.Rect, ev ui.InputEvent) {
 		down:        true,
 		pressScreen: palettePointerScreen(base, a.paletteWindowPosition(), ev),
 		panel:       panel,
-		displayID:   paletteDisplayMatching(a.paletteDisplaysNow(), paletteRect(panel, a.paletteSize())).ID,
+		displayID:   displayMatching(a.paletteDisplaysNow(), screenRect(panel, a.palettePanelSize())).ID,
 	}
 }
 
@@ -175,7 +170,7 @@ func (a *application) beginPaletteDrag(base ui.Rect, ev ui.InputEvent) {
 func (a *application) movePaletteDrag(base ui.Rect, ev ui.InputEvent) {
 	p := a.palette
 	drag := &p.drag
-	size := a.paletteSize()
+	size := a.palettePanelSize()
 	screen := palettePointerScreen(base, a.paletteWindowPosition(), ev)
 	dx, dy := screen.X-drag.pressScreen.X, screen.Y-drag.pressScreen.Y
 	if !drag.active {
@@ -188,9 +183,9 @@ func (a *application) movePaletteDrag(base ui.Rect, ev ui.InputEvent) {
 	// Always the press's position plus the whole offset: snapping moves the
 	// panel, and a per-frame delta would then be measured from the snapped
 	// place and drift away from the pointer.
-	candidate := palettePoint{X: drag.panel.X + dx, Y: drag.panel.Y + dy}
+	candidate := screenPoint{X: drag.panel.X + dx, Y: drag.panel.Y + dy}
 	displays := a.paletteDisplaysNow()
-	display := paletteDisplayMatching(displays, paletteRect(candidate, size))
+	display := displayMatching(displays, screenRect(candidate, size))
 	drag.displayID = display.ID
 	guides := paletteGuidesFor(display.WorkArea, a.paletteTopOffset())
 	if ev.Mods&ui.Alt == 0 {
@@ -200,7 +195,7 @@ func (a *application) movePaletteDrag(base ui.Rect, ev ui.InputEvent) {
 		// stay so the user can still line it up.
 		drag.snap = paletteSnap{}
 	}
-	candidate = paletteClamp(candidate, size, display.WorkArea)
+	candidate = clampToWorkArea(candidate, size, display.WorkArea)
 	a.movePalettePanelTo(candidate)
 	a.showPaletteGuides(guides, display.WorkArea, drag.snap)
 }
@@ -230,7 +225,7 @@ func (a *application) endPaletteDrag() {
 	}
 	if drag.active {
 		panel := a.palettePanelPoint()
-		display := paletteDisplayMatching(a.paletteDisplaysNow(), paletteRect(panel, a.paletteSize()))
+		display := displayMatching(a.paletteDisplaysNow(), screenRect(panel, a.palettePanelSize()))
 		a.storePaletteSeat(display, panel)
 		return
 	}
@@ -239,7 +234,7 @@ func (a *application) endPaletteDrag() {
 	}
 	// The margin belongs to the window and takes the click; a press there that
 	// never moved reads as a click outside the panel.
-	if !paletteRectContains(paletteRect(drag.panel, a.paletteSize()), drag.pressScreen) {
+	if !screenRectContains(screenRect(drag.panel, a.palettePanelSize()), drag.pressScreen) {
 		a.hidePalette()
 	}
 }

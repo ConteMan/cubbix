@@ -50,13 +50,13 @@ type application struct {
 	palette              *paletteState
 	paletteShortcutError string
 	panelShortcutError   string
-	// paletteDisplays, paletteCursor, paletteWindowPosition and
+	// displays, cursorPoint, paletteWindowPosition and
 	// setPaletteWindowPosition are seams: tests place and drag the panel
 	// without an app, a real screen or a native window.
-	paletteDisplays          func() []mygo.Display
-	paletteCursor            func() mygo.Point
-	paletteWindowPosition    func() palettePoint
-	setPaletteWindowPosition func(palettePoint)
+	displays                 func() []mygo.Display
+	cursorPoint              func() mygo.Point
+	paletteWindowPosition    func() screenPoint
+	setPaletteWindowPosition func(screenPoint)
 	// createPaletteGuide is a seam too: tests never open the overlay.
 	createPaletteGuide func(*paletteGuideState)
 	guide              *paletteGuideState
@@ -140,16 +140,16 @@ func newApplication(path string) (*application, error) {
 	a := &application{config: config, path: path, catalog: catalog, awake: newAwakeController(), moduleAsync: true, notifyBattery: newBatteryNotifier().send, registerShortcut: mygo.GlobalShortcut.Register, unregisterShortcut: mygo.GlobalShortcut.Unregister, registerURLScheme: mygo.App.RegisterURLScheme, urlDispatch: mygo.RunOnMain}
 	a.createPaletteWindow = a.buildPaletteWindow
 	a.createPaletteGuide = a.buildPaletteGuideWindow
-	a.paletteDisplays = mygo.Screen.Displays
-	a.paletteCursor = mygo.Screen.CursorScreenPoint
-	a.paletteWindowPosition = func() palettePoint {
+	a.displays = mygo.Screen.Displays
+	a.cursorPoint = mygo.Screen.CursorScreenPoint
+	a.paletteWindowPosition = func() screenPoint {
 		if a.palette == nil || a.palette.window == nil {
-			return palettePoint{}
+			return screenPoint{}
 		}
 		x, y := a.palette.window.Position()
-		return palettePoint{X: x, Y: y}
+		return screenPoint{X: x, Y: y}
 	}
-	a.setPaletteWindowPosition = func(p palettePoint) {
+	a.setPaletteWindowPosition = func(p screenPoint) {
 		if a.palette == nil || a.palette.window == nil {
 			return
 		}

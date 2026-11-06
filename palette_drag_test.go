@@ -55,29 +55,29 @@ func paletteTester(a *application, locale string) *ui.Tester {
 // position. The platform gives a pointer relative to the window, and a drag
 // moves that window under the pointer, so the same screen position is a
 // different window position every frame.
-func palettePress(tt *ui.Tester, f *fakeScreens, at palettePoint) {
+func palettePress(tt *ui.Tester, f *fakeScreens, at screenPoint) {
 	tt.Press(float32(at.X-f.window.X), float32(at.Y-f.window.Y))
 }
 
-func paletteMove(tt *ui.Tester, f *fakeScreens, at palettePoint) {
+func paletteMove(tt *ui.Tester, f *fakeScreens, at screenPoint) {
 	tt.Move(float32(at.X-f.window.X), float32(at.Y-f.window.Y))
 }
 
-func paletteRelease(tt *ui.Tester, f *fakeScreens, at palettePoint) {
+func paletteRelease(tt *ui.Tester, f *fakeScreens, at screenPoint) {
 	tt.Release(float32(at.X-f.window.X), float32(at.Y-f.window.Y))
 }
 
 // panelPointOf is where the panel's top-left corner is, from the fake window.
-func panelPointOf(a *application, f *fakeScreens) palettePoint {
+func panelPointOf(a *application, f *fakeScreens) screenPoint {
 	margin := a.paletteMargin()
-	return palettePoint{X: f.window.X + margin, Y: f.window.Y + margin}
+	return screenPoint{X: f.window.X + margin, Y: f.window.Y + margin}
 }
 
 // grabScreen is the centre of the search row's icon, the drag handle.
-func grabScreen(a *application, f *fakeScreens) palettePoint {
+func grabScreen(a *application, f *fakeScreens) screenPoint {
 	t := tokens(false, "zh-CN")
 	panel := panelPointOf(a, f)
-	return palettePoint{
+	return screenPoint{
 		X: panel.X + int(2*t.Space8+t.SizePaletteSearchHeight/2),
 		Y: panel.Y + int(t.Space8+t.SizePaletteSearchHeight/2),
 	}
@@ -88,16 +88,16 @@ func TestPaletteDragMovesAndRemembersThePanel(t *testing.T) {
 	tt := paletteTester(a, "zh-CN")
 	grab := grabScreen(a, f)
 	palettePress(tt, f, grab)
-	paletteMove(tt, f, palettePoint{X: grab.X + 40, Y: grab.Y + 30})
+	paletteMove(tt, f, screenPoint{X: grab.X + 40, Y: grab.Y + 30})
 	if !a.palette.drag.active {
 		t.Fatal("a move past the dead zone did not start a drag")
 	}
-	paletteRelease(tt, f, palettePoint{X: grab.X + 40, Y: grab.Y + 30})
-	if got := panelPointOf(a, f); got != (palettePoint{X: 440, Y: 151}) {
+	paletteRelease(tt, f, screenPoint{X: grab.X + 40, Y: grab.Y + 30})
+	if got := panelPointOf(a, f); got != (screenPoint{X: 440, Y: 151}) {
 		t.Fatalf("panel = %+v; want the press position plus the offset", got)
 	}
-	if seat, ok := a.config.PalettePositions["1"]; !ok || seat != (paletteSeat{X: 440, Y: 126}) {
-		t.Fatalf("stored seat = %+v, %v", seat, ok)
+	if stored, ok := a.config.PalettePositions["1"]; !ok || stored != (seat{X: 440, Y: 126}) {
+		t.Fatalf("stored seat = %+v, %v", stored, ok)
 	}
 	if a.guide != nil && a.guide.visible {
 		t.Fatal("the guides stayed after the release")
@@ -109,14 +109,14 @@ func TestPaletteDragSnapsToTheCentreLine(t *testing.T) {
 	tt := paletteTester(a, "zh-CN")
 	grab := grabScreen(a, f)
 	palettePress(tt, f, grab)
-	paletteMove(tt, f, palettePoint{X: grab.X + 6, Y: grab.Y})
+	paletteMove(tt, f, screenPoint{X: grab.X + 6, Y: grab.Y})
 	if !a.palette.drag.snap.X {
 		t.Fatal("six DIPs from the centre line did not snap")
 	}
 	if got := panelPointOf(a, f); got.X != 400 {
 		t.Fatalf("snapped panel x = %d; want the centre line at 400", got.X)
 	}
-	paletteRelease(tt, f, palettePoint{X: grab.X + 6, Y: grab.Y})
+	paletteRelease(tt, f, screenPoint{X: grab.X + 6, Y: grab.Y})
 }
 
 func TestPaletteDragLeavesThePanelFreeBeyondTheThreshold(t *testing.T) {
@@ -124,14 +124,14 @@ func TestPaletteDragLeavesThePanelFreeBeyondTheThreshold(t *testing.T) {
 	tt := paletteTester(a, "zh-CN")
 	grab := grabScreen(a, f)
 	palettePress(tt, f, grab)
-	paletteMove(tt, f, palettePoint{X: grab.X + 20, Y: grab.Y})
+	paletteMove(tt, f, screenPoint{X: grab.X + 20, Y: grab.Y})
 	if a.palette.drag.snap.X {
 		t.Fatal("twenty DIPs from the centre line still snapped")
 	}
 	if got := panelPointOf(a, f); got.X != 420 {
 		t.Fatalf("panel x = %d; want the pointer's 420", got.X)
 	}
-	paletteRelease(tt, f, palettePoint{X: grab.X + 20, Y: grab.Y})
+	paletteRelease(tt, f, screenPoint{X: grab.X + 20, Y: grab.Y})
 }
 
 // TestPaletteDragHoldingOptionDoesNotSnap drives the handler directly: the
@@ -143,15 +143,15 @@ func TestPaletteDragHoldingOptionDoesNotSnap(t *testing.T) {
 	handle := a.paletteDragHandler(&base, nil)
 	// A pointer at a screen position, reported relative to the window that
 	// moves under it.
-	send := func(kind ui.InputKind, at palettePoint, mods ui.Modifiers) bool {
+	send := func(kind ui.InputKind, at screenPoint, mods ui.Modifiers) bool {
 		return handle(ui.InputEvent{Kind: kind, Button: 0, Clicks: 1, Mods: mods,
 			X: float32(at.X - f.window.X), Y: float32(at.Y - f.window.Y)})
 	}
-	press := palettePoint{X: f.window.X + 100, Y: f.window.Y + 100}
+	press := screenPoint{X: f.window.X + 100, Y: f.window.Y + 100}
 	if !send(ui.InputPointerDown, press, 0) {
 		t.Fatal("the drag area refused the press")
 	}
-	send(ui.InputPointerMove, palettePoint{X: press.X + 6, Y: press.Y}, ui.Alt)
+	send(ui.InputPointerMove, screenPoint{X: press.X + 6, Y: press.Y}, ui.Alt)
 	if a.palette.drag.snap.X {
 		t.Fatal("⌥ still snapped")
 	}
@@ -159,11 +159,11 @@ func TestPaletteDragHoldingOptionDoesNotSnap(t *testing.T) {
 		t.Fatalf("panel x = %d; want the pointer's 406", got.X)
 	}
 	// Letting ⌥ go snaps the same pointer position onto the centre line.
-	send(ui.InputPointerMove, palettePoint{X: press.X + 6, Y: press.Y}, 0)
+	send(ui.InputPointerMove, screenPoint{X: press.X + 6, Y: press.Y}, 0)
 	if !a.palette.drag.snap.X || panelPointOf(a, f).X != 400 {
 		t.Fatalf("letting ⌥ go did not snap: snap=%v x=%d", a.palette.drag.snap.X, panelPointOf(a, f).X)
 	}
-	send(ui.InputPointerUp, palettePoint{X: press.X + 6, Y: press.Y}, 0)
+	send(ui.InputPointerUp, screenPoint{X: press.X + 6, Y: press.Y}, 0)
 }
 
 func TestPalettePressInsideTheDeadZoneIsAClick(t *testing.T) {
@@ -172,8 +172,8 @@ func TestPalettePressInsideTheDeadZoneIsAClick(t *testing.T) {
 	before := panelPointOf(a, f)
 	grab := grabScreen(a, f)
 	palettePress(tt, f, grab)
-	paletteMove(tt, f, palettePoint{X: grab.X + 2, Y: grab.Y + 1})
-	paletteRelease(tt, f, palettePoint{X: grab.X + 2, Y: grab.Y + 1})
+	paletteMove(tt, f, screenPoint{X: grab.X + 2, Y: grab.Y + 1})
+	paletteRelease(tt, f, screenPoint{X: grab.X + 2, Y: grab.Y + 1})
 	if a.palette.drag.active {
 		t.Fatal("two DIPs started a drag")
 	}
@@ -203,8 +203,8 @@ func TestPaletteTextSelectionKeepsThePanelAndTheFocus(t *testing.T) {
 		t.Fatalf("no search field in %v", tt.Texts())
 	}
 	before := panelPointOf(a, f)
-	start := palettePoint{X: f.window.X + int(field.X+2), Y: f.window.Y + int(field.Y+field.H/2)}
-	end := palettePoint{X: start.X + 55, Y: start.Y}
+	start := screenPoint{X: f.window.X + int(field.X+2), Y: f.window.Y + int(field.Y+field.H/2)}
+	end := screenPoint{X: start.X + 55, Y: start.Y}
 	palettePress(tt, f, start)
 	paletteMove(tt, f, end)
 	paletteRelease(tt, f, end)
@@ -230,16 +230,16 @@ func TestPaletteTextSelectionKeepsThePanelAndTheFocus(t *testing.T) {
 
 func TestPaletteDoubleClickMoveDoesNotStartDrag(t *testing.T) {
 	a, f := paletteDragApp(t)
-	a.config.putPaletteSeat("1", paletteSeat{X: 100, Y: 200})
-	a.config.putPaletteSeat("2", paletteSeat{X: 80, Y: 90})
-	f.window = palettePoint{X: 100, Y: 200}
+	a.config.putPaletteSeat("1", seat{X: 100, Y: 200})
+	a.config.putPaletteSeat("2", seat{X: 80, Y: 90})
+	f.window = screenPoint{X: 100, Y: 200}
 	base := ui.Rect{X: 32, Y: 32}
 	handle := a.paletteDragHandler(&base, nil)
 	handle(ui.InputEvent{Kind: ui.InputPointerDown, Clicks: 2, X: 25, Y: 25})
 	reset := f.window
 	handle(ui.InputEvent{Kind: ui.InputPointerMove, X: -100, Y: 300})
 	handle(ui.InputEvent{Kind: ui.InputPointerUp})
-	if f.window != reset || !a.palette.visible || len(a.config.PalettePositions) != 1 || a.config.PalettePositions["2"] != (paletteSeat{X: 80, Y: 90}) {
+	if f.window != reset || !a.palette.visible || len(a.config.PalettePositions) != 1 || a.config.PalettePositions["2"] != (seat{X: 80, Y: 90}) {
 		t.Fatalf("double-click move changed the reset: window=%+v seats=%v", f.window, a.config.PalettePositions)
 	}
 	if a.guide != nil || a.palette.drag.down {
@@ -275,23 +275,23 @@ func TestPaletteDisplayChangeCancelsDragWithoutMovingOrSaving(t *testing.T) {
 	tt := paletteTester(a, "zh-CN")
 	grab := grabScreen(a, f)
 	palettePress(tt, f, grab)
-	paletteMove(tt, f, palettePoint{X: grab.X + 60, Y: grab.Y + 60})
+	paletteMove(tt, f, screenPoint{X: grab.X + 60, Y: grab.Y + 60})
 	before := f.window
 	f.displays = f.displays[1:]
 	a.paletteDisplaysChanged()
 	if f.window != before || len(a.config.PalettePositions) != 0 || a.palette.drag.down || a.guide.visible {
 		t.Fatalf("display change moved or committed a drag: window=%+v drag=%+v", f.window, a.palette.drag)
 	}
-	paletteRelease(tt, f, palettePoint{X: grab.X + 60, Y: grab.Y + 60})
+	paletteRelease(tt, f, screenPoint{X: grab.X + 60, Y: grab.Y + 60})
 	if len(a.config.PalettePositions) != 0 {
 		t.Fatal("release committed the cancelled drag")
 	}
 	// Reopening uses the remaining display's normal placement and keeps the
 	// old display's remembered seat intact.
-	a.config.putPaletteSeat("1", paletteSeat{X: 100, Y: 200})
+	a.config.putPaletteSeat("1", seat{X: 100, Y: 200})
 	a.hidePalette()
 	a.showPalette()
-	if got := panelPointOf(a, f); got != (palettePoint{X: -1280, Y: 121}) || len(a.config.PalettePositions) != 1 {
+	if got := panelPointOf(a, f); got != (screenPoint{X: -1280, Y: 121}) || len(a.config.PalettePositions) != 1 {
 		t.Fatalf("reopen after disconnect: panel=%+v seats=%v", got, a.config.PalettePositions)
 	}
 }
@@ -307,16 +307,16 @@ func TestPaletteDragKeepsTextInputAndComposition(t *testing.T) {
 			start := grabScreen(a, f)
 			if area == "padding" {
 				panel := panelPointOf(a, f)
-				start = palettePoint{X: panel.X + 4, Y: panel.Y + 4}
+				start = screenPoint{X: panel.X + 4, Y: panel.Y + 4}
 			} else if area == "margin" {
-				start = palettePoint{X: f.window.X + 16, Y: f.window.Y + 16}
+				start = screenPoint{X: f.window.X + 16, Y: f.window.Y + 16}
 			}
 			palettePress(tt, f, start)
 			if active, noIME := tt.TextInputActive(); !active || noIME {
 				t.Fatal("press stopped text input or disabled input methods")
 			}
-			paletteMove(tt, f, palettePoint{X: start.X + 60, Y: start.Y + 40})
-			paletteRelease(tt, f, palettePoint{X: start.X + 60, Y: start.Y + 40})
+			paletteMove(tt, f, screenPoint{X: start.X + 60, Y: start.Y + 40})
+			paletteRelease(tt, f, screenPoint{X: start.X + 60, Y: start.Y + 40})
 			if after, active := tt.TextCaret(); !composing || !active || after != caret || a.palette.query != "prefix " {
 				t.Fatal("drag changed the text input caret or committed composition")
 			}
@@ -332,8 +332,8 @@ func TestPaletteRowStillClicks(t *testing.T) {
 	a, f := paletteDragApp(t)
 	// Somewhere that is not the default, so the row's command shows in the
 	// position it leaves behind.
-	a.config.putPaletteSeat("1", paletteSeat{X: 10, Y: 20})
-	f.window = palettePoint{X: 700, Y: 400}
+	a.config.putPaletteSeat("1", seat{X: 10, Y: 20})
+	f.window = screenPoint{X: 700, Y: 400}
 	tt := paletteTester(a, "zh-CN")
 	// The command sits at the end of a long list: filter it to the top first.
 	tt.Type(a.text("zh-CN", "PaletteResetPosition"))
@@ -346,7 +346,7 @@ func TestPaletteRowStillClicks(t *testing.T) {
 	if _, ok := a.config.PalettePositions["1"]; ok {
 		t.Fatalf("the row's command did not run: %+v", a.config.PalettePositions)
 	}
-	if got := panelPointOf(a, f); got != (palettePoint{X: 400, Y: 121}) {
+	if got := panelPointOf(a, f); got != (screenPoint{X: 400, Y: 121}) {
 		t.Fatalf("the panel did not go back to its default: %+v", got)
 	}
 }
@@ -355,8 +355,8 @@ func TestPaletteClickOnTheMarginClosesIt(t *testing.T) {
 	a, f := paletteDragApp(t)
 	tt := paletteTester(a, "zh-CN")
 	margin := a.paletteMargin() / 2
-	palettePress(tt, f, palettePoint{X: f.window.X + margin, Y: f.window.Y + margin})
-	paletteRelease(tt, f, palettePoint{X: f.window.X + margin, Y: f.window.Y + margin})
+	palettePress(tt, f, screenPoint{X: f.window.X + margin, Y: f.window.Y + margin})
+	paletteRelease(tt, f, screenPoint{X: f.window.X + margin, Y: f.window.Y + margin})
 	if a.palette.visible {
 		t.Fatal("a click on the shadow margin kept the panel open")
 	}
@@ -367,14 +367,14 @@ func TestPaletteDragFromTheMarginMovesIt(t *testing.T) {
 	tt := paletteTester(a, "zh-CN")
 	margin := a.paletteMargin() / 2
 	before := panelPointOf(a, f)
-	start := palettePoint{X: f.window.X + margin, Y: f.window.Y + margin}
+	start := screenPoint{X: f.window.X + margin, Y: f.window.Y + margin}
 	palettePress(tt, f, start)
-	paletteMove(tt, f, palettePoint{X: start.X + 30, Y: start.Y + 20})
-	paletteRelease(tt, f, palettePoint{X: start.X + 30, Y: start.Y + 20})
+	paletteMove(tt, f, screenPoint{X: start.X + 30, Y: start.Y + 20})
+	paletteRelease(tt, f, screenPoint{X: start.X + 30, Y: start.Y + 20})
 	if !a.palette.visible {
 		t.Fatal("a drag on the margin closed the panel")
 	}
-	if got := panelPointOf(a, f); got != (palettePoint{X: before.X + 30, Y: before.Y + 20}) {
+	if got := panelPointOf(a, f); got != (screenPoint{X: before.X + 30, Y: before.Y + 20}) {
 		t.Fatalf("panel = %+v; want %+v", got, before)
 	}
 }
@@ -386,19 +386,19 @@ func TestPaletteBlankSpaceDrags(t *testing.T) {
 	tt := paletteTester(a, "zh-CN")
 	before := panelPointOf(a, f)
 	// The panel's padding ring, just inside its top-left corner.
-	start := palettePoint{X: before.X + 4, Y: before.Y + 4}
+	start := screenPoint{X: before.X + 4, Y: before.Y + 4}
 	palettePress(tt, f, start)
-	paletteMove(tt, f, palettePoint{X: start.X + 25, Y: start.Y + 35})
-	paletteRelease(tt, f, palettePoint{X: start.X + 25, Y: start.Y + 35})
-	if got := panelPointOf(a, f); got != (palettePoint{X: before.X + 25, Y: before.Y + 35}) {
+	paletteMove(tt, f, screenPoint{X: start.X + 25, Y: start.Y + 35})
+	paletteRelease(tt, f, screenPoint{X: start.X + 25, Y: start.Y + 35})
+	if got := panelPointOf(a, f); got != (screenPoint{X: before.X + 25, Y: before.Y + 35}) {
 		t.Fatalf("panel = %+v; want %+v", got, before)
 	}
 }
 
 func TestPaletteDoubleClickRestoresTheDefaultPosition(t *testing.T) {
 	a, f := paletteDragApp(t)
-	a.config.putPaletteSeat("1", paletteSeat{X: 10, Y: 20})
-	f.window = palettePoint{X: 500, Y: 400}
+	a.config.putPaletteSeat("1", seat{X: 10, Y: 20})
+	f.window = screenPoint{X: 500, Y: 400}
 	tt := paletteTester(a, "zh-CN")
 	grab := grabScreen(a, f)
 	// Two presses within the double click interval: the engine counts the
@@ -409,7 +409,7 @@ func TestPaletteDoubleClickRestoresTheDefaultPosition(t *testing.T) {
 	if _, ok := a.config.PalettePositions["1"]; ok {
 		t.Fatalf("a double click kept the seat: %+v", a.config.PalettePositions)
 	}
-	if got := panelPointOf(a, f); got != (palettePoint{X: 400, Y: 121}) {
+	if got := panelPointOf(a, f); got != (screenPoint{X: 400, Y: 121}) {
 		t.Fatalf("panel = %+v; want the default position", got)
 	}
 	if !a.palette.visible {
@@ -424,7 +424,7 @@ func TestPaletteDragAcrossDisplays(t *testing.T) {
 	palettePress(tt, f, grab)
 	// Drag far left: most of the panel ends up on the second display, whose
 	// work area then clamps it, not the display the press started on.
-	paletteMove(tt, f, palettePoint{X: grab.X - 1200, Y: grab.Y})
+	paletteMove(tt, f, screenPoint{X: grab.X - 1200, Y: grab.Y})
 	if a.palette.drag.displayID != 2 {
 		t.Fatalf("drag display = %d; want the left display", a.palette.drag.displayID)
 	}
@@ -436,11 +436,11 @@ func TestPaletteDragAcrossDisplays(t *testing.T) {
 	}
 	// Past the left edge of that display it is pulled back inside it, not
 	// inside the display the press started on.
-	paletteMove(tt, f, palettePoint{X: grab.X - 2500, Y: grab.Y})
+	paletteMove(tt, f, screenPoint{X: grab.X - 2500, Y: grab.Y})
 	if got := panelPointOf(a, f); got.X != -1920 {
 		t.Fatalf("panel x = %d; want the left edge of the left display", got.X)
 	}
-	paletteRelease(tt, f, palettePoint{X: grab.X - 2500, Y: grab.Y})
+	paletteRelease(tt, f, screenPoint{X: grab.X - 2500, Y: grab.Y})
 	if _, ok := a.config.PalettePositions["2"]; !ok {
 		t.Fatalf("the drag stored no seat for the left display: %+v", a.config.PalettePositions)
 	}
@@ -505,11 +505,11 @@ func TestPaletteGuidesHideWithThePanel(t *testing.T) {
 	tt := paletteTester(a, "zh-CN")
 	grab := grabScreen(a, f)
 	palettePress(tt, f, grab)
-	paletteMove(tt, f, palettePoint{X: grab.X + 40, Y: grab.Y + 30})
+	paletteMove(tt, f, screenPoint{X: grab.X + 40, Y: grab.Y + 30})
 	if a.guide == nil || !a.guide.visible {
 		t.Fatal("the guides did not show while dragging")
 	}
-	paletteRelease(tt, f, palettePoint{X: grab.X + 40, Y: grab.Y + 30})
+	paletteRelease(tt, f, screenPoint{X: grab.X + 40, Y: grab.Y + 30})
 	if a.guide.visible {
 		t.Fatal("the guides stayed after the release")
 	}

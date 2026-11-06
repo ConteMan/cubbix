@@ -16,7 +16,7 @@ import (
 type fakeScreens struct {
 	displays []mygo.Display
 	cursor   mygo.Point
-	window   palettePoint
+	window   screenPoint
 }
 
 // paletteTestScreens replaces the palette's screen, pointer and window seams
@@ -30,33 +30,33 @@ func paletteTestScreens(a *application) *fakeScreens {
 		},
 		cursor: mygo.Point{X: 700, Y: 300},
 	}
-	a.paletteDisplays = func() []mygo.Display { return f.displays }
-	a.paletteCursor = func() mygo.Point { return f.cursor }
-	a.paletteWindowPosition = func() palettePoint { return f.window }
-	a.setPaletteWindowPosition = func(p palettePoint) { f.window = p }
+	a.displays = func() []mygo.Display { return f.displays }
+	a.cursorPoint = func() mygo.Point { return f.cursor }
+	a.paletteWindowPosition = func() screenPoint { return f.window }
+	a.setPaletteWindowPosition = func(p screenPoint) { f.window = p }
 	a.createPaletteGuide = func(*paletteGuideState) {}
 	return f
 }
 
 func TestSnapPalette(t *testing.T) {
-	size := paletteSize{Width: 640, Height: 400}
+	size := screenSize{Width: 640, Height: 400}
 	guides := paletteGuides{CenterX: 720, TopY: 121, MiddleY: 462}
 	cases := []struct {
 		name      string
-		candidate palettePoint
-		want      palettePoint
+		candidate screenPoint
+		want      screenPoint
 		snap      paletteSnap
 	}{
-		{"free", palettePoint{X: 100, Y: 300}, palettePoint{X: 100, Y: 300}, paletteSnap{}},
-		{"vertical centre", palettePoint{X: 404, Y: 300}, palettePoint{X: 400, Y: 300}, paletteSnap{X: true}},
-		{"vertical centre at the threshold", palettePoint{X: 408, Y: 300}, palettePoint{X: 400, Y: 300}, paletteSnap{X: true}},
-		{"past the threshold", palettePoint{X: 409, Y: 300}, palettePoint{X: 409, Y: 300}, paletteSnap{}},
-		{"default height", palettePoint{X: 100, Y: 117}, palettePoint{X: 100, Y: 121}, paletteSnap{Y: paletteSnapTop}},
-		{"work area centre", palettePoint{X: 100, Y: 265}, palettePoint{X: 100, Y: 262}, paletteSnap{Y: paletteSnapMiddle}},
+		{"free", screenPoint{X: 100, Y: 300}, screenPoint{X: 100, Y: 300}, paletteSnap{}},
+		{"vertical centre", screenPoint{X: 404, Y: 300}, screenPoint{X: 400, Y: 300}, paletteSnap{X: true}},
+		{"vertical centre at the threshold", screenPoint{X: 408, Y: 300}, screenPoint{X: 400, Y: 300}, paletteSnap{X: true}},
+		{"past the threshold", screenPoint{X: 409, Y: 300}, screenPoint{X: 409, Y: 300}, paletteSnap{}},
+		{"default height", screenPoint{X: 100, Y: 117}, screenPoint{X: 100, Y: 121}, paletteSnap{Y: paletteSnapTop}},
+		{"work area centre", screenPoint{X: 100, Y: 265}, screenPoint{X: 100, Y: 262}, paletteSnap{Y: paletteSnapMiddle}},
 		// Both horizontal lines equally near: the default height wins, it is
 		// where the panel opens.
-		{"tie takes the default height", palettePoint{X: 100, Y: 118}, palettePoint{X: 100, Y: 121}, paletteSnap{Y: paletteSnapTop}},
-		{"both lines nearest wins", palettePoint{X: 100, Y: 255}, palettePoint{X: 100, Y: 262}, paletteSnap{Y: paletteSnapMiddle}},
+		{"tie takes the default height", screenPoint{X: 100, Y: 118}, screenPoint{X: 100, Y: 121}, paletteSnap{Y: paletteSnapTop}},
+		{"both lines nearest wins", screenPoint{X: 100, Y: 255}, screenPoint{X: 100, Y: 262}, paletteSnap{Y: paletteSnapMiddle}},
 	}
 	for _, c := range cases {
 		got, snap := snapPalette(c.candidate, size, guides, 8)
@@ -66,33 +66,33 @@ func TestSnapPalette(t *testing.T) {
 	}
 	// A tie needs guides half a panel apart; check that rule directly.
 	tie := paletteGuides{CenterX: 720, TopY: 121, MiddleY: 321}
-	if _, snap := snapPalette(palettePoint{X: 0, Y: 118}, size, tie, 8); snap.Y != paletteSnapTop {
+	if _, snap := snapPalette(screenPoint{X: 0, Y: 118}, size, tie, 8); snap.Y != paletteSnapTop {
 		t.Errorf("tie snapped to %d; want the default height", snap.Y)
 	}
 }
 
 func TestPaletteClamp(t *testing.T) {
-	size := paletteSize{Width: 640, Height: 400}
+	size := screenSize{Width: 640, Height: 400}
 	main := mygo.Rectangle{X: 0, Y: 25, Width: 1440, Height: 875}
 	cases := []struct {
 		name string
-		in   palettePoint
+		in   screenPoint
 		work mygo.Rectangle
-		want palettePoint
+		want screenPoint
 	}{
-		{"inside", palettePoint{X: 400, Y: 121}, main, palettePoint{X: 400, Y: 121}},
-		{"past the right and bottom", palettePoint{X: 1000, Y: 700}, main, palettePoint{X: 800, Y: 500}},
-		{"past the left and top", palettePoint{X: -100, Y: -100}, main, palettePoint{X: 0, Y: 25}},
+		{"inside", screenPoint{X: 400, Y: 121}, main, screenPoint{X: 400, Y: 121}},
+		{"past the right and bottom", screenPoint{X: 1000, Y: 700}, main, screenPoint{X: 800, Y: 500}},
+		{"past the left and top", screenPoint{X: -100, Y: -100}, main, screenPoint{X: 0, Y: 25}},
 		// A work area narrower than the panel leaves X alone: opening centres
 		// it across, and a drag keeps the pointer's choice.
-		{"narrow work area keeps x", palettePoint{X: -20, Y: 121}, mygo.Rectangle{X: 0, Y: 0, Width: 600, Height: 900}, palettePoint{X: -20, Y: 121}},
+		{"narrow work area keeps x", screenPoint{X: -20, Y: 121}, mygo.Rectangle{X: 0, Y: 0, Width: 600, Height: 900}, screenPoint{X: -20, Y: 121}},
 		// A work area shorter than the panel leaves Y alone for the same
 		// reason; the caller's fallback pins it against the top.
-		{"short work area keeps y", palettePoint{X: 100, Y: 20}, mygo.Rectangle{X: 0, Y: 0, Width: 1440, Height: 320}, palettePoint{X: 100, Y: 20}},
-		{"display left of the main one", palettePoint{X: -1000, Y: 0}, mygo.Rectangle{X: -1920, Y: 25, Width: 1920, Height: 1055}, palettePoint{X: -1000, Y: 25}},
+		{"short work area keeps y", screenPoint{X: 100, Y: 20}, mygo.Rectangle{X: 0, Y: 0, Width: 1440, Height: 320}, screenPoint{X: 100, Y: 20}},
+		{"display left of the main one", screenPoint{X: -1000, Y: 0}, mygo.Rectangle{X: -1920, Y: 25, Width: 1920, Height: 1055}, screenPoint{X: -1000, Y: 25}},
 	}
 	for _, c := range cases {
-		if got := paletteClamp(c.in, size, c.work); got != c.want {
+		if got := clampToWorkArea(c.in, size, c.work); got != c.want {
 			t.Errorf("%s: got %+v; want %+v", c.name, got, c.want)
 		}
 	}
@@ -100,21 +100,21 @@ func TestPaletteClamp(t *testing.T) {
 
 func TestPalettePointerScreen(t *testing.T) {
 	box := ui.Rect{X: 32, Y: 32}
-	window := palettePoint{X: 1000, Y: 500}
+	window := screenPoint{X: 1000, Y: 500}
 	press := palettePointerScreen(box, window, ui.InputEvent{X: 5, Y: 7})
-	if press != (palettePoint{X: 1037, Y: 539}) {
+	if press != (screenPoint{X: 1037, Y: 539}) {
 		t.Fatalf("press = %+v", press)
 	}
 	// The window moved by the drag: the same screen point composes the same
 	// way from the new window and the negative element coordinates that come
 	// with it. Subtracting element-local positions would give the residual.
-	moved := palettePoint{X: 1050, Y: 520}
+	moved := screenPoint{X: 1050, Y: 520}
 	again := palettePointerScreen(box, moved, ui.InputEvent{X: -45, Y: -13})
 	if again != press {
 		t.Fatalf("screen point moved from %+v to %+v", press, again)
 	}
 	// Sub-pixel pointer positions round to the DIP they are nearest.
-	if got := palettePointerScreen(ui.Rect{}, palettePoint{}, ui.InputEvent{X: 4.6, Y: 4.4}); got != (palettePoint{X: 5, Y: 4}) {
+	if got := palettePointerScreen(ui.Rect{}, screenPoint{}, ui.InputEvent{X: 4.6, Y: 4.4}); got != (screenPoint{X: 5, Y: 4}) {
 		t.Fatalf("rounding = %+v", got)
 	}
 }
@@ -151,22 +151,22 @@ func TestPaletteGuideLocal(t *testing.T) {
 
 func TestPaletteSeat(t *testing.T) {
 	main := mygo.Rectangle{X: 0, Y: 25, Width: 1440, Height: 875}
-	panel := palettePoint{X: 400, Y: 121}
-	seat := paletteSeatFor(panel, main)
-	if seat != (paletteSeat{X: 400, Y: 96}) {
-		t.Fatalf("seat = %+v", seat)
+	panel := screenPoint{X: 400, Y: 121}
+	stored := seatOffset(panel, main)
+	if stored != (seat{X: 400, Y: 96}) {
+		t.Fatalf("seat = %+v", stored)
 	}
-	if got := palettePanelFromSeat(seat, main); got != panel {
+	if got := seatPoint(stored, main); got != panel {
 		t.Fatalf("panel = %+v", got)
 	}
-	if got := paletteSeatKey(int64(-42)); got != "-42" {
+	if got := seatKey(int64(-42)); got != "-42" {
 		t.Fatalf("negative key = %q", got)
 	}
 	// An older config has no palette_positions table at all: the map is nil
 	// and writing has to build it instead of panicking.
 	config := Config{}
-	config.putPaletteSeat("1", paletteSeat{X: 12, Y: 34})
-	if !reflect.DeepEqual(config.PalettePositions, map[string]paletteSeat{"1": {X: 12, Y: 34}}) {
+	config.putPaletteSeat("1", seat{X: 12, Y: 34})
+	if !reflect.DeepEqual(config.PalettePositions, map[string]seat{"1": {X: 12, Y: 34}}) {
 		t.Fatalf("seats = %+v", config.PalettePositions)
 	}
 }
@@ -186,8 +186,8 @@ func TestPaletteConfigDefaultsAndRoundTrip(t *testing.T) {
 	if config.PalettePositions != nil {
 		t.Fatalf("seats = %+v; want none", config.PalettePositions)
 	}
-	config.putPaletteSeat("732561", paletteSeat{X: 40, Y: 96})
-	config.putPaletteSeat("-42", paletteSeat{X: -8, Y: 0})
+	config.putPaletteSeat("732561", seat{X: 40, Y: 96})
+	config.putPaletteSeat("-42", seat{X: -8, Y: 0})
 	config.PanelShortcut = "Ctrl+Alt+Cmd+M"
 	if err := saveConfig(path, config); err != nil {
 		t.Fatal(err)
@@ -223,7 +223,7 @@ func TestPaletteSeatsInAnOldConfig(t *testing.T) {
 	a.config = config
 	a.placePalette()
 	margin := a.paletteMargin()
-	if got := (palettePoint{X: f.window.X + margin, Y: f.window.Y + margin}); got != (palettePoint{X: 40, Y: 121}) {
+	if got := (screenPoint{X: f.window.X + margin, Y: f.window.Y + margin}); got != (screenPoint{X: 40, Y: 121}) {
 		t.Fatalf("panel = %+v; want the remembered offset on the main display", got)
 	}
 }
@@ -235,16 +235,16 @@ func TestPaletteDisplays(t *testing.T) {
 	}}
 	// The display a rectangle overlaps most, so a panel straddling two
 	// displays follows the one it is mostly on.
-	if got := paletteDisplayMatching(f.displays, mygo.Rectangle{X: -100, Y: 100, Width: 640, Height: 400}); got.ID != 1 {
+	if got := displayMatching(f.displays, mygo.Rectangle{X: -100, Y: 100, Width: 640, Height: 400}); got.ID != 1 {
 		t.Fatalf("matching display = %d; want the main one", got.ID)
 	}
-	if got := paletteDisplayMatching(f.displays, mygo.Rectangle{X: -500, Y: 100, Width: 640, Height: 400}); got.ID != 2 {
+	if got := displayMatching(f.displays, mygo.Rectangle{X: -500, Y: 100, Width: 640, Height: 400}); got.ID != 2 {
 		t.Fatalf("matching display = %d; want the left one", got.ID)
 	}
-	if got := paletteDisplayNearest(f.displays, mygo.Point{X: -400, Y: 300}); got.ID != 2 {
+	if got := displayNearest(f.displays, mygo.Point{X: -400, Y: 300}); got.ID != 2 {
 		t.Fatalf("nearest display = %d; want the left one", got.ID)
 	}
-	if got := paletteDisplayNearest(f.displays, mygo.Point{X: 900, Y: 300}); got.ID != 1 {
+	if got := displayNearest(f.displays, mygo.Point{X: 900, Y: 300}); got.ID != 1 {
 		t.Fatalf("nearest display = %d; want the main one", got.ID)
 	}
 }
@@ -257,20 +257,20 @@ func TestPalettePlaceUsesTheRememberedSeat(t *testing.T) {
 	f := paletteTestScreens(a)
 	a.placePalette()
 	margin := a.paletteMargin()
-	if want := (palettePoint{X: f.window.X + margin, Y: f.window.Y + margin}); want != (palettePoint{X: 400, Y: 121}) {
+	if want := (screenPoint{X: f.window.X + margin, Y: f.window.Y + margin}); want != (screenPoint{X: 400, Y: 121}) {
 		t.Fatalf("default position = %+v", want)
 	}
 	// The second display remembers a place: the panel opens there.
 	f.cursor = mygo.Point{X: -400, Y: 300}
-	a.config.putPaletteSeat("2", paletteSeat{X: 100, Y: 50})
+	a.config.putPaletteSeat("2", seat{X: 100, Y: 50})
 	a.placePalette()
-	if got := (palettePoint{X: f.window.X + margin, Y: f.window.Y + margin}); got != (palettePoint{X: -1820, Y: 75}) {
+	if got := (screenPoint{X: f.window.X + margin, Y: f.window.Y + margin}); got != (screenPoint{X: -1820, Y: 75}) {
 		t.Fatalf("remembered position = %+v", got)
 	}
 	// A remembered place that no longer fits is pulled back inside.
-	a.config.putPaletteSeat("2", paletteSeat{X: 5000, Y: 5000})
+	a.config.putPaletteSeat("2", seat{X: 5000, Y: 5000})
 	a.placePalette()
-	if got := (palettePoint{X: f.window.X + margin, Y: f.window.Y + margin}); got != (palettePoint{X: -640, Y: 680}) {
+	if got := (screenPoint{X: f.window.X + margin, Y: f.window.Y + margin}); got != (screenPoint{X: -640, Y: 680}) {
 		t.Fatalf("clamped position = %+v", got)
 	}
 }
@@ -283,8 +283,8 @@ func TestPaletteResetCommand(t *testing.T) {
 	if command == nil || command.Available != nil {
 		t.Fatalf("reset command = %+v", command)
 	}
-	a.config.putPaletteSeat("1", paletteSeat{X: 10, Y: 20})
-	f.window = palettePoint{X: 700 - a.paletteMargin(), Y: 500 - a.paletteMargin()}
+	a.config.putPaletteSeat("1", seat{X: 10, Y: 20})
+	f.window = screenPoint{X: 700 - a.paletteMargin(), Y: 500 - a.paletteMargin()}
 	if err := command.Run(a, request{Command: command}); err != nil {
 		t.Fatal(err)
 	}
@@ -292,8 +292,8 @@ func TestPaletteResetCommand(t *testing.T) {
 		t.Fatalf("reset kept the seat: %+v", a.config.PalettePositions)
 	}
 	// Back at the default position for the display the panel was on.
-	panel := palettePoint{X: f.window.X + a.paletteMargin(), Y: f.window.Y + a.paletteMargin()}
-	if panel != (palettePoint{X: 400, Y: 121}) {
+	panel := screenPoint{X: f.window.X + a.paletteMargin(), Y: f.window.Y + a.paletteMargin()}
+	if panel != (screenPoint{X: 400, Y: 121}) {
 		t.Fatalf("position after reset = %+v", panel)
 	}
 }
@@ -307,15 +307,15 @@ func TestPaletteRememberedPositionOnSmallerWorkArea(t *testing.T) {
 		a := paletteTestApp(t)
 		f := paletteTestScreens(a)
 		f.displays = []mygo.Display{{ID: 1, Bounds: work, WorkArea: work}}
-		seat := paletteSeat{X: 5000, Y: 5000}
-		a.config.putPaletteSeat("1", seat)
+		stored := seat{X: 5000, Y: 5000}
+		a.config.putPaletteSeat("1", stored)
 		a.placePalette()
 		got := panelPointOf(a, f)
-		want := palettePoint{X: work.X + max(0, work.Width-640), Y: work.Y + max(0, work.Height-400)}
+		want := screenPoint{X: work.X + max(0, work.Width-640), Y: work.Y + max(0, work.Height-400)}
 		if work.Width < 640 {
 			want.X = work.X + (work.Width-640)/2
 		}
-		if got != want || a.config.PalettePositions["1"] != seat {
+		if got != want || a.config.PalettePositions["1"] != stored {
 			t.Fatalf("work=%+v: panel=%+v want=%+v seat=%+v", work, got, want, a.config.PalettePositions["1"])
 		}
 	}

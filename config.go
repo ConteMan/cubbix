@@ -18,14 +18,6 @@ const (
 	defaultPanelKey    = "Ctrl+Alt+Cmd+P"
 )
 
-// paletteSeat is where the palette sits on one display: the offset of the
-// panel's top-left corner from that display's work area origin. Offsets
-// survive a display moving, an absolute position would not.
-type paletteSeat struct {
-	X int `toml:"x"`
-	Y int `toml:"y"`
-}
-
 // normalizeCommandIDs drops blanks and duplicates while keeping the order.
 func normalizeCommandIDs(ids []string) []string {
 	var out []string
@@ -54,34 +46,34 @@ func normalizePaletteRecents(ids []string) []string {
 }
 
 type Config struct {
-	AwakeLid           bool                   `toml:"awake_lid"`
-	AwakeLidBatteryMin int                    `toml:"awake_lid_battery_min"`
-	JSONEnabled        bool                   `toml:"json_enabled"`
-	JSONShortcut       string                 `toml:"json_shortcut"`
-	JSONWidth          int                    `toml:"json_width,omitempty"`
-	JSONHeight         int                    `toml:"json_height,omitempty"`
-	JSONSplit          int                    `toml:"json_split,omitempty"`
-	Version            int                    `toml:"version"`
-	Language           string                 `toml:"language"`
-	OpenAtLogin        bool                   `toml:"open_at_login"`
-	FeedbackMode       string                 `toml:"feedback_mode"`
-	FeedbackCorner     string                 `toml:"feedback_corner"`
-	AutomaticUpdates   bool                   `toml:"automatic_updates"`
-	AwakeEnabled       bool                   `toml:"awake_enabled"`
-	AwakeMode          string                 `toml:"awake_mode"`
-	AwakeMinutes       int                    `toml:"awake_minutes"`
-	AwakeUntil         string                 `toml:"awake_until,omitempty"`
-	AwakeAgents        string                 `toml:"awake_agents"`
-	AwakeShortcut      string                 `toml:"awake_shortcut"`
-	PaletteShortcut    string                 `toml:"palette_shortcut"`
-	PanelShortcut      string                 `toml:"panel_shortcut"`
-	PalettePositions   map[string]paletteSeat `toml:"palette_positions,omitempty"`
-	PaletteFavorites   []string               `toml:"palette_favorites,omitempty"`
-	PaletteRecents     []string               `toml:"palette_recents,omitempty"`
-	AwakeSession       *awakeSession          `toml:"awake_session,omitempty"`
-	RestoreAwake       bool                   `toml:"restore_awake,omitempty"`
-	WindowWidth        int                    `toml:"window_width,omitempty"`
-	WindowHeight       int                    `toml:"window_height,omitempty"`
+	AwakeLid           bool            `toml:"awake_lid"`
+	AwakeLidBatteryMin int             `toml:"awake_lid_battery_min"`
+	JSONEnabled        bool            `toml:"json_enabled"`
+	JSONShortcut       string          `toml:"json_shortcut"`
+	JSONWidth          int             `toml:"json_width,omitempty"`
+	JSONHeight         int             `toml:"json_height,omitempty"`
+	JSONSplit          int             `toml:"json_split,omitempty"`
+	Version            int             `toml:"version"`
+	Language           string          `toml:"language"`
+	OpenAtLogin        bool            `toml:"open_at_login"`
+	FeedbackMode       string          `toml:"feedback_mode"`
+	FeedbackCorner     string          `toml:"feedback_corner"`
+	AutomaticUpdates   bool            `toml:"automatic_updates"`
+	AwakeEnabled       bool            `toml:"awake_enabled"`
+	AwakeMode          string          `toml:"awake_mode"`
+	AwakeMinutes       int             `toml:"awake_minutes"`
+	AwakeUntil         string          `toml:"awake_until,omitempty"`
+	AwakeAgents        string          `toml:"awake_agents"`
+	AwakeShortcut      string          `toml:"awake_shortcut"`
+	PaletteShortcut    string          `toml:"palette_shortcut"`
+	PanelShortcut      string          `toml:"panel_shortcut"`
+	PalettePositions   map[string]seat `toml:"palette_positions,omitempty"`
+	PaletteFavorites   []string        `toml:"palette_favorites,omitempty"`
+	PaletteRecents     []string        `toml:"palette_recents,omitempty"`
+	AwakeSession       *awakeSession   `toml:"awake_session,omitempty"`
+	RestoreAwake       bool            `toml:"restore_awake,omitempty"`
+	WindowWidth        int             `toml:"window_width,omitempty"`
+	WindowHeight       int             `toml:"window_height,omitempty"`
 	// UpdateLastCheck is the UTC RFC3339Nano time of the last finished update
 	// check. It is optional: an older config simply has none.
 	UpdateLastCheck string `toml:"update_last_check,omitempty"`
@@ -164,14 +156,13 @@ func normalizeCheckedAt(value string, now time.Time) string {
 	return parsed.UTC().Format(time.RFC3339Nano)
 }
 
-// putPaletteSeat remembers where the palette sits on a display. An older
-// config has no palette_positions table at all, so the map starts nil and an
-// assignment would panic: build it first.
-func (c *Config) putPaletteSeat(key string, seat paletteSeat) {
+// putPaletteSeat remembers where the palette sits on a display, by display
+// key. It is the string-keyed form of the shared seat table.
+func (c *Config) putPaletteSeat(key string, value seat) {
 	if c.PalettePositions == nil {
-		c.PalettePositions = map[string]paletteSeat{}
+		c.PalettePositions = map[string]seat{}
 	}
-	c.PalettePositions[key] = seat
+	c.PalettePositions[key] = value
 }
 
 func saveConfig(path string, config Config) (err error) {
