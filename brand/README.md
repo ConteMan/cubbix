@@ -51,13 +51,13 @@
 
 ## 安装与重新导出
 
-依赖全部装在仓库外。已验证 Python 3.13 / 3.15、pen CLI 0.3.12、Node.js，以及以下固定渲染依赖。先按 pen.dev 官方安装说明准备 `pen`，确保 `pen version` 可运行；导出器通过 headless interactive 的 Get/Print 读取保存后的文档，不保存或改写源。
+依赖全部装在仓库外。已验证 Python 3.13 / 3.15、pen CLI 0.3.15、Node.js，以及以下固定渲染依赖。先按 pen.dev 官方安装说明准备 `pen`，确保 `pen version` 可运行；导出器通过 headless interactive 的 Get/Print 读取保存后的文档，不保存或改写源。
 
 在仓库根目录执行（`mktemp` 默认创建仓库外临时目录）：
 
 ```sh
 logo_env=$(mktemp -d)
-python3.13 -m venv "$logo_env/venv"
+python3 -m venv "$logo_env/venv"   # 任一已验证版本，比如 python3.15
 "$logo_env/venv/bin/python" -m pip install -r brand/scripts/requirements.txt
 npm install --prefix "$logo_env/render" --no-audit --no-fund @resvg/resvg-js@2.6.2
 export NODE_PATH="$logo_env/render/node_modules"

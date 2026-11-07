@@ -22,7 +22,7 @@
     "file": "brand/scripts/export.py",
     "sha256": "fc63a044f0d467fa0f9bf3a56873aa3721b8c5e7929ccb82a156f49efbe5e37f",
     "versions": {
-      "pen_cli": "0.3.12",
+      "pen_cli": "0.3.15",
       "resvg": "2.6.2",
       "pillow": "13.0.0",
       "svgpathtools": "1.7.2"
