@@ -6,3 +6,6 @@ build/
 frontend/node_modules/
 
 /resources/darwin-*/bin/
+
+# Python test caches
+__pycache__/
