@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"strings"
 	"testing"
@@ -182,5 +183,67 @@ func TestCLITranslateUnexpectedBody(t *testing.T) {
 	defer client.Close()
 	if _, err := client.Do(Request{V: Protocol, ID: "abc", Op: OpStatus}, nil, time.Second); CodeOf(err) != CodeInternal {
 		t.Fatalf("orphan body = %v", err)
+	}
+}
+
+func TestTranslateResponseValidation(t *testing.T) {
+	for _, scenario := range []struct {
+		name     string
+		action   string
+		response Response
+		body     string
+		code     string
+	}{
+		{"negative length", ActionTranslate, Response{OK: true, Bytes: -1, Translate: &TranslateResult{}}, "", CodeInternal},
+		{"missing metadata", ActionTranslate, Response{OK: true}, "", CodeInternal},
+		{"inline text", ActionTranslate, Response{OK: true, Translate: &TranslateResult{Text: "inline"}}, "", CodeInternal},
+		{"oversized", ActionTranslate, Response{OK: true, Bytes: MaxTranslateBody + 1, Translate: &TranslateResult{}}, "", CodeInternal},
+		{"invalid UTF-8", ActionTranslate, Response{OK: true, Bytes: 1, Translate: &TranslateResult{}}, "\xff", CodeInternal},
+		{"short body", ActionTranslate, Response{OK: true, Bytes: 4, Translate: &TranslateResult{}}, "abc", CodeNotRunning},
+		{"metadata on status", "", Response{OK: true, Translate: &TranslateResult{}}, "", CodeInternal},
+		{"negative status length", "", Response{OK: true, Bytes: -1}, "", CodeInternal},
+		{"body on error", ActionTranslate, Response{Code: CodeBusy, Bytes: 3, Translate: &TranslateResult{}}, "abc", CodeInternal},
+	} {
+		t.Run(scenario.name, func(t *testing.T) {
+			client := &Client{r: bufio.NewReader(strings.NewReader(scenario.body))}
+			result := scenario.response.Result()
+			if err := client.readTranslationBody(Request{Action: scenario.action}, &result); CodeOf(err) != scenario.code {
+				t.Fatalf("response validation = %v, want %s", err, scenario.code)
+			}
+		})
+	}
+}
+
+func TestTranslateFragmentedResponse(t *testing.T) {
+	reader, writer := io.Pipe()
+	text := strings.Repeat("你🙂", MaxTranslateBody/len("你🙂"))
+	go func() {
+		defer writer.Close()
+		for _, octet := range []byte(text) {
+			if _, err := writer.Write([]byte{octet}); err != nil {
+				return
+			}
+		}
+	}()
+	defer reader.Close()
+	body, err := readBodyFrame(bufio.NewReader(reader), len(text))
+	if err != nil || string(body) != text {
+		t.Fatalf("fragmented response length=%d, error=%v", len(body), err)
+	}
+	_, err = readBodyFrame(bufio.NewReader(strings.NewReader("你")), 2)
+	if err == nil || errors.Is(err, io.EOF) {
+		t.Fatal("a frame ending inside a UTF-8 rune was accepted")
+	}
+}
+
+func TestTranslateOldAppError(t *testing.T) {
+	line, err := EncodeLine(Response{V: Protocol, ID: "old", Code: CodeBadRequest})
+	if err != nil {
+		t.Fatal(err)
+	}
+	client := &Client{r: bufio.NewReader(bytes.NewReader(line))}
+	result, err := client.readResponse(Request{ID: "old", Action: ActionTranslate})
+	if err != nil || result.Code != CodeBadRequest || !strings.Contains(result.Message, "Update and restart") {
+		t.Fatalf("old app answer = %+v, %v", result, err)
 	}
 }

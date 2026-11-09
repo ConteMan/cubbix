@@ -5,10 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"net"
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -38,7 +40,7 @@ func runTranslateCLI(t *testing.T, a *application, req cli.Request, body []byte)
 	var result cli.Result
 	var out []byte
 	calls := 0
-	a.applyTranslateCLI(req, body, func(r cli.Result, b []byte) {
+	a.applyTranslateCLI(context.Background(), req, body, func(r cli.Result, b []byte) {
 		calls++
 		result, out = r, b
 	})
@@ -70,6 +72,10 @@ func TestCommandPrefixRawArg(t *testing.T) {
 				scenario.query, prefix.Arg, prefix.RawArg, scenario.arg, scenario.raw)
 		}
 	}
+	prefix, ok := splitCommandQuery(a, "en", "Translate Hello iOS", commands)
+	if !ok || prefix.Command.ID != "translate.open" || prefix.RawArg != "Hello iOS" {
+		t.Fatalf("English text prefix = %+v, %v", prefix, ok)
+	}
 }
 
 func TestRefreshPaletteParamText(t *testing.T) {
@@ -96,6 +102,16 @@ func TestRefreshPaletteParamText(t *testing.T) {
 	a.refreshPalette(bare, "zh-CN")
 	if bare.request.Command == nil || bare.request.Command.ID != "translate.open" || bare.request.Arg != "" {
 		t.Fatalf("bare translate request = %+v", bare.request)
+	}
+	english := &paletteState{query: "Translate Hello iOS"}
+	a.refreshPalette(english, "en")
+	if english.request.Command == nil || english.request.Command.ID != "translate.open" || english.request.Arg != "Hello iOS" {
+		t.Fatalf("English text request = %+v", english.request)
+	}
+	english.query = "Awake 45m"
+	a.refreshPalette(english, "en")
+	if english.request.Awake.Minutes != 45 || english.request.Arg != "45m" {
+		t.Fatalf("English paramAwake regressed: %+v", english.request)
 	}
 
 	a.config.TranslateEnabled = false
@@ -130,7 +146,7 @@ func TestTranslateCommandStartsOriginalText(t *testing.T) {
 	}
 }
 
-func TestCLITranslateGeneration(t *testing.T) {
+func TestCLITranslateConcurrentRequests(t *testing.T) {
 	a := translateCLIApp(t)
 	a.translateAsync = true
 	a.lidCompletion = nil
@@ -158,9 +174,9 @@ func TestCLITranslateGeneration(t *testing.T) {
 			close(done)
 		}
 	}
-	a.applyTranslateCLI(translateCLIRequest(""), []byte("one"), reply("one", firstDone))
+	a.applyTranslateCLI(context.Background(), translateCLIRequest(""), []byte("one"), reply("one", firstDone))
 	<-firstStarted
-	a.applyTranslateCLI(translateCLIRequest(""), []byte("two"), reply("two", secondDone))
+	a.applyTranslateCLI(context.Background(), translateCLIRequest(""), []byte("two"), reply("two", secondDone))
 	<-secondDone
 	close(releaseFirst)
 	<-firstDone
@@ -168,8 +184,8 @@ func TestCLITranslateGeneration(t *testing.T) {
 	if counts["one"] != 1 || counts["two"] != 1 {
 		t.Fatalf("reply counts = %v", counts)
 	}
-	if results["one"].OK || results["one"].Code != cli.CodeBusy {
-		t.Fatalf("the late generation was not dropped: %+v", results["one"])
+	if !results["one"].OK || bodies["one"] != "T:one" {
+		t.Fatalf("an independent request was superseded: %+v", results["one"])
 	}
 	// The app keeps the translation in the body frame; only the client fills
 	// Translate.Text from it.
@@ -179,6 +195,174 @@ func TestCLITranslateGeneration(t *testing.T) {
 	}
 	if a.lidCompletion != nil || a.lidBusy {
 		t.Fatal("a translation touched the lid completion path")
+	}
+}
+
+func TestCLITranslateCanceledCompletion(t *testing.T) {
+	a := translateCLIApp(t)
+	callbacks := make(chan func(), 1)
+	a.translateCLIDispatch = func(fn func()) { callbacks <- fn }
+	a.translateStreamFn = func(context.Context, translateConfig, string, string, string, func(string)) (string, error) {
+		return "late", nil
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	calls := 0
+	a.applyTranslateCLI(ctx, translateCLIRequest(""), []byte("hello"), func(cli.Result, []byte) { calls++ })
+	callback := <-callbacks
+	cancel()
+	callback()
+	if calls != 0 {
+		t.Fatal("a canceled request delivered a late completion")
+	}
+}
+
+func TestCLITranslateInvalidInputAndOutput(t *testing.T) {
+	a := translateCLIApp(t)
+	called := false
+	a.translateStreamFn = func(context.Context, translateConfig, string, string, string, func(string)) (string, error) {
+		called = true
+		return "ok", nil
+	}
+	for _, input := range []string{"\xff", "binary\x00text", " \t\r\n"} {
+		result, _ := runTranslateCLI(t, a, translateCLIRequest(""), []byte(input))
+		if result.Code != cli.CodeBadRequest || called {
+			t.Fatalf("invalid input was translated: %+v", result)
+		}
+	}
+	for _, output := range []string{"", "\xff", strings.Repeat("a", cli.MaxTranslateBody+1)} {
+		a.translateStreamFn = func(context.Context, translateConfig, string, string, string, func(string)) (string, error) {
+			return output, nil
+		}
+		result, body := runTranslateCLI(t, a, translateCLIRequest(""), []byte("hello"))
+		if result.Code != "TranslateBadResponse" || len(body) != 0 {
+			t.Fatalf("invalid output was accepted: %+v", result)
+		}
+	}
+}
+
+func TestCLITranslateConnectionLifecycle(t *testing.T) {
+	for _, ending := range []string{"disconnect", "timeout", "client timeout", "shutdown"} {
+		t.Run(ending, func(t *testing.T) {
+			a := translateCLIApp(t)
+			a.translateAsync = true
+			started := make(chan struct{})
+			canceled := make(chan struct{})
+			a.translateStreamFn = func(ctx context.Context, _ translateConfig, _, _, _ string, _ func(string)) (string, error) {
+				close(started)
+				<-ctx.Done()
+				close(canceled)
+				return "late", nil
+			}
+			s, path := testServer(t, a)
+			s.translateAsync = a.applyTranslateCLI
+			if ending == "timeout" {
+				s.actionTimeout = 20 * time.Millisecond
+			}
+			client := dial(t, path)
+			resultCh := make(chan cli.Result, 1)
+			errorCh := make(chan error, 1)
+			go func() {
+				req := translateCLIRequest("")
+				req.Bytes = len("hello")
+				timeout := 2 * time.Second
+				if ending == "client timeout" {
+					timeout = 50 * time.Millisecond
+				}
+				result, err := client.Do(req, []byte("hello"), timeout)
+				client.Close()
+				resultCh <- result
+				errorCh <- err
+			}()
+			select {
+			case <-started:
+			case <-time.After(time.Second):
+				t.Fatal("worker did not start")
+			}
+			switch ending {
+			case "disconnect":
+				client.Close()
+			case "shutdown":
+				s.stop()
+			}
+			select {
+			case <-canceled:
+			case <-time.After(time.Second):
+				t.Fatal("worker was not canceled")
+			}
+			result, err := <-resultCh, <-errorCh
+			if ending == "timeout" && (err != nil || result.Code != cli.CodeBusy) {
+				t.Fatalf("server timeout = %+v, %v", result, err)
+			}
+			if ending == "shutdown" && (err != nil || result.Code != cli.CodeQuitting) {
+				t.Fatalf("shutdown = %+v, %v", result, err)
+			}
+			if ending == "client timeout" && cli.CodeOf(err) != cli.CodeTimeout {
+				t.Fatalf("client timeout = %+v, %v", result, err)
+			}
+			s.stop()
+			if len(s.slots) != 0 {
+				t.Fatal("a canceled request retained a connection slot")
+			}
+		})
+	}
+}
+
+func TestCLITranslateFragmentedRequest(t *testing.T) {
+	a := translateCLIApp(t)
+	var called atomic.Int32
+	a.translateStreamFn = func(_ context.Context, _ translateConfig, text, _, _ string, _ func(string)) (string, error) {
+		called.Add(1)
+		if text != "你好 iOS" {
+			return "", errors.New("unexpected text")
+		}
+		return "Hello", nil
+	}
+	s, path := testServer(t, a)
+	s.translateAsync = a.applyTranslateCLI
+	conn, err := net.Dial("unix", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	conn.SetDeadline(time.Now().Add(2 * time.Second))
+	req := translateCLIRequest("")
+	req.Bytes = len("你好 iOS")
+	line, _ := cli.EncodeLine(req)
+	for _, octet := range append(line, []byte("你好 iOS")...) {
+		if _, err := conn.Write([]byte{octet}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	reader := bufio.NewReader(conn)
+	line, err = reader.ReadBytes('\n')
+	if err != nil {
+		t.Fatal(err)
+	}
+	var response cli.Response
+	if err := json.Unmarshal(line, &response); err != nil || !response.OK {
+		t.Fatalf("fragmented request: %+v, %v", response, err)
+	}
+	body := make([]byte, response.Bytes)
+	if _, err := io.ReadFull(reader, body); err != nil || string(body) != "Hello" || called.Load() != 1 {
+		t.Fatalf("body = %q, %v; calls = %d", body, err, called.Load())
+	}
+}
+
+func TestCLITranslateSurplusRequestBody(t *testing.T) {
+	a := translateCLIApp(t)
+	var called atomic.Bool
+	a.translateStreamFn = func(context.Context, translateConfig, string, string, string, func(string)) (string, error) {
+		called.Store(true)
+		return "unexpected", nil
+	}
+	s, path := testServer(t, a)
+	s.translateAsync = a.applyTranslateCLI
+	req := translateCLIRequest("")
+	req.Bytes = 1
+	response := rawRequest(t, path, req, []byte("more"))
+	if response.Code != cli.CodeBadRequest || called.Load() {
+		t.Fatalf("surplus body: %+v; called=%v", response, called.Load())
 	}
 }
 
@@ -351,5 +535,53 @@ func TestCLITranslateResponseFields(t *testing.T) {
 	}
 	if back.Bytes != 6 || back.Translate == nil || back.Translate.Clipped != 2 || back.Translate.Text != "" || back.State == nil {
 		t.Fatalf("writeResult dropped a field: %+v", back)
+	}
+}
+
+func TestCLITranslateResponseEncodingFailures(t *testing.T) {
+	for _, scenario := range []struct {
+		name     string
+		response cli.Response
+		body     string
+	}{
+		{"length mismatch", cli.Response{OK: true, Bytes: 4, Translate: &cli.TranslateResult{}}, "abc"},
+		{"empty success", cli.Response{OK: true, Translate: &cli.TranslateResult{}}, ""},
+		{"invalid UTF-8", cli.Response{OK: true, Bytes: 1, Translate: &cli.TranslateResult{}}, "\xff"},
+		{"inline text", cli.Response{OK: true, Bytes: 3, Translate: &cli.TranslateResult{Text: "abc"}}, "abc"},
+		{"error body", cli.Response{Bytes: 3, Translate: &cli.TranslateResult{}}, "abc"},
+		{"oversized header", cli.Response{OK: true, Bytes: 3, Translate: &cli.TranslateResult{Model: strings.Repeat("m", cli.MaxLine)}}, "abc"},
+	} {
+		t.Run(scenario.name, func(t *testing.T) {
+			path := filepath.Join(shortDir(t), "encode.sock")
+			listener, err := net.ListenUnix("unix", &net.UnixAddr{Name: path, Net: "unix"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer listener.Close()
+			go func() {
+				conn, err := listener.AcceptUnix()
+				if err != nil {
+					return
+				}
+				defer conn.Close()
+				response := scenario.response
+				response.V, response.ID = cli.Protocol, "encode"
+				writeTranslationResult(conn, response, []byte(scenario.body))
+			}()
+			conn, err := net.Dial("unix", path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer conn.Close()
+			conn.SetReadDeadline(time.Now().Add(time.Second))
+			data, err := io.ReadAll(conn)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var response cli.Response
+			if err := json.Unmarshal(data, &response); err != nil || response.OK || response.Code != cli.CodeInternal || response.Bytes != 0 || response.Translate != nil {
+				t.Fatalf("invalid response included a body: %q, %v", data, err)
+			}
+		})
 	}
 }

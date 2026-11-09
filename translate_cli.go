@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 	"sync"
-	"sync/atomic"
+	"unicode/utf8"
 
 	"github.com/ConteMan/cubbix/internal/cli"
 )
@@ -15,14 +15,15 @@ import (
 type translateCLIRuntime struct {
 	cfg    translateConfig
 	stream translateStreamFunc
+	secret translateSecretStore
 }
 
 type translateCLIRuntimeKey struct{}
 
 // applyTranslateCLI is the translate hook of cliServer. It runs on the main
-// thread, owns its own generation and reply, and never touches lidCompletion
-// or applyCLIAsync. The HTTP call itself happens on a worker.
-func (a *application) applyTranslateCLI(req cli.Request, body []byte, reply func(cli.Result, []byte)) {
+// thread; each request owns its context and reply, separate from lidCompletion
+// and applyCLIAsync. The HTTP call itself happens on a worker.
+func (a *application) applyTranslateCLI(ctx context.Context, req cli.Request, body []byte, reply func(cli.Result, []byte)) {
 	if a.quitting {
 		reply(cli.Failure(cli.CodeQuitting), nil)
 		return
@@ -40,27 +41,31 @@ func (a *application) applyTranslateCLI(req cli.Request, body []byte, reply func
 		reply(result, nil)
 		return
 	}
-	generation := atomic.AddUint64(&a.translateCLIGeneration, 1)
+	if !cli.ValidTranslateInput(body) || strings.TrimSpace(string(body)) == "" {
+		reply(cli.Failure(cli.CodeBadRequest), nil)
+		return
+	}
 	runtime := translateCLIRuntime{
 		cfg: translateConfig{
 			BaseURL: a.config.TranslateBaseURL,
 			Model:   strings.TrimSpace(a.config.TranslateModel),
 		},
 		stream: a.translateStreamFunction(),
+		secret: a.translateSecret,
 	}
-	ctx := context.WithValue(context.Background(), translateCLIRuntimeKey{}, runtime)
+	ctx = context.WithValue(ctx, translateCLIRuntimeKey{}, runtime)
 	text, to := string(body), req.To
 	var once sync.Once
 	send := func(result cli.Result, out []byte) {
 		once.Do(func() { reply(result, out) })
 	}
 	a.runTranslateWorker(func() {
-		result, out := a.runCLITranslate(ctx, text, to, generation)
+		result, out := a.runCLITranslate(ctx, text, to)
+		if ctx.Err() != nil {
+			return
+		}
 		a.translateCLIMain(func() {
-			// A late result is dropped: it may not answer for a newer request.
-			// Each request still gets exactly one reply.
-			if atomic.LoadUint64(&a.translateCLIGeneration) != generation {
-				send(cli.Failure(cli.CodeBusy), nil)
+			if ctx.Err() != nil || a.quitting {
 				return
 			}
 			if result.OK {
@@ -76,10 +81,10 @@ func (a *application) applyTranslateCLI(req cli.Request, body []byte, reply func
 // runCLITranslate clips, detects the direction, streams the translation and
 // returns the result plus its body frame. It builds no window and refreshes no
 // UI state: the caller assembles the final snapshot on the main thread.
-func (a *application) runCLITranslate(ctx context.Context, text, to string, gen uint64) (cli.Result, []byte) {
+func (a *application) runCLITranslate(ctx context.Context, text, to string) (cli.Result, []byte) {
 	runtime, _ := ctx.Value(translateCLIRuntimeKey{}).(translateCLIRuntime)
-	if atomic.LoadUint64(&a.translateCLIGeneration) != gen {
-		return cli.Failure(cli.CodeBusy), nil
+	if ctx.Err() != nil {
+		return cli.Failure(cli.CodeQuitting), nil
 	}
 	clipped, dropped := clipTranslateInput(text)
 	source, target := detectDirection(clipped)
@@ -90,7 +95,7 @@ func (a *application) runCLITranslate(ctx context.Context, text, to string, gen 
 		source, target = "auto", "en"
 	}
 	cfg := runtime.cfg
-	key, err := a.translateAPIKey()
+	key, err := readTranslateAPIKey(runtime.secret)
 	if err != nil {
 		return cli.Failure("TranslateKeyError"), nil
 	}
@@ -98,34 +103,45 @@ func (a *application) runCLITranslate(ctx context.Context, text, to string, gen 
 	if strings.TrimSpace(cfg.BaseURL) == "" || strings.TrimSpace(cfg.Model) == "" || key == "" {
 		return cli.Failure("TranslateNotConfigured"), nil
 	}
-	// The model gets at most 50s, below the server's 70s wait. A slower model
-	// yields an explicit TranslateTimeout (exit 4), not a client timeout (5).
+	// The model gets at most 50s, below the server's 70s wait. Clients using
+	// --timeout 60s can receive TranslateTimeout (exit 4) before their deadline.
 	ctx, cancel := context.WithTimeout(ctx, translateHTTPTimeout)
 	defer cancel()
+	if ctx.Err() != nil {
+		return cli.Failure(translateErrorKey(ctx.Err())), nil
+	}
 	stream := runtime.stream
 	if stream == nil {
 		stream = streamTranslation
 	}
 	var deltas strings.Builder
+	oversized := false
 	out, err := stream(ctx, cfg, clipped, source, target, func(delta string) {
-		if atomic.LoadUint64(&a.translateCLIGeneration) != gen {
+		if ctx.Err() != nil {
+			return
+		}
+		if deltas.Len()+len(delta) > cli.MaxTranslateBody {
+			oversized = true
 			cancel()
 			return
 		}
 		deltas.WriteString(delta)
 	})
+	if oversized {
+		return cli.Failure("TranslateBadResponse"), nil
+	}
 	if err != nil {
-		if atomic.LoadUint64(&a.translateCLIGeneration) != gen {
-			return cli.Failure(cli.CodeBusy), nil
-		}
 		return cli.Failure(translateErrorKey(err)), nil
+	}
+	if ctx.Err() != nil {
+		return cli.Failure(translateErrorKey(ctx.Err())), nil
 	}
 	if out == "" {
 		out = deltas.String()
 	}
 	body := []byte(out)
-	if len(body) > cli.MaxTranslateBody {
-		return cli.Failure(cli.CodeInternal), nil
+	if len(body) > cli.MaxTranslateBody || !utf8.Valid(body) || len(body) == 0 {
+		return cli.Failure("TranslateBadResponse"), nil
 	}
 	result := cli.Result{
 		V:     cli.Protocol,

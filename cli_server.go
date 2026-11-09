@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,6 +31,8 @@ type cliServer struct {
 	closing       atomic.Bool
 	lifecycle     sync.Mutex // serializes WaitGroup.Add with shutdown
 	actionTimeout time.Duration
+	context       context.Context
+	cancel        context.CancelFunc
 
 	// Seams: tests replace them so no socket, no window and no main loop is
 	// involved.
@@ -38,7 +41,7 @@ type cliServer struct {
 	applyAsync func(cli.Request, []byte, func(cli.Result))
 	// translateAsync is deliberately separate from applyAsync: a translation
 	// must never claim the lid completion that applyCLIAsync owns.
-	translateAsync func(cli.Request, []byte, func(cli.Result, []byte))
+	translateAsync func(context.Context, cli.Request, []byte, func(cli.Result, []byte))
 	dispatch       func(func())
 	logf           func(string, ...any)
 }
@@ -80,6 +83,7 @@ func (a *application) startCLIServer() {
 // listen binds the socket. It follows the single instance lock's order: connect
 // first (someone may be serving), then remove a leftover file, then bind.
 func (s *cliServer) listen() error {
+	s.context, s.cancel = context.WithCancel(context.Background())
 	dir := filepath.Dir(s.path)
 	info, err := os.Stat(dir)
 	if err != nil || !info.IsDir() {
@@ -193,6 +197,9 @@ func (s *cliServer) stop() {
 	}
 	s.lifecycle.Lock()
 	s.closing.Store(true)
+	if s.cancel != nil {
+		s.cancel()
+	}
 	s.lifecycle.Unlock()
 	if s.listener != nil {
 		s.listener.Close()
@@ -249,7 +256,29 @@ func (s *cliServer) handle(conn *net.UnixConn) {
 			return
 		}
 	}
-	result, responseBody, ran, dispatched := s.applyReq(req, body)
+	ctx := context.Background()
+	cancel := func() {}
+	var invalidFrame atomic.Bool
+	if req.Action == cli.ActionTranslate {
+		if reader.Buffered() > 0 {
+			writeResult(conn, cli.Response{V: cli.Protocol, ID: req.ID, Code: cli.CodeBadRequest})
+			return
+		}
+		ctx, cancel = context.WithCancel(s.context)
+		defer cancel()
+		_ = conn.SetReadDeadline(time.Time{})
+		go func() {
+			if _, err := reader.ReadByte(); err == nil {
+				invalidFrame.Store(true)
+			}
+			cancel()
+		}()
+	}
+	result, responseBody, ran, dispatched := s.applyReqContext(ctx, req, body)
+	cancel()
+	if invalidFrame.Load() {
+		result, responseBody = cli.Failure(cli.CodeBadRequest), nil
+	}
 	response := cli.Response{V: cli.Protocol, ID: req.ID, OK: result.OK, Code: result.Code,
 		Message: result.Message, Lines: result.Lines, State: result.State,
 		Bytes: result.Bytes, Translate: result.Translate}
@@ -271,6 +300,10 @@ func (s *cliServer) handle(conn *net.UnixConn) {
 // action uses its own hook and carries a response body frame alongside the
 // result; it never passes through applyAsync / applyCLIAsync.
 func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, []byte, bool, <-chan struct{}) {
+	return s.applyReqContext(context.Background(), req, body)
+}
+
+func (s *cliServer) applyReqContext(ctx context.Context, req cli.Request, body []byte) (cli.Result, []byte, bool, <-chan struct{}) {
 	type outcome struct {
 		result cli.Result
 		body   []byte
@@ -279,30 +312,32 @@ func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, []byte, 
 	result := make(chan outcome, 1)
 	finished := make(chan struct{})
 	var phase atomic.Int32 // 0 queued, 1 started, 2 cancelled
+	var replied sync.Once
+	send := func(out outcome) { replied.Do(func() { result <- out }) }
 	go func() {
 		defer close(finished)
 		var out outcome
 		deferred := false
 		s.dispatch(func() {
-			if !phase.CompareAndSwap(0, 1) || s.closing.Load() {
+			if !phase.CompareAndSwap(0, 1) || s.closing.Load() || ctx.Err() != nil {
 				return
 			}
 			if req.Action == cli.ActionTranslate && s.translateAsync != nil {
 				deferred = true
-				s.translateAsync(req, body, func(r cli.Result, out []byte) {
-					result <- outcome{result: r, body: out, ran: true}
+				s.translateAsync(ctx, req, body, func(r cli.Result, out []byte) {
+					send(outcome{result: r, body: out, ran: true})
 				})
 				return
 			}
 			if s.applyAsync != nil {
 				deferred = true
-				s.applyAsync(req, body, func(r cli.Result) { result <- outcome{result: r, ran: true} })
+				s.applyAsync(req, body, func(r cli.Result) { send(outcome{result: r, ran: true}) })
 				return
 			}
 			out = outcome{result: s.apply(req, body), ran: true}
 		})
 		if !deferred {
-			result <- out
+			send(out)
 		}
 	}()
 	timer := time.NewTimer(s.actionTimeoutFor(req))
@@ -313,6 +348,9 @@ func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, []byte, 
 	case <-timer.C:
 		phase.CompareAndSwap(0, 2) // timed-out queued actions must never execute later
 		return cli.Failure(cli.CodeBusy), nil, true, finished
+	case <-ctx.Done():
+		phase.CompareAndSwap(0, 2)
+		return cli.Failure(cli.CodeQuitting), nil, true, finished
 	}
 }
 
@@ -342,8 +380,11 @@ func writeResult(conn *net.UnixConn, response cli.Response) {
 // response.Bytes bytes of UTF-8 translation. Sharing the write deadline with
 // both writes keeps a slow client from holding a slot indefinitely.
 func writeTranslationResult(conn *net.UnixConn, response cli.Response, body []byte) {
-	if response.Bytes > len(body) {
-		response.Bytes = len(body)
+	if response.Bytes != len(body) || len(body) > cli.MaxTranslateBody || !utf8.Valid(body) ||
+		response.OK && (len(body) == 0 || response.Translate == nil || response.Translate.Text != "") ||
+		!response.OK && (response.Translate != nil || len(body) != 0) {
+		writeResult(conn, cli.Response{V: cli.Protocol, ID: response.ID, Code: cli.CodeInternal})
+		return
 	}
 	if !writeResponseLine(conn, response) {
 		return
@@ -355,6 +396,7 @@ func writeTranslationResult(conn *net.UnixConn, response cli.Response, body []by
 
 func writeResponseLine(conn *net.UnixConn, response cli.Response) bool {
 	line, err := cli.EncodeLine(response)
+	valid := err == nil
 	if err != nil {
 		line, err = cli.EncodeLine(cli.Response{V: cli.Protocol, ID: response.ID, OK: false, Code: cli.CodeInternal})
 		if err != nil {
@@ -363,7 +405,7 @@ func writeResponseLine(conn *net.UnixConn, response cli.Response) bool {
 	}
 	_ = conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
 	_, err = conn.Write(line)
-	return err == nil
+	return valid && err == nil
 }
 
 // readCLILine reads one line, refusing anything over the line limit.

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -200,5 +202,65 @@ func TestTranslateHumanAndJSONOutput(t *testing.T) {
 	if code := run([]string{"translate", "Hello"}, e); code != exitRejected || stdout.Len() != 0 ||
 		!strings.Contains(stderr.String(), "接口响应超时") {
 		t.Fatalf("failed translation = %d %q %q", code, stdout.String(), stderr.String())
+	}
+}
+
+func TestTranslateInputRejectedBeforeConnection(t *testing.T) {
+	for _, scenario := range []struct {
+		name  string
+		args  []string
+		input string
+	}{
+		{"empty positional", []string{"translate", ""}, "piped text"},
+		{"whitespace", []string{"translate"}, " \n\t"},
+		{"invalid UTF-8", []string{"translate"}, "\xff"},
+		{"binary", []string{"translate"}, "text\x00binary"},
+		{"conflicting empty positional", []string{"translate", "", "--text", "other"}, ""},
+		{"extra source text", []string{"translate", "private-source", "extra"}, ""},
+	} {
+		t.Run(scenario.name, func(t *testing.T) {
+			e, stdout, stderr, stub := translateEnv(t, cli.NewResult(nil), scenario.input, false)
+			args := append(scenario.args, "--json")
+			if code := run(args, e); code != exitUsage || stderr.Len() != 0 || stub.req.Action != "" {
+				t.Fatalf("input rejection: %d, %q, %q", code, stdout.String(), stderr.String())
+			}
+			var result cli.Result
+			if err := json.Unmarshal(stdout.Bytes(), &result); err != nil || result.Code != cli.CodeUsage || strings.Contains(result.Message, "private-source") {
+				t.Fatalf("usage answer = %q, %v", stdout.String(), err)
+			}
+		})
+	}
+}
+
+func TestTranslateInputFiles(t *testing.T) {
+	for _, text := range []string{"Hello iOS\n你好\t世界", "\xff", "binary\x00text", ""} {
+		path := filepath.Join(t.TempDir(), "input.txt")
+		if err := os.WriteFile(path, []byte(text), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		inv, err := parse([]string{"translate", "--file", path})
+		if err != nil {
+			t.Fatal(err)
+		}
+		e, _, _, _ := translateEnv(t, cli.NewResult(nil), "", true)
+		_, body, err := buildRequest(inv, e)
+		valid := text != "" && cli.ValidTranslateInput([]byte(text))
+		if valid && (err != nil || string(body) != text) || !valid && err == nil {
+			t.Fatalf("file validity=%v, error=%v", valid, err)
+		}
+	}
+	path := filepath.Join(t.TempDir(), "large.txt")
+	file, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = file.Truncate(cli.MaxPayload + 1)
+	file.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	e, _, _, stub := translateEnv(t, cli.NewResult(nil), "", true)
+	if code := run([]string{"translate", "--file", path}, e); code != exitUsage || stub.req.Action != "" {
+		t.Fatalf("oversized file = %d", code)
 	}
 }

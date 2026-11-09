@@ -83,14 +83,15 @@ func main() { os.Exit(run(os.Args[1:], live())) }
 
 // invocation is a parsed command line.
 type invocation struct {
-	command   string // awake.on, awake.off, awake.toggle, awake.status, status, json.new, palette, settings, translate, version, help
-	flags     flags
-	awake     awakeOptions
-	body      bodyOptions
-	page      string
-	to        string // translate target override
-	textArg   string // the positional TEXT of translate
-	helpTopic string // `cubbix help translate`
+	command    string // awake.on, awake.off, awake.toggle, awake.status, status, json.new, palette, settings, translate, version, help
+	flags      flags
+	awake      awakeOptions
+	body       bodyOptions
+	page       string
+	to         string // translate target override
+	textArg    string // the positional TEXT of translate
+	hasTextArg bool
+	helpTopic  string // `cubbix help translate`
 }
 
 type flags struct {
@@ -316,7 +317,7 @@ func buildRequest(inv invocation, e *env) (cli.Request, []byte, error) {
 // usage error: the app would otherwise open a panel for a script.
 func readTranslateBody(inv invocation, e *env) ([]byte, error) {
 	sources := 0
-	for _, present := range []bool{inv.body.hasText, inv.body.hasFile, inv.textArg != ""} {
+	for _, present := range []bool{inv.body.hasText, inv.body.hasFile, inv.hasTextArg} {
 		if present {
 			sources++
 		}
@@ -333,7 +334,7 @@ func readTranslateBody(inv invocation, e *env) ([]byte, error) {
 		data, err = readBody(bodyOptions{file: inv.body.file, hasFile: true}, e)
 	case inv.textArg == "-":
 		data, err = readStdin(e)
-	case inv.textArg != "":
+	case inv.hasTextArg:
 		data = []byte(inv.textArg)
 	default:
 		reader, terminal := e.stdin()
@@ -343,10 +344,13 @@ func readTranslateBody(inv invocation, e *env) ([]byte, error) {
 		data, err = io.ReadAll(io.LimitReader(reader, cli.MaxPayload+1))
 	}
 	if err != nil {
-		return nil, err
+		return nil, usagef("Could not read translation text.")
 	}
 	if len(data) > cli.MaxPayload {
 		return nil, usagef("The text exceeds the 64 MiB limit.")
+	}
+	if !cli.ValidTranslateInput(data) {
+		return nil, usagef("Translation input must be UTF-8 text without binary control characters.")
 	}
 	if len(bytes.TrimSpace(data)) == 0 {
 		return nil, usagef("translate needs text. See \"cubbix help translate\".")

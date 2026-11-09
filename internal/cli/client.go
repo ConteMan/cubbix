@@ -172,7 +172,7 @@ func (c *Client) Do(req Request, payload []byte, timeout time.Duration) (Result,
 	// Its busy response remains authoritative even if our upload hit EPIPE.
 	result, readErr := c.readResponse(req)
 	if readErr == nil {
-		if bodyErr := c.readTranslationBody(&result); bodyErr == nil {
+		if bodyErr := c.readTranslationBody(req, &result); bodyErr == nil {
 			return result, nil
 		} else {
 			readErr = bodyErr
@@ -191,12 +191,15 @@ func (c *Client) Do(req Request, payload []byte, timeout time.Duration) (Result,
 // readTranslationBody reads the response body frame that follows a translate
 // JSON line and fills in Translate.Text locally. Other actions have neither
 // Bytes nor Translate, so their wire format and timing stay unchanged.
-func (c *Client) readTranslationBody(result *Result) error {
-	if result.Translate == nil {
-		if result.Bytes > 0 {
-			return &Error{Code: CodeInternal, Msg: "Cubbix sent a malformed answer"}
+func (c *Client) readTranslationBody(req Request, result *Result) error {
+	if req.Action != ActionTranslate || !result.OK {
+		if result.Bytes != 0 || result.Translate != nil {
+			return failf(CodeInternal, "Cubbix sent a malformed answer")
 		}
 		return nil
+	}
+	if result.Translate == nil || result.Translate.Text != "" || result.Bytes <= 0 {
+		return failf(CodeInternal, "Cubbix sent a malformed translation answer")
 	}
 	if result.Bytes > MaxTranslateBody {
 		return &Error{Code: CodeInternal, Msg: "Cubbix sent an oversized answer"}
@@ -206,7 +209,7 @@ func (c *Client) readTranslationBody(result *Result) error {
 		switch {
 		case errors.Is(err, os.ErrDeadlineExceeded):
 			return &Error{Code: CodeTimeout, Msg: "Cubbix did not answer in time", Err: err}
-		case errors.Is(err, io.EOF):
+		case errors.Is(err, io.EOF), errors.Is(err, io.ErrUnexpectedEOF):
 			return &Error{Code: CodeNotRunning, Msg: "Cubbix closed the connection", Err: err}
 		default:
 			return &Error{Code: CodeInternal, Msg: "Cubbix sent a malformed answer", Err: err}
@@ -252,6 +255,9 @@ func (c *Client) readResponse(req Request) (Result, error) {
 	}
 	if response.V != Protocol {
 		return Result{}, &Error{Code: CodeProtocolMismatch, Msg: "Cubbix speaks another protocol version"}
+	}
+	if req.Action == ActionTranslate && !response.OK && response.Code == CodeBadRequest {
+		response.Message = "Cubbix rejected translate. Update and restart the app if it is an older version."
 	}
 	return response.Result(), nil
 }

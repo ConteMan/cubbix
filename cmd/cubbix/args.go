@@ -24,7 +24,7 @@ Commands:
   json new [options]   Open a JSON window  (--text STR | --file PATH | --blank)
   palette              Open the command palette
   settings [--page P]  Open Settings  (general|awake|json|translate|shortcuts|about)
-  translate [TEXT]     Translate text (or the current selection)
+  translate [TEXT]     Translate text from an argument, file or standard input
                        [--to auto|zh|en] [--text STR | --file PATH | -]
   version              Print the version of this tool and its app bundle
   help [command]       Show this help
@@ -49,6 +49,11 @@ const translateHelpText = `Usage: cubbix translate [TEXT] [options]
 
 Translate text with the running app and print only the translation. TEXT may
 be omitted when piping standard input; "-" reads standard input explicitly.
+Input must be non-empty UTF-8 text. Only the first 4000 characters are
+translated; --json reports the number of omitted characters in translate.clipped.
+The current selection is not supported yet. --notify is not accepted.
+For a slow model, use --timeout 60s: the app's model limit is 50s. A client
+timeout exits 5; a model timeout reported by the app exits 4.
 
 Options:
   --to auto|zh|en      Override the detected target language (default auto)
@@ -329,11 +334,12 @@ func resolve(inv *invocation, positional []string) error {
 		inv.command = "version"
 	case "translate":
 		if len(rest) > 1 {
-			return usagef("Unknown command %q. See \"cubbix help\".", strings.Join(positional, " "))
+			return usagef("translate accepts one TEXT argument. See \"cubbix help translate\".")
 		}
 		inv.command = "translate"
 		if len(rest) == 1 {
 			inv.textArg = rest[0]
+			inv.hasTextArg = true
 		}
 	case "help":
 		if len(rest) > 1 {

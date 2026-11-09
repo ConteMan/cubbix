@@ -109,19 +109,15 @@ type application struct {
 	translateTestRunning    bool
 	translateTestKey        string
 	translateTestUntil      time.Time
-	// translateCLIGeneration serializes CLI translations: a late worker result
-	// must not answer for a newer request. translateCLIDispatch hops back to
-	// the main thread; headless tests leave it nil.
-	translateCLIGeneration uint64
-	translateCLIDispatch   func(func())
-	translateSecret        translateSecretStore
-	translateRunOnMain     func(func())
-	translateAsync         bool
-	translateStreamFn      translateStreamFunc
-	translateModelsFn      translateModelsFunc
-	translateTestFn        translateTestFunc
-	translateCopy          func(string) error
-	createTranslateWindow  func(*translateState)
+	translateCLIDispatch    func(func())
+	translateSecret         translateSecretStore
+	translateRunOnMain      func(func())
+	translateAsync          bool
+	translateStreamFn       translateStreamFunc
+	translateModelsFn       translateModelsFunc
+	translateTestFn         translateTestFunc
+	translateCopy           func(string) error
+	createTranslateWindow   func(*translateState)
 	// quiet silences the hint and the lid notification for one command line
 	// request; it is set and reset on the main thread only.
 	quiet                  bool

@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"regexp"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
 // Protocol is the wire version. Bump it only for incompatible semantics;
@@ -229,6 +231,18 @@ func NewResult(state *State) Result {
 // Failure builds a failed result.
 func Failure(code string) Result {
 	return Result{V: Protocol, OK: false, Code: code}
+}
+
+func ValidTranslateInput(data []byte) bool {
+	if !utf8.Valid(data) {
+		return false
+	}
+	for _, character := range string(data) {
+		if unicode.IsControl(character) && character != '\n' && character != '\r' && character != '\t' {
+			return false
+		}
+	}
+	return true
 }
 
 // State is the snapshot every successful response carries.
