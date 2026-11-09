@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image/color"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -16,6 +17,61 @@ import (
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
+
+func TestTranslateSettingsDarkNavigation(t *testing.T) {
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, page := range []int{settingsAwake, settingsTranslate} {
+			t.Run(fmt.Sprintf("%s/%s", locale, settingsPageName(page)), func(t *testing.T) {
+				a := translateTestApp(t)
+				a.page = page
+				tester := renderTranslateSettingsScreenshot(a, locale, true)
+				tk := tokens(true, locale)
+				key := "Translate"
+				if page == settingsAwake {
+					key = "Awake"
+				}
+				label, ok := tester.Find(a.text(locale, key))
+				if !ok || label.X >= tk.SizeSidebarWidth {
+					t.Fatalf("missing selected navigation label: %+v", label)
+				}
+				assertStyle := func(state string) {
+					t.Helper()
+					img := tester.Image()
+					background := img.RGBAAt(int((tk.Space12+tk.Space4)*2), int((label.Y+label.H/2)*2))
+					wantBackground := ui.Hex(tk.ColorAccentSoft)
+					wantText := ui.Hex(tk.ColorText)
+					if background != (color.RGBA{wantBackground.R, wantBackground.G, wantBackground.B, wantBackground.A}) {
+						t.Fatalf("%s: selected background = %v, want %s", state, background, tk.ColorAccentSoft)
+					}
+					foreground := color.RGBA{wantText.R, wantText.G, wantText.B, wantText.A}
+					foundText := false
+					for pixelY := int(label.Y * 2); pixelY < int((label.Y+label.H)*2); pixelY++ {
+						for pixelX := int(label.X * 2); pixelX < int((label.X+label.W)*2); pixelX++ {
+							if img.RGBAAt(pixelX, pixelY) == foreground {
+								foundText = true
+							}
+						}
+					}
+					if !foundText || contrastRatio(foreground, background) < 4.5 {
+						t.Fatalf("%s: selected label is unreadable", state)
+					}
+				}
+				assertStyle("idle")
+				pointerX, pointerY := label.X+label.W/2, label.Y+label.H/2
+				tester.Move(pointerX, pointerY)
+				tester.Advance(300 * time.Millisecond)
+				assertStyle("hover")
+				tester.Press(pointerX, pointerY)
+				tester.Advance(300 * time.Millisecond)
+				assertStyle("pressed")
+				tester.Release(pointerX, pointerY)
+				tester.Move(0, 0)
+				tester.Advance(300 * time.Millisecond)
+				assertStyle("released")
+			})
+		}
+	}
+}
 
 func TestTranslateStreamEvents(t *testing.T) {
 	for _, test := range []struct {

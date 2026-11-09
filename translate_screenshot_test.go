@@ -7,9 +7,21 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 )
+
+func renderTranslateSettingsScreenshot(a *application, locale string, dark bool) *ui.Tester {
+	tester := ui.NewTester(a.view, 720, settingsWindowHeight)
+	tester.SetScale(2)
+	tester.SetLocale(locale)
+	tester.SetDark(dark)
+	tester.Frame()
+	tester.Advance(300 * time.Millisecond)
+	tester.Frame()
+	return tester
+}
 
 // TestTranslateScreenshots renders the floating panel and its settings page
 // in both languages and both themes. It is an in-memory ui.Tester render: no
@@ -50,11 +62,7 @@ func TestTranslateScreenshots(t *testing.T) {
 			a.page = settingsTranslate
 			a.translateKeySaved = true
 			a.translateModelList = []string{"group/one", "provider/two"}
-			tt := ui.NewTester(a.view, 720, settingsWindowHeight)
-			tt.SetScale(2)
-			tt.SetLocale(locale)
-			tt.SetDark(dark)
-			tt.Frame()
+			tt := renderTranslateSettingsScreenshot(a, locale, dark)
 			save(fmt.Sprintf("translate-settings-%s", suffix), tt.Image())
 			// The floating panel in its finished state.
 			b := translateTestApp(t)
