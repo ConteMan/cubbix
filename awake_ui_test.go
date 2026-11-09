@@ -29,6 +29,7 @@ func awakeTestApp(t *testing.T) *application {
 	a.translateAsync = false
 	a.translateRunOnMain = func(fn func()) { fn() }
 	a.translateSecret = newFakeTranslateSecrets()
+	a.translateDictionaryFn = func(string) string { return "" }
 	a.translateCopy = func(string) error { return nil }
 	a.awake, _ = fakeAwake(time.Now())
 	a.awake.changed = a.awakeChanged

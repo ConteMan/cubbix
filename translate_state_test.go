@@ -236,6 +236,13 @@ func TestTranslateBlurRule(t *testing.T) {
 	if s.visible {
 		t.Fatal("an empty result stayed open on blur")
 	}
+	// A dictionary result alone also keeps the panel for comparison.
+	s.visible, s.output, s.input, s.dictionary = true, "", "hello", dictionaryTestDefinition
+	a.onTranslateBlur()
+	if !s.visible {
+		t.Fatal("a dictionary-only result was hidden on blur")
+	}
+	s.dictionary = ""
 	// Esc closes even with a result on screen.
 	s.visible, s.output = true, "你好"
 	tt := ui.NewTester(a.translateView, 480+64, 148+64)
@@ -311,7 +318,33 @@ func TestTranslateHeight(t *testing.T) {
 	if got := a.translateHeight(tk, s); got >= 520 || got < 148 {
 		t.Fatalf("four input rows = %v", got)
 	}
-	// Dictionary states are deliberately not measured in this step.
+	// Dictionary states: folded keeps only the header, expanded adds the
+	// three-line preview. Both sit below the translation with a hairline.
+	s.phase, s.output, s.input, s.clipped = translateLoading, "", "hello", 0
+	s.dictionary, s.dictionaryExpanded = dictionaryTestDefinition, false
+	separator := tk.Space8 + tk.StrokeHairline + tk.Space8
+	folded := 152 + separator + dictionaryBlockHeight(tk, false)
+	if got := a.translateHeight(tk, s); got != folded || got != 217 {
+		t.Fatalf("folded dictionary height = %v; want %v", got, folded)
+	}
+	s.dictionaryExpanded = true
+	unfolded := 152 + separator + dictionaryBlockHeight(tk, true)
+	if got := a.translateHeight(tk, s); got != unfolded || got <= folded {
+		t.Fatalf("expanded dictionary height = %v; want %v", got, unfolded)
+	}
+	if dictionaryBodyHeight(tk) != tk.SizeTranslateDictionaryPreviewLines*tk.FontSizeSmall*tk.LineHeightBody {
+		t.Fatal("preview lines were not used for the body height")
+	}
+	// Two overlong blocks stop at the panel ceiling.
+	s.phase, s.output, s.input = translateStreaming, strings.Repeat("长", 3000), "a\nb\nc\nd"
+	if got := a.translateHeight(tk, s); got != tk.SizeTranslateMaxHeight {
+		t.Fatalf("both blocks overlong = %v; want %v", got, tk.SizeTranslateMaxHeight)
+	}
+	// A nil definition removes the separator and the whole block.
+	s.dictionary, s.input, s.output, s.phase = "", "hello", "", translateLoading
+	if got := a.translateHeight(tk, s); got != 152 {
+		t.Fatalf("nil definition left a block: %v", got)
+	}
 }
 
 func TestSettingsTranslatePageHeight(t *testing.T) {

@@ -22,23 +22,25 @@ const (
 )
 
 // translateState is the floating window's own state. It lives on the main
-// thread, like paletteState and menubarPanelState. Dictionary, speech and
-// selection belong to later steps; this state is only the translation main
-// path.
+// thread, like paletteState and menubarPanelState. The dictionary text is the
+// cropped plain-text definition from the local macOS dictionaries; speech and
+// selection belong to later steps.
 type translateState struct {
-	window           *mygo.Window
-	visible          bool
-	input            string
-	directionInput   string
-	phase            translatePhase
-	directionSwapped bool
-	output           string
-	errorKey         string
-	request          uint64
-	cancel           context.CancelFunc
-	clipped          int
-	copiedUntil      time.Time
-	focus            bool
+	window             *mygo.Window
+	visible            bool
+	input              string
+	directionInput     string
+	phase              translatePhase
+	directionSwapped   bool
+	output             string
+	dictionary         string
+	dictionaryExpanded bool
+	errorKey           string
+	request            uint64
+	cancel             context.CancelFunc
+	clipped            int
+	copiedUntil        time.Time
+	focus              bool
 }
 
 type translateStreamFunc func(context.Context, translateConfig, string, string, string, func(string)) (string, error)
@@ -51,7 +53,7 @@ func defaultTranslateCopy(text string) error {
 
 func (a *application) ensureTranslateState() *translateState {
 	if a.translate == nil {
-		a.translate = &translateState{}
+		a.translate = &translateState{dictionaryExpanded: true}
 	}
 	return a.translate
 }
@@ -93,6 +95,15 @@ func (a *application) translateTestFunction() translateTestFunc {
 		return a.translateTestFn
 	}
 	return testTranslateConnection
+}
+
+// translateDictionaryFunction is the local dictionary seam. Headless tests
+// replace it so no case needs the system dictionaries.
+func (a *application) translateDictionaryFunction() func(string) string {
+	if a.translateDictionaryFn != nil {
+		return a.translateDictionaryFn
+	}
+	return dictionaryDefinition
 }
 
 func (a *application) registerTranslateShortcut() {
@@ -154,6 +165,8 @@ func (a *application) openTranslateText(text string) {
 	s.input = text
 	s.directionInput = text
 	s.output = ""
+	s.dictionary = ""
+	s.dictionaryExpanded = true
 	s.errorKey = ""
 	s.clipped = 0
 	s.directionSwapped = false
@@ -228,7 +241,7 @@ func (a *application) onTranslateBlur() {
 	if s == nil {
 		return
 	}
-	hasResult := strings.TrimSpace(s.output) != ""
+	hasResult := strings.TrimSpace(s.output) != "" || strings.TrimSpace(s.dictionary) != ""
 	if hasResult && strings.TrimSpace(s.input) != "" {
 		return
 	}
@@ -299,6 +312,8 @@ func (a *application) submitTranslate() {
 	if strings.TrimSpace(text) == "" {
 		s.phase = translateEmpty
 		s.output = ""
+		s.dictionary = ""
+		s.dictionaryExpanded = true
 		s.errorKey = ""
 		s.clipped = 0
 		a.refreshTranslate()
@@ -312,6 +327,8 @@ func (a *application) submitTranslate() {
 	s.directionInput = clipped
 	s.clipped = dropped
 	s.output = ""
+	s.dictionary = ""
+	s.dictionaryExpanded = true
 	s.copiedUntil = time.Time{}
 	s.errorKey = ""
 	s.phase = translateLoading
@@ -322,6 +339,7 @@ func (a *application) submitTranslate() {
 	s.cancel = cancel
 	cfg := translateConfig{BaseURL: a.config.TranslateBaseURL, Model: strings.TrimSpace(a.config.TranslateModel)}
 	stream := a.translateStreamFunction()
+	dictionary := a.translateDictionaryFunction()
 	a.refreshTranslate()
 
 	apply := func(fn func()) { a.translateOnMain(fn) }
@@ -333,6 +351,21 @@ func (a *application) submitTranslate() {
 			s.phase = phase
 			s.errorKey = key
 			a.refreshTranslate()
+		})
+	}
+	// Only single English words get a dictionary lookup: a phrase does not
+	// yield a definition for the whole phrase. The system call runs on a
+	// worker, so the panel stays responsive while the model streams above.
+	if isSingleEnglishWord(clipped) {
+		a.runTranslateWorker(func() {
+			definition := dictionary(clipped)
+			apply(func() {
+				if generation != s.request || definition == "" {
+					return
+				}
+				s.dictionary = definition
+				a.refreshTranslate()
+			})
 		})
 	}
 	a.runTranslateWorker(func() {
@@ -387,6 +420,17 @@ func (a *application) copyTranslateResult() {
 		return
 	}
 	s.copiedUntil = time.Now().Add(1500 * time.Millisecond)
+	a.refreshTranslate()
+}
+
+// toggleDictionary folds or unfolds the definition below the translation.
+// The model's failure text and retry button stay above it either way.
+func (a *application) toggleDictionary() {
+	s := a.translate
+	if s == nil || strings.TrimSpace(s.dictionary) == "" {
+		return
+	}
+	s.dictionaryExpanded = !s.dictionaryExpanded
 	a.refreshTranslate()
 }
 

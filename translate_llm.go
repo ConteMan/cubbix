@@ -137,7 +137,14 @@ func buildTranslateMessages(source, target, text string, word bool) []translateM
 	}
 	shape := "Keep the punctuation, line breaks and numbers of the whole text."
 	if word {
-		shape = "This is one word or a short phrase: give its most common meaning, with no explanation."
+		// A single word gets a short gloss, not a reproduction of the long
+		// plain-text entry the local dictionary shows below the translation.
+		shape = "This is one word: reply with only a brief Simplified Chinese gloss, one line with at most a few common meanings. " +
+			"Do not add phonetics, part-of-speech labels, examples, etymology or any dictionary-style detail."
+		if target != "zh-Hans" {
+			shape = "This is one word: reply with only a brief English gloss, one line with at most a few common meanings. " +
+				"Do not add phonetics, part-of-speech labels, examples, etymology or any dictionary-style detail."
+		}
 	}
 	sourceHint := "Detect the source language."
 	if source == "zh-Hans" {

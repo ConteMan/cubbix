@@ -6,13 +6,23 @@ import (
 )
 
 func TestIsSingleEnglishWord(t *testing.T) {
-	yes := []string{"hello", "don't", "well-known", "A", strings.Repeat("a", 48)}
+	// Case, internal hyphens and both apostrophe forms are still one word;
+	// leading/trailing blanks are trimmed before the test.
+	yes := []string{"hello", "Hello", "HELLO", "iPhone", "A", "don't", "it’s",
+		"well-known", "a-b-c", "O'Reilly", strings.Repeat("a", 48),
+		"  serendipity  ", "take-"}
 	for _, term := range yes {
 		if !isSingleEnglishWord(term) {
 			t.Fatalf("%q should be a word", term)
 		}
 	}
-	no := []string{"", "hello world", "take2", "不", strings.Repeat("a", 49), "a.b", "take into account", "123"}
+	// Phrases, punctuation, digits, Chinese, whitespace and overlong terms
+	// never reach the dictionary: a phrase cannot yield a whole definition.
+	no := []string{"", " ", "\t", "hello world", "take into account", "out of the box",
+		"hello\tworld", "hello\nworld", "  hello  world  ", "hello, world", "hello.", "hello!",
+		"(hello)", "hello?", "a.b", "a/b", "a_b", "hello-world!", "take2", "2hello", "123",
+		"不", "你好", "hello 你好", "日本語", "-hello", "'hello", "🙂", "é",
+		strings.Repeat("a", 49)}
 	for _, term := range no {
 		if isSingleEnglishWord(term) {
 			t.Fatalf("%q should not be a word", term)

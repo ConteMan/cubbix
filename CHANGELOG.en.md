@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The translation panel now looks up the macOS dictionary for single English words only: the translation stays above a collapsible dictionary block that opens with a short preview. When the model fails or is not configured, the failure text and Retry stay above while the definition remains below. Single words also get a short Chinese gloss instead of a long dictionary-style answer.
 - New `cubbix translate`: text from an argument, a file or a pipe, printing only the translation; `--json` gives stable fields, `--to` chooses the target language, long translations come back intact, and `cubbix help translate` documents it. Typing "Translate <text>" in the command palette keeps the original capitalization, opens the panel and starts the translation.
 - New Translate module: a global shortcut opens a small floating panel; type text, press Return, and read the streamed translation. You can copy it, swap the direction, and configure the endpoint, the API key (kept in the system keychain) and the model in Settings. Models can be fetched from the endpoint or typed by hand, and the connection can be tested. A word auto-speak preference is stored but does not speak yet.
 - Translate has its own global shortcut and module switch. Turning the module off releases the shortcut while its settings row stays visible, disabled.
