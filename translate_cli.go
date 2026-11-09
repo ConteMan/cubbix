@@ -24,27 +24,34 @@ type translateCLIRuntimeKey struct{}
 // thread; each request owns its context and reply, separate from lidCompletion
 // and applyCLIAsync. The HTTP call itself happens on a worker.
 func (a *application) applyTranslateCLI(ctx context.Context, req cli.Request, body []byte, reply func(cli.Result, []byte)) {
+	var once sync.Once
+	send := func(result cli.Result, out []byte) {
+		once.Do(func() { reply(result, out) })
+	}
 	if a.quitting {
-		reply(cli.Failure(cli.CodeQuitting), nil)
+		send(cli.Failure(cli.CodeQuitting), nil)
 		return
 	}
 	if !a.config.TranslateEnabled {
-		reply(cli.Failure(cli.CodeDisabled), nil)
+		send(cli.Failure(cli.CodeDisabled), nil)
 		return
 	}
 	if len(body) == 0 {
-		// bytes == 0 would mean "translate the current selection". That path
-		// belongs to a later step; a script must never make the app open a
-		// panel, so this is an ordinary application failure (exit 4).
-		result := cli.Failure("TranslateNoSelection")
-		result.Message = a.text(uiLocale(), "TranslateNoSelection")
-		reply(result, nil)
+		// bytes == 0 means "translate the AX selection of the frontmost app".
+		// It never opens a panel: the CLI is for scripts.
+		a.startTranslateCLISelection(ctx, req, send)
 		return
 	}
 	if !cli.ValidTranslateInput(body) || strings.TrimSpace(string(body)) == "" {
-		reply(cli.Failure(cli.CodeBadRequest), nil)
+		send(cli.Failure(cli.CodeBadRequest), nil)
 		return
 	}
+	a.startTranslateCLI(ctx, req, body, send)
+}
+
+// startTranslateCLI captures the main-thread state, then runs the model call
+// on a worker. It is shared by an explicit body frame and the selection path.
+func (a *application) startTranslateCLI(ctx context.Context, req cli.Request, body []byte, send func(cli.Result, []byte)) {
 	runtime := translateCLIRuntime{
 		cfg: translateConfig{
 			BaseURL: a.config.TranslateBaseURL,
@@ -55,10 +62,6 @@ func (a *application) applyTranslateCLI(ctx context.Context, req cli.Request, bo
 	}
 	ctx = context.WithValue(ctx, translateCLIRuntimeKey{}, runtime)
 	text, to := string(body), req.To
-	var once sync.Once
-	send := func(result cli.Result, out []byte) {
-		once.Do(func() { reply(result, out) })
-	}
 	a.runTranslateWorker(func() {
 		result, out := a.runCLITranslate(ctx, text, to)
 		if ctx.Err() != nil {

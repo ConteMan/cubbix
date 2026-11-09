@@ -74,6 +74,11 @@ func translateNonResultHeight(t tokenValues, s *translateState) float32 {
 	if s.clipped > 0 {
 		height += t.FontSizeSmall*t.LineHeightBody + t.Space8
 	}
+	// The accessibility hint owns its own row plus the column gap above it;
+	// without it the measured window would clip the hint.
+	if s.denied {
+		height += t.SizeSegmentHeight + t.Space8
+	}
 	// The separator sits between the translation and the dictionary, with a
 	// Space8 gap on each side contributed by the panel column.
 	if strings.TrimSpace(s.dictionary) != "" {
@@ -109,6 +114,9 @@ func (a *application) translateView(c *ui.Context) {
 			InsetShadow(0, 0, 0, t.StrokeHairline, ui.Hex(t.ColorPanelStrokeInner)).
 			Shadow(0, t.Space8, t.Space24, 0, ui.Hex(t.ColorPanelShadow)).Children(func() {
 			a.translateInputArea(c, t, locale, s)
+			if s.denied {
+				a.translateSelectionHint(c, t, locale)
+			}
 			if s.clipped > 0 {
 				ui.Text(c, fmt.Sprintf(text("TranslateTooLong"), maxTranslateInput)).
 					Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).
@@ -157,6 +165,22 @@ func (a *application) translateInputArea(c *ui.Context, t tokenValues, locale st
 				ui.Icon(c, icon("x")).Size(t.SizeIconSmall, t.SizeIconSmall).TextColor(ui.Hex(t.ColorTextSecondary))
 			})
 		})
+	})
+}
+
+// translateSelectionHint is the one-line, in-panel permission guide. It sits
+// directly under the input and above the direction row; the text button opens
+// System Settings on demand and never shows a system dialog by itself.
+func (a *application) translateSelectionHint(c *ui.Context, t tokenValues, locale string) {
+	text := func(key string) string { return a.text(locale, key) }
+	label := text("TranslateSelectionDenied")
+	ui.Row(c.Key("translate-selection-hint")).FillWidth().Height(t.SizeSegmentHeight).
+		Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+		ui.Text(c, label).Grow(1).MinWidth(0).FontSize(t.FontSizeSmall).
+			LineHeight(t.LineHeightBody).TextColor(ui.Hex(t.ColorTextSecondary)).
+			SingleLine().Label(label).Tooltip(label)
+		a.translateTextButton(c, t, "translate-selection-grant-panel",
+			text("TranslateGrantAccess"), a.grantAccessibility)
 	})
 }
 

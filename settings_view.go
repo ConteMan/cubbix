@@ -862,6 +862,9 @@ func (a *application) selectSettingsPage(page int) {
 	a.cancelShortcutRecording()
 	a.focusModuleSwitch = false
 	a.page, a.notesPage = page, false
+	if page == settingsTranslate {
+		a.refreshSelectionTrust()
+	}
 	a.invalidateWindow()
 }
 

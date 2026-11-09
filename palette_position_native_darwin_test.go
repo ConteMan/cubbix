@@ -50,6 +50,6 @@ func nativePalettePositionChecks(a *application, nsapp objc.ID) error {
 	if width != 720 || height != settingsWindowHeight {
 		return fmt.Errorf("settings minimum = %dx%d; want 720x%d", width, height, settingsWindowHeight)
 	}
-	fmt.Println("PASS: hidden production command/guide panels: nonactivating, transparent, all-Spaces/fullscreen auxiliary, no system shadow; guide ignores mouse; 704x464 shadow margin and screen-DIP moves; settings minimum 720x444; never shown or focused")
+	fmt.Println("PASS: hidden production command/guide panels: nonactivating, transparent, all-Spaces/fullscreen auxiliary, no system shadow; guide ignores mouse; 704x464 shadow margin and screen-DIP moves; settings minimum 720x492; never shown or focused")
 	return nil
 }

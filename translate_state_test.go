@@ -350,17 +350,17 @@ func TestTranslateHeight(t *testing.T) {
 func TestSettingsTranslatePageHeight(t *testing.T) {
 	a := translateTestApp(t)
 	tk := tokens(false, "zh-CN")
-	if got := translatePageHeight(tk, true); got != 395 {
-		t.Fatalf("translate page content = %v; want 395", got)
+	if got := translatePageHeight(tk, true); got != 444 {
+		t.Fatalf("translate page content = %v; want 444", got)
 	}
 	if got := translatePageHeight(tk, false); got != 144 {
 		t.Fatalf("closed translate page = %v; want 144", got)
 	}
-	if got := pageHeight(tk, settingsTranslate, true, false, false, false, false); got != 395 {
+	if got := pageHeight(tk, settingsTranslate, true, false, false, false, false); got != 444 {
 		t.Fatalf("pageHeight = %v", got)
 	}
-	if w, h := settingsMinimumSize(); w != 720 || h != 444 {
-		t.Fatalf("minimum window = %dx%d; want 720x444", w, h)
+	if w, h := settingsMinimumSize(); w != 720 || h != settingsWindowHeight {
+		t.Fatalf("minimum window = %dx%d; want 720x%d", w, h, settingsWindowHeight)
 	}
 	if got := sidebarNaturalHeight(tk); got != 365 {
 		t.Fatalf("sidebar = %v; want 365", got)

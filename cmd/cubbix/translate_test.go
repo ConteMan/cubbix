@@ -88,6 +88,7 @@ func TestTranslateBuildRequestBody(t *testing.T) {
 		{[]string{"translate", "--text", "Hi", "--to", "zh"}, "", true, "Hi", "zh"},
 		{[]string{"translate", "--to=en", "Hi"}, "", true, "Hi", "en"},
 		{[]string{"translate"}, "piped\n", false, "piped\n", ""},
+		{[]string{"translate"}, "", true, "", ""}, // current selection
 		{[]string{"translate", "-"}, "piped", false, "piped", ""},
 		{[]string{"translate", "--file", "-"}, "from file", false, "from file", ""},
 	}
@@ -127,13 +128,14 @@ func TestTranslateBuildRequestBody(t *testing.T) {
 			t.Fatalf("%v: not a usage error: %v", args, err)
 		}
 	}
-	// No text and an interactive stdin is a usage error (exit 2), not a panel.
+	// No text on an interactive terminal asks the app for the current AX
+	// selection: bytes == 0, no body frame and no panel.
 	e, _, _, conn := translateEnv(t, cli.NewResult(&cli.State{}), "", true)
-	if code := run([]string{"translate"}, e); code != exitUsage {
-		t.Fatalf("empty translate exit = %d", code)
+	if code := run([]string{"translate"}, e); code != exitOK {
+		t.Fatalf("selection translate exit = %d", code)
 	}
-	if conn.req.Action != "" {
-		t.Fatal("an empty translation connected to the app")
+	if conn.req.Action != cli.ActionTranslate || conn.req.Bytes != 0 || len(conn.body) != 0 {
+		t.Fatalf("selection request = %+v body=%q", conn.req, conn.body)
 	}
 }
 

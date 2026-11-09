@@ -16,7 +16,10 @@ func translatePageHeight(t tokenValues, on bool) float32 {
 	if !on {
 		return sectionHeight(t, cardHeight(t, rowHeight(t, 3)))
 	}
-	settings := cardHeight(t, rowHeight(t, 1), rowHeight(t, 2), rowHeight(t, 3), rowHeight(t, 1))
+	// Five rows: the level-3 selection row adds one 48 pt row and a hairline.
+	// The window floor follows this page (720 x 492), not a scattered literal.
+	settings := cardHeight(t, rowHeight(t, 1), rowHeight(t, 2), rowHeight(t, 3),
+		rowHeight(t, 1), rowHeight(t, 3))
 	return sectionHeight(t, settings, cardHeight(t, rowHeight(t, 3)))
 }
 
@@ -37,6 +40,8 @@ func (a *application) translateModulePage(c *ui.Context, t tokenValues, locale s
 			a.translateModelRow(c, t, locale)
 			ui.Divider(c)
 			a.translateAutoSpeakRow(c, t, locale)
+			ui.Divider(c)
+			a.translateSelectionRow(c, t, locale)
 		})
 	}
 	a.settingsSection(c, t, text("GroupShortcuts"), func() {
@@ -184,6 +189,25 @@ func (a *application) translateAutoSpeakRow(c *ui.Context, t tokenValues, locale
 			a.changeTranslateAutoSpeak(!a.config.TranslateAutoSpeak)
 		}, "", false)
 	})
+}
+
+// translateSelectionRow shows the Accessibility state. Level 3 is the right
+// level from 007: the status changes with the system permission and the
+// explanation needs more than one short sentence. The text button is a
+// user action, never an automatic system window.
+func (a *application) translateSelectionRow(c *ui.Context, t tokenValues, locale string) {
+	text := func(key string) string { return a.text(locale, key) }
+	status := text("TranslateSelectionUnauthorized")
+	if a.translateSelectionTrusted {
+		status = text("TranslateSelectionAuthorized")
+	}
+	a.settingsRow(c, t, text("TranslateSelectionLabel"),
+		settingsRowOpts{level: 3, tooltip: text("TranslateSelectionInfo")}, func() {
+			ui.Text(c, status).FontSize(t.FontSizeSmall).LineHeight(t.LineHeightBody).
+				TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine().Label(status)
+			a.translateTextButton(c, t, "translate-selection-grant",
+				text("TranslateGrantAccess"), a.grantAccessibility)
+		})
 }
 
 func (a *application) currentTranslateConfig() translateConfig {
