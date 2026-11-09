@@ -41,6 +41,10 @@ type translateState struct {
 	clipped            int
 	copiedUntil        time.Time
 	focus              bool
+	// denied is the per-launch accessibility hint under the input. It is an
+	// overlay, not a phase: submitting text must still stream normally, and
+	// typing anything dismisses it.
+	denied bool
 }
 
 type translateStreamFunc func(context.Context, translateConfig, string, string, string, func(string)) (string, error)
@@ -152,12 +156,16 @@ func (a *application) toggleTranslate() {
 		a.closeTranslate()
 		return
 	}
-	a.openTranslateText("")
+	// The AX read runs on a worker with a 200 ms deadline, so a stuck
+	// application can never hold the shortcut callback.
+	a.beginTranslateSelection()
 }
 
-// openTranslateText is the one panel entry point. Later steps feed it the
-// selected text; this step opens an empty input and focuses it.
+// openTranslateText is the one panel entry point. The shortcut, the command
+// palette and the card panel all land here with either selected text or an
+// empty input.
 func (a *application) openTranslateText(text string) {
+	a.cancelTranslateSelection()
 	a.hideMenubarPanel()
 	a.hidePalette()
 	s := a.ensureTranslateState()
@@ -172,6 +180,7 @@ func (a *application) openTranslateText(text string) {
 	s.directionSwapped = false
 	s.copiedUntil = time.Time{}
 	s.phase = translateEmpty
+	s.denied = false
 	s.focus = true
 	if s.window == nil && a.createTranslateWindow != nil {
 		a.createTranslateWindow(s)
@@ -230,6 +239,7 @@ func (a *application) hideTranslate() {
 }
 
 func (a *application) closeTranslate() {
+	a.cancelTranslateSelection()
 	a.cancelTranslate()
 	a.hideTranslate()
 }
@@ -296,6 +306,8 @@ func (a *application) syncTranslateInput() {
 		return
 	}
 	s.directionInput = s.input
+	// The first keystroke removes the accessibility hint.
+	s.denied = false
 	a.cancelTranslate()
 	s.directionSwapped = false
 	s.clipped = 0

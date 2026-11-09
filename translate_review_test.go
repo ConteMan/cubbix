@@ -325,7 +325,7 @@ func TestTranslateKeyRowDisclosure(t *testing.T) {
 			a := translateTestApp(t)
 			a.page, a.translateKeySaved = settingsTranslate, true
 			a.translateSecret.(*fakeTranslateSecrets).value = []byte("old")
-			tt := ui.NewTester(a.view, 720, 444)
+			tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 			tt.SetLocale(locale)
 			tt.SetDark(dark)
 			tt.Frame()

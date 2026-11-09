@@ -1,6 +1,5 @@
 package main
 
-// settingsWindowHeight is the shared window floor after the sixth module page.
-// Every headless render and every minimum-size assertion uses it instead of a
-// scattered literal, so one change to pageHeight moves them together.
+// settingsWindowHeight is the shared window floor. The translate page's
+// additional selection row scrolls without raising it for other pages.
 const settingsWindowHeight = 444

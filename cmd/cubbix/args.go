@@ -24,7 +24,8 @@ Commands:
   json new [options]   Open a JSON window  (--text STR | --file PATH | --blank)
   palette              Open the command palette
   settings [--page P]  Open Settings  (general|awake|json|translate|shortcuts|about)
-  translate [TEXT]     Translate text from an argument, file or standard input
+  translate [TEXT]     Translate text from an argument, file, standard input,
+                       or the current selection when no text is given
                        [--to auto|zh|en] [--text STR | --file PATH | -]
   version              Print the version of this tool and its app bundle
   help [command]       Show this help
@@ -51,7 +52,9 @@ Translate text with the running app and print only the translation. TEXT may
 be omitted when piping standard input; "-" reads standard input explicitly.
 Input must be non-empty UTF-8 text. Only the first 4000 characters are
 translated; --json reports the number of omitted characters in translate.clipped.
-The current selection is not supported yet. --notify is not accepted.
+With no text and an interactive terminal, Cubbix translates the selected text
+of the frontmost application (Accessibility permission required); no panel
+opens, and a missing selection is rejected. --notify is not accepted.
 For a slow model, use --timeout 60s: the app's model limit is 50s. A client
 timeout exits 5; a model timeout reported by the app exits 4.
 

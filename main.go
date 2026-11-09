@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/egoist/mygo"
@@ -119,6 +120,18 @@ type application struct {
 	translateDictionaryFn   func(string) string
 	translateCopy           func(string) error
 	createTranslateWindow   func(*translateState)
+	// selection is the AX seam. It stays nil in every headless test; ready()
+	// installs the real reader, so tests can neither read the frontmost
+	// application nor cause a permission prompt.
+	selection                    selectionReader
+	selectionReading             atomic.Bool
+	selectionBudget              time.Duration
+	openAccessibilitySettings    func()
+	translateSelectionTrusted    bool
+	translateSelectionHintShown  bool
+	accessibilitySettingsOpened  bool
+	translateSelectionPending    bool
+	translateSelectionGeneration uint64
 	// quiet silences the hint and the lid notification for one command line
 	// request; it is set and reset on the main thread only.
 	quiet                  bool
@@ -205,6 +218,7 @@ func newApplication(path string) (*application, error) {
 	a.translateAsync = true
 	a.translateDictionaryFn = dictionaryDefinition
 	a.translateCopy = defaultTranslateCopy
+	a.selectionBudget = selectionTimeout
 	a.createJSONWindow = a.buildJSONWindow
 	a.presentJSONWindow = a.focusJSONWindow
 	a.feedbackMode = feedbackIndex(feedbackModes, config.FeedbackMode)
@@ -438,6 +452,7 @@ func (a *application) createSettingsWindow() {
 	a.window.OnResize(a.rememberWindowSize)
 	a.window.OnMove(a.observeSettingsMove)
 	a.window.OnRestore(a.reconcileSettingsDisplayIfNeeded)
+	a.window.OnFocus(a.onSettingsFocus)
 
 	a.window.OnClose(func(event *mygo.CloseEvent) {
 		if !a.quitting {
@@ -449,6 +464,14 @@ func (a *application) createSettingsWindow() {
 
 func (a *application) ready() {
 	mygo.App.SetLanguages("zh-CN", "en")
+	// The real AX reader and the System Settings opener exist only in the
+	// running app. Headless tests keep both seams nil.
+	a.selection = systemSelectionReader{}
+	a.openAccessibilitySettings = openAccessibilitySettingsPane
+	if a.selectionBudget <= 0 {
+		a.selectionBudget = selectionTimeout
+	}
+
 	a.setLocale = mygo.App.SetLocale
 	a.setLogin = mygo.App.SetOpenAtLogin
 	a.installQuitWatchdog()

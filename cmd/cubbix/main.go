@@ -313,8 +313,9 @@ func buildRequest(inv invocation, e *env) (cli.Request, []byte, error) {
 }
 
 // readTranslateBody reads the source text of translate: an argument, --text,
-// a file, or stdin when it is a pipe. Unlike json.new, an empty text is a
-// usage error: the app would otherwise open a panel for a script.
+// a file, or stdin when it is a pipe. With no source at all on an interactive
+// terminal, bytes == 0 asks the app to translate the current AX selection.
+// An explicitly empty text stays a usage error.
 func readTranslateBody(inv invocation, e *env) ([]byte, error) {
 	sources := 0
 	for _, present := range []bool{inv.body.hasText, inv.body.hasFile, inv.hasTextArg} {
@@ -339,7 +340,8 @@ func readTranslateBody(inv invocation, e *env) ([]byte, error) {
 	default:
 		reader, terminal := e.stdin()
 		if terminal {
-			return nil, usagef("translate needs text. See \"cubbix help translate\".")
+			// No body frame: translate the frontmost application's selection.
+			return nil, nil
 		}
 		data, err = io.ReadAll(io.LimitReader(reader, cli.MaxPayload+1))
 	}

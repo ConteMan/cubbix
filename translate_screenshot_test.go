@@ -60,6 +60,64 @@ func saveTranslateEvidence(t *testing.T, dir, name string, img *image.RGBA) {
 	}
 }
 
+// renderSelectionSettingsScreenshot advances well past the theme transition
+// so a dark capture is fully dark before it is saved.
+func renderSelectionSettingsScreenshot(a *application, locale string, dark bool) *ui.Tester {
+	tester := ui.NewTester(a.view, 720, settingsWindowHeight)
+	tester.SetScale(2)
+	tester.SetLocale(locale)
+	tester.SetDark(dark)
+	tester.Frame()
+	tester.Advance(700 * time.Millisecond)
+	tester.Frame()
+	return tester
+}
+
+// TestTranslateSelectionScreenshots captures the accessibility hint and the
+// selection row in both languages and both themes. It is in-memory only: no
+// window, no AX call, no permission prompt and no system window is opened.
+// CUBBIX_TRANSLATE_SELECTION_EVIDENCE names a directory outside the repo.
+func TestTranslateSelectionScreenshots(t *testing.T) {
+	dir := os.Getenv("CUBBIX_TRANSLATE_SELECTION_EVIDENCE")
+	if dir == "" {
+		t.Skip("selection evidence not requested")
+	}
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, dark := range []bool{false, true} {
+			mode := "light"
+			if dark {
+				mode = "dark"
+			}
+			suffix := locale + "-" + mode
+			panel := translateTestApp(t)
+			s := panel.ensureTranslateState()
+			s.denied = true
+			s.phase = translateEmpty
+			saveTranslateEvidence(t, dir, "translate-selection-denied-"+suffix,
+				renderTranslatePanelScreenshot(panel, locale, dark).Image())
+			for _, trusted := range []bool{false, true} {
+				state := "unauthorized"
+				if trusted {
+					state = "authorized"
+				}
+				settings := selectionTestApp(t, nil)
+				settings.page = settingsTranslate
+				settings.translateSelectionTrusted = trusted
+				settings.translateKeySaved = true
+				tester := renderSelectionSettingsScreenshot(settings, locale, dark)
+				saveTranslateEvidence(t, dir, "translate-selection-settings-"+state+"-"+suffix, tester.Image())
+				tester.Scroll(650, 350, 0, 1000)
+				tester.Advance(700 * time.Millisecond)
+				tester.Frame()
+				saveTranslateEvidence(t, dir, "translate-selection-settings-scrolled-"+state+"-"+suffix, tester.Image())
+			}
+		}
+	}
+}
+
 // TestTranslateScreenshots renders the floating panel and its settings page
 // in both languages and both themes. It is an in-memory ui.Tester render: no
 // window is created, nothing is activated and no shortcut is registered.

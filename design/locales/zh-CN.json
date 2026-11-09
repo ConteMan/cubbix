@@ -340,8 +340,8 @@
   "TranslateModelError": "模型不可用，请检查设置里的模型名",
   "TranslateRetry": "重试",
   "TranslateTooLong": "文本过长，只翻译了前 %d 个字符",
-  "TranslateSelectionDenied": "没有辅助功能权限，改为手动输入",
-  "TranslateGrantAccess": "打开辅助功能设置",
+  "TranslateSelectionDenied": "开启辅助功能权限后可直接翻译选中文字",
+  "TranslateGrantAccess": "去设置",
   "TranslateBaseURL": "接口地址",
   "TranslateBaseURLInfo": "一般必须用 https；仅本机网关的回环地址允许 http，Key 不会离开本机；路径为空时补 /v1，聊天与模型列表共用同一前缀；不带查询串或片段",
   "TranslateEndpointLocalHint": "本机地址可用 http",
@@ -367,5 +367,9 @@
   "TranslateAutoSpeakHint": "只对单个英文单词生效",
   "TranslateCardAction": "翻译…",
   "TranslateCancel": "停止",
-  "TranslateNoSelection": "没有取到选中文字"
+  "TranslateNoSelection": "没有取到选中文字",
+  "TranslateSelectionLabel": "划词",
+  "TranslateSelectionAuthorized": "已授权",
+  "TranslateSelectionUnauthorized": "未授权",
+  "TranslateSelectionInfo": "需要辅助功能权限才能读取其他应用的选中文字；授权后按快捷键可直接翻译。Cubbix 只读取选中文字，不复制、不改动剪贴板。"
 }

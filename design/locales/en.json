@@ -340,8 +340,8 @@
   "TranslateModelError": "The model is unavailable. Check the model name in Settings.",
   "TranslateRetry": "Retry",
   "TranslateTooLong": "Too long; only the first %d characters were translated",
-  "TranslateSelectionDenied": "Accessibility access is off, so type the text instead",
-  "TranslateGrantAccess": "Open Accessibility settings",
+  "TranslateSelectionDenied": "Turn on Accessibility access to translate selected text",
+  "TranslateGrantAccess": "Open Settings",
   "TranslateBaseURL": "Endpoint",
   "TranslateBaseURLInfo": "Use https in general. Only loopback addresses of a local gateway may use http, where the key stays on the local machine. An empty path gets /v1, and chat and model lists share that prefix. No query string or fragment.",
   "TranslateEndpointLocalHint": "http allowed for localhost",
@@ -367,5 +367,9 @@
   "TranslateAutoSpeakHint": "Only for a single English word",
   "TranslateCardAction": "Translate…",
   "TranslateCancel": "Stop",
-  "TranslateNoSelection": "No selected text"
+  "TranslateNoSelection": "No selected text",
+  "TranslateSelectionLabel": "Selected text",
+  "TranslateSelectionAuthorized": "Allowed",
+  "TranslateSelectionUnauthorized": "Not allowed",
+  "TranslateSelectionInfo": "Accessibility permission is needed to read selected text from other applications. Once allowed, the shortcut translates it directly. Cubbix only reads the selection; it never copies or changes the clipboard."
 }
