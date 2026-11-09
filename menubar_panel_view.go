@@ -40,6 +40,9 @@ func (a *application) menubarPanelView(c *ui.Context) {
 		if rows.json {
 			a.panelJSONCard(c, t, locale, rows)
 		}
+		if rows.translate {
+			a.panelTranslateCard(c, t, locale)
+		}
 		if rows.empty {
 			ui.Box(c).FillWidth().Height(t.SizeNavHeight).AlignItems(ui.Center).Justify(ui.Center).Children(func() {
 				ui.Text(c, a.text(locale, "PanelEmpty")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextDisabled))
@@ -235,6 +238,32 @@ func (a *application) panelJSONRow(c *ui.Context, t tokenValues, locale string, 
 			if d.pinned {
 				ui.Icon(c, icon("pin")).Size(t.SizeIconSmall, t.SizeIconSmall).TextColor(ui.Hex(t.ColorTextSecondary)).Label(name)
 			}
+		})
+	})
+}
+
+// panelTranslateCard is one row with no state and no recent translation.
+// The button opens the floating panel with an empty input; the module switch
+// decides whether the card is drawn at all.
+func (a *application) panelTranslateCard(c *ui.Context, t tokenValues, locale string) {
+	text := func(key string) string { return a.text(locale, key) }
+	label := text("TranslateCardAction")
+	ui.Column(c.Key("panel-translate-card")).FillWidth().Height(translateCardHeight(t)).
+		Padding(t.Space4, t.Space10).Radius(t.RadiusCard).
+		Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
+		ui.Row(c).FillWidth().Height(t.SizeNavHeight).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+			ui.Icon(c, icon("languages")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorText))
+			ui.Text(c, text("Translate")).FontSize(t.FontSizeBody).
+				FontWeight(fontWeight(t.FontWeightSemibold)).TextColor(ui.Hex(t.ColorText)).Grow(1)
+			button := ui.ButtonBase(c.Key("panel-translate-open")).Size(t.SizeIconButton, t.SizeIconButton).
+				Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label).OnClick(a.panelOpenTranslate)
+			if button.Hovered() {
+				button.Background(ui.Hex(t.ColorControlHover))
+			}
+			button.Children(func() {
+				ui.Icon(c, icon("text-quote")).Size(t.SizeIcon, t.SizeIcon).
+					TextColor(ui.Hex(t.ColorTextSecondary))
+			})
 		})
 	})
 }

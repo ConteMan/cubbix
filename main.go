@@ -119,7 +119,10 @@ type application struct {
 	translateTestFn         translateTestFunc
 	translateDictionaryFn   func(string) string
 	translateCopy           func(string) error
-	createTranslateWindow   func(*translateState)
+	// speech is the pronunciation seam. ready() installs the real engine;
+	// headless tests keep it nil or inject a fake, so no test makes a sound.
+	speech                speechEngine
+	createTranslateWindow func(*translateState)
 	// selection is the AX seam. It stays nil in every headless test; ready()
 	// installs the real reader, so tests can neither read the frontmost
 	// application nor cause a permission prompt.
@@ -464,10 +467,11 @@ func (a *application) createSettingsWindow() {
 
 func (a *application) ready() {
 	mygo.App.SetLanguages("zh-CN", "en")
-	// The real AX reader and the System Settings opener exist only in the
-	// running app. Headless tests keep both seams nil.
+	// The real AX reader, the System Settings opener and the speech engine
+	// exist only in the running app. Headless tests keep these seams nil.
 	a.selection = systemSelectionReader{}
 	a.openAccessibilitySettings = openAccessibilitySettingsPane
+	a.speech = newSystemSpeech()
 	if a.selectionBudget <= 0 {
 		a.selectionBudget = selectionTimeout
 	}

@@ -209,8 +209,14 @@ func (a *application) translateResultBlock(c *ui.Context, t tokenValues, locale 
 				a.translateResultContent(c, t, locale, s)
 			})
 		})
-		if s.phase == translateLoading || s.phase == translateStreaming || s.phase == translateDone {
-			a.translateCopyButton(c, t, locale, s)
+		// The two icon buttons share one top-trailing row and keep the
+		// Space4 gap from the spec; the result text scrolls beside them.
+		// The 44 pt empty block is too short for a 28 pt button.
+		if s.phase != translateEmpty {
+			ui.Row(c).Shrink(0).Gap(t.Space4).AlignItems(ui.Start).Children(func() {
+				a.translateCopyButton(c, t, locale, s)
+				a.translateSpeakButton(c, t, locale, s)
+			})
 		}
 	})
 }
@@ -335,6 +341,34 @@ func (a *application) translateCopyButton(c *ui.Context, t tokenValues, locale s
 	button.Children(func() {
 		ui.Row(c).Fill().AlignItems(ui.Center).Justify(ui.Center).Children(func() {
 			ui.Icon(c, icon(glyph)).Size(t.SizeIconSmall, t.SizeIconSmall).TextColor(ui.Hex(t.ColorTextSecondary))
+		})
+	})
+}
+
+// translateSpeakButton reads the source text. While speaking it becomes a
+// loader and a second click stops the utterance; a failed engine explains
+// itself with the failure tooltip, never with an alert box.
+func (a *application) translateSpeakButton(c *ui.Context, t tokenValues, locale string, s *translateState) {
+	text := func(key string) string { return a.text(locale, key) }
+	glyph, label := "volume-2", text("TranslateSpeak")
+	switch {
+	case s.speaking:
+		glyph, label = "loader-circle", text("TranslateSpeakStop")
+	case s.speakFailed:
+		label = text("TranslateSpeakFailed")
+	}
+	usable := strings.TrimSpace(s.input) != "" && s.phase != translateEmpty && s.phase != translateLoading
+	button := ui.ButtonBase(c.Key("translate-speak")).Size(t.SizeIconButton, t.SizeIconButton).
+		Shrink(0).Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label)
+	if usable || s.speaking {
+		button = button.OnClick(a.speakTranslateSource)
+	} else {
+		button = button.Disabled(true).Opacity(t.OpacityDisabled)
+	}
+	button.Children(func() {
+		ui.Row(c).Fill().AlignItems(ui.Center).Justify(ui.Center).Children(func() {
+			ui.Icon(c, icon(glyph)).Size(t.SizeIconSmall, t.SizeIconSmall).
+				TextColor(ui.Hex(t.ColorTextSecondary))
 		})
 	})
 }

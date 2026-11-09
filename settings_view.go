@@ -33,7 +33,7 @@ var settingsNav = []struct {
 	{settingsGeneral, "settings-2", "General"},
 	{settingsAwake, "sun", "Awake"},
 	{settingsJSON, "braces", "JSON"},
-	{settingsTranslate, "text-quote", "Translate"},
+	{settingsTranslate, "languages", "Translate"},
 	{settingsShortcuts, "keyboard", "R05Shortcuts"},
 	{settingsAbout, "info", "About"},
 }
@@ -872,10 +872,17 @@ func (a *application) selectSettingsPage(page int) {
 }
 
 // settingsView is the settings column for the page on screen.
+// translateScrollbarGutter reserves room for the floating scroll bar inside
+// the scroll container: the bar is 6 wide and sits 3 from the container's
+// right edge, so Space12 leaves it entirely outside the cards' right border.
+// Keeping the bar inside the container also keeps it draggable.
+func translateScrollbarGutter(t tokenValues) float32 { return t.Space12 }
+
 func (a *application) settingsView(c *ui.Context, t tokenValues, locale string) {
 	l := newSettingsLayout(a, a.page)
 	if l.page == settingsTranslate {
-		ui.Scroll(c.Key("settings-translate-scroll")).Fill().Children(func() {
+		ui.Scroll(c.Key("settings-translate-scroll")).Fill().
+			Padding(0, translateScrollbarGutter(t), 0, 0).Children(func() {
 			ui.Column(c).FillWidth().Shrink(0).Children(func() {
 				a.settingsContent(c, t, locale, l)
 			})

@@ -102,13 +102,11 @@ func (a *application) commands() []*command {
 func (a *application) translateCommands() []*command {
 	return []*command{
 		{
-			ID:       "translate.open",
-			Title:    localizedTitle("Translate"),
-			Keywords: []string{"翻译", "translate", "fanyi", "fy", "translation"},
-			Tile:     "translate",
-			// languages arrives with a later icon round; text-quote is the
-			// existing icon the settings page already uses for this module.
-			Icon:      "text-quote",
+			ID:        "translate.open",
+			Title:     localizedTitle("Translate"),
+			Keywords:  []string{"翻译", "translate", "fanyi", "fy", "translation"},
+			Tile:      "translate",
+			Icon:      "languages",
 			Param:     paramText,
 			Available: func(a *application) bool { return a.config.TranslateEnabled },
 			Run: func(a *application, req request) error {

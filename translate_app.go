@@ -41,6 +41,12 @@ type translateState struct {
 	clipped            int
 	copiedUntil        time.Time
 	focus              bool
+	// speaking, speakFailed and autoSpoke are the pronunciation overlays.
+	// speechToken makes a completion from a stopped utterance harmless.
+	speaking    bool
+	speakFailed bool
+	autoSpoke   bool
+	speechToken uint64
 	// denied is the per-launch accessibility hint under the input. It is an
 	// overlay, not a phase: submitting text must still stream normally, and
 	// typing anything dismisses it.
@@ -140,6 +146,9 @@ func (a *application) changeTranslateAutoSpeak(target bool) {
 		return
 	}
 	a.config.TranslateAutoSpeak = target
+	if !target {
+		a.stopTranslateSpeech()
+	}
 	a.save()
 	a.invalidateWindow()
 }
@@ -169,6 +178,7 @@ func (a *application) openTranslateText(text string) {
 	a.hideMenubarPanel()
 	a.hidePalette()
 	s := a.ensureTranslateState()
+	a.stopTranslateSpeech()
 	a.cancelTranslate()
 	s.input = text
 	s.directionInput = text
@@ -180,6 +190,8 @@ func (a *application) openTranslateText(text string) {
 	s.directionSwapped = false
 	s.copiedUntil = time.Time{}
 	s.phase = translateEmpty
+	s.autoSpoke = false
+	s.speakFailed = false
 	s.denied = false
 	s.focus = true
 	if s.window == nil && a.createTranslateWindow != nil {
@@ -232,6 +244,7 @@ func (a *application) hideTranslate() {
 	if s == nil {
 		return
 	}
+	a.stopTranslateSpeech()
 	s.visible = false
 	if s.window != nil {
 		s.window.Hide()
@@ -317,6 +330,7 @@ func (a *application) syncTranslateInput() {
 	s.phase = translateEmpty
 	s.errorKey = ""
 	s.copiedUntil = time.Time{}
+	a.stopTranslateSpeech()
 	a.refreshTranslate()
 }
 
@@ -326,6 +340,7 @@ func (a *application) syncTranslateInput() {
 func (a *application) submitTranslate() {
 	s := a.ensureTranslateState()
 	a.syncTranslateInput()
+	a.stopTranslateSpeech()
 	a.cancelTranslate()
 	text := s.input
 	if strings.TrimSpace(text) == "" {
@@ -383,6 +398,7 @@ func (a *application) submitTranslate() {
 					return
 				}
 				s.dictionary = definition
+				a.maybeAutoSpeakTranslate()
 				a.refreshTranslate()
 			})
 		})
@@ -425,6 +441,7 @@ func (a *application) submitTranslate() {
 			s.output = out
 			s.phase = translateDone
 			s.errorKey = ""
+			a.maybeAutoSpeakTranslate()
 			a.refreshTranslate()
 		})
 	})

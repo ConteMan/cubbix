@@ -24,7 +24,7 @@ func translatePageHeight(t tokenValues, on bool) float32 {
 func (a *application) translateModulePage(c *ui.Context, t tokenValues, locale string, l settingsLayout, alert string) {
 	text := func(key string) string { return a.text(locale, key) }
 	on := l.translateOn
-	a.pageHeader(c, t, locale, "text-quote", "Translate", "TranslatePageDesc", alert, func() {
+	a.pageHeader(c, t, locale, "languages", "Translate", "TranslatePageDesc", alert, func() {
 		a.switchControl(c, t, "translate-enabled", text("Translate"), &on, func() {
 			a.changeTranslateEnabled(!a.config.TranslateEnabled)
 		}, "", false)
@@ -182,7 +182,7 @@ func (a *application) translateAutoSpeakRow(c *ui.Context, t tokenValues, locale
 	text := func(key string) string { return a.text(locale, key) }
 	on := a.config.TranslateAutoSpeak
 	a.settingsRow(c, t, text("TranslateAutoSpeak"), settingsRowOpts{level: 1, hint: text("TranslateAutoSpeakHint")}, func() {
-		// This step only stores the preference; speaking is a later step.
+		// Reads a single English word once, after a definition or a translation.
 		a.switchControl(c, t, "translate-auto-speak", text("TranslateAutoSpeak"), &on, func() {
 			a.changeTranslateAutoSpeak(!a.config.TranslateAutoSpeak)
 		}, "", false)

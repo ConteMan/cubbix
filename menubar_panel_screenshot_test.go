@@ -87,6 +87,7 @@ func TestMenubarPanelScreenshots(t *testing.T) {
 		{"panel-empty", func(a *application) {
 			a.config.AwakeEnabled = false
 			a.config.JSONEnabled = false
+			a.config.TranslateEnabled = false
 		}},
 	}
 	for _, locale := range []string{"zh-CN", "en"} {

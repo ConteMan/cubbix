@@ -334,7 +334,9 @@ func lidSourceViolations(path string, source []byte) []string {
 			// /usr/bin/open: the command line tool launches the app bundle the
 			// tool belongs to (006 §3.4). It is not privileged and cannot set
 			// power options; it starts an app, as LaunchServices would.
-			case "/bin/ps", "/usr/bin/caffeinate", "/usr/bin/codesign", "/usr/bin/pmset", "/usr/bin/" + "osa" + "script", "/usr/bin/open":
+			// /usr/bin/say: the translation speech fallback. It reads text from
+			// standard input, has no shell and cannot set power options.
+			case "/bin/ps", "/usr/bin/caffeinate", "/usr/bin/codesign", "/usr/bin/pmset", "/usr/bin/" + "osa" + "script", "/usr/bin/open", "/usr/bin/say":
 			default:
 				reject("unreviewed executable or command proxy")
 				break
@@ -348,6 +350,11 @@ func lidSourceViolations(path string, source []byte) []string {
 				values, known := lidCallStrings(args)
 				if !known || n.Ellipsis.IsValid() || !lidReadOnlyPMSet(values) {
 					reject("power command is not an explicit read-only query")
+				}
+			case "say":
+				values, known := lidCallStrings(args)
+				if !known || n.Ellipsis.IsValid() || !lidSameStrings(values, "-f", "-") {
+					reject("speech fallback is not the fixed standard-input command")
 				}
 			case "osa" + "script":
 				valid := isAdmin && executable == "/usr/bin/"+"osa"+"script" && len(args) == 2 && !n.Ellipsis.IsValid()
@@ -561,6 +568,8 @@ func main(){sleep:=lid.PMSet{Run:func(ctx context.Context,name string,args ...st
 		{"composed-write", "extra.go", process(`exec.Command("/usr/bin/"+"pmset","sleep","0")`)},
 		{"dynamic-executable", "extra.go", process(`name:="/usr/bin/pmset";exec.Command(name,"-g")`)},
 		{"command-proxy", "extra.go", process(`exec.Command("/usr/bin/env","pmset","sleep","0")`)},
+		{"speech-argv", "extra.go", process(`exec.Command("/usr/bin/say","-v","Samantha","hello")`)},
+		{"speech-dynamic-args", "extra.go", process(`args:=[]string{"-f","-"};exec.Command("/usr/bin/say",args...)`)},
 		{"authorization-proxy", "extra.go", process(`exec.Command("/usr/bin/sudo","pmset","sleep","0")`)},
 		{"shell", "extra.go", process(`exec.Command("/bin/sh","-c","ignored")`)},
 		{"shell-arg-vector", "extra.go", process(`args:=[]string{"-c","ignored"};exec.CommandContext(ctx,"/bin/sh",args...)`)},
@@ -599,6 +608,7 @@ func main(){sleep:=lid.PMSet{Run:func(ctx context.Context,name string,args ...st
 	}
 	allowed := []struct{ path, source string }{
 		{"extra.go", process(`exec.Command("/usr/bin/pmset","-g");exec.CommandContext(ctx,"/usr/bin/pmset","-g","batt")`)},
+		{"extra.go", process(`exec.Command("/usr/bin/say","-f","-")`)},
 		{"cmd/cubbix-helper/main.go", strings.Replace(helper, "EXTRA", "", 1)},
 		{"lid_restore_darwin.go", admin(`exec.Command(` + appleExe + `,"-e",lidInstallScriptApple);exec.Command(` + appleExe + `,"-e",lidUninstallScriptApple);exec.Command(` + appleExe + `,"-e",lidForceScriptApple)`)},
 	}
