@@ -21,10 +21,14 @@ const translateSecretKey = "translate-api-key"
 // translateAPIKey reads the key for a worker. A missing secret is not an
 // error: it means the module is not configured yet.
 func (a *application) translateAPIKey() (string, error) {
-	if a.translateSecret == nil {
+	return readTranslateAPIKey(a.translateSecret)
+}
+
+func readTranslateAPIKey(store translateSecretStore) (string, error) {
+	if store == nil {
 		return "", nil
 	}
-	value, err := a.translateSecret.Get(translateSecretKey)
+	value, err := store.Get(translateSecretKey)
 	if errors.Is(err, mygo.ErrSecretNotFound) {
 		return "", nil
 	}

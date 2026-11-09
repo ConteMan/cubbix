@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ConteMan/cubbix/internal/awake"
+	"github.com/ConteMan/cubbix/internal/cli"
 )
 
 // helpText is the whole help output. The tool's own strings are English: the
@@ -23,6 +24,8 @@ Commands:
   json new [options]   Open a JSON window  (--text STR | --file PATH | --blank)
   palette              Open the command palette
   settings [--page P]  Open Settings  (general|awake|json|translate|shortcuts|about)
+  translate [TEXT]     Translate text from an argument, file or standard input
+                       [--to auto|zh|en] [--text STR | --file PATH | -]
   version              Print the version of this tool and its app bundle
   help [command]       Show this help
 
@@ -30,9 +33,35 @@ Options:
   --json               Print one JSON object with stable fields
   --notify             Show the same hint or notification as the shortcut
   --no-launch          Do not start Cubbix when it is not running
-  --timeout DURATION   Wait at most this long for Cubbix (default 5s, max 60s)
+  --timeout DURATION   Wait at most this long for Cubbix (default 5s,
+                       30s for translate, max 60s)
 
 Debugging:
+  --socket PATH        Talk to the app at PATH instead of the default socket
+
+Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
+             4 rejected, 5 timeout
+`
+
+// translateHelpText is the topic help for `cubbix help translate`. The tool's
+// own strings stay in English (006 §9.3); app messages carry the UI language.
+const translateHelpText = `Usage: cubbix translate [TEXT] [options]
+
+Translate text with the running app and print only the translation. TEXT may
+be omitted when piping standard input; "-" reads standard input explicitly.
+Input must be non-empty UTF-8 text. Only the first 4000 characters are
+translated; --json reports the number of omitted characters in translate.clipped.
+The current selection is not supported yet. --notify is not accepted.
+For a slow model, use --timeout 60s: the app's model limit is 50s. A client
+timeout exits 5; a model timeout reported by the app exits 4.
+
+Options:
+  --to auto|zh|en      Override the detected target language (default auto)
+  --text STR           Translate STR
+  --file PATH          Translate the contents of PATH, or standard input for -
+  --json               Print one JSON object with stable fields
+  --no-launch          Do not start Cubbix when it is not running
+  --timeout DURATION   Wait at most this long (default 30s, max 60s)
   --socket PATH        Talk to the app at PATH instead of the default socket
 
 Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
@@ -181,6 +210,16 @@ func parse(argv []string) (inv invocation, err error) {
 				return inv, usagef("Invalid value for --page: %q", raw)
 			}
 			inv.page = raw
+		case "--to":
+			raw, err := value(&i, name, inline, hasInline)
+			if err != nil {
+				return inv, err
+			}
+			seen = append(seen, name)
+			if raw != cli.TranslateToAuto && raw != cli.TranslateToZh && raw != cli.TranslateToEn {
+				return inv, usagef("Invalid value for --to: %q", raw)
+			}
+			inv.to = raw
 		default:
 			return inv, usagef("Unknown option %q.", name)
 		}
@@ -193,6 +232,11 @@ func parse(argv []string) (inv invocation, err error) {
 	}
 	if err := checkOptions(inv.command, seen); err != nil {
 		return inv, err
+	}
+	// A translation can spend up to 50s in the model call: 5s would time out
+	// before the app could answer. An explicit --timeout still wins.
+	if inv.command == "translate" && !seenContains(seen, "--timeout") {
+		inv.flags.timeout = 30 * time.Second
 	}
 	if inv.command == "awake.on" {
 		chosen := 0
@@ -288,11 +332,23 @@ func resolve(inv *invocation, positional []string) error {
 			return err
 		}
 		inv.command = "version"
+	case "translate":
+		if len(rest) > 1 {
+			return usagef("translate accepts one TEXT argument. See \"cubbix help translate\".")
+		}
+		inv.command = "translate"
+		if len(rest) == 1 {
+			inv.textArg = rest[0]
+			inv.hasTextArg = true
+		}
 	case "help":
 		if len(rest) > 1 {
 			return usagef("Unknown command %q. See \"cubbix help\".", strings.Join(positional, " "))
 		}
 		inv.command = "help"
+		if len(rest) == 1 {
+			inv.helpTopic = rest[0]
+		}
 	default:
 		return usagef("Unknown command %q. See \"cubbix help\".", strings.Join(positional, " "))
 	}
@@ -305,6 +361,7 @@ func checkOptions(command string, seen []string) error {
 	global := map[string]bool{"--json": true, "--notify": true, "--no-launch": true, "--timeout": true, "--socket": true}
 	awakeOnly := map[string]bool{"--minutes": true, "--until": true, "--follow": true, "--mode": true, "--lid": true, "--no-lid": true}
 	bodyOnly := map[string]bool{"--text": true, "--file": true, "--blank": true}
+	translateOnly := map[string]bool{"--to": true, "--text": true, "--file": true}
 	allowed := map[string]bool{}
 	for name := range global {
 		allowed[name] = true
@@ -319,11 +376,15 @@ func checkOptions(command string, seen []string) error {
 		allow(awakeOnly)
 	case "json.new":
 		allow(bodyOnly)
+	case "translate":
+		// A translation never shows a hint and never opens a window, so
+		// --notify would be a no-op at best. --blank belongs to json.new only.
+		allow(translateOnly)
 	case "settings":
 		allowed["--page"] = true
 	}
 	// A read-only command never carries --notify: nothing would show.
-	if strings.HasPrefix(command, "awake.status") || command == "status" || command == "version" || command == "help" {
+	if strings.HasPrefix(command, "awake.status") || command == "status" || command == "version" || command == "help" || command == "translate" {
 		delete(allowed, "--notify")
 	}
 	if command == "help" || command == "version" {

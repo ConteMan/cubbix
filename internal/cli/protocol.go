@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"regexp"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
 // Protocol is the wire version. Bump it only for incompatible semantics;
@@ -20,6 +22,10 @@ const (
 	MaxLine = 4096
 	// MaxPayload bounds the document body that follows a json.new line.
 	MaxPayload = 64 << 20 // jsonFileLimit
+	// MaxTranslateBody bounds the translation body frame of a response. The
+	// app clips its input to 4000 runes, so 64 KiB leaves ample room even for
+	// all-non-ASCII output.
+	MaxTranslateBody = 64 << 10
 	// MaxConcurrent bounds the connections served at once.
 	MaxConcurrent = 8
 	// SocketName is the socket's file name inside the config directory.
@@ -42,6 +48,14 @@ const (
 	ActionJSONNew     = "json.new"
 	ActionPalette     = "palette"
 	ActionSettings    = "settings"
+	ActionTranslate   = "translate"
+)
+
+// Accepted --to values for the translate action. Empty means auto.
+const (
+	TranslateToAuto = "auto"
+	TranslateToZh   = "zh"
+	TranslateToEn   = "en"
 )
 
 // Codes the app and the client share. The values are stable API.
@@ -89,6 +103,8 @@ type Request struct {
 	Notify bool `json:"notify,omitempty"`
 	// Page is the settings page for the settings action.
 	Page string `json:"page,omitempty"`
+	// To overrides the detected target language for translate.
+	To string `json:"to,omitempty"`
 }
 
 // Validate reports the protocol code of an invalid request, or "".
@@ -143,36 +159,68 @@ func (r Request) Validate(maxPayload int) string {
 		if len(r.Page) > 32 {
 			return CodeBadRequest
 		}
+	case ActionTranslate:
+		// The source text travels in a body frame; a translation never shows
+		// a hint, so --notify is a usage error rather than a silent no-op.
+		if r.Arg != "" || r.Mode != "" || r.Follow != 0 || r.Lid != nil ||
+			r.Blank || r.Page != "" || r.Notify {
+			return CodeBadRequest
+		}
+		if r.Bytes < 0 || r.Bytes > maxPayload {
+			return CodeBadRequest
+		}
+		switch r.To {
+		case "", TranslateToAuto, TranslateToZh, TranslateToEn:
+		default:
+			return CodeBadRequest
+		}
 	default:
 		return CodeBadRequest
 	}
 	return ""
 }
 
+// TranslateResult is the small metadata of a translation. Text is filled in
+// locally by the client from the response body frame: the app never puts the
+// translation into the JSON line, which must stay below MaxLine.
+type TranslateResult struct {
+	Source  string `json:"source"`
+	Target  string `json:"target"`
+	Model   string `json:"model"`
+	Clipped int    `json:"clipped"`
+	Text    string `json:"text,omitempty"`
+}
+
 // Result is what the command line tool prints: the stable --json object.
 type Result struct {
-	V       int      `json:"v"`
-	OK      bool     `json:"ok"`
-	Code    string   `json:"code"`
-	Message string   `json:"message"`
-	Lines   []string `json:"lines,omitempty"`
-	State   *State   `json:"state"`
+	V         int              `json:"v"`
+	OK        bool             `json:"ok"`
+	Code      string           `json:"code"`
+	Message   string           `json:"message"`
+	Lines     []string         `json:"lines,omitempty"`
+	State     *State           `json:"state"`
+	Bytes     int              `json:"bytes,omitempty"`
+	Translate *TranslateResult `json:"translate,omitempty"`
 }
 
 // Response is a Result with the request id the wire response carries.
 type Response struct {
-	V       int      `json:"v"`
-	ID      string   `json:"id"`
-	OK      bool     `json:"ok"`
-	Code    string   `json:"code"`
-	Message string   `json:"message"`
-	Lines   []string `json:"lines,omitempty"`
-	State   *State   `json:"state"`
+	V         int              `json:"v"`
+	ID        string           `json:"id"`
+	OK        bool             `json:"ok"`
+	Code      string           `json:"code"`
+	Message   string           `json:"message"`
+	Lines     []string         `json:"lines,omitempty"`
+	State     *State           `json:"state"`
+	Bytes     int              `json:"bytes,omitempty"`
+	Translate *TranslateResult `json:"translate,omitempty"`
 }
 
-// Result drops the id for printing.
+// Result drops the id for printing. Both translate fields travel through it:
+// a field added only to Response would be lost before the tool sees it.
 func (r Response) Result() Result {
-	return Result{V: r.V, OK: r.OK, Code: r.Code, Message: r.Message, Lines: r.Lines, State: r.State}
+	return Result{V: r.V, OK: r.OK, Code: r.Code, Message: r.Message, Lines: r.Lines,
+		State: r.State, Bytes: r.Bytes, Translate: r.Translate}
 }
 
 // NewResult is a successful result with a state.
@@ -183,6 +231,18 @@ func NewResult(state *State) Result {
 // Failure builds a failed result.
 func Failure(code string) Result {
 	return Result{V: Protocol, OK: false, Code: code}
+}
+
+func ValidTranslateInput(data []byte) bool {
+	if !utf8.Valid(data) {
+		return false
+	}
+	for _, character := range string(data) {
+		if unicode.IsControl(character) && character != '\n' && character != '\r' && character != '\t' {
+			return false
+		}
+	}
+	return true
 }
 
 // State is the snapshot every successful response carries.

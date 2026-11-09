@@ -109,6 +109,7 @@ type application struct {
 	translateTestRunning    bool
 	translateTestKey        string
 	translateTestUntil      time.Time
+	translateCLIDispatch    func(func())
 	translateSecret         translateSecretStore
 	translateRunOnMain      func(func())
 	translateAsync          bool

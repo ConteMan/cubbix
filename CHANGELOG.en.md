@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- New `cubbix translate`: text from an argument, a file or a pipe, printing only the translation; `--json` gives stable fields, `--to` chooses the target language, long translations come back intact, and `cubbix help translate` documents it. Typing "Translate <text>" in the command palette keeps the original capitalization, opens the panel and starts the translation.
 - New Translate module: a global shortcut opens a small floating panel; type text, press Return, and read the streamed translation. You can copy it, swap the direction, and configure the endpoint, the API key (kept in the system keychain) and the model in Settings. Models can be fetched from the endpoint or typed by hand, and the connection can be tested. A word auto-speak preference is stored but does not speak yet.
 - Translate has its own global shortcut and module switch. Turning the module off releases the shortcut while its settings row stays visible, disabled.
 - A saved translation key shows only Saved, Replace, and Clear; choose Replace to enter a new one. Keychain operations keep the interface responsive. Multiline streams, timeout and truncation hints, and stale request updates are fixed; switching panels cancels the translation.

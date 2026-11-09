@@ -645,6 +645,11 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 					rawArg = prefix.Arg
 				}
 			}
+			if cmd.Param == paramText && matchedPrefix && prefix.Command == cmd {
+				// A text argument keeps the query's original case; only the
+				// lowercase copy is used for matching.
+				rawArg = prefix.RawArg
+			}
 			p.request = request{Command: cmd, Arg: rawArg, Awake: arg}
 			if arg.Error != "" {
 				p.errorKey = arg.Error

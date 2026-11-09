@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+	"unicode/utf8"
 )
 
 // Error is a failure with a stable code, mapped to an exit status by the tool.
@@ -169,9 +170,13 @@ func (c *Client) Do(req Request, payload []byte, timeout time.Duration) (Result,
 	}
 	// An overloaded server answers before reading the request and closes.
 	// Its busy response remains authoritative even if our upload hit EPIPE.
-	result, err := c.readResponse(req)
-	if err == nil {
-		return result, nil
+	result, readErr := c.readResponse(req)
+	if readErr == nil {
+		if bodyErr := c.readTranslationBody(req, &result); bodyErr == nil {
+			return result, nil
+		} else {
+			readErr = bodyErr
+		}
 	}
 	if writeErr != nil {
 		code := CodeNotRunning
@@ -180,7 +185,54 @@ func (c *Client) Do(req Request, payload []byte, timeout time.Duration) (Result,
 		}
 		return Result{}, &Error{Code: code, Err: writeErr}
 	}
-	return Result{}, err
+	return Result{}, readErr
+}
+
+// readTranslationBody reads the response body frame that follows a translate
+// JSON line and fills in Translate.Text locally. Other actions have neither
+// Bytes nor Translate, so their wire format and timing stay unchanged.
+func (c *Client) readTranslationBody(req Request, result *Result) error {
+	if req.Action != ActionTranslate || !result.OK {
+		if result.Bytes != 0 || result.Translate != nil {
+			return failf(CodeInternal, "Cubbix sent a malformed answer")
+		}
+		return nil
+	}
+	if result.Translate == nil || result.Translate.Text != "" || result.Bytes <= 0 {
+		return failf(CodeInternal, "Cubbix sent a malformed translation answer")
+	}
+	if result.Bytes > MaxTranslateBody {
+		return &Error{Code: CodeInternal, Msg: "Cubbix sent an oversized answer"}
+	}
+	data, err := readBodyFrame(c.r, result.Bytes)
+	if err != nil {
+		switch {
+		case errors.Is(err, os.ErrDeadlineExceeded):
+			return &Error{Code: CodeTimeout, Msg: "Cubbix did not answer in time", Err: err}
+		case errors.Is(err, io.EOF), errors.Is(err, io.ErrUnexpectedEOF):
+			return &Error{Code: CodeNotRunning, Msg: "Cubbix closed the connection", Err: err}
+		default:
+			return &Error{Code: CodeInternal, Msg: "Cubbix sent a malformed answer", Err: err}
+		}
+	}
+	result.Translate.Text = string(data)
+	return nil
+}
+
+// readBodyFrame reads exactly size bytes, with its own limit and UTF-8 check.
+// It is the client counterpart of the app's readFull.
+func readBodyFrame(r *bufio.Reader, size int) ([]byte, error) {
+	if size < 0 || size > MaxTranslateBody {
+		return nil, fmt.Errorf("cli: response body over %d bytes", MaxTranslateBody)
+	}
+	buf := make([]byte, size)
+	if _, err := io.ReadFull(r, buf); err != nil {
+		return nil, err
+	}
+	if !utf8.Valid(buf) {
+		return nil, errors.New("cli: response body is not UTF-8")
+	}
+	return buf, nil
 }
 
 func (c *Client) readResponse(req Request) (Result, error) {
@@ -203,6 +255,9 @@ func (c *Client) readResponse(req Request) (Result, error) {
 	}
 	if response.V != Protocol {
 		return Result{}, &Error{Code: CodeProtocolMismatch, Msg: "Cubbix speaks another protocol version"}
+	}
+	if req.Action == ActionTranslate && !response.OK && response.Code == CodeBadRequest {
+		response.Message = "Cubbix rejected translate. Update and restart the app if it is an older version."
 	}
 	return response.Result(), nil
 }
