@@ -65,21 +65,32 @@ func (a *application) translateBaseURLRow(c *ui.Context, t tokenValues, locale s
 
 func (a *application) translateKeyRow(c *ui.Context, t tokenValues, locale string) {
 	text := func(key string) string { return a.text(locale, key) }
-	status := text("TranslateKeyMissing")
-	if a.translateKeySaved {
-		status = text("TranslateKeySaved")
-	}
 	a.settingsRow(c, t, text("TranslateAPIKey"), settingsRowOpts{level: 2, hint: text("TranslateKeyHint")}, func() {
-		a.statusDot(c, t, a.translateKeySaved, status)
-		ui.Text(c, status).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
-		ui.TextInput(c.Key("translate-key"), &a.translateKeyDraft).
-			Width(180).Height(t.SizeSegmentHeight).PaddingX(t.Space8).
-			Radius(t.RadiusControl).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
-			Background(ui.Hex(t.ColorControl)).FontSize(t.FontSizeBody).
-			Placeholder(text("TranslateKeyPlaceholder")).Label(text("TranslateAPIKey")).
-			FocusRing(true).Password().OnSubmit(a.commitTranslateKey)
-		a.translateTextButton(c, t, "translate-key-replace", text("TranslateKeyReplace"), a.commitTranslateKey)
-		a.translateTextButton(c, t, "translate-key-clear", text("TranslateKeyClear"), a.clearTranslateKeyAndDraft)
+		ui.Row(c).Gap(t.Space8).AlignItems(ui.Center).Disabled(a.translateKeyWriting).Children(func() {
+			if a.translateKeySaved && !a.translateKeyEditing {
+				ui.Text(c, text("TranslateKeySaved")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+				a.translateTextButton(c, t, "translate-key-replace", text("TranslateKeyReplace"), func() {
+					a.translateKeyEditing = true
+					a.translateKeyFocus = true
+					a.invalidateWindow()
+				})
+				a.translateTextButton(c, t, "translate-key-clear", text("TranslateKeyClear"), a.clearTranslateKeyAndDraft)
+				return
+			}
+			input := ui.TextInput(c.Key("translate-key"), &a.translateKeyDraft).
+				Width(180).Height(t.SizeSegmentHeight).PaddingX(t.Space8).
+				Radius(t.RadiusControl).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
+				Background(ui.Hex(t.ColorControl)).FontSize(t.FontSizeBody).
+				Placeholder(text("TranslateKeyPlaceholder")).Label(text("TranslateAPIKey")).
+				FocusRing(true).Password().OnSubmit(a.commitTranslateKey)
+			if a.translateKeyFocus {
+				a.translateKeyFocus = false
+				input.Focus()
+			}
+		})
+		if a.translateKeyWriting {
+			ui.Spinner(c).Size(t.SizeIcon, t.SizeIcon).Label(text("TranslateAPIKey"))
+		}
 		if a.translateKeyError != "" {
 			a.alertIcon(c, t, text(a.translateKeyError))
 		}
@@ -209,12 +220,15 @@ func (a *application) setTranslateModel(name string) {
 }
 
 func (a *application) commitTranslateKey() {
-	_ = a.setTranslateAPIKey(a.translateKeyDraft)
+	if strings.TrimSpace(a.translateKeyDraft) == "" {
+		return
+	}
+	a.setTranslateAPIKey(a.translateKeyDraft)
 }
 
 func (a *application) clearTranslateKeyAndDraft() {
 	a.translateKeyDraft = ""
-	_ = a.clearTranslateAPIKey()
+	a.clearTranslateAPIKey()
 	a.invalidateWindow()
 }
 

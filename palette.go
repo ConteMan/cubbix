@@ -113,6 +113,7 @@ func (a *application) paletteVisible() bool {
 }
 
 func (a *application) showPalette() {
+	a.closeTranslate()
 	a.hideMenubarPanel()
 	if a.palette == nil {
 		a.palette = &paletteState{}

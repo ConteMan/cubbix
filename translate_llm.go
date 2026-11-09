@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/netip"
 	"net/url"
@@ -25,6 +26,8 @@ const (
 	translateHTTPTimeout      = 50 * time.Second
 	translateProbeTimeout     = 10 * time.Second
 	translateMaxResponseBytes = 4096
+	translateMaxEventBytes    = 1 << 20
+	translateMaxOutputBytes   = 4 << 20
 )
 
 type translateConfig struct {
@@ -48,7 +51,10 @@ func translateEndpoints(base string) (chat string, models string, err error) {
 	raw := strings.TrimSpace(base)
 	u, parseErr := url.Parse(raw)
 	if parseErr != nil || u.Scheme == "" || u.Host == "" || u.Opaque != "" || u.User != nil ||
-		u.RawQuery != "" || u.ForceQuery || u.Fragment != "" {
+		u.RawQuery != "" || u.ForceQuery || strings.Contains(raw, "#") || u.Hostname() == "" {
+		return "", "", errTranslateAddress
+	}
+	if strings.Contains(u.Hostname(), ":") && !strings.HasPrefix(u.Host, "[") {
 		return "", "", errTranslateAddress
 	}
 	switch {
@@ -60,7 +66,7 @@ func translateEndpoints(base string) (chat string, models string, err error) {
 		}
 		return "", "", errTranslateAddress
 	}
-	path := strings.TrimRight(u.Path, "/")
+	path := strings.TrimRight(u.EscapedPath(), "/")
 	if strings.HasSuffix(path, "/chat/completions") {
 		path = strings.TrimRight(strings.TrimSuffix(path, "/chat/completions"), "/")
 	}
@@ -86,24 +92,7 @@ func translateLoopbackAllowed(u *url.URL) bool {
 	if addr.Is4() {
 		return addr.As4()[0] == 127
 	}
-	return addr.Is6() && addr.IsLoopback() && strings.HasPrefix(u.Host, "[")
-}
-
-// isLoopbackHost reports whether a bare hostname is one of the loopback
-// literals. IPv6 needs the brackets checked by translateLoopbackAllowed, so
-// this helper is deliberately only about the host text.
-func isLoopbackHost(host string) bool {
-	if strings.EqualFold(host, "localhost") {
-		return true
-	}
-	addr, err := netip.ParseAddr(host)
-	if err != nil {
-		return false
-	}
-	if addr.Is4() {
-		return addr.As4()[0] == 127
-	}
-	return addr.Is6() && addr.IsLoopback()
+	return addr == netip.IPv6Loopback() && strings.HasPrefix(u.Host, "[")
 }
 
 func (c translateConfig) endpoint() (string, error) {
@@ -161,7 +150,20 @@ func buildTranslateMessages(source, target, text string, word bool) []translateM
 }
 
 func translateHTTPClient() *http.Client {
-	return &http.Client{Timeout: translateHTTPTimeout}
+	return &http.Client{Timeout: translateHTTPTimeout, CheckRedirect: func(*http.Request, []*http.Request) error {
+		return http.ErrUseLastResponse
+	}}
+}
+
+func translateTransportError(err error) error {
+	if errors.Is(err, context.Canceled) {
+		return context.Canceled
+	}
+	var network net.Error
+	if errors.Is(err, context.DeadlineExceeded) || errors.As(err, &network) && network.Timeout() {
+		return context.DeadlineExceeded
+	}
+	return errTranslateNetwork
 }
 
 func translateRequest(ctx context.Context, cfg translateConfig, address string, body []byte, accept string) (*http.Response, error) {
@@ -176,15 +178,9 @@ func translateRequest(ctx context.Context, cfg translateConfig, address string, 
 	}
 	resp, err := translateHTTPClient().Do(req)
 	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return nil, context.DeadlineExceeded
-		}
-		if errors.Is(err, context.Canceled) {
-			return nil, context.Canceled
-		}
 		// An http error wraps the address. Deliberately do not keep it: no URL,
 		// key or request body ever reaches a log or the interface.
-		return nil, errTranslateNetwork
+		return nil, translateTransportError(err)
 	}
 	return resp, nil
 }
@@ -225,34 +221,61 @@ func streamTranslation(ctx context.Context, cfg translateConfig, text, source, t
 		return "", translateStatusError(resp)
 	}
 	var out strings.Builder
-	reader := bufio.NewReader(resp.Body)
-	for {
-		line, readErr := reader.ReadBytes('\n')
-		if len(line) > 0 {
-			var delta string
-			done, parseErr := parseSSELine(bytes.TrimRight(line, "\r\n"), &delta)
+	scanner := bufio.NewScanner(resp.Body)
+	scanner.Buffer(make([]byte, translateMaxResponseBytes), translateMaxEventBytes+1)
+	var event strings.Builder
+	dispatch := func() (bool, error) {
+		if ctx.Err() != nil {
+			return false, ctx.Err()
+		}
+		if event.Len() == 0 {
+			return false, nil
+		}
+		var delta string
+		done, parseErr := parseSSEData(strings.TrimSuffix(event.String(), "\n"), &delta)
+		event.Reset()
+		if parseErr != nil {
+			return false, parseErr
+		}
+		if out.Len()+len(delta) > translateMaxOutputBytes {
+			return false, errTranslateBadResponse
+		}
+		out.WriteString(delta)
+		if delta != "" && onDelta != nil {
+			onDelta(delta)
+		}
+		return done, nil
+	}
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			done, parseErr := dispatch()
 			if parseErr != nil {
 				return "", parseErr
-			}
-			if delta != "" {
-				out.WriteString(delta)
-				if onDelta != nil {
-					onDelta(delta)
-				}
 			}
 			if done {
 				break
 			}
+			continue
 		}
-		if readErr != nil {
-			if errors.Is(readErr, io.EOF) {
-				break
-			}
-			if errors.Is(readErr, context.Canceled) || errors.Is(readErr, context.DeadlineExceeded) {
-				return "", readErr
-			}
-			return "", errTranslateNetwork
+		if !strings.HasPrefix(line, "data:") {
+			continue
 		}
+		data := strings.TrimPrefix(strings.TrimPrefix(line, "data:"), " ")
+		if event.Len()+len(data)+1 > translateMaxEventBytes {
+			return "", errTranslateBadResponse
+		}
+		event.WriteString(data)
+		event.WriteByte('\n')
+	}
+	if err := scanner.Err(); err != nil {
+		if errors.Is(err, bufio.ErrTooLong) {
+			return "", errTranslateBadResponse
+		}
+		return "", translateTransportError(err)
+	}
+	if _, err := dispatch(); err != nil {
+		return "", err
 	}
 	if ctx.Err() != nil {
 		return "", ctx.Err()
@@ -274,6 +297,10 @@ func parseSSELine(line []byte, delta *string) (done bool, err error) {
 		return false, nil
 	}
 	data := strings.TrimSpace(strings.TrimPrefix(trimmed, "data:"))
+	return parseSSEData(data, delta)
+}
+
+func parseSSEData(data string, delta *string) (bool, error) {
 	if data == "[DONE]" {
 		return true, nil
 	}
@@ -334,6 +361,11 @@ func translateErrorKey(err error) string {
 			return "TranslateServerError"
 		}
 	}
+	var network net.Error
+	var address *url.Error
+	if errors.As(err, &network) || errors.As(err, &address) {
+		return translateErrorKey(translateTransportError(err))
+	}
 	return "TranslateServerError"
 }
 
@@ -352,19 +384,22 @@ func fetchTranslateModels(ctx context.Context, cfg translateConfig) ([]string, e
 	req.Header.Set("Authorization", "Bearer "+cfg.Key)
 	resp, err := translateHTTPClient().Do(req)
 	if err != nil {
-		return nil, errTranslateNetwork
+		return nil, translateTransportError(err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, translateMaxResponseBytes))
-		return nil, errTranslateModelsUnusable
+		return nil, translateStatusError(resp)
 	}
 	var payload struct {
 		Data []struct {
 			ID string `json:"id"`
 		} `json:"data"`
 	}
-	if err := json.NewDecoder(io.LimitReader(resp.Body, translateMaxResponseBytes)).Decode(&payload); err != nil {
+	body, err := io.ReadAll(io.LimitReader(resp.Body, translateMaxOutputBytes+1))
+	if err != nil {
+		return nil, translateTransportError(err)
+	}
+	if len(body) > translateMaxOutputBytes || json.Unmarshal(body, &payload) != nil {
 		return nil, errTranslateModelsUnusable
 	}
 	var models []string
@@ -405,13 +440,21 @@ func testTranslateConnection(ctx context.Context, cfg translateConfig) (string, 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return translateErrorKey(translateStatusError(resp)), nil
 	}
+	defer resp.Body.Close()
 	var answer struct {
-		Choices []json.RawMessage `json:"choices"`
+		Choices []struct {
+			Message *struct {
+				Content *string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
 	}
-	if err := json.NewDecoder(io.LimitReader(resp.Body, translateMaxResponseBytes)).Decode(&answer); err != nil || len(answer.Choices) == 0 {
-		resp.Body.Close()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, translateMaxResponseBytes+1))
+	if err != nil {
+		return translateErrorKey(translateTransportError(err)), nil
+	}
+	if len(body) > translateMaxResponseBytes || json.Unmarshal(body, &answer) != nil || len(answer.Choices) == 0 ||
+		answer.Choices[0].Message == nil || answer.Choices[0].Message.Content == nil {
 		return "TranslateBadResponse", nil
 	}
-	resp.Body.Close()
 	return "", nil
 }

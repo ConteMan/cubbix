@@ -98,6 +98,10 @@ type application struct {
 	translateRowError       string
 	translateKeyDraft       string
 	translateKeySaved       bool
+	translateKeyEditing     bool
+	translateKeyFocus       bool
+	translateKeyWriting     bool
+	translateKeyGeneration  uint64
 	translateKeyError       string
 	translateModelList      []string
 	translateModelListError string

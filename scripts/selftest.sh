@@ -24,7 +24,7 @@ cmp assets/menubar-template-active.tiff "$tmp_dir/menubar-template-active.tiff"
 ./scripts/build-tools.sh
 go vet ./...
 go test ./...
-release_dir="$HOME/Projects/temp/cubbix/release"
+release_dir="${CUBBIX_SELFTEST_RELEASE_DIR:-$HOME/Projects/temp/cubbix/release}"
 mkdir -p "$release_dir"
 go run github.com/egoist/mygo/cmd/mygo@v0.6.2 build -platform darwin/arm64 -sign - -skip-dmg -skip-notarize -o "$tmp_dir/build"
 ./scripts/check-helper.sh "$tmp_dir/build/darwin-arm64/Cubbix.app"

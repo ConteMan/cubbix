@@ -361,9 +361,7 @@ func TestTranslateSecretStore(t *testing.T) {
 	a := translateTestApp(t)
 	secrets := a.translateSecret.(*fakeTranslateSecrets)
 	a.translateKeyDraft = "  secret  "
-	if err := a.setTranslateAPIKey(a.translateKeyDraft); err != nil {
-		t.Fatal(err)
-	}
+	a.setTranslateAPIKey(a.translateKeyDraft)
 	if string(secrets.value) != "secret" || secrets.sets != 1 || !a.translateKeySaved || a.translateKeyDraft != "" {
 		t.Fatalf("key state = %q %+v", secrets.value, a)
 	}

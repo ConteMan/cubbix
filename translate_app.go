@@ -29,7 +29,7 @@ type translateState struct {
 	window           *mygo.Window
 	visible          bool
 	input            string
-	submitted        string
+	directionInput   string
 	phase            translatePhase
 	directionSwapped bool
 	output           string
@@ -152,7 +152,7 @@ func (a *application) openTranslateText(text string) {
 	s := a.ensureTranslateState()
 	a.cancelTranslate()
 	s.input = text
-	s.submitted = ""
+	s.directionInput = text
 	s.output = ""
 	s.errorKey = ""
 	s.clipped = 0
@@ -265,9 +265,10 @@ func (a *application) translateDirection(s *translateState) (source, target stri
 
 func (a *application) swapTranslateDirection() {
 	s := a.translate
-	if s == nil {
+	if s == nil || strings.TrimSpace(s.input) == "" {
 		return
 	}
+	a.syncTranslateInput()
 	s.directionSwapped = !s.directionSwapped
 	if strings.TrimSpace(s.input) != "" {
 		a.submitTranslate()
@@ -276,14 +277,26 @@ func (a *application) swapTranslateDirection() {
 	}
 }
 
+func (a *application) syncTranslateInput() {
+	s := a.translate
+	if s == nil || s.input == s.directionInput {
+		return
+	}
+	s.directionInput = s.input
+	s.directionSwapped = false
+	s.clipped = 0
+	a.refreshTranslate()
+}
+
 // submitTranslate starts one request. A generation number makes late deltas
 // and late completions harmless, and every UI update goes through the main
 // thread seam.
 func (a *application) submitTranslate() {
 	s := a.ensureTranslateState()
+	a.syncTranslateInput()
 	a.cancelTranslate()
-	text := strings.TrimSpace(s.input)
-	if text == "" {
+	text := s.input
+	if strings.TrimSpace(text) == "" {
 		s.phase = translateEmpty
 		s.output = ""
 		s.errorKey = ""
@@ -292,10 +305,14 @@ func (a *application) submitTranslate() {
 		return
 	}
 	clipped, dropped := clipTranslateInput(text)
+	if dropped == 0 {
+		dropped = s.clipped
+	}
 	s.input = clipped
-	s.submitted = clipped
+	s.directionInput = clipped
 	s.clipped = dropped
 	s.output = ""
+	s.copiedUntil = time.Time{}
 	s.errorKey = ""
 	s.phase = translateLoading
 	s.request++
@@ -304,6 +321,7 @@ func (a *application) submitTranslate() {
 	ctx, cancel := context.WithCancel(context.Background())
 	s.cancel = cancel
 	cfg := translateConfig{BaseURL: a.config.TranslateBaseURL, Model: strings.TrimSpace(a.config.TranslateModel)}
+	stream := a.translateStreamFunction()
 	a.refreshTranslate()
 
 	apply := func(fn func()) { a.translateOnMain(fn) }
@@ -318,6 +336,7 @@ func (a *application) submitTranslate() {
 		})
 	}
 	a.runTranslateWorker(func() {
+		defer cancel()
 		key, err := a.translateAPIKey()
 		if err != nil {
 			finish(translateFailed, "TranslateKeyError")
@@ -328,7 +347,10 @@ func (a *application) submitTranslate() {
 			finish(translateNotConfigured, "")
 			return
 		}
-		out, streamErr := a.translateStreamFunction()(ctx, cfg, clipped, source, target, func(delta string) {
+		if ctx.Err() != nil {
+			return
+		}
+		out, streamErr := stream(ctx, cfg, clipped, source, target, func(delta string) {
 			apply(func() {
 				if generation != s.request {
 					return
@@ -369,7 +391,7 @@ func (a *application) copyTranslateResult() {
 }
 
 func (a *application) openTranslateSettings() {
-	a.hideTranslate()
+	a.closeTranslate()
 	a.selectSettingsPage(settingsTranslate)
 	a.show()
 }
@@ -409,7 +431,7 @@ func (a *application) buildTranslateWindow(s *translateState) {
 	window.OnClose(func(event *mygo.CloseEvent) {
 		if !a.quitting {
 			event.PreventDefault()
-			a.hideTranslate()
+			a.closeTranslate()
 		}
 	})
 	window.OnBlur(a.onTranslateBlur)

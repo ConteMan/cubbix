@@ -50,6 +50,7 @@ func (a *application) showMenubarPanel() {
 	if a.shortcutRecording {
 		return
 	}
+	a.closeTranslate()
 	a.hidePalette()
 	a.pollLid()
 	if a.panel == nil {

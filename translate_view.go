@@ -86,7 +86,7 @@ func (a *application) translateView(c *ui.Context) {
 			a.translateDirectionRow(c, t, locale, s)
 			a.translateResultBlock(c, t, locale, s)
 			if s.clipped > 0 {
-				ui.Text(c, fmt.Sprintf(text("TranslateTooLong"), s.clipped)).
+				ui.Text(c, fmt.Sprintf(text("TranslateTooLong"), maxTranslateInput)).
 					Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).
 					LineHeight(t.LineHeightBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
 			}
@@ -109,8 +109,10 @@ func (a *application) translateInputArea(c *ui.Context, t tokenValues, locale st
 				}
 				s.input = k.Text()
 				a.submitTranslate()
+				k.SetText(s.input)
 				return true
 			})
+			input.OnChange(a.syncTranslateInput)
 			if s.focus {
 				s.focus = false
 				input.Focus()
@@ -152,7 +154,9 @@ func (a *application) translateResultBlock(c *ui.Context, t tokenValues, locale 
 				a.translateResultContent(c, t, locale, s)
 			})
 		})
-		a.translateCopyButton(c, t, locale, s)
+		if s.phase == translateLoading || s.phase == translateStreaming || s.phase == translateDone {
+			a.translateCopyButton(c, t, locale, s)
+		}
 	})
 }
 

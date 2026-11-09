@@ -34,40 +34,57 @@ func (a *application) translateAPIKey() (string, error) {
 	return strings.TrimSpace(string(value)), nil
 }
 
-func (a *application) setTranslateAPIKey(value string) error {
+func (a *application) setTranslateAPIKey(value string) {
+	if a.translateKeyWriting {
+		return
+	}
 	value = strings.TrimSpace(value)
 	a.translateKeyDraft = ""
-	if a.translateSecret == nil {
-		return errors.New("translate: secret store unavailable")
-	}
-	var err error
-	if value == "" {
-		err = a.translateSecret.Delete(translateSecretKey)
-		a.translateKeySaved = false
-	} else {
-		if len(value) > mygo.MaxSecretSize {
-			return errors.New("translate: key too long")
-		}
-		err = a.translateSecret.Set(translateSecretKey, []byte(value))
-		a.translateKeySaved = err == nil
-	}
-	if err != nil {
+	if a.translateSecret == nil || len(value) > mygo.MaxSecretSize {
 		a.translateKeyError = "TranslateKeyError"
-	} else {
-		a.translateKeyError = ""
+		a.invalidateWindow()
+		return
 	}
+	a.translateKeyGeneration++
+	a.translateKeyWriting = true
+	a.translateKeyError = ""
 	a.invalidateWindow()
-	return err
+	a.runTranslateWorker(func() {
+		var err error
+		if value == "" {
+			err = a.translateSecret.Delete(translateSecretKey)
+			if errors.Is(err, mygo.ErrSecretNotFound) {
+				err = nil
+			}
+		} else {
+			err = a.translateSecret.Set(translateSecretKey, []byte(value))
+		}
+		a.translateOnMain(func() {
+			a.translateKeyWriting = false
+			if err != nil {
+				a.translateKeyError = "TranslateKeyError"
+			} else {
+				a.translateKeySaved = value != ""
+				a.translateKeyEditing = false
+				a.translateKeyError = ""
+			}
+			a.invalidateWindow()
+		})
+	})
 }
 
-func (a *application) clearTranslateAPIKey() error { return a.setTranslateAPIKey("") }
+func (a *application) clearTranslateAPIKey() { a.setTranslateAPIKey("") }
 
 // refreshTranslateKey reads the status dot on a worker: the system may ask
 // the user to unlock the keychain, which must not block the main thread.
 func (a *application) refreshTranslateKey() {
+	generation := a.translateKeyGeneration
 	a.runTranslateWorker(func() {
 		key, err := a.translateAPIKey()
-		a.translateRunOnMain(func() {
+		a.translateOnMain(func() {
+			if generation != a.translateKeyGeneration {
+				return
+			}
 			if err != nil {
 				a.translateKeyError = "TranslateKeyError"
 			} else {
