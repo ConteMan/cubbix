@@ -48,12 +48,14 @@ type Engine struct {
 	logged  *responseLogState
 	journal *Journal
 	owner   uint64
-	// lastObserve is shared by tick and refresh: one ping observes once.
+	// lastObserve is shared by the timer and requests.
 	lastRequest, lastBattery, retryAt, lastObserve time.Time
 	lastValue                                      int
 	lastCode                                       string
 	failures, unknown, readFailures                int
 	rewriteFails                                   int
+	cleanupPending                                 bool
+	cleanupCode                                    string
 	state, code, detail                            string
 }
 
@@ -91,8 +93,10 @@ func (e *Engine) Start() error {
 	e.journal = j
 	if e.writerOf() == "foreign" {
 		e.dropWatch("ok")
-		e.lastObserve = time.Time{}
-		e.observe(e.Now(), true)
+		if e.journal == nil {
+			e.lastObserve = time.Time{}
+			e.observe(e.Now(), true)
+		}
 		return nil
 	}
 	e.restore("ok")
@@ -100,15 +104,13 @@ func (e *Engine) Start() error {
 }
 
 // setObservation keeps the response value in step with a confirmed write or
-// restore. refresh is rate limited, so it must not report a stale value.
+// restore. Responses must not report a stale value.
 func (e *Engine) setObservation(value int, code string) {
 	e.lastValue, e.lastCode = value, code
 }
 
-// observe is the only read path used by the 1s tick, request handling and
-// refresh. A request forces one observation; the timer and refresh share
-// lastObserve so a single ping reads once and consumes at most one rewrite
-// budget slot.
+// observe is the shared read path used by the 1s tick and request handling.
+// Requests and the timer share the same observation throttle.
 func (e *Engine) observe(now time.Time, force bool) (int, string) {
 	if !force && now.Sub(e.lastObserve) < ObserveInterval {
 		return e.lastValue, e.lastCode
@@ -131,7 +133,7 @@ func (e *Engine) observeValue(value int, now time.Time) (int, string) {
 		// The bounded retry loop owns this state until it converges.
 		return value, ""
 	}
-	if value == 0 || value == 1 {
+	if value == 1 || value == 0 && (e.journal == nil || e.writerOf() == "foreign") {
 		e.readFailures = 0
 	}
 	if e.journal == nil {
@@ -162,8 +164,12 @@ func (e *Engine) observeValue(value int, now time.Time) (int, string) {
 	case 1:
 		e.detail = ""
 		e.state = "on-ours"
+		e.rewriteFails = 0
 		return 1, ""
 	case 0:
+		if e.rewriteFails < RewriteFailLimit && e.rewriteBudgetOpen(now) {
+			e.readFailures = 0
+		}
 		return e.rewrite(now)
 	default:
 		e.readFailures++
@@ -179,10 +185,8 @@ func (e *Engine) observeValue(value int, now time.Time) (int, string) {
 	}
 }
 
-func (e *Engine) refresh() (int, string) { return e.observe(e.Now(), false) }
-
 func (e *Engine) response(id string, ok bool, code string) Response {
-	value, observed := e.refresh()
+	value, observed := e.lastValue, e.lastCode
 	if code == "" {
 		code = e.code
 		if observed != "" {
@@ -247,7 +251,29 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 			e.lastRequest = e.Now()
 		}
 	}()
-	e.tick(now, true)
+	if r.Op == "disable" {
+		if e.journal != nil && e.owner != 0 && e.owner != owner {
+			return e.responseValue(r.ID, false, "busy", e.lastValue)
+		}
+		if e.journal != nil {
+			e.end("ok")
+			if e.journal != nil {
+				return e.responseValue(r.ID, false, e.code, e.lastValue)
+			}
+			value, err := e.Sleep.Read()
+			if err != nil || value != 0 && value != 1 {
+				value = -1
+			}
+			e.setObservation(value, "")
+			e.lastObserve = now
+			return e.responseValue(r.ID, true, e.code, value)
+		}
+	}
+	hadJournal := e.journal != nil
+	e.tick(now, false)
+	if r.Op == "enable" && hadJournal && e.journal == nil {
+		return e.response(r.ID, false, "")
+	}
 	if e.owner == owner {
 		e.lastRequest = now
 	}
@@ -271,8 +297,7 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 			}
 			e.journal = &j
 			e.lastRequest = now
-			// A saved renewal owns the same lease. Observe once using the
-			// polling grace period rather than restoring on a single error.
+			// A saved renewal owns the same lease and cached observation.
 			return e.response(r.ID, true, "")
 		}
 		value, err := e.Sleep.Read()
@@ -330,22 +355,8 @@ func (e *Engine) Handle(owner uint64, r Request) (out Response) {
 		e.readFailures = 0
 		e.setObservation(1, "")
 		return e.responseValue(r.ID, true, "ok", value)
-	case "disable":
-		if e.journal != nil && e.owner != 0 && e.owner != owner {
-			return e.response(r.ID, false, "busy")
-		}
-		if e.journal != nil {
-			e.end("ok")
-			if e.journal == nil {
-				value, err := e.Sleep.Read()
-				if err != nil || value != 0 && value != 1 {
-					value = -1
-				}
-				return e.responseValue(r.ID, true, e.code, value)
-			}
-		}
 	}
-	// Select the current code after response refreshes the observed setting.
+	// Use the current code and the observation already made by tick.
 	return e.response(r.ID, e.state != "restore-failed", "")
 }
 
@@ -421,6 +432,9 @@ func (e *Engine) finishRewrite(code string) (int, string) {
 		if e.readFailures >= readFailureLimit {
 			e.detail = "poll-read-failed"
 			e.restore("pmset-failed")
+			if e.state != "restore-failed" {
+				return 0, "pmset-failed"
+			}
 			return -1, "restore-failed"
 		}
 		return -1, "pmset-failed"
@@ -428,6 +442,8 @@ func (e *Engine) finishRewrite(code string) (int, string) {
 	if value == 1 {
 		// Our last write (or another tool) left a 1. Never drop its owner.
 		e.state, e.code, e.detail = "on-ours", "ok", ""
+		e.readFailures = 0
+		e.rewriteFails = 0
 		return 1, ""
 	}
 	e.dropWatch(code)
@@ -475,23 +491,20 @@ func (e *Engine) writeOne(now time.Time, takingOver bool) (int, string) {
 	if err := e.Store.Save(j); err != nil {
 		e.detail = "journal-save-failed"
 		e.rewriteFails++
+		e.journal.LastRewrite = now
 		e.state = "on-ours"
 		return 0, "pmset-failed"
 	}
 	e.journal = &j
-	err := e.Sleep.Set(1)
-	value := 0
-	if err == nil {
-		value, err = e.Sleep.Read()
-		if err != nil {
-			value = -1
-		}
-	} else {
-		value = 0
+	writeErr := e.Sleep.Set(1)
+	value, readErr := e.Sleep.Read()
+	if readErr != nil || value != 0 && value != 1 {
+		value = -1
 	}
-	if err == nil && value == 1 {
+	if value == 1 {
 		e.state, e.code, e.detail = "on-ours", "ok", ""
 		e.rewriteFails = 0
+		e.readFailures = 0
 		if takingOver {
 			e.detail = "adopted"
 		} else {
@@ -502,13 +515,16 @@ func (e *Engine) writeOne(now time.Time, takingOver bool) (int, string) {
 	e.rewriteFails++
 	e.state, e.code = "on-ours", "ok"
 	if takingOver {
-		if err != nil {
+		if writeErr != nil {
 			e.detail = "takeover-write-failed"
 		} else {
 			e.detail = "takeover-readback-failed"
 		}
 	} else {
 		e.detail = "rewrite-failed"
+	}
+	if value < 0 {
+		return e.observeValue(value, now)
 	}
 	return value, "pmset-failed"
 }
@@ -536,32 +552,28 @@ func (e *Engine) restore(code string) {
 		}
 	}
 	if err == nil {
-		err = e.Store.Remove()
-	}
-	if err != nil {
-		e.state = "restore-failed"
-		e.code = "restore-failed"
-		e.retryAt = e.Now().Add(backoff[min(e.failures, len(backoff)-1)])
-		e.failures++
-		// The 0 was never confirmed. Keep the last known value so the app can
-		// still see an unconfirmed liability and offer its recovery entry.
-		e.setObservation(e.lastValue, "restore-failed")
+		e.setObservation(0, "")
+		detail := e.detail
+		e.dropWatch(code)
+		if e.journal == nil {
+			e.detail = detail
+		}
 		return
 	}
-	e.journal = nil
-	e.owner = 0
-	e.state = "off"
-	e.code = code
-	e.failures = 0
-	e.unknown = 0
-	e.readFailures = 0
-	e.rewriteFails = 0
-	e.setObservation(0, "")
+	e.state = "restore-failed"
+	e.code = "restore-failed"
+	e.retryAt = e.Now().Add(backoff[min(e.failures, len(backoff)-1)])
+	e.failures++
+	e.setObservation(e.lastValue, "restore-failed")
 }
 
 // end sends every termination path through the ownership split. A foreign
 // writer's 1 is never ours to clear.
 func (e *Engine) end(code string) {
+	if e.cleanupPending {
+		e.dropWatch(e.cleanupCode)
+		return
+	}
 	if e.journal != nil && e.writerOf() == "foreign" {
 		e.dropWatch(code)
 		return
@@ -572,16 +584,27 @@ func (e *Engine) end(code string) {
 // dropWatch releases a lease WITHOUT calling Sleep.Set. It is used both for a
 // foreign writer and for an owned lease whose value has just been confirmed 0.
 func (e *Engine) dropWatch(code string) {
-	if err := e.Store.Remove(); err != nil {
-		e.detail = "journal-remove-failed"
+	e.cleanupPending = true
+	e.cleanupCode = code
+	if e.writerOf() == "ours" {
+		journal := *e.journal
+		journal.Writer = "foreign"
+		if err := e.Store.Save(journal); err != nil {
+			e.state, e.code, e.detail = "off", "pmset-failed", "journal-save-failed"
+			return
+		}
+		e.journal = &journal
 	}
+	if err := e.Store.Remove(); err != nil {
+		e.state, e.code, e.detail = "off", "pmset-failed", "journal-remove-failed"
+		return
+	}
+	e.cleanupPending = false
 	e.journal = nil
 	e.owner = 0
 	e.state = "off"
 	e.code = code
-	if e.detail != "journal-remove-failed" {
-		e.detail = ""
-	}
+	e.detail = ""
 	e.failures = 0
 	e.unknown = 0
 	e.readFailures = 0
@@ -615,17 +638,24 @@ func (e *Engine) Tick() { e.mu.Lock(); defer e.mu.Unlock(); e.tick(e.Now(), fals
 func (e *Engine) tick(now time.Time, force bool) {
 	// Observation rides the existing 1s server tick, so it does not depend on
 	// the app being online while the lid is closed.
-	e.observe(now, force)
 	if e.journal == nil {
+		e.observe(now, force)
+		return
+	}
+	if e.cleanupPending {
+		e.lastObserve = now
+		e.dropWatch(e.cleanupCode)
 		return
 	}
 	if e.state == "restore-failed" {
+		e.lastObserve = now
 		if !now.Before(e.retryAt) {
 			e.restore("ok")
 		}
 		return
 	}
 	if !now.Before(e.effectiveDeadline()) {
+		e.lastObserve = now
 		code := "ok"
 		if !now.Before(e.journal.Started.Add(HardLimit)) {
 			code = "max-duration"
@@ -634,6 +664,7 @@ func (e *Engine) tick(now time.Time, force bool) {
 		return
 	}
 	if now.Sub(e.lastRequest) >= Lease {
+		e.lastObserve = now
 		e.end("ok")
 		return
 	}
@@ -643,13 +674,17 @@ func (e *Engine) tick(now time.Time, force bool) {
 		if err != nil || sample.Percent < 0 || sample.Percent > 100 {
 			e.unknown++
 			if e.unknown >= batteryUnknownLimit {
+				e.lastObserve = now
 				e.end("battery-unknown")
+				return
 			}
-			return
-		}
-		e.unknown = 0
-		if !Plugged(sample) && sample.Percent <= e.journal.MinPercent {
+		} else if !Plugged(sample) && sample.Percent <= e.journal.MinPercent {
+			e.lastObserve = now
 			e.end("battery-low")
+			return
+		} else {
+			e.unknown = 0
 		}
 	}
+	e.observe(now, force)
 }

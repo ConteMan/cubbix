@@ -64,6 +64,7 @@ type lidTestConnection struct {
 	gone         bool
 	helloVersion string
 	requests     []lid.Request
+	beforeCall   func()
 }
 
 func (c *lidTestConnection) Call(r lid.Request) (lid.Response, error) {
@@ -71,6 +72,9 @@ func (c *lidTestConnection) Call(r lid.Request) (lid.Response, error) {
 		return lid.Response{}, errors.New("gone")
 	}
 	c.requests = append(c.requests, r)
+	if c.beforeCall != nil {
+		c.beforeCall()
+	}
 	r.V = lid.Protocol
 	r.ID = "test-client"
 	out := c.engine.Handle(1, r)
@@ -103,8 +107,10 @@ func lidTestApp(t *testing.T) (*application, *lidTestSleep, *lidTestPower, *lidT
 	power := &lidTestPower{kind: "ac", percent: 80}
 	svc := &lidTestService{status: svcEnabled, after: svcEnabled}
 	engine := lid.NewEngine(sleep, power, lid.FileJournal{Path: filepath.Join(t.TempDir(), "root", "session.json")})
+	now := time.Now()
+	engine.Now = func() time.Time { return now }
 	engine.Start()
-	conn := &lidTestConnection{engine: engine}
+	conn := &lidTestConnection{engine: engine, beforeCall: func() { now = now.Add(time.Second) }}
 	a.lid = &lidController{service: svc, dial: func() (lidConnection, error) {
 		if conn.gone {
 			return nil, errors.New("gone")
@@ -361,7 +367,7 @@ func TestLidCombinedLifecycle(t *testing.T) {
 				}
 				return
 			default:
-				now := time.Now()
+				now := conn.engine.Now()
 				conn.engine.Now = func() time.Time { return now }
 				if end == "max-duration" {
 					now = now.Add(lid.HardLimit)

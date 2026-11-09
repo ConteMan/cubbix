@@ -139,6 +139,7 @@ func (c *lidController) setRearmPending(value bool) {
 	c.snapshotValue.rearmPending = value
 	if !value {
 		c.rearmSince = time.Time{}
+		c.lastWatching = c.snapshotValue.state == lidOn && c.snapshotValue.watching
 	}
 	c.publish()
 }
@@ -225,7 +226,7 @@ func (c *lidController) apply(r lid.Response) {
 	// An unknown observation is not evidence that an owned lease ended.
 	// Keep the last confirmed state and recovery marker until the helper
 	// reports a terminal reason or a confirmed value/state transition.
-	if s.state == lidOn && s.value != 0 && s.value != 1 && (r.Code == "ok" || r.Code == "pmset-failed") && (r.State == "on-ours" || r.State == "off" || r.State == "watching") {
+	if s.state == lidOn && s.value != 0 && s.value != 1 && (r.Code == "ok" || r.Code == "pmset-failed") && r.State == "off" {
 		return
 	}
 	if s.value == 0 {
@@ -657,7 +658,30 @@ func (c *lidController) stop() error {
 	}
 	c.mu.Lock()
 	defer func() { c.publish(); c.mu.Unlock() }()
-	return c.stopLocked()
+	err := c.stopLocked()
+	if err == nil {
+		c.snapshotValue.rearmPending = false
+		c.snapshotValue.watching = false
+		c.lastWatching = false
+		c.rearmSince = time.Time{}
+	}
+	return err
+}
+
+func (c *lidController) ensureMarker() {
+	c.mu.Lock()
+	defer func() { c.publish(); c.mu.Unlock() }()
+	s := &c.snapshotValue
+	if !s.online || s.state != lidOn || s.value != 1 || s.watching || c.markerExists() {
+		return
+	}
+	if err := c.writeMarker(rand.Text()); err != nil {
+		s.lastCode = "marker-write-failed"
+		if err := c.stopLocked(); err != nil {
+			return
+		}
+		s.state, s.reason, s.lastCode = lidBlocked, "LidEnableFailed", "marker-write-failed"
+	}
 }
 func (c *lidController) canForce() bool {
 	s := c.snapshot()

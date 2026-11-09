@@ -242,6 +242,7 @@ func TestBudgetExhaustionNeedsConfirmedZero(t *testing.T) {
 		}
 		e.journal = &j
 		e.Sleep = &readSequence{fakeSleep: s, values: []int{0, -1, -1}}
+		advance(now, ObserveInterval)
 		e.Handle(1, request("ping"))
 		if e.journal == nil || e.state != "on-ours" || e.readFailures != 1 {
 			t.Fatal("a failed confirmation dropped the journal", e.state, e.readFailures)
@@ -395,8 +396,8 @@ func TestObserveIntervalAndSingleReadPerPing(t *testing.T) {
 	}
 	before = s.reads
 	e.Handle(1, request("ping"))
-	if got := s.reads - before; got != 1 {
-		t.Fatal("a ping read", got, "times; tick and refresh must share lastObserve")
+	if got := s.reads - before; got != 0 {
+		t.Fatal("a ping repeated the timer observation", got)
 	}
 }
 
@@ -465,9 +466,10 @@ func TestEndPathsRespectWriter(t *testing.T) {
 }
 
 func TestObservationRewritesInsteadOfRestoring(t *testing.T) {
-	e, s, _, _ := fixture(t)
+	e, s, _, now := fixture(t)
 	enable(t, e)
 	s.v = 0
+	advance(now, ObserveInterval)
 	r := e.Handle(1, request("ping"))
 	if r.State != "on-ours" || countWrites(s.writes, 1) != 2 || countWrites(s.writes, 0) != 0 {
 		t.Fatal("readback mismatch still restored", r, s.writes)
@@ -478,7 +480,7 @@ func TestObservationRewritesInsteadOfRestoring(t *testing.T) {
 func TestReadFailuresOnlyCountForOwnedLeases(t *testing.T) {
 	for _, mode := range []string{"watching", "on-ours"} {
 		t.Run(mode, func(t *testing.T) {
-			e, s, _, _ := fixture(t)
+			e, s, _, now := fixture(t)
 			if mode == "watching" {
 				enterWatch(t, e, s, nil)
 			} else {
@@ -487,6 +489,7 @@ func TestReadFailuresOnlyCountForOwnedLeases(t *testing.T) {
 			}
 			e.Sleep = &failingObservation{fakeSleep: s, failures: readFailureLimit}
 			for range readFailureLimit {
+				advance(now, ObserveInterval)
 				e.Handle(1, request("ping"))
 			}
 			if mode == "watching" {
@@ -608,10 +611,13 @@ func TestAlDenteCalibration(t *testing.T) {
 		name    string
 		adapter AdapterState
 		start   string // "watching" or "owned"
+		minimum int
+		percent int
 	}{
-		{"attached-watching", AdapterAttached, "watching"},
-		{"absent-watching", AdapterAbsent, "watching"},
-		{"absent-owned", AdapterAbsent, "owned"},
+		{"attached-watching", AdapterAttached, "watching", 20, 10},
+		{"absent-watching", AdapterAbsent, "watching", 20, 10},
+		{"absent-owned", AdapterAbsent, "owned", 20, 10},
+		{"five-percent-calibration", AdapterAbsent, "watching", 5, 10},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			e, s, p, now := fixture(t)
@@ -632,12 +638,12 @@ func TestAlDenteCalibration(t *testing.T) {
 					}
 					continue
 				case enableAt:
-					if tc.start == "watching" && !e.Handle(1, watchRequest(nil, 0)).OK {
+					if tc.start == "watching" && !e.Handle(1, watchRequest(nil, tc.minimum)).OK {
 						t.Fatal("enable{adopt} failed")
 					}
 					continue
 				case discharge:
-					p.kind, p.p = "battery", 4
+					p.kind, p.p = "battery", tc.percent
 				case takeover:
 					s.v = 0
 				case recharge:
@@ -653,7 +659,7 @@ func TestAlDenteCalibration(t *testing.T) {
 				}
 			}
 			switch tc.name {
-			case "attached-watching":
+			case "attached-watching", "five-percent-calibration":
 				if countWrites(s.writes, 1) != 2 || countWrites(s.writes, 0) != 0 {
 					t.Fatal("calibration wrote an unexpected value", s.writes)
 				}
@@ -664,6 +670,16 @@ func TestAlDenteCalibration(t *testing.T) {
 				if !j.Started.Equal(start.Add(takeover*time.Second)) || j.Deadline != nil || j.Rewrites != 2 {
 					t.Fatalf("takeover/rewrite moved the lease: %+v", j)
 				}
+				if j.MinPercent != tc.minimum || endedCode != "" {
+					t.Fatal("calibration lost its threshold or ended early", j.MinPercent, endedCode)
+				}
+				*now = j.Started.Add(HardLimit)
+				heartbeat(e, now)
+				e.Tick()
+				if s.v != 0 || e.code != "max-duration" || countWrites(s.writes, 0) != 1 {
+					t.Fatal("calibration bypassed the hard limit", e.code, s.writes)
+				}
+				noJournal(t, e)
 			case "absent-watching":
 				if len(s.writes) != 0 || endedCode != "battery-low" || e.journal != nil {
 					t.Fatal("unplugged watch did not drop cleanly", s.writes, endedCode)

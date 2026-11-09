@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/rand"
 	"errors"
 	"github.com/egoist/mygo"
 	"time"
@@ -199,6 +198,8 @@ func (a *application) finishLidPoll() {
 	state := a.awake.snapshot()
 	if s.rearmPending {
 		switch {
+		case !state.Active || !state.Session.Lid:
+			a.lid.setRearmPending(false)
 		case a.lid.rearmExpired():
 			// No helper for several leases: stop waiting and converge.
 			a.lid.setRearmPending(false)
@@ -211,8 +212,8 @@ func (a *application) finishLidPoll() {
 		case state.Active && state.Session.Lid && s.state == lidBlocked && s.reason == "LidForeign":
 			// Reattach before any cleanup, without authorization or a write.
 			// The completion callback enters finishLidPoll again.
-			a.enableLid(state.Session.End, false)
 			a.lid.setRearmPending(false)
+			a.enableLid(state.Session.End, false)
 			return
 		default:
 			// Any other reconnect state (off, contested, approval needed)
@@ -220,14 +221,15 @@ func (a *application) finishLidPoll() {
 			a.lid.setRearmPending(false)
 		}
 	}
+	if state.Active && state.Session.Lid {
+		a.lid.ensureMarker()
+		s = a.lid.snapshot()
+	}
 	if state.Active && state.Session.Lid && s.state != lidOn {
 		a.setSessionLid(false)
 		// A lid failure only removes the lid extension. The ordinary
 		// assertion keeps its deadline, mode and followed process.
 		a.awakeChanged()
-	} else if state.Active && state.Session.Lid && s.state == lidOn && s.value == 1 && !s.watching && !a.lid.markerExists() {
-		// A takeover made the 1 ours: the recovery marker belongs to us again.
-		_ = a.lid.writeMarker(rand.Text())
 	}
 	a.notifyLid(s.reason)
 	a.refreshAwake()
