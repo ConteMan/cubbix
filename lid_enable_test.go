@@ -126,7 +126,7 @@ func TestCLIServerWaitsForDeferredReply(t *testing.T) {
 	s := &cliServer{dispatch: func(run func()) { run() }, applyAsync: func(_ cli.Request, _ []byte, reply func(cli.Result)) { callback <- reply }}
 	done := make(chan cli.Result, 1)
 	go func() {
-		result, ran, finished := s.applyReq(cli.Request{}, nil)
+		result, _, ran, finished := s.applyReq(cli.Request{}, nil)
 		<-finished
 		if !ran {
 			result = cli.Failure("not-ran")

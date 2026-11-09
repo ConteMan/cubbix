@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -82,11 +83,14 @@ func main() { os.Exit(run(os.Args[1:], live())) }
 
 // invocation is a parsed command line.
 type invocation struct {
-	command string // awake.on, awake.off, awake.toggle, awake.status, status, json.new, palette, settings, version, help
-	flags   flags
-	awake   awakeOptions
-	body    bodyOptions
-	page    string
+	command   string // awake.on, awake.off, awake.toggle, awake.status, status, json.new, palette, settings, translate, version, help
+	flags     flags
+	awake     awakeOptions
+	body      bodyOptions
+	page      string
+	to        string // translate target override
+	textArg   string // the positional TEXT of translate
+	helpTopic string // `cubbix help translate`
 }
 
 type flags struct {
@@ -131,7 +135,11 @@ func run(args []string, e *env) int {
 	}
 	switch inv.command {
 	case "help":
-		fmt.Fprint(e.stdout, helpText)
+		if inv.helpTopic == "translate" {
+			fmt.Fprint(e.stdout, translateHelpText)
+		} else {
+			fmt.Fprint(e.stdout, helpText)
+		}
 		return exitOK
 	case "version":
 		return printVersion(e, inv)
@@ -204,6 +212,14 @@ func report(e *env, inv invocation, asJSON bool, result cli.Result) int {
 		fmt.Fprintln(e.stderr, result.Message)
 		return exitCode(result.Code)
 	}
+	if inv.command == "translate" {
+		// Human output is the response body frame verbatim, including any
+		// line breaks the model produced; --json prints the whole object.
+		if result.Translate != nil {
+			fmt.Fprint(e.stdout, result.Translate.Text)
+		}
+		return exitOK
+	}
 	for _, line := range result.Lines {
 		fmt.Fprintln(e.stdout, line)
 	}
@@ -242,8 +258,11 @@ func fallbackMessage(code, command string) string {
 	case cli.CodeQuitting:
 		return "Cubbix is quitting."
 	case cli.CodeDisabled:
-		if strings.HasPrefix(command, "json") {
+		switch {
+		case strings.HasPrefix(command, "json"):
 			return "The JSON module is disabled."
+		case command == "translate":
+			return "The translate module is disabled."
 		}
 		return "The keep-awake module is disabled."
 	case cli.CodeBusy:
@@ -278,10 +297,61 @@ func buildRequest(inv invocation, e *env) (cli.Request, []byte, error) {
 		request.Op, request.Action = cli.OpRun, cli.ActionPalette
 	case "settings":
 		request.Op, request.Action, request.Page = cli.OpRun, cli.ActionSettings, inv.page
+	case "translate":
+		body, err := readTranslateBody(inv, e)
+		if err != nil {
+			return request, nil, err
+		}
+		payload = body
+		request.Op, request.Action = cli.OpRun, cli.ActionTranslate
+		request.Bytes, request.To = len(body), inv.to
 	default:
 		return request, nil, usagef("Unknown command %q.", inv.command)
 	}
 	return request, payload, nil
+}
+
+// readTranslateBody reads the source text of translate: an argument, --text,
+// a file, or stdin when it is a pipe. Unlike json.new, an empty text is a
+// usage error: the app would otherwise open a panel for a script.
+func readTranslateBody(inv invocation, e *env) ([]byte, error) {
+	sources := 0
+	for _, present := range []bool{inv.body.hasText, inv.body.hasFile, inv.textArg != ""} {
+		if present {
+			sources++
+		}
+	}
+	if sources > 1 {
+		return nil, usagef("--text, --file and TEXT are mutually exclusive.")
+	}
+	var data []byte
+	var err error
+	switch {
+	case inv.body.hasText:
+		data = []byte(inv.body.text)
+	case inv.body.hasFile:
+		data, err = readBody(bodyOptions{file: inv.body.file, hasFile: true}, e)
+	case inv.textArg == "-":
+		data, err = readStdin(e)
+	case inv.textArg != "":
+		data = []byte(inv.textArg)
+	default:
+		reader, terminal := e.stdin()
+		if terminal {
+			return nil, usagef("translate needs text. See \"cubbix help translate\".")
+		}
+		data, err = io.ReadAll(io.LimitReader(reader, cli.MaxPayload+1))
+	}
+	if err != nil {
+		return nil, err
+	}
+	if len(data) > cli.MaxPayload {
+		return nil, usagef("The text exceeds the 64 MiB limit.")
+	}
+	if len(bytes.TrimSpace(data)) == 0 {
+		return nil, usagef("translate needs text. See \"cubbix help translate\".")
+	}
+	return data, nil
 }
 
 // readBody reads the document a json.new carries: --text, a file, or stdin when

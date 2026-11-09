@@ -36,9 +36,19 @@ type cliServer struct {
 	verify     func(*net.UnixConn) error
 	apply      func(cli.Request, []byte) cli.Result
 	applyAsync func(cli.Request, []byte, func(cli.Result))
-	dispatch   func(func())
-	logf       func(string, ...any)
+	// translateAsync is deliberately separate from applyAsync: a translation
+	// must never claim the lid completion that applyCLIAsync owns.
+	translateAsync func(cli.Request, []byte, func(cli.Result, []byte))
+	dispatch       func(func())
+	logf           func(string, ...any)
 }
+
+const (
+	defaultCLIActionTimeout = 15 * time.Second
+	// cliTranslateActionTimeout outlasts the client's 60s --timeout ceiling,
+	// so the client never receives busy before its own timer fires.
+	cliTranslateActionTimeout = 70 * time.Second
+)
 
 // startCLIServer listens for the command line tool. It never blocks the app:
 // a socket that cannot be created only costs the tool.
@@ -56,6 +66,9 @@ func (a *application) startCLIServer() {
 		logf:     log.Printf,
 	}
 	s.applyAsync = a.applyCLIAsync
+	s.translateAsync = a.applyTranslateCLI
+	// A CLI translation assembles its final snapshot on the main thread.
+	a.translateCLIDispatch = a.urlDispatch
 	if err := s.listen(); err != nil {
 		s.logf("cli: socket unavailable")
 		return
@@ -236,23 +249,31 @@ func (s *cliServer) handle(conn *net.UnixConn) {
 			return
 		}
 	}
-	result, ran, dispatched := s.applyReq(req, body)
+	result, responseBody, ran, dispatched := s.applyReq(req, body)
 	response := cli.Response{V: cli.Protocol, ID: req.ID, OK: result.OK, Code: result.Code,
-		Message: result.Message, Lines: result.Lines, State: result.State}
+		Message: result.Message, Lines: result.Lines, State: result.State,
+		Bytes: result.Bytes, Translate: result.Translate}
 	if !ran {
 		response = cli.Response{V: cli.Protocol, ID: req.ID, OK: false, Code: cli.CodeQuitting}
 	}
-	writeResult(conn, response)
+	if req.Action == cli.ActionTranslate {
+		writeTranslationResult(conn, response, responseBody)
+	} else {
+		writeResult(conn, response)
+	}
 	// A blocked main-thread dispatch keeps its slot until it has returned.
 	// Otherwise repeated timeouts could create an unbounded queue of bodies.
 	<-dispatched
 }
 
 // applyReq runs the request on the main thread and reports whether it ran at
-// all: RunOnMain drops the function once the loop is gone.
-func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, bool, <-chan struct{}) {
+// all: RunOnMain drops the function once the loop is gone. The translate
+// action uses its own hook and carries a response body frame alongside the
+// result; it never passes through applyAsync / applyCLIAsync.
+func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, []byte, bool, <-chan struct{}) {
 	type outcome struct {
 		result cli.Result
+		body   []byte
 		ran    bool
 	}
 	result := make(chan outcome, 1)
@@ -266,6 +287,13 @@ func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, bool, <-
 			if !phase.CompareAndSwap(0, 1) || s.closing.Load() {
 				return
 			}
+			if req.Action == cli.ActionTranslate && s.translateAsync != nil {
+				deferred = true
+				s.translateAsync(req, body, func(r cli.Result, out []byte) {
+					result <- outcome{result: r, body: out, ran: true}
+				})
+				return
+			}
 			if s.applyAsync != nil {
 				deferred = true
 				s.applyAsync(req, body, func(r cli.Result) { result <- outcome{result: r, ran: true} })
@@ -277,19 +305,28 @@ func (s *cliServer) applyReq(req cli.Request, body []byte) (cli.Result, bool, <-
 			result <- out
 		}
 	}()
-	timeout := s.actionTimeout
-	if timeout == 0 {
-		timeout = 15 * time.Second
-	}
-	timer := time.NewTimer(timeout)
+	timer := time.NewTimer(s.actionTimeoutFor(req))
 	defer timer.Stop()
 	select {
 	case out := <-result:
-		return out.result, out.ran, finished
+		return out.result, out.body, out.ran, finished
 	case <-timer.C:
 		phase.CompareAndSwap(0, 2) // timed-out queued actions must never execute later
-		return cli.Failure(cli.CodeBusy), true, finished
+		return cli.Failure(cli.CodeBusy), nil, true, finished
 	}
+}
+
+// actionTimeoutFor keeps the default 15s for every existing action and waits
+// 70s for translate, which can spend 50s in the model call. An explicit
+// actionTimeout (a test seam) still wins.
+func (s *cliServer) actionTimeoutFor(req cli.Request) time.Duration {
+	if s.actionTimeout > 0 {
+		return s.actionTimeout
+	}
+	if req.Action == cli.ActionTranslate {
+		return cliTranslateActionTimeout
+	}
+	return defaultCLIActionTimeout
 }
 
 // writeBusy answers without a request id: the request was never read.
@@ -298,15 +335,35 @@ func writeBusy(conn *net.UnixConn) {
 }
 
 func writeResult(conn *net.UnixConn, response cli.Response) {
+	writeResponseLine(conn, response)
+}
+
+// writeTranslationResult sends one small JSON line and then exactly
+// response.Bytes bytes of UTF-8 translation. Sharing the write deadline with
+// both writes keeps a slow client from holding a slot indefinitely.
+func writeTranslationResult(conn *net.UnixConn, response cli.Response, body []byte) {
+	if response.Bytes > len(body) {
+		response.Bytes = len(body)
+	}
+	if !writeResponseLine(conn, response) {
+		return
+	}
+	if response.Bytes > 0 {
+		_, _ = conn.Write(body[:response.Bytes])
+	}
+}
+
+func writeResponseLine(conn *net.UnixConn, response cli.Response) bool {
 	line, err := cli.EncodeLine(response)
 	if err != nil {
 		line, err = cli.EncodeLine(cli.Response{V: cli.Protocol, ID: response.ID, OK: false, Code: cli.CodeInternal})
 		if err != nil {
-			return
+			return false
 		}
 	}
 	_ = conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
-	_, _ = conn.Write(line)
+	_, err = conn.Write(line)
+	return err == nil
 }
 
 // readCLILine reads one line, refusing anything over the line limit.

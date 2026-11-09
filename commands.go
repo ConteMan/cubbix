@@ -22,6 +22,7 @@ type commandParam int
 const (
 	paramNone  commandParam = iota
 	paramAwake              // duration, until, unlimited, or the remembered setting
+	paramText               // free-form text, kept with its original case
 )
 
 // command is pure data plus functions; it never holds a window.
@@ -72,6 +73,8 @@ func commandCategory(cmd *command) string {
 		return "JSON"
 	case "palette":
 		return "PaletteShortcutLabel"
+	case "translate":
+		return "Translate"
 	}
 	return "R05App"
 }
@@ -83,6 +86,7 @@ func (a *application) commands() []*command {
 	all := a.awakeCommands()
 	all = append(all, a.jsonCommands()...)
 	all = append(all, a.systemCommands()...)
+	all = append(all, a.translateCommands()...)
 	commands := make([]*command, 0, len(all))
 	for _, command := range all {
 		if command.Available == nil || command.Available(a) {
@@ -90,6 +94,29 @@ func (a *application) commands() []*command {
 		}
 	}
 	return commands
+}
+
+// translateCommands is the command palette entry. The text argument keeps its
+// original case: matching uses a lowercase copy, but the translation must see
+// the exact string the user typed (product names in particular).
+func (a *application) translateCommands() []*command {
+	return []*command{
+		{
+			ID:       "translate.open",
+			Title:    localizedTitle("Translate"),
+			Keywords: []string{"翻译", "translate", "fanyi", "fy", "translation"},
+			Tile:     "translate",
+			// languages arrives with a later icon round; text-quote is the
+			// existing icon the settings page already uses for this module.
+			Icon:      "text-quote",
+			Param:     paramText,
+			Available: func(a *application) bool { return a.config.TranslateEnabled },
+			Run: func(a *application, req request) error {
+				a.openTranslateText(req.Arg)
+				return nil
+			},
+		},
+	}
 }
 
 func (a *application) awakeCommands() []*command {
@@ -739,8 +766,9 @@ func matchScore(query, title string, keywords []string) int {
 // commandPrefix is the result of splitting a query into command and argument.
 type commandPrefix struct {
 	Command *command
-	Arg     string
-	Shared  bool // more than one command carries this exact name
+	Arg     string // lowercase copy, used for matching and keep-awake parsing
+	RawArg  string // the same span from the unlowered query
+	Shared  bool   // more than one command carries this exact name
 }
 
 // splitCommandQuery matches whole command names at the start of a query. A
@@ -748,8 +776,9 @@ type commandPrefix struct {
 // non-letter right after it (a digit, ∞, :, -, +). The longest name wins;
 // ties follow registration order.
 func splitCommandQuery(a *application, locale, query string, commands []*command) (commandPrefix, bool) {
-	query = strings.ToLower(normalizeQuery(query))
-	if query == "" {
+	rawQuery := normalizeQuery(query)
+	matchQuery := strings.ToLower(rawQuery)
+	if matchQuery == "" {
 		return commandPrefix{}, false
 	}
 	best := commandPrefix{}
@@ -761,15 +790,22 @@ func splitCommandQuery(a *application, locale, query string, commands []*command
 			if name == "" {
 				continue
 			}
-			if query == name {
+			if matchQuery == name {
 				exact++
 			}
-			arg, ok := commandPrefixMatch(query, name)
+			arg, start, ok := commandPrefixMatch(matchQuery, name)
 			if !ok {
 				continue
 			}
 			if length := runeLen(name); length > bestLen {
-				best = commandPrefix{Command: cmd, Arg: arg}
+				rawArg := ""
+				if start >= 0 {
+					runes := []rune(rawQuery)
+					if start <= len(runes) {
+						rawArg = strings.TrimSpace(string(runes[start:]))
+					}
+				}
+				best = commandPrefix{Command: cmd, Arg: arg, RawArg: rawArg}
 				bestLen = length
 			}
 		}
@@ -781,20 +817,22 @@ func splitCommandQuery(a *application, locale, query string, commands []*command
 	return best, true
 }
 
-func commandPrefixMatch(query, name string) (string, bool) {
+// commandPrefixMatch also reports where the argument starts, counted in runes,
+// so the caller can cut the same span out of the unlowered query.
+func commandPrefixMatch(query, name string) (string, int, bool) {
 	if query == name {
-		return "", true
+		return "", -1, true
 	}
 	if strings.HasPrefix(query, name+" ") {
-		return strings.TrimSpace(query[len(name):]), true
+		return strings.TrimSpace(query[len(name):]), runeLen(name) + 1, true
 	}
 	if strings.HasPrefix(query, name) && len(query) > len(name) {
 		r, _ := utf8.DecodeRuneInString(query[len(name):])
 		if !unicode.IsLetter(r) {
-			return strings.TrimSpace(query[len(name):]), true
+			return strings.TrimSpace(query[len(name):]), runeLen(name), true
 		}
 	}
-	return "", false
+	return "", -1, false
 }
 
 // bestCommand picks the default selection for a query. A parameter prefix
