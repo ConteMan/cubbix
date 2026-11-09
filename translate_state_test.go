@@ -282,34 +282,34 @@ func TestTranslateHeight(t *testing.T) {
 		t.Fatalf("empty height = %v; want 148", got)
 	}
 	s.phase = translateLoading
-	if got := a.translateHeight(tk, s); got != 152 {
-		t.Fatalf("loading height = %v; want 152 (64 from loading onwards)", got)
+	if got := a.translateHeight(tk, s); got != 154 {
+		t.Fatalf("loading height = %v; want 154 (64 plus panel borders)", got)
 	}
 	s.phase, s.output = translateDone, "你好"
-	if got := a.translateHeight(tk, s); got != 152 {
+	if got := a.translateHeight(tk, s); got != 154 {
 		t.Fatalf("done height = %v", got)
 	}
 	s.phase, s.errorKey = translateFailed, "TranslateNetworkError"
 	failed := a.translateHeight(tk, s)
-	if failed <= 152 {
+	if failed <= 154 {
 		t.Fatalf("failed height = %v; retry row missing", failed)
 	}
 	s.phase = translateNotConfigured
-	if got := a.translateHeight(tk, s); got <= 152 {
+	if got := a.translateHeight(tk, s); got <= 154 {
 		t.Fatalf("not configured height = %v", got)
 	}
 	s.phase, s.output, s.input, s.clipped = translateStreaming, strings.Repeat("长", 3000), "one", 0
 	// Without a dictionary block the ceiling is the result block's own
-	// maximum (320): 12 + 28 + 8 + 20 + 8 + 320 + 12 = 408. The 520 ceiling
-	// is reached only once the dictionary block exists in a later step.
-	if got := a.translateHeight(tk, s); got != 408 || got > tk.SizeTranslateMaxHeight {
-		t.Fatalf("long result height = %v; want 408", got)
+	// maximum (320), plus the panel's padding, gaps and two border edges.
+	// The 520 ceiling is reached once the dictionary block exists.
+	if got := a.translateHeight(tk, s); got != 410 || got > tk.SizeTranslateMaxHeight {
+		t.Fatalf("long result height = %v; want 410", got)
 	}
 	s.phase, s.output, s.clipped = translateEmpty, "", 12
-	// The empty block is 44, so the raw panel is 132; the overlay adds 18+4
+	// The empty block is 44, so the raw panel is 134; the overlay adds 18+8
 	// and the 148 floor does not apply until that sum passes it.
 	want := tk.Space12 + tk.SizeTranslateInputBase + tk.Space8 + tk.SizeTranslateDirectionHeight +
-		tk.Space8 + 44 + tk.Space12 + tk.FontSizeSmall*tk.LineHeightBody + tk.Space4
+		tk.Space8 + 44 + tk.Space12 + 2*tk.StrokeHairline + tk.FontSizeSmall*tk.LineHeightBody + tk.Space8
 	if got := a.translateHeight(tk, s); got != want {
 		t.Fatalf("too-long overlay height = %v; want %v", got, want)
 	}
@@ -323,12 +323,12 @@ func TestTranslateHeight(t *testing.T) {
 	s.phase, s.output, s.input, s.clipped = translateLoading, "", "hello", 0
 	s.dictionary, s.dictionaryExpanded = dictionaryTestDefinition, false
 	separator := tk.Space8 + tk.StrokeHairline + tk.Space8
-	folded := 152 + separator + dictionaryBlockHeight(tk, false)
-	if got := a.translateHeight(tk, s); got != folded || got != 217 {
+	folded := 154 + separator + dictionaryBlockHeight(tk, false)
+	if got := a.translateHeight(tk, s); got != folded || got != 221 {
 		t.Fatalf("folded dictionary height = %v; want %v", got, folded)
 	}
 	s.dictionaryExpanded = true
-	unfolded := 152 + separator + dictionaryBlockHeight(tk, true)
+	unfolded := 154 + separator + dictionaryBlockHeight(tk, true)
 	if got := a.translateHeight(tk, s); got != unfolded || got <= folded {
 		t.Fatalf("expanded dictionary height = %v; want %v", got, unfolded)
 	}
@@ -342,7 +342,7 @@ func TestTranslateHeight(t *testing.T) {
 	}
 	// A nil definition removes the separator and the whole block.
 	s.dictionary, s.input, s.output, s.phase = "", "hello", "", translateLoading
-	if got := a.translateHeight(tk, s); got != 152 {
+	if got := a.translateHeight(tk, s); got != 154 {
 		t.Fatalf("nil definition left a block: %v", got)
 	}
 }

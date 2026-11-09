@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -194,20 +193,16 @@ func TestTranslateDictionaryLookupUsesWorker(t *testing.T) {
 		<-release
 		return dictionaryTestDefinition
 	}
-	var mu sync.Mutex
-	var queued []func()
-	a.translateRunOnMain = func(fn func()) {
-		mu.Lock()
-		queued = append(queued, fn)
-		mu.Unlock()
-	}
+	queued := make(chan func(), 4)
+	a.translateRunOnMain = func(fn func()) { queued <- fn }
 	drain := func() {
-		mu.Lock()
-		pending := queued
-		queued = nil
-		mu.Unlock()
-		for _, fn := range pending {
-			fn()
+		for range 2 {
+			select {
+			case fn := <-queued:
+				fn()
+			case <-time.After(time.Second):
+				t.Fatal("worker result was not dispatched")
+			}
 		}
 	}
 	s := a.ensureTranslateState()
@@ -224,20 +219,96 @@ func TestTranslateDictionaryLookupUsesWorker(t *testing.T) {
 		t.Fatal("worker wrote the UI before main-thread dispatch")
 	}
 	close(release)
-	deadline := time.Now().Add(time.Second)
-	for strings.TrimSpace(s.dictionary) == "" && time.Now().Before(deadline) {
-		drain()
-		time.Sleep(time.Millisecond)
-	}
+	drain()
 	if s.dictionary != dictionaryTestDefinition {
 		t.Fatalf("worker result was not dispatched: %q", s.dictionary)
 	}
-	// A late definition from a canceled request must not resurrect the block.
-	s.input, s.dictionary = "world", ""
+}
+
+func TestTranslateInputEditDiscardsQueuedResults(t *testing.T) {
+	for _, action := range []string{"edit", "close", "submit"} {
+		t.Run(action, func(t *testing.T) {
+			testTranslateDiscardQueuedResults(t, action)
+		})
+	}
+}
+
+func testTranslateDiscardQueuedResults(t *testing.T, action string) {
+	t.Helper()
+	a := translateTestApp(t)
+	a.translateSecret.(*fakeTranslateSecrets).value = []byte("k")
+	a.config.TranslateBaseURL, a.config.TranslateModel = "https://h/v1", "m"
+	a.translateDictionaryFn = func(string) string { return dictionaryTestDefinition }
+	a.translateStreamFn = func(_ context.Context, _ translateConfig, _, _, _ string, delta func(string)) (string, error) {
+		delta("old delta")
+		return "old result", nil
+	}
+	var pending []func()
+	a.translateRunOnMain = func(fn func()) { pending = append(pending, fn) }
+	s := a.ensureTranslateState()
+	s.input = "hello"
 	a.submitTranslate()
-	a.closeTranslate()
-	drain()
-	if s.dictionary != "" {
-		t.Fatal("late definition appeared after closing")
+	old := pending
+	pending = nil
+	wantPhase := translateEmpty
+	switch action {
+	case "edit":
+		s.input = "new phrase"
+		a.syncTranslateInput()
+	case "close":
+		a.closeTranslate()
+		wantPhase = translateLoading
+	case "submit":
+		s.input = "world"
+		a.submitTranslate()
+		wantPhase = translateLoading
+	}
+	for _, fn := range old {
+		fn()
+	}
+	if s.dictionary != "" || s.output != "" || s.phase != wantPhase {
+		t.Fatalf("%s accepted old results: %+v", action, s)
+	}
+	if action == "submit" {
+		for _, fn := range pending {
+			fn()
+		}
+		if s.dictionary == "" || s.output != "old result" || s.phase != translateDone {
+			t.Fatalf("current generation was discarded: %+v", s)
+		}
+	}
+}
+
+func TestTranslateDictionaryHeightBudgetAndScroll(t *testing.T) {
+	for _, expanded := range []bool{false, true} {
+		t.Run(map[bool]string{false: "collapsed", true: "expanded"}[expanded], func(t *testing.T) {
+			a := translateTestApp(t)
+			s := a.ensureTranslateState()
+			s.input, s.output, s.phase = "a\nb\nc\nd", strings.Repeat("long output ", 500), translateStreaming
+			s.dictionary = strings.Repeat("noun a definition • another sense ", 10) + "ORIGIN last visible marker"
+			s.dictionaryExpanded, s.clipped = expanded, 10
+			tk := tokens(false, "en")
+			tester := renderTranslatePanel(a, "en", false, s)
+			header, ok := tester.Find(a.text("en", "TranslateDictionary"))
+			if !ok {
+				t.Fatal("dictionary header missing")
+			}
+			bottom := tk.SizePaletteShadowMargin + a.translateHeight(tk, s) - tk.Space12
+			wantHeaderBottom := bottom - tk.Space12
+			if expanded {
+				wantHeaderBottom -= dictionaryBodyHeight(tk)
+			}
+			if header.Y+header.H > wantHeaderBottom+1 {
+				t.Fatalf("dictionary lost its bottom padding: header=%+v, bottom=%v, want header end <= %v", header, bottom, wantHeaderBottom)
+			}
+			if expanded {
+				tester.Scroll(header.X+header.W/2, header.Y+header.H+tk.Space8, 0, 10000)
+				tester.Frame()
+				last, found := tester.Find("ORIGIN last visible marker")
+				if !found || last.Y < header.Y+header.H || last.Y+last.H > bottom-tk.Space12+1 {
+					t.Fatalf("last definition line is not reachable inside the block: %+v, header=%+v, bottom=%v", last, header, bottom)
+				}
+			}
+		})
 	}
 }

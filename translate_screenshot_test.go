@@ -6,6 +6,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -127,6 +128,7 @@ func TestTranslateDictionaryScreenshots(t *testing.T) {
 				{"expanded", false, true},
 				{"collapsed", false, false},
 				{"failed", true, true},
+				{"capped", false, true},
 			} {
 				a := translateTestApp(t)
 				s := a.ensureTranslateState()
@@ -142,8 +144,21 @@ func TestTranslateDictionaryScreenshots(t *testing.T) {
 						s.output = "a fortunate discovery made by chance"
 					}
 				}
+				if state.name == "capped" {
+					s.output = strings.Repeat(s.output+"\n", 100)
+				}
 				name := fmt.Sprintf("translate-word-%s-%s", state.name, suffix)
-				saveTranslateEvidence(t, dir, name, renderTranslatePanelScreenshot(a, locale, dark).Image())
+				tester := renderTranslatePanelScreenshot(a, locale, dark)
+				saveTranslateEvidence(t, dir, name, tester.Image())
+				if state.name == "capped" {
+					header, ok := tester.Find(a.text(locale, "TranslateDictionary"))
+					if !ok {
+						t.Fatal("dictionary header missing")
+					}
+					tester.Scroll(header.X+header.W/2, header.Y+header.H+8, 0, 10000)
+					tester.Frame()
+					saveTranslateEvidence(t, dir, fmt.Sprintf("translate-word-capped-scrolled-%s", suffix), tester.Image())
+				}
 			}
 		}
 	}

@@ -75,7 +75,7 @@ func cropDictionaryDefinition(definition string) string {
 	if len(runes) <= maxDictionaryRunes {
 		return text
 	}
-	return strings.TrimSpace(string(runes[:maxDictionaryRunes])) + "…"
+	return strings.TrimSpace(string(runes[:maxDictionaryRunes-1])) + "…"
 }
 
 // Parts of speech and section headings used as display breakpoints. The text

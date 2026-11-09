@@ -59,7 +59,7 @@ func dictionaryBodyHeight(t tokenValues) float32 {
 // dictionaryBlockHeight includes the block's own padding. Collapsed it is
 // only the header row; expanded it adds the preview body.
 func dictionaryBlockHeight(t tokenValues, expanded bool) float32 {
-	height := 2*t.Space12 + dictionaryHeaderHeight(t)
+	height := 2*(t.Space12+t.StrokeHairline) + dictionaryHeaderHeight(t)
 	if expanded {
 		height += dictionaryBodyHeight(t)
 	}
@@ -68,24 +68,25 @@ func dictionaryBlockHeight(t tokenValues, expanded bool) float32 {
 
 // translateHeight is the panel height (without the shadow margin). Its only
 // inputs are tokens and state, so it can be asserted without a window.
-func (a *application) translateHeight(t tokenValues, s *translateState) float32 {
-	if s == nil {
-		return t.SizeTranslateMinHeight
-	}
+func translateNonResultHeight(t tokenValues, s *translateState) float32 {
 	input := t.SizeTranslateInputBase + float32(translateInputLines(s.input)-1)*t.SizeTranslateInputLine
-	result := float32(44)
-	if s.phase != translateEmpty {
-		result = a.translateResultHeight(t, s)
-	}
-	height := t.Space12 + input + t.Space8 + t.SizeTranslateDirectionHeight + t.Space8 + result + t.Space12
+	height := t.Space12 + input + t.Space8 + t.SizeTranslateDirectionHeight + t.Space8 + t.Space12 + 2*t.StrokeHairline
 	if s.clipped > 0 {
-		height += t.FontSizeSmall*t.LineHeightBody + t.Space4
+		height += t.FontSizeSmall*t.LineHeightBody + t.Space8
 	}
 	// The separator sits between the translation and the dictionary, with a
 	// Space8 gap on each side contributed by the panel column.
 	if strings.TrimSpace(s.dictionary) != "" {
 		height += t.Space8 + t.StrokeHairline + t.Space8 + dictionaryBlockHeight(t, s.dictionaryExpanded)
 	}
+	return height
+}
+
+func (a *application) translateHeight(t tokenValues, s *translateState) float32 {
+	if s == nil {
+		return t.SizeTranslateMinHeight
+	}
+	height := translateNonResultHeight(t, s) + a.translateResultHeightForState(t, s)
 	return clampTranslate(height, t.SizeTranslateMinHeight, t.SizeTranslateMaxHeight)
 }
 
@@ -194,7 +195,7 @@ func (a *application) translateResultHeightForState(t tokenValues, s *translateS
 	if s.phase == translateEmpty {
 		return 44
 	}
-	return a.translateResultHeight(t, s)
+	return min(a.translateResultHeight(t, s), t.SizeTranslateMaxHeight-translateNonResultHeight(t, s))
 }
 
 // translateDictionaryBlock draws the local definition below the translation.

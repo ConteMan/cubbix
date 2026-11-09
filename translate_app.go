@@ -296,8 +296,15 @@ func (a *application) syncTranslateInput() {
 		return
 	}
 	s.directionInput = s.input
+	a.cancelTranslate()
 	s.directionSwapped = false
 	s.clipped = 0
+	s.output = ""
+	s.dictionary = ""
+	s.dictionaryExpanded = true
+	s.phase = translateEmpty
+	s.errorKey = ""
+	s.copiedUntil = time.Time{}
 	a.refreshTranslate()
 }
 

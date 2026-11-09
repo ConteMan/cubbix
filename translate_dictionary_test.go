@@ -2,6 +2,8 @@ package main
 
 import (
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 )
 
@@ -46,6 +48,39 @@ func TestDictionaryRepeatedLookup(t *testing.T) {
 	}
 }
 
+func TestDictionaryCacheConcurrentLimit(t *testing.T) {
+	var calls atomic.Int32
+	cache := newDictionaryCache(func(string) string {
+		calls.Add(1)
+		return strings.Repeat("词", maxDictionaryRunes+1)
+	}, dictionaryCacheLimit)
+	var workers sync.WaitGroup
+	for range 32 {
+		workers.Go(func() {
+			if got := cache.definition("Hello"); len([]rune(got)) != maxDictionaryRunes {
+				t.Error("concurrent result exceeded the display limit")
+			}
+		})
+	}
+	workers.Wait()
+	if calls.Load() != 1 {
+		t.Fatalf("same-word system calls = %d; want 1", calls.Load())
+	}
+	for index := range dictionaryCacheLimit * 2 {
+		term := "word" + string(rune('a'+index/26)) + string(rune('a'+index%26))
+		workers.Go(func() { cache.definition(term) })
+	}
+	workers.Wait()
+	if len(cache.entries) != dictionaryCacheLimit || len(cache.order) != dictionaryCacheLimit {
+		t.Fatalf("cache exceeded its bound: entries=%d order=%d", len(cache.entries), len(cache.order))
+	}
+	for _, key := range cache.order {
+		if _, ok := cache.entries[key]; !ok {
+			t.Fatalf("eviction order contains missing key %q", key)
+		}
+	}
+}
+
 func TestDictionaryDefinitionWithoutResult(t *testing.T) {
 	cache := newDictionaryCache(func(string) string { return "" }, dictionaryCacheLimit)
 	for _, term := range []string{"hello", "take into account", "hello world", "你好", "123", ""} {
@@ -62,7 +97,7 @@ func TestCropDictionaryDefinition(t *testing.T) {
 	}
 	long := strings.Repeat("词", maxDictionaryRunes+100)
 	got := cropDictionaryDefinition(long)
-	if !strings.HasSuffix(got, "…") || len([]rune(got)) != maxDictionaryRunes+1 {
+	if !strings.HasSuffix(got, "…") || len([]rune(got)) != maxDictionaryRunes {
 		t.Fatalf("cropped length = %d", len([]rune(got)))
 	}
 }

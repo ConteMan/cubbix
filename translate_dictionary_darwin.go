@@ -53,11 +53,21 @@ func loadDictionarySymbols() {
 		dictionaryLoadErr = errDictionaryUnavailable
 		return
 	}
+	defer func() {
+		if dictionaryLoadErr != nil {
+			purego.Dlclose(cf)
+		}
+	}()
 	ds, err := purego.Dlopen(dictionaryServicesLibrary, purego.RTLD_NOW|purego.RTLD_LOCAL)
 	if err != nil {
 		dictionaryLoadErr = errDictionaryUnavailable
 		return
 	}
+	defer func() {
+		if dictionaryLoadErr != nil {
+			purego.Dlclose(ds)
+		}
+	}()
 	for _, symbol := range []struct {
 		handle uintptr
 		name   string
@@ -80,19 +90,19 @@ func loadDictionarySymbols() {
 	purego.RegisterLibFunc(&dictionaryHandles.textDef, ds, "DCSCopyTextDefinition")
 }
 
-// cfStringToGoString copies a CFStringRef into Go memory with UTF-8 encoding.
+// goString copies a CFStringRef into Go memory with UTF-8 encoding.
 // The buffer is sized by CoreFoundation and bounded so a bad length cannot
 // allocate an unbounded slice.
-func cfStringToGoString(ref uintptr) string {
+func (symbols dictionarySymbols) goString(ref uintptr) string {
 	if ref == 0 {
 		return ""
 	}
-	size := dictionaryHandles.stringMaxSize(dictionaryHandles.stringLength(ref), cfStringEncodingUTF8) + 1
+	size := symbols.stringMaxSize(symbols.stringLength(ref), cfStringEncodingUTF8) + 1
 	if size <= 0 || size > maxDictionarySystemBytes {
 		return ""
 	}
 	buffer := make([]byte, size)
-	if dictionaryHandles.stringBytes(ref, unsafe.Pointer(&buffer[0]), size, cfStringEncodingUTF8) == 0 {
+	if symbols.stringBytes(ref, unsafe.Pointer(&buffer[0]), size, cfStringEncodingUTF8) == 0 {
 		return ""
 	}
 	end := bytes.IndexByte(buffer, 0)
@@ -114,21 +124,25 @@ func systemDictionaryLookup(term string) string {
 	if dictionaryLoadErr != nil {
 		return ""
 	}
+	return dictionaryHandles.definition(term)
+}
+
+func (symbols dictionarySymbols) definition(term string) string {
 	text := strings.TrimSpace(term)
-	cfText := dictionaryHandles.createString(0, text, cfStringEncodingUTF8)
+	cfText := symbols.createString(0, text, cfStringEncodingUTF8)
 	if cfText == 0 {
 		return ""
 	}
-	defer dictionaryHandles.release(cfText)
-	found := dictionaryHandles.termRange(0, cfText, 0)
+	defer symbols.release(cfText)
+	found := symbols.termRange(0, cfText, 0)
 	units := int64(len(utf16.Encode([]rune(text))))
 	if found.Length <= 0 || found.Location != 0 || found.Length != units {
 		return ""
 	}
-	definition := dictionaryHandles.textDef(0, cfText, found)
+	definition := symbols.textDef(0, cfText, found)
 	if definition == 0 {
 		return ""
 	}
-	defer dictionaryHandles.release(definition)
-	return cfStringToGoString(definition)
+	defer symbols.release(definition)
+	return symbols.goString(definition)
 }
