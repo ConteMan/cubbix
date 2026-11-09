@@ -107,9 +107,12 @@ func TestTranslateSelectionScreenshots(t *testing.T) {
 				settings.page = settingsTranslate
 				settings.translateSelectionTrusted = trusted
 				settings.translateKeySaved = true
-				saveTranslateEvidence(t, dir,
-					"translate-selection-settings-"+state+"-"+suffix,
-					renderSelectionSettingsScreenshot(settings, locale, dark).Image())
+				tester := renderSelectionSettingsScreenshot(settings, locale, dark)
+				saveTranslateEvidence(t, dir, "translate-selection-settings-"+state+"-"+suffix, tester.Image())
+				tester.Scroll(650, 350, 0, 1000)
+				tester.Advance(700 * time.Millisecond)
+				tester.Frame()
+				saveTranslateEvidence(t, dir, "translate-selection-settings-scrolled-"+state+"-"+suffix, tester.Image())
 			}
 		}
 	}

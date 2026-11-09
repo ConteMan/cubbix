@@ -177,8 +177,8 @@ func sidebarNaturalHeight(t tokenValues) float32 {
 	return 2*t.Space12 + t.Space12 + 3*t.Space16 + t.Space20 + t.StrokeHairline + nav
 }
 
-// settingsMinimumHeight keeps every page's tallest state visible at once. It
-// never follows the page on screen, the display count or the CLI state.
+// settingsMinimumHeight keeps the shared floor independent of the current
+// page. The extra selection row scrolls within the translate page.
 func settingsMinimumHeight(t tokenValues) float32 {
 	content := max(
 		pageHeight(t, settingsGeneral, true, true, true, true, false),
@@ -186,7 +186,7 @@ func settingsMinimumHeight(t tokenValues) float32 {
 		pageHeight(t, settingsAwake, true, false, false, false, false),
 		pageHeight(t, settingsShortcuts, true, false, false, false, false),
 		pageHeight(t, settingsJSON, true, false, false, false, false),
-		pageHeight(t, settingsTranslate, true, false, false, false, false),
+		translatePageHeight(t, true)-rowHeight(t, 3)-t.StrokeHairline,
 	)
 	height := max(t.SizeWindowMinHeight, sidebarNaturalHeight(t), content+2*t.Space24)
 	return ceilingTo(t, height)
@@ -215,6 +215,9 @@ func settingsNaturalHeight(t tokenValues, page int, awakeOn, showPlacement, fixe
 }
 
 func settingsHeight(t tokenValues, page int, awakeOn, showPlacement, fixedDisplay, hasCLI, ready bool) int {
+	if page == settingsTranslate {
+		return int(settingsMinimumHeight(t))
+	}
 	return int(max(settingsMinimumHeight(t), ceilingTo(t, pageHeight(t, page, awakeOn, showPlacement, fixedDisplay, hasCLI, ready)+2*t.Space24)))
 }
 
@@ -871,5 +874,13 @@ func (a *application) selectSettingsPage(page int) {
 // settingsView is the settings column for the page on screen.
 func (a *application) settingsView(c *ui.Context, t tokenValues, locale string) {
 	l := newSettingsLayout(a, a.page)
+	if l.page == settingsTranslate {
+		ui.Scroll(c.Key("settings-translate-scroll")).Fill().Children(func() {
+			ui.Column(c).FillWidth().Shrink(0).Children(func() {
+				a.settingsContent(c, t, locale, l)
+			})
+		})
+		return
+	}
 	a.settingsContent(c, t, locale, l)
 }

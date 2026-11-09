@@ -165,6 +165,7 @@ func (a *application) toggleTranslate() {
 // palette and the card panel all land here with either selected text or an
 // empty input.
 func (a *application) openTranslateText(text string) {
+	a.cancelTranslateSelection()
 	a.hideMenubarPanel()
 	a.hidePalette()
 	s := a.ensureTranslateState()
@@ -238,6 +239,7 @@ func (a *application) hideTranslate() {
 }
 
 func (a *application) closeTranslate() {
+	a.cancelTranslateSelection()
 	a.cancelTranslate()
 	a.hideTranslate()
 }

@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/egoist/mygo"
@@ -123,6 +124,7 @@ type application struct {
 	// installs the real reader, so tests can neither read the frontmost
 	// application nor cause a permission prompt.
 	selection                    selectionReader
+	selectionReading             atomic.Bool
 	selectionBudget              time.Duration
 	openAccessibilitySettings    func()
 	translateSelectionTrusted    bool
@@ -450,6 +452,7 @@ func (a *application) createSettingsWindow() {
 	a.window.OnResize(a.rememberWindowSize)
 	a.window.OnMove(a.observeSettingsMove)
 	a.window.OnRestore(a.reconcileSettingsDisplayIfNeeded)
+	a.window.OnFocus(a.onSettingsFocus)
 
 	a.window.OnClose(func(event *mygo.CloseEvent) {
 		if !a.quitting {

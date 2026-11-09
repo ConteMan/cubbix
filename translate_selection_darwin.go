@@ -4,9 +4,10 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"errors"
-	"os"
 	"sync"
+	"time"
 	"unsafe"
 
 	"github.com/ebitengine/purego"
@@ -43,6 +44,8 @@ type axSymbols struct {
 	isTrusted      func() uint8
 	createApp      func(int32) uintptr
 	copyAttribute  func(uintptr, uintptr, unsafe.Pointer) int32
+	setTimeout     func(uintptr, float32) int32
+	axTypeID       func() uint64
 	createString   func(uintptr, string, uint32) uintptr
 	release        func(uintptr)
 	stringLength   func(uintptr) int64
@@ -71,7 +74,10 @@ func loadAXSymbols() {
 	}
 	// AppKit is already loaded in the app; dlopen makes the standalone
 	// read-only experiment work as well. It is reference counted by dyld.
-	_, _ = purego.Dlopen(appKitLibrary, purego.RTLD_LAZY|purego.RTLD_GLOBAL)
+	if _, err := purego.Dlopen(appKitLibrary, purego.RTLD_LAZY|purego.RTLD_GLOBAL); err != nil {
+		axLoadErr = err
+		return
+	}
 	for _, symbol := range []struct {
 		handle uintptr
 		name   string
@@ -81,6 +87,7 @@ func loadAXSymbols() {
 		{cf, "CFRelease"}, {cf, "CFGetTypeID"}, {cf, "CFStringGetTypeID"},
 		{his, "AXIsProcessTrusted"}, {his, "AXUIElementCreateApplication"},
 		{his, "AXUIElementCopyAttributeValue"},
+		{his, "AXUIElementSetMessagingTimeout"}, {his, "AXUIElementGetTypeID"},
 	} {
 		if _, err := purego.Dlsym(symbol.handle, symbol.name); err != nil {
 			axLoadErr = err
@@ -90,6 +97,8 @@ func loadAXSymbols() {
 	purego.RegisterLibFunc(&axHandles.isTrusted, his, "AXIsProcessTrusted")
 	purego.RegisterLibFunc(&axHandles.createApp, his, "AXUIElementCreateApplication")
 	purego.RegisterLibFunc(&axHandles.copyAttribute, his, "AXUIElementCopyAttributeValue")
+	purego.RegisterLibFunc(&axHandles.setTimeout, his, "AXUIElementSetMessagingTimeout")
+	purego.RegisterLibFunc(&axHandles.axTypeID, his, "AXUIElementGetTypeID")
 	purego.RegisterLibFunc(&axHandles.createString, cf, "CFStringCreateWithCString")
 	purego.RegisterLibFunc(&axHandles.release, cf, "CFRelease")
 	purego.RegisterLibFunc(&axHandles.stringLength, cf, "CFStringGetLength")
@@ -146,53 +155,88 @@ func (systemSelectionReader) FrontmostPID() int32 {
 // same decision tree as the shortcut: no permission, Cubbix in front or a
 // failed AX read all mean "no selection".
 func copySelectedText() (string, bool) {
-	answer := readSelection(systemSelectionReader{}, int32(os.Getpid()))
+	a := application{selection: systemSelectionReader{}}
+	answer := a.captureSelection()
 	return answer.text, answer.status == selectionFound
 }
 
-func (systemSelectionReader) SelectedText(pid int32) (string, error) {
+func (systemSelectionReader) SelectedText(ctx context.Context, pid int32) (string, error) {
 	if pid <= 0 || !axAvailable() {
 		return "", errSelectionUnavailable
 	}
-	app := axHandles.createApp(pid)
+	return axHandles.selectedText(ctx, pid)
+}
+
+func (symbols axSymbols) selectedText(ctx context.Context, pid int32) (string, error) {
+	app := symbols.createApp(pid)
 	if app == 0 {
 		return "", errSelectionUnavailable
 	}
-	defer axHandles.release(app)
+	defer symbols.release(app)
 
-	focusedName := axHandles.createString(0, axAttributeFocusedUIElement, cfStringEncodingUTF8)
+	focusedName := symbols.createString(0, axAttributeFocusedUIElement, cfStringEncodingUTF8)
 	if focusedName == 0 {
 		return "", errSelectionIllegalArgument
 	}
-	defer axHandles.release(focusedName)
+	defer symbols.release(focusedName)
+	if err := symbols.messagingTimeout(ctx, app); err != nil {
+		return "", err
+	}
 	var focused uintptr
-	code := axHandles.copyAttribute(app, focusedName, unsafe.Pointer(&focused))
+	code := symbols.copyAttribute(app, focusedName, unsafe.Pointer(&focused))
+	if focused != 0 {
+		defer symbols.release(focused)
+	}
 	if err := axSelectionError(code); err != nil {
 		return "", err
 	}
 	if focused == 0 {
 		return "", errSelectionNoValue
 	}
-	defer axHandles.release(focused)
+	if symbols.getTypeID(focused) != symbols.axTypeID() {
+		return "", errSelectionUnavailable
+	}
 
-	selectedName := axHandles.createString(0, axAttributeSelectedText, cfStringEncodingUTF8)
+	selectedName := symbols.createString(0, axAttributeSelectedText, cfStringEncodingUTF8)
 	if selectedName == 0 {
 		return "", errSelectionIllegalArgument
 	}
-	defer axHandles.release(selectedName)
+	defer symbols.release(selectedName)
+	if err := symbols.messagingTimeout(ctx, focused); err != nil {
+		return "", err
+	}
 	var value uintptr
-	code = axHandles.copyAttribute(focused, selectedName, unsafe.Pointer(&value))
+	code = symbols.copyAttribute(focused, selectedName, unsafe.Pointer(&value))
+	if value != 0 {
+		defer symbols.release(value)
+	}
 	if err := axSelectionError(code); err != nil {
 		return "", err
 	}
 	if value == 0 {
 		return "", errSelectionNoValue
 	}
-	defer axHandles.release(value)
-	if axHandles.getTypeID(value) != axHandles.cfStringTypeID() {
+	if symbols.getTypeID(value) != symbols.cfStringTypeID() {
 		return "", errSelectionUnavailable
 	}
-	return axGoString(value), nil
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
+	return symbols.goString(value), nil
+}
+
+func (symbols axSymbols) messagingTimeout(ctx context.Context, element uintptr) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	remaining := selectionTimeout
+	if deadline, ok := ctx.Deadline(); ok {
+		remaining = min(remaining, time.Until(deadline))
+	}
+	if remaining <= 0 {
+		return context.DeadlineExceeded
+	}
+	return axSelectionError(symbols.setTimeout(element, float32(remaining.Seconds())))
 }
 
 // axSelectionError folds AXError into the status the platform-independent
@@ -215,18 +259,18 @@ func axSelectionError(code int32) error {
 	}
 }
 
-// axGoString copies a CFStringRef into Go memory as UTF-8. The buffer comes
+// goString copies a CFStringRef into Go memory as UTF-8. The buffer comes
 // from CoreFoundation and is bounded before allocation.
-func axGoString(ref uintptr) string {
+func (symbols axSymbols) goString(ref uintptr) string {
 	if ref == 0 {
 		return ""
 	}
-	size := axHandles.stringMaxSize(axHandles.stringLength(ref), cfStringEncodingUTF8) + 1
+	size := symbols.stringMaxSize(symbols.stringLength(ref), cfStringEncodingUTF8) + 1
 	if size <= 0 || size > maxSelectionSystemBytes {
 		return ""
 	}
 	buffer := make([]byte, size)
-	if axHandles.stringBytes(ref, unsafe.Pointer(&buffer[0]), size, cfStringEncodingUTF8) == 0 {
+	if symbols.stringBytes(ref, unsafe.Pointer(&buffer[0]), size, cfStringEncodingUTF8) == 0 {
 		return ""
 	}
 	end := bytes.IndexByte(buffer, 0)

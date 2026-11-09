@@ -34,10 +34,14 @@ func (f *fakeSelectionReader) FrontmostPID() int32 {
 	return f.pid
 }
 
-func (f *fakeSelectionReader) SelectedText(int32) (string, error) {
+func (f *fakeSelectionReader) SelectedText(ctx context.Context, _ int32) (string, error) {
 	f.readCalls.Add(1)
 	if f.wait != nil {
-		<-f.wait
+		select {
+		case <-f.wait:
+		case <-ctx.Done():
+			return "", ctx.Err()
+		}
 	}
 	if f.err != nil {
 		return "", f.err

@@ -10,14 +10,12 @@ import (
 )
 
 // translatePageHeight is the natural height of the sixth settings page. The
-// settings card has four rows (① 48, ② 64, ③ 48, ① 48) and the shortcut
+// settings card has five rows (① 48, ② 64, ③ 48, ① 48, ③ 48) and the shortcut
 // card one; with a closed module only the shortcut card stays.
 func translatePageHeight(t tokenValues, on bool) float32 {
 	if !on {
 		return sectionHeight(t, cardHeight(t, rowHeight(t, 3)))
 	}
-	// Five rows: the level-3 selection row adds one 48 pt row and a hairline.
-	// The window floor follows this page (720 x 492), not a scattered literal.
 	settings := cardHeight(t, rowHeight(t, 1), rowHeight(t, 2), rowHeight(t, 3),
 		rowHeight(t, 1), rowHeight(t, 3))
 	return sectionHeight(t, settings, cardHeight(t, rowHeight(t, 3)))

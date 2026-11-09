@@ -34,7 +34,7 @@ const (
 type selectionReader interface {
 	Trusted() bool
 	FrontmostPID() int32
-	SelectedText(pid int32) (string, error)
+	SelectedText(context.Context, int32) (string, error)
 }
 
 // The AX errors that reach this layer are classified here; the darwin reader
@@ -67,29 +67,39 @@ func (a *application) selectionTimeoutDuration() time.Duration {
 // deadline. A slow AX call cannot hold the shortcut callback or the CLI
 // socket: the caller runs this on a worker and the timer always wins.
 func (a *application) captureSelection() selectionAnswer {
+	return a.captureSelectionContext(context.Background())
+}
+
+func (a *application) captureSelectionContext(parent context.Context) selectionAnswer {
 	reader := a.selection
 	if reader == nil {
 		return selectionAnswer{status: selectionNone, reason: "no selection reader"}
 	}
-	type outcome struct{ answer selectionAnswer }
-	done := make(chan outcome, 1) // buffered: a late reader never blocks
+	ctx, cancel := context.WithTimeout(parent, a.selectionTimeoutDuration())
+	defer cancel()
+	if ctx.Err() != nil || !a.selectionReading.CompareAndSwap(false, true) {
+		return selectionAnswer{status: selectionNone, reason: "selection unavailable"}
+	}
+	done := make(chan selectionAnswer, 1)
 	go func() {
-		done <- outcome{readSelection(reader, int32(os.Getpid()))}
+		answer := readSelection(ctx, reader, int32(os.Getpid()))
+		a.selectionReading.Store(false)
+		done <- answer
 	}()
-	timer := time.NewTimer(a.selectionTimeoutDuration())
-	defer timer.Stop()
 	select {
 	case result := <-done:
-		return result.answer
-	case <-timer.C:
-		return selectionAnswer{status: selectionNone, reason: "selection timeout"}
+		if ctx.Err() == nil {
+			return result
+		}
+	case <-ctx.Done():
 	}
+	return selectionAnswer{status: selectionNone, reason: "selection timeout"}
 }
 
 // readSelection is the AX decision tree, free of window and platform state:
 // no permission, the frontmost application being Cubbix itself, an empty
 // string and every read failure all fall back to an empty input.
-func readSelection(reader selectionReader, ownPID int32) selectionAnswer {
+func readSelection(ctx context.Context, reader selectionReader, ownPID int32) selectionAnswer {
 	if !reader.Trusted() {
 		return selectionAnswer{status: selectionDenied, trustedKnown: true, reason: "accessibility not trusted"}
 	}
@@ -100,7 +110,10 @@ func readSelection(reader selectionReader, ownPID int32) selectionAnswer {
 	case pid == ownPID:
 		return selectionAnswer{status: selectionNone, trusted: true, trustedKnown: true, reason: "frontmost is Cubbix"}
 	}
-	text, err := reader.SelectedText(pid)
+	if ctx.Err() != nil {
+		return selectionAnswer{status: selectionNone, reason: "selection timeout"}
+	}
+	text, err := reader.SelectedText(ctx, pid)
 	if err != nil {
 		if errors.Is(err, errSelectionDenied) {
 			return selectionAnswer{status: selectionDenied, trustedKnown: true, reason: "accessibility disabled"}
@@ -131,7 +144,7 @@ func (a *application) beginTranslateSelection() {
 	a.runTranslateWorker(func() {
 		answer := a.captureSelection()
 		a.translateOnMain(func() {
-			if generation != a.translateSelectionGeneration {
+			if generation != a.translateSelectionGeneration || !a.config.TranslateEnabled || a.quitting {
 				return
 			}
 			a.translateSelectionPending = false
@@ -152,6 +165,11 @@ func (a *application) beginTranslateSelection() {
 			}
 		})
 	})
+}
+
+func (a *application) cancelTranslateSelection() {
+	a.translateSelectionGeneration++
+	a.translateSelectionPending = false
 }
 
 // showSelectionHintOnce puts the accessibility hint under the input. It is a
@@ -175,6 +193,13 @@ func (a *application) refreshSelectionTrust() {
 		return
 	}
 	a.translateSelectionTrusted = a.selection.Trusted()
+}
+
+func (a *application) onSettingsFocus() {
+	if a.page == settingsTranslate {
+		a.refreshSelectionTrust()
+		a.invalidateWindow()
+	}
 }
 
 // grantAccessibility is the "Open Settings" text button in the panel and on
@@ -208,9 +233,13 @@ func openAccessibilitySettingsPane() {
 // read both answer TranslateNoSelection (exit 4), as the spec requires.
 func (a *application) startTranslateCLISelection(ctx context.Context, req cli.Request, send func(cli.Result, []byte)) {
 	a.runTranslateWorker(func() {
-		answer := a.captureSelection()
+		answer := a.captureSelectionContext(ctx)
 		a.translateCLIMain(func() {
 			if ctx.Err() != nil || a.quitting {
+				return
+			}
+			if !a.config.TranslateEnabled {
+				send(cli.Failure(cli.CodeDisabled), nil)
 				return
 			}
 			if answer.trustedKnown {
