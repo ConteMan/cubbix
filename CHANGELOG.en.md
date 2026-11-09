@@ -3,9 +3,9 @@
 ## Unreleased
 
 - New Translate module: open a small floating panel from the shortcut, the card panel or the command palette; selected text or what you type is translated, with copy, direction swap, a dictionary for single English words, and `cubbix translate` for scripts.
-- Translations can be read aloud: the speak button reads the source, and a single English word can be spoken automatically once a result arrives. Click again or close the panel to stop.
+- Hear the original text with the speak button. A single English word can be spoken automatically once a result arrives; click again or close the panel to stop.
 - Configure the endpoint, key and model in Settings; a saved key only shows "Saved". Turning the module off also releases its shortcut and hides its entries.
-- The floating scroll bar no longer covers card borders on the Translate settings page, and long text, retries, timeouts and truncation hints are steadier.
+- Scroll through Translate settings without the scroll bar covering the cards. Failed translations can be retried, with hints when text is too long or a request times out.
 - When another tool has already disabled sleep on lid close, the lid switch still works: Cubbix remembers the request, and the helper takes over once the other tool lets go. It never overwrites the other tool's setting and never asks for authorization to do it.
 - After taking over, or when the helper's own setting is turned back off, the helper writes it back as soon as the lease allows, with a bounded number of retries. Two tools repeatedly fighting over the setting now stop and show a hint.
 - Low battery no longer ends a lid session while plugged in. A new 5% limit is available for tools that calibrate by discharging.

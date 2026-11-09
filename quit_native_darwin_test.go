@@ -99,8 +99,15 @@ func quitNativeMain() int {
 		os.Exit(0)
 	}
 	mygo.App.OnBeforeQuit(a.beforeQuit)
+	speech := &fakeSpeechBackend{}
+	a.speech = speech
+	a.translate = &translateState{speaking: true}
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnQuit(func() {
+		if speech.stops == 0 || a.translate.speaking {
+			write("quit did not stop speech")
+			return
+		}
 		if mode == "normal" {
 			write("PASS")
 		} else {

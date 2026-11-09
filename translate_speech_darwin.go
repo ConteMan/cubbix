@@ -21,6 +21,7 @@ const (
 	avfaudioLibrary     = "/System/Library/Frameworks/AVFAudio.framework/AVFAudio"
 	foundationLibrary   = "/System/Library/Frameworks/Foundation.framework/Foundation"
 	speechPollInterval  = 100 * time.Millisecond
+	speechStartGrace    = time.Second
 	speechPollMax       = 2 * time.Minute
 	speechBoundaryNow   = 0 // AVSpeechBoundaryImmediate
 	speechVoiceLanguage = "en-US"
@@ -102,14 +103,60 @@ func speechLanguage(text string) string {
 	}
 }
 
-// avSpeechBackend keeps one synthesizer alive from creation until the
-// utterance ends or is stopped. A local object would be collected while
-// AppKit is still speaking. Creation, speaking, release and the isSpeaking
-// poll all run on the main thread; the poll only waits on a worker.
+type avSpeechDriver interface {
+	Start(string) (objc.ID, error)
+	IsSpeaking(objc.ID) bool
+	StopAndRelease(objc.ID)
+}
+
+type systemAVSpeech struct{}
+
+func (systemAVSpeech) Start(text string) (objc.ID, error) {
+	speechOnce.Do(loadSpeechClasses)
+	if speechLoadErr != nil {
+		return 0, speechLoadErr
+	}
+	pool := objc.ID(objc.GetClass("NSAutoreleasePool")).Send(speechSelector.newPool)
+	defer func() {
+		if pool != 0 {
+			pool.Send(speechSelector.drain)
+		}
+	}()
+	synth := speechClasses.synth.Send(speechSelector.alloc).Send(speechSelector.init)
+	if synth == 0 {
+		return 0, errSpeechUnavailable
+	}
+	utterance := speechClasses.utterance.Send(speechSelector.utteranceWithString, speechString(text))
+	if utterance == 0 {
+		synth.Send(speechSelector.release)
+		return 0, errSpeechUnavailable
+	}
+	if voice := speechClasses.voice.Send(speechSelector.voiceWithLanguage, speechString(speechLanguage(text))); voice != 0 {
+		utterance.Send(speechSelector.setVoice, voice)
+	}
+	synth.Send(speechSelector.speakUtterance, utterance)
+	return synth, nil
+}
+
+func (systemAVSpeech) IsSpeaking(synth objc.ID) bool {
+	return objc.Send[bool](synth, speechSelector.isSpeaking)
+}
+
+func (systemAVSpeech) StopAndRelease(synth objc.ID) {
+	synth.Send(speechSelector.stopSpeaking, uintptr(speechBoundaryNow))
+	synth.Send(speechSelector.release)
+}
+
 type avSpeechBackend struct {
-	mu         sync.Mutex
-	synth      objc.ID
-	generation uint64
+	driver      avSpeechDriver
+	onMain      func(func())
+	after       func(time.Duration, func()) func()
+	now         func() time.Time
+	synth       objc.ID
+	generation  uint64
+	cancelPoll  func()
+	started     time.Time
+	wasSpeaking bool
 }
 
 func (b *avSpeechBackend) Speak(text string, done func()) error {
@@ -117,119 +164,65 @@ func (b *avSpeechBackend) Speak(text string, done func()) error {
 	if text == "" {
 		return errSpeechUnavailable
 	}
-	speechOnce.Do(loadSpeechClasses)
-	if speechLoadErr != nil {
-		return speechLoadErr
-	}
-	b.stop()
-	var started bool
-	var startErr error
-	mygo.RunOnMain(func() {
-		pool := objc.ID(objc.GetClass("NSAutoreleasePool")).Send(speechSelector.newPool)
-		defer func() {
-			if pool != 0 {
-				pool.Send(speechSelector.drain)
-			}
-		}()
-		synth := objc.ID(speechClasses.synth).Send(speechSelector.alloc).Send(speechSelector.init)
-		if synth == 0 {
+	startErr := errSpeechUnavailable
+	b.onMain(func() {
+		b.stopOnMain()
+		b.synth, startErr = b.driver.Start(text)
+		if startErr != nil || b.synth == 0 {
+			b.stopOnMain()
 			startErr = errSpeechUnavailable
 			return
 		}
-		utterance := objc.ID(speechClasses.utterance).Send(speechSelector.utteranceWithString, speechString(text))
-		if utterance == 0 {
-			synth.Send(speechSelector.release)
-			startErr = errSpeechUnavailable
-			return
-		}
-		if voice := objc.ID(speechClasses.voice).Send(speechSelector.voiceWithLanguage, speechString(speechLanguage(text))); voice != 0 {
-			utterance.Send(speechSelector.setVoice, voice)
-		}
-		synth.Send(speechSelector.speakUtterance, utterance)
-		b.mu.Lock()
-		b.generation++
-		generation := b.generation
-		b.synth = synth
-		b.mu.Unlock()
-		started = true
-		go b.watch(generation, done)
+		b.started, b.wasSpeaking = b.now(), false
+		b.schedulePoll(b.generation, done)
 	})
-	if startErr != nil {
-		return startErr
-	}
-	if !started {
-		return errSpeechUnavailable
-	}
-	return nil
+	return startErr
 }
 
-// watch polls isSpeaking on the main thread. The synthesizer is released only
-// after speech ends, so a second click or a closed panel stops it early while
-// a finished utterance still clears the UI marker through done.
-func (b *avSpeechBackend) watch(generation uint64, done func()) {
-	deadline := time.Now().Add(speechPollMax)
-	wasSpeaking := false
-	for time.Now().Before(deadline) {
-		time.Sleep(speechPollInterval)
-		var speaking, active bool
-		// Hold the lock across the main-thread call: Stop may clear and
-		// release the synthesizer while this poll is queued.
-		mygo.RunOnMain(func() {
-			b.mu.Lock()
-			defer b.mu.Unlock()
-			active = b.generation == generation && b.synth != 0
-			if active {
-				speaking = b.synth.Send(speechSelector.isSpeaking) != 0
+func (b *avSpeechBackend) schedulePoll(generation uint64, done func()) {
+	b.cancelPoll = b.after(speechPollInterval, func() {
+		b.onMain(func() {
+			if b.generation != generation || b.synth == 0 {
+				return
 			}
+			b.cancelPoll = nil
+			speaking := b.driver.IsSpeaking(b.synth)
+			elapsed := b.now().Sub(b.started)
+			if elapsed >= speechPollMax || !speaking && (b.wasSpeaking || elapsed >= speechStartGrace) {
+				b.stopOnMain()
+				if done != nil {
+					done()
+				}
+				return
+			}
+			b.wasSpeaking = b.wasSpeaking || speaking
+			b.schedulePoll(generation, done)
 		})
-		if !active {
-			return
-		}
-		if speaking {
-			wasSpeaking = true
-		} else if wasSpeaking {
-			break
-		}
+	})
+}
+
+func (b *avSpeechBackend) stopOnMain() {
+	b.generation++
+	if b.cancelPoll != nil {
+		b.cancelPoll()
+		b.cancelPoll = nil
 	}
-	b.mu.Lock()
-	var releaseID objc.ID
-	if b.generation == generation && b.synth != 0 {
-		releaseID = b.synth
+	if b.synth != 0 {
+		b.driver.StopAndRelease(b.synth)
 		b.synth = 0
 	}
-	b.mu.Unlock()
-	if releaseID == 0 {
-		return
-	}
-	mygo.RunOnMain(func() { releaseID.Send(speechSelector.release) })
-	if done != nil {
-		done()
-	}
 }
 
-func (b *avSpeechBackend) stop() {
-	b.mu.Lock()
-	b.generation++
-	synth := b.synth
-	b.synth = 0
-	b.mu.Unlock()
-	if synth == 0 {
-		return
-	}
-	mygo.RunOnMain(func() {
-		synth.Send(speechSelector.stopSpeaking, uintptr(speechBoundaryNow))
-		synth.Send(speechSelector.release)
-	})
-}
-
-func (b *avSpeechBackend) Stop() { b.stop() }
+func (b *avSpeechBackend) Stop() { b.onMain(b.stopOnMain) }
 
 // saySpeechBackend is the fallback. Text goes through standard input, never
 // through a shell or a command line that could be parsed as options; Stop
 // kills the child process. A natural exit reports done, a killed one does not.
 type saySpeechBackend struct {
 	mu         sync.Mutex
+	command    func() *exec.Cmd
 	cmd        *exec.Cmd
+	exited     chan struct{}
 	generation uint64
 }
 
@@ -239,8 +232,9 @@ func (b *saySpeechBackend) Speak(text string, done func()) error {
 		return errSpeechUnavailable
 	}
 	b.Stop()
-	cmd := exec.Command("/usr/bin/say", "-f", "-")
+	cmd := b.command()
 	cmd.Stdin = strings.NewReader(text)
+	cmd.WaitDelay = time.Second
 	if err := cmd.Start(); err != nil {
 		return err
 	}
@@ -248,6 +242,8 @@ func (b *saySpeechBackend) Speak(text string, done func()) error {
 	b.generation++
 	generation := b.generation
 	b.cmd = cmd
+	exited := make(chan struct{})
+	b.exited = exited
 	b.mu.Unlock()
 	go func() {
 		_ = cmd.Wait()
@@ -255,8 +251,10 @@ func (b *saySpeechBackend) Speak(text string, done func()) error {
 		active := b.generation == generation && b.cmd == cmd
 		if active {
 			b.cmd = nil
+			b.exited = nil
 		}
 		b.mu.Unlock()
+		close(exited)
 		if active && done != nil {
 			done()
 		}
@@ -268,14 +266,28 @@ func (b *saySpeechBackend) Stop() {
 	b.mu.Lock()
 	b.generation++
 	cmd := b.cmd
+	exited := b.exited
 	b.cmd = nil
+	b.exited = nil
 	b.mu.Unlock()
 	if cmd != nil && cmd.Process != nil {
 		_ = cmd.Process.Kill()
+		<-exited
 	}
 }
 
 // newSystemSpeech installs the real engine only in the running application.
 func newSystemSpeech() speechEngine {
-	return &fallbackSpeech{primary: &avSpeechBackend{}, fallback: &saySpeechBackend{}}
+	return &fallbackSpeech{
+		primary: &avSpeechBackend{
+			driver: systemAVSpeech{}, onMain: mygo.RunOnMain, now: time.Now,
+			after: func(delay time.Duration, fn func()) func() {
+				timer := time.AfterFunc(delay, fn)
+				return func() { timer.Stop() }
+			},
+		},
+		fallback: &saySpeechBackend{command: func() *exec.Cmd {
+			return exec.Command("/usr/bin/say", "-f", "-")
+		}},
+	}
 }

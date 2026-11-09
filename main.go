@@ -587,7 +587,7 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	// JSON seat of each display. Windows are still alive here.
 	a.saveWindowPlacesOnQuit()
 	a.cli.stop()
-	a.cancelTranslate()
+	a.closeTranslate()
 	a.hidePalette()
 	a.hidePaletteGuides()
 	a.hideMenubarPanel()

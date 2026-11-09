@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"os"
 	"strings"
@@ -38,16 +39,22 @@ func finalColorRun(tt *ui.Tester, width int, x float32, want color.RGBA) float32
 // scrolledTranslateSettings frames the real settings view, hovers the scroll
 // container and scrolls it. Waiting past the theme transition keeps the dark
 // captures fully dark before any pixel is inspected.
-func scrolledTranslateSettings(a *application, locale string, dark bool) *ui.Tester {
-	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
+func scrolledTranslateSettings(a *application, locale string, dark bool, widths ...int) *ui.Tester {
+	width := 720
+	if len(widths) > 0 {
+		width = widths[0]
+	}
+	tt := ui.NewTester(a.view, width, settingsWindowHeight)
 	tt.SetScale(2)
 	tt.SetLocale(locale)
 	tt.SetDark(dark)
 	tt.Frame()
 	tt.Advance(700 * time.Millisecond)
 	tt.Frame()
-	tt.Move(650, 350)
-	tt.Scroll(650, 350, 0, 1000)
+	tk := tokens(dark, locale)
+	scrollX := (float32(width) + tk.SizeSidebarWidth) / 2
+	tt.Move(scrollX, 350)
+	tt.Scroll(scrollX, 350, 0, 1000)
 	tt.Frame()
 	tt.Advance(700 * time.Millisecond)
 	tt.Frame()
@@ -59,45 +66,48 @@ func scrolledTranslateSettings(a *application, locale string, dark bool) *ui.Tes
 func TestTranslateSettingsScrollbarOutsideCard(t *testing.T) {
 	for _, locale := range []string{"zh-CN", "en"} {
 		for _, dark := range []bool{false, true} {
-			a := translateTestApp(t)
-			a.page, a.translateKeySaved = settingsTranslate, true
-			tk := tokens(dark, locale)
-			tt := scrolledTranslateSettings(a, locale, dark)
-			barColor := ui.Hex(tk.ColorTextSecondary)
-			want := color.RGBA{barColor.R, barColor.G, barColor.B, 255}
-			containerRight := float32(720) - tk.Space24
-			cardRight := containerRight - translateScrollbarGutter(tk)
-			barLeft := containerRight - tk.SizeScrollbar - 3
-			if run := finalColorRun(tt, 720, barLeft+tk.SizeScrollbar/2, want); run < 24 {
-				t.Fatalf("%s dark=%v: scroll bar not visible in the gutter (run %.1f)", locale, dark, run)
-			}
-			for _, x := range []float32{cardRight - 1, cardRight + 1, barLeft - 1} {
-				if run := finalColorRun(tt, 720, x, want); run >= 24 {
-					t.Fatalf("%s dark=%v: scroll bar covers the card at x=%.1f (run %.1f)", locale, dark, x, run)
+			for _, width := range []int{720, 840, 1024} {
+				a := translateTestApp(t)
+				a.page, a.translateKeySaved = settingsTranslate, true
+				tk := tokens(dark, locale)
+				tt := scrolledTranslateSettings(a, locale, dark, width)
+				barColor := ui.Hex(tk.ColorTextSecondary)
+				want := color.RGBA{barColor.R, barColor.G, barColor.B, 255}
+				contentWidth := min(float32(width)-tk.SizeSidebarWidth-2*tk.Space24, tk.SizeContentMaxWidth)
+				containerRight := (float32(width) + tk.SizeSidebarWidth + contentWidth) / 2
+				cardRight := containerRight - translateScrollbarGutter(tk)
+				barLeft := containerRight - tk.SizeScrollbar - 3
+				if run := finalColorRun(tt, width, barLeft+tk.SizeScrollbar/2, want); run < 24 {
+					t.Fatalf("%s dark=%v width=%d: scroll bar not visible in the gutter (run %.1f)", locale, dark, width, run)
 				}
-			}
-			if barLeft+tk.SizeScrollbar > containerRight {
-				t.Fatal("the scroll bar left its container")
-			}
-			// The gutter keeps the bar inside the scroll container, so it is
-			// still draggable rather than becoming a decorative overlay.
-			barX := barLeft + tk.SizeScrollbar/2
-			label := a.text(locale, "TranslateRecordShortcut")
-			before, ok := tt.Find(label)
-			if !ok {
-				t.Fatal("shortcut row missing before dragging")
-			}
-			tt.Move(barX, 300)
-			tt.Frame()
-			tt.Press(barX, 300)
-			tt.Move(barX, 200)
-			tt.Move(barX, 100)
-			tt.Move(barX, 40)
-			tt.Release(barX, 40)
-			tt.Frame()
-			after, ok := tt.Find(label)
-			if !ok || after.Y <= before.Y {
-				t.Fatalf("%s dark=%v: the scroll bar cannot be dragged: before=%+v after=%+v", locale, dark, before, after)
+				for _, x := range []float32{cardRight - 1, cardRight + 1, barLeft - 1} {
+					if run := finalColorRun(tt, width, x, want); run >= 24 {
+						t.Fatalf("%s dark=%v: scroll bar covers the card at x=%.1f (run %.1f)", locale, dark, x, run)
+					}
+				}
+				if barLeft+tk.SizeScrollbar > containerRight {
+					t.Fatal("the scroll bar left its container")
+				}
+				// The gutter keeps the bar inside the scroll container, so it is
+				// still draggable rather than becoming a decorative overlay.
+				barX := barLeft + tk.SizeScrollbar/2
+				label := a.text(locale, "TranslateRecordShortcut")
+				before, ok := tt.Find(label)
+				if !ok {
+					t.Fatal("shortcut row missing before dragging")
+				}
+				tt.Move(barX, 300)
+				tt.Frame()
+				tt.Press(barX, 300)
+				tt.Move(barX, 200)
+				tt.Move(barX, 100)
+				tt.Move(barX, 40)
+				tt.Release(barX, 40)
+				tt.Frame()
+				after, ok := tt.Find(label)
+				if !ok || after.Y <= before.Y {
+					t.Fatalf("%s dark=%v: the scroll bar cannot be dragged: before=%+v after=%+v", locale, dark, before, after)
+				}
 			}
 		}
 	}
@@ -231,6 +241,10 @@ func TestTranslateFinalScreenshots(t *testing.T) {
 			settings.page, settings.translateKeySaved = settingsTranslate, true
 			saveTranslateEvidence(t, dir, "translate-settings-scrolled-"+suffix,
 				scrolledTranslateSettings(settings, locale, dark).Image())
+			for _, width := range []int{840, 1024} {
+				saveTranslateEvidence(t, dir, fmt.Sprintf("translate-settings-scrolled-%d-%s", width, suffix),
+					scrolledTranslateSettings(settings, locale, dark, width).Image())
+			}
 		}
 	}
 }

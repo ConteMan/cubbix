@@ -261,7 +261,7 @@ func (a *application) panelTranslateCard(c *ui.Context, t tokenValues, locale st
 				button.Background(ui.Hex(t.ColorControlHover))
 			}
 			button.Children(func() {
-				ui.Icon(c, icon("text-quote")).Size(t.SizeIcon, t.SizeIcon).
+				ui.Icon(c, icon("chevron-right")).Size(t.SizeIcon, t.SizeIcon).
 					TextColor(ui.Hex(t.ColorTextSecondary))
 			})
 		})
