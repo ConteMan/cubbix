@@ -28,6 +28,7 @@ var numberValue func(uintptr, int32, unsafe.Pointer) bool
 var cfEqual func(uintptr, uintptr) bool
 var typeID func(uintptr) uintptr
 var numberType func() uintptr
+var iopsAdapterDetails func() uintptr
 
 func initPower() {
 	secOnce.Do(initSecurity)
@@ -55,6 +56,12 @@ func initPower() {
 	purego.RegisterLibFunc(&cfEqual, cf, "CFEqual")
 	purego.RegisterLibFunc(&typeID, cf, "CFGetTypeID")
 	purego.RegisterLibFunc(&numberType, cf, "CFNumberGetTypeID")
+	// A missing symbol is a supported outcome: the adapter stays unknown and
+	// the low-battery protection keeps its conservative behaviour.
+	iopsAdapterDetails = nil
+	if sym, err := purego.Dlsym(io, "IOPSCopyExternalPowerAdapterDetails"); err == nil && sym != 0 {
+		purego.RegisterFunc(&iopsAdapterDetails, sym)
+	}
 }
 
 type SystemPower struct{}
@@ -109,7 +116,25 @@ func internalBattery(info, list uintptr) uintptr {
 	return 0
 }
 
-func (SystemPower) Source() (string, int, error) {
+// Adapter reports whether IOKit has external adapter details. NULL covers
+// both "not attached" and "lookup failed"; either keeps protection enabled.
+func (SystemPower) Adapter() AdapterState {
+	powerOnce.Do(initPower)
+	if powerErr != nil || iopsAdapterDetails == nil {
+		return AdapterUnknown
+	}
+	d := iopsAdapterDetails()
+	if d == 0 {
+		return AdapterAbsent
+	}
+	cfRelease(d)
+	return AdapterAttached
+}
+
+// Sample is the single power read: source kind, trusted capacity and the
+// adapter state used by Plugged.
+func (SystemPower) Sample() (PowerSample, error) {
+	sample := PowerSample{Kind: "unknown", Percent: -1}
 	kind, percent := "unknown", -1
 	err := withPowerSources(func(info, list uintptr) error {
 		d := internalBattery(info, list)
@@ -140,5 +165,7 @@ func (SystemPower) Source() (string, int, error) {
 		}
 		return nil
 	})
-	return kind, percent, err
+	sample.Kind, sample.Percent = kind, percent
+	sample.Adapter = (SystemPower{}).Adapter()
+	return sample, err
 }

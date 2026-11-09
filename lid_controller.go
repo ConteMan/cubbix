@@ -64,7 +64,21 @@ type lidSnapshot struct {
 	lastFailure                    *lid.Response
 	install                        lidInstallDiagnostic
 	stale, ours                    bool
+	// watching is true only while the helper reports state "watching": the
+	// value 1 belongs to another tool and we have not written anything.
+	watching bool
+	adapter  string
+	rewrites int
+	// rearmPending marks a watching lease whose helper temporarily went away.
+	// The session intent must survive that round so the online app can attach
+	// again once the helper reports on-foreign.
+	rearmPending bool
 }
+
+// lidRearmLimit bounds an unattended rearm: four 15-second leases. If the
+// helper never comes back, the ordinary cleanup still converges.
+const lidRearmLimit = 4 * lid.Lease
+
 type lidController struct {
 	mu                 sync.Mutex
 	published          atomic.Pointer[lidSnapshot]
@@ -79,8 +93,13 @@ type lidController struct {
 	connection         lidConnection
 	snapshotValue      lidSnapshot
 	deadline           time.Time
-	now                func() time.Time
-	wait               func(time.Duration)
+	rearmSince         time.Time
+	lastWatching       bool
+	// allowForeignStop is set only while an authorized update retires an old
+	// lease. A foreign 1 without our marker is not a liability we must clear.
+	allowForeignStop bool
+	now              func() time.Time
+	wait             func(time.Duration)
 }
 
 func (c *lidController) snapshot() lidSnapshot {
@@ -96,7 +115,34 @@ func (c *lidController) snapshot() lidSnapshot {
 	}
 	return lidSnapshot{state: lidEnabling, value: -1}
 }
-func (c *lidController) publish()           { copy := c.snapshotValue; c.published.Store(&copy) }
+func (c *lidController) publish() { copy := c.snapshotValue; c.published.Store(&copy) }
+func (c *lidController) clock() time.Time {
+	if c.now != nil {
+		return c.now()
+	}
+	return time.Now()
+}
+
+// rearmExpired gives up a rearm when the helper has been away too long.
+func (c *lidController) rearmExpired() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if !c.snapshotValue.rearmPending {
+		return false
+	}
+	return c.clock().Sub(c.rearmSince) > lidRearmLimit
+}
+
+func (c *lidController) setRearmPending(value bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.snapshotValue.rearmPending = value
+	if !value {
+		c.rearmSince = time.Time{}
+		c.lastWatching = c.snapshotValue.state == lidOn && c.snapshotValue.watching
+	}
+	c.publish()
+}
 func (c *lidController) Available() bool    { return c != nil && c.capable && c.supported }
 func (c *lidController) markerExists() bool { _, err := os.Stat(c.marker); return err == nil }
 func (c *lidController) removeMarker() error {
@@ -171,6 +217,8 @@ func (c *lidController) apply(r lid.Response) {
 	s := &c.snapshotValue
 	s.online = true
 	s.response = r
+	s.adapter = r.Adapter
+	s.rewrites = r.Rewrites
 	s.value = -1
 	if r.Value != nil {
 		s.value = *r.Value
@@ -178,13 +226,19 @@ func (c *lidController) apply(r lid.Response) {
 	// An unknown observation is not evidence that an owned lease ended.
 	// Keep the last confirmed state and recovery marker until the helper
 	// reports a terminal reason or a confirmed value/state transition.
-	if s.state == lidOn && s.value != 0 && s.value != 1 && (r.Code == "ok" || r.Code == "pmset-failed") && (r.State == "on-ours" || r.State == "off") {
+	if s.state == lidOn && s.value != 0 && s.value != 1 && (r.Code == "ok" || r.Code == "pmset-failed") && r.State == "off" {
 		return
 	}
 	if s.value == 0 {
 		c.removeMarker()
 		s.stale = false
 		s.ours = false
+	}
+	s.watching = false
+	if r.State == "watching" {
+		c.lastWatching = true
+	} else if r.State == "on-ours" || r.State == "off" {
+		c.lastWatching = false
 	}
 	switch r.State {
 	case "on-foreign":
@@ -197,6 +251,13 @@ func (c *lidController) apply(r lid.Response) {
 		s.reason = "LidRestoreFailed"
 	case "on-ours":
 		s.state = lidOn
+		s.reason = ""
+	case "watching":
+		// The 1 is not ours. Never leave a recovery marker that could offer
+		// to force somebody else's setting back to 0.
+		c.removeMarker()
+		s.state = lidOn
+		s.watching = true
 		s.reason = ""
 	case "off":
 		s.state = lidOff
@@ -213,6 +274,14 @@ func (c *lidController) apply(r lid.Response) {
 		s.reason = "LidBatteryUnknown"
 	case "max-duration":
 		s.reason = "LidMaxDuration"
+	case "contested":
+		s.reason = "LidContested"
+		s.lastCode = "contested"
+		c.removeMarker()
+	case "external-release-failed":
+		s.reason = "LidExternalReleaseFailed"
+		s.lastCode = "external-release-failed"
+		c.removeMarker()
 	}
 }
 func (c *lidController) lost() {
@@ -224,6 +293,12 @@ func (c *lidController) lost() {
 	s.online = false
 	s.state = lidHelperGone
 	s.reason = "LidHelperGone"
+	// Only a watching lease needs reattaching: an owned lease still converges
+	// through its confirmed recovery path and must not keep a stale intent.
+	if (s.watching || c.lastWatching) && !s.rearmPending {
+		s.rearmPending = true
+		c.rearmSince = c.clock()
+	}
 	c.readStale()
 }
 func (c *lidController) readStale() {
@@ -329,18 +404,28 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 		return fail(key, key)
 	}
 	if c.power != nil {
-		kind, p, err := c.power.Source()
-		if err != nil || p < 0 || p > 100 || kind == "battery" && p <= min {
+		// The same Plugged rule as the helper: an adapter description or AC
+		// power suppresses the low-battery protection.
+		sample, err := c.power.Sample()
+		s.adapter = lid.AdapterLabel(sample.Adapter)
+		if err != nil || sample.Percent < 0 || sample.Percent > 100 || !lid.Plugged(sample) && sample.Percent <= min {
 			return fail("LidBatteryTooLow", "LidBatteryTooLow")
 		}
 	}
-	// Refuse foreign values before presenting any authorization.
+	// A foreign 1 is not a failure when a helper can register a watching
+	// lease. A nil connection at this point may just mean this launch has not
+	// dialed yet, so reach the observer before refusing: without a helper
+	// nobody can watch the value and no intention may be registered.
 	if value, err := c.read(); err != nil {
 		return fail("LidEnableFailed", "pmset-read-failed")
 	} else if value == 1 && s.state != lidOn && c.connection == nil {
-		c.readStale()
-		if !s.ours {
-			return fail("LidForeign", "LidForeign")
+		_ = c.connect()
+		if c.connection == nil {
+			c.readStale()
+			s.online = false
+			if !s.ours {
+				return fail("LidForeign", "LidForeign")
+			}
 		}
 	}
 	if s.service == svcRequiresApproval {
@@ -363,7 +448,12 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 			return fail("LidAuthNeeded", "LidAuthNeeded")
 		}
 		if c.connection != nil || c.markerExists() {
-			if err := c.stopLocked(); err != nil {
+			// An external 1 without our marker is not our liability: let this
+			// authorized update proceed to Register instead of stopping at it.
+			c.allowForeignStop = authorize
+			err := c.stopLocked()
+			c.allowForeignStop = false
+			if err != nil {
 				return err
 			}
 		}
@@ -409,7 +499,10 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 	if err := c.connect(); err != nil {
 		return fail("LidServiceBroken", "LidServiceBroken")
 	}
-	req := lid.Request{Op: "enable", MinPercent: min}
+	// Every "want the lid" path (switch, CLI, URL, rearm) allows the helper
+	// to register the intention while another tool holds the 1. Renewals
+	// simply ignore the flag on the helper side.
+	req := lid.Request{Op: "enable", MinPercent: min, AdoptForeign: true}
 	if !end.IsZero() {
 		utc := end.UTC()
 		req.Deadline = &utc
@@ -423,7 +516,9 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 	// A renewal already saved by the helper may have an unknown readback
 	// during its grace period. Initial enable still requires confirmed 1.
 	grace := wasOn && r.OK && r.State == "on-ours" && r.Code == "pmset-failed" && (r.Value == nil || *r.Value == -1)
-	if !r.OK || r.State != "on-ours" || !grace && (r.Value == nil || *r.Value != 1) {
+	watchingOK := r.OK && r.State == "watching"
+	oursOK := r.OK && r.State == "on-ours" && (grace || r.Value != nil && *r.Value == 1)
+	if !watchingOK && !oursOK {
 		key := "LidEnableFailed"
 		switch r.Code {
 		case "foreign-setting":
@@ -439,7 +534,15 @@ func (c *lidController) enable(end time.Time, min int, authorize bool) error {
 		}
 		return fail(key, code)
 	}
-	if err = c.writeMarker(rand.Text()); err != nil {
+	if watchingOK {
+		// No write, therefore no liability to mark. Drop any stale marker so
+		// the force-restore entry can never target another tool's 1.
+		if c.markerExists() {
+			if err = c.removeMarker(); err != nil {
+				return fail("LidRestoreFailed", "marker-remove-failed")
+			}
+		}
+	} else if err = c.writeMarker(rand.Text()); err != nil {
 		// Do not leave an unmarked lease if the user directory cannot persist it.
 		if stopErr := c.stopLocked(); stopErr != nil {
 			return fail("LidRestoreFailed", "marker-write-restore-failed")
@@ -489,6 +592,9 @@ func (c *lidController) waitForHelper() error {
 
 func (c *lidController) stopLocked() error {
 	s := &c.snapshotValue
+	// A watching lease leaves the foreign 1 in place; its disable response
+	// intentionally does not read back 0.
+	watching := s.watching
 	if c.connection == nil {
 		if !c.markerExists() && s.state != lidOn && s.state != lidRestoreFailed {
 			return nil
@@ -514,7 +620,16 @@ func (c *lidController) stopLocked() error {
 		return errors.New("LidRestoreFailed")
 	}
 	c.apply(r)
-	if !r.OK || r.Value == nil || *r.Value != 0 {
+	confirmedZero := r.Value != nil && *r.Value == 0
+	watchingDone := watching && r.OK && r.State == "off"
+	if !r.OK || !confirmedZero && !watchingDone {
+		// During an authorized helper update, another tool may hold a 1 that
+		// we never wrote. Without our own marker there is nothing to restore.
+		if c.allowForeignStop && r.State == "on-foreign" && !c.markerExists() {
+			s.state = lidOff
+			s.reason = ""
+			return nil
+		}
 		if r.State == "on-foreign" {
 			return errors.New("LidForeign")
 		}
@@ -527,10 +642,12 @@ func (c *lidController) stopLocked() error {
 		s.reason = "LidRestoreFailed"
 		return errors.New(s.reason)
 	}
-	if err = c.removeMarker(); err != nil {
-		s.state = lidRestoreFailed
-		s.reason = "LidRestoreFailed"
-		return errors.New(s.reason)
+	if !watching {
+		if err = c.removeMarker(); err != nil {
+			s.state = lidRestoreFailed
+			s.reason = "LidRestoreFailed"
+			return errors.New(s.reason)
+		}
 	}
 	s.state = lidOff
 	return nil
@@ -541,7 +658,30 @@ func (c *lidController) stop() error {
 	}
 	c.mu.Lock()
 	defer func() { c.publish(); c.mu.Unlock() }()
-	return c.stopLocked()
+	err := c.stopLocked()
+	if err == nil {
+		c.snapshotValue.rearmPending = false
+		c.snapshotValue.watching = false
+		c.lastWatching = false
+		c.rearmSince = time.Time{}
+	}
+	return err
+}
+
+func (c *lidController) ensureMarker() {
+	c.mu.Lock()
+	defer func() { c.publish(); c.mu.Unlock() }()
+	s := &c.snapshotValue
+	if !s.online || s.state != lidOn || s.value != 1 || s.watching || c.markerExists() {
+		return
+	}
+	if err := c.writeMarker(rand.Text()); err != nil {
+		s.lastCode = "marker-write-failed"
+		if err := c.stopLocked(); err != nil {
+			return
+		}
+		s.state, s.reason, s.lastCode = lidBlocked, "LidEnableFailed", "marker-write-failed"
+	}
 }
 func (c *lidController) canForce() bool {
 	s := c.snapshot()

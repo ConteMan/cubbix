@@ -455,6 +455,9 @@ func (a *application) cliMessage(locale, action string) string {
 		if !state.Active {
 			return a.text(locale, "ToastAwakeOff")
 		}
+		if a.lid != nil && a.lid.snapshot().watching {
+			return a.text(locale, "LidWatching")
+		}
 		return a.awakeFeedbackMessage(locale, state.Session).Text
 	case cli.ActionAwakeStop:
 		return a.text(locale, "ToastAwakeOff")
@@ -509,6 +512,13 @@ func (a *application) cliState() *cli.State {
 	if a.lid != nil {
 		s := a.lid.snapshot()
 		awake.Lid.State = lidStateName(s.state)
+		// lidStateName only sees lidState; watching is an explicit override
+		// driven by the helper's state, not a new lidState value.
+		if s.state == lidOn && s.watching {
+			awake.Lid.State = "watching"
+		}
+		awake.Lid.Adapter = s.adapter
+		awake.Lid.Rewrites = s.rewrites
 		awake.Lid.LastCode = s.lastCode
 		awake.Lid.HelperVersion = s.helperVersion
 		awake.Lid.Hello = s.hello

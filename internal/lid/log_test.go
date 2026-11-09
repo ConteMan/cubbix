@@ -133,36 +133,41 @@ func TestPollingLogsOnlyChangesAndErrors(t *testing.T) {
 		}
 		return []byte(fmt.Sprint("SleepDisabled ", value)), nil
 	}, Logf: logf}
-	e, _, _, _ := fixture(t)
+	e, _, _, now := fixture(t)
 	e.Sleep, e.Logf = p, logf
-	e.Handle(1, request("ping"))
+	// Observation rides a 1s interval; advance the fake clock for each poll.
+	ping := func() Response {
+		*now = now.Add(ObserveInterval)
+		return e.Handle(1, request("ping"))
+	}
+	ping()
 	logs.Reset()
 	for range 20 {
-		e.Handle(1, request("ping"))
+		ping()
 	}
 	if logs.Len() != 0 {
 		t.Fatal("stable polling was noisy", logs.String())
 	}
 	value = 1
-	e.Handle(1, request("ping"))
+	ping()
 	if strings.Count(logs.String(), "pmset read") != 1 || !strings.Contains(logs.String(), "op=ping") || !strings.Contains(logs.String(), "state=on-foreign") {
 		t.Fatal(logs.String())
 	}
 	logs.Reset()
 	for range 20 {
-		e.Handle(1, request("ping"))
+		ping()
 	}
 	if logs.Len() != 0 {
 		t.Fatal(logs.String())
 	}
 	failed = true
-	e.Handle(1, request("ping"))
+	ping()
 	if !strings.Contains(logs.String(), "command-failed") {
 		t.Fatal(logs.String())
 	}
 	logs.Reset()
 	failed = false
-	e.Handle(1, request("ping"))
+	ping()
 	if !strings.Contains(logs.String(), "pmset read result=ok value=1") {
 		t.Fatal("missing read recovery", logs.String())
 	}
@@ -183,25 +188,29 @@ func TestPollingDeduplicatesFailuresAndRecovers(t *testing.T) {
 				}
 				return []byte(fmt.Sprint("SleepDisabled ", value)), nil
 			}, Logf: logf}
-			e, _, _, _ := fixture(t)
+			e, _, _, now := fixture(t)
 			e.Sleep, e.Logf = p, logf
+			ping := func() Response {
+				*now = now.Add(ObserveInterval)
+				return e.Handle(1, request("ping"))
+			}
 			logs.Reset()
-			e.Handle(1, request("ping"))
+			ping()
 			logs.Reset()
 			for range 250 {
-				e.Handle(1, request("ping"))
+				ping()
 			}
 			if logs.Len() != 0 {
 				t.Fatal("identical failure flooded logs", logs.String())
 			}
 			failed, malformed = false, true
-			e.Handle(1, request("ping"))
+			ping()
 			if strings.Count(logs.String(), "result=parse-failed") != 1 {
 				t.Fatal("changed read failure was not logged once", logs.String())
 			}
 			logs.Reset()
 			malformed = false
-			r := e.Handle(1, request("ping"))
+			r := ping()
 			want := "ok"
 			if value == 1 {
 				want = "foreign-setting"
@@ -213,7 +222,7 @@ func TestPollingDeduplicatesFailuresAndRecovers(t *testing.T) {
 				t.Fatal("recovery was not logged", logs.String())
 			}
 			logs.Reset()
-			e.Handle(1, request("ping"))
+			ping()
 			if logs.Len() != 0 {
 				t.Fatal("stable recovery was noisy", logs.String())
 			}
@@ -250,7 +259,7 @@ func TestReadFailureClearsWithoutLosingTerminationCode(t *testing.T) {
 	for _, code := range []string{"ok", "battery-low", "battery-unknown", "max-duration"} {
 		t.Run(code, func(t *testing.T) {
 			failed := true
-			e, _, _, _ := fixture(t)
+			e, _, _, now := fixture(t)
 			e.code = code
 			e.Sleep = &PMSet{Run: func(context.Context, string, ...string) ([]byte, error) {
 				if failed {
@@ -258,11 +267,15 @@ func TestReadFailureClearsWithoutLosingTerminationCode(t *testing.T) {
 				}
 				return []byte("SleepDisabled 0"), nil
 			}}
-			if r := e.Handle(1, request("ping")); r.Code != "pmset-failed" {
+			ping := func() Response {
+				*now = now.Add(ObserveInterval)
+				return e.Handle(1, request("ping"))
+			}
+			if r := ping(); r.Code != "pmset-failed" {
 				t.Fatal(r)
 			}
 			failed = false
-			if r := e.Handle(1, request("ping")); r.Code != code || r.Value == nil || *r.Value != 0 {
+			if r := ping(); r.Code != code || r.Value == nil || *r.Value != 0 {
 				t.Fatal("read recovery lost the previous termination code", r)
 			}
 		})

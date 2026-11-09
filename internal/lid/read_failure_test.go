@@ -72,13 +72,17 @@ func TestPMSetReadTimeoutHasIPCHeadroom(t *testing.T) {
 }
 
 func TestPersistentReadFailureKeepsUnconfirmedRecoveryJournal(t *testing.T) {
-	e, sleep, _, _ := fixture(t)
+	e, sleep, _, now := fixture(t)
 	enable(t, e)
 	e.Sleep = &failingObservation{fakeSleep: sleep, failures: 4}
-	for range 2 {
-		e.Handle(1, request("ping"))
+	var r Response
+	for i := range 3 {
+		*now = now.Add(ObserveInterval)
+		r = e.Handle(1, request("ping"))
+		if i < 2 && (r.State != "on-ours" || r.Code != "pmset-failed") {
+			t.Fatal("bounded read failures ended the lease early", r)
+		}
 	}
-	r := e.Handle(1, request("ping"))
 	if r.OK || r.State != "restore-failed" || r.Code != "restore-failed" || e.journal == nil {
 		t.Fatal("unconfirmed recovery lost its liability", r)
 	}

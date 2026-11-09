@@ -191,11 +191,40 @@ func (a *application) pollLid() {
 	a.finishLidPoll()
 }
 func (a *application) finishLidPoll() {
-	if a.lidBusy {
+	if a.lidBusy || a.lid == nil {
 		return
 	}
 	s := a.lid.snapshot()
 	state := a.awake.snapshot()
+	if s.rearmPending {
+		switch {
+		case !state.Active || !state.Session.Lid:
+			a.lid.setRearmPending(false)
+		case a.lid.rearmExpired():
+			// No helper for several leases: stop waiting and converge.
+			a.lid.setRearmPending(false)
+		case !s.online:
+			// The disconnect round must not clear the session's lid intent:
+			// the online round needs it to attach the observation again.
+			a.notifyLid(s.reason)
+			a.refreshAwake()
+			return
+		case state.Active && state.Session.Lid && s.state == lidBlocked && s.reason == "LidForeign":
+			// Reattach before any cleanup, without authorization or a write.
+			// The completion callback enters finishLidPoll again.
+			a.lid.setRearmPending(false)
+			a.enableLid(state.Session.End, false)
+			return
+		default:
+			// Any other reconnect state (off, contested, approval needed)
+			// falls through to the ordinary cleanup below.
+			a.lid.setRearmPending(false)
+		}
+	}
+	if state.Active && state.Session.Lid {
+		a.lid.ensureMarker()
+		s = a.lid.snapshot()
+	}
 	if state.Active && state.Session.Lid && s.state != lidOn {
 		a.setSessionLid(false)
 		// A lid failure only removes the lid extension. The ordinary
@@ -207,7 +236,7 @@ func (a *application) finishLidPoll() {
 }
 func (a *application) notifyLid(key string) {
 	switch key {
-	case "LidServiceBroken", "LidHelperNotRunning", "LidRestoreFailed", "LidHelperGone", "LidDenied", "LidForceRestoreFailed", "LidStaleSetting", "LidMaxDuration", "LidBatteryLow", "LidBatteryUnknown":
+	case "LidServiceBroken", "LidHelperNotRunning", "LidRestoreFailed", "LidHelperGone", "LidDenied", "LidForceRestoreFailed", "LidStaleSetting", "LidMaxDuration", "LidBatteryLow", "LidBatteryUnknown", "LidContested", "LidExternalReleaseFailed":
 	default:
 		return
 	}

@@ -29,7 +29,9 @@ func (s *signalSleep) Set(v int) error {
 
 type signalPower struct{}
 
-func (signalPower) Source() (string, int, error) { return "ac", 80, nil }
+func (signalPower) Sample() (lid.PowerSample, error) {
+	return lid.PowerSample{Kind: "ac", Percent: 80}, nil
+}
 
 // Only this isolated test child receives SIGTERM; it has fake power operations,
 // a temporary socket and journal, and no production helper startup path.

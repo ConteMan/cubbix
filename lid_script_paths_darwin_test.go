@@ -13,6 +13,7 @@ func TestLidScriptCommandsExist(t *testing.T) {
 	command := regexp.MustCompile(`(?m)(?:^|[\s;|&(!])(/(?:usr/)?s?bin/[A-Za-z0-9_.-]+)`)
 	for name, script := range map[string]string{
 		"install":   lidInstallScript,
+		"update":    lidUpdateScript,
 		"uninstall": lidUninstallScript,
 		"force":     lidForceScript,
 	} {

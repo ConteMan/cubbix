@@ -24,6 +24,7 @@ type menubarPanelState struct {
 type menubarPanelRows struct {
 	awake, json, empty bool
 	lid                bool
+	watching           bool // the lid row's second line
 	status             bool // the awake card's status line
 	documents          []*jsonDocument
 	folded             bool // the JSON windows hide behind one count row
@@ -116,6 +117,9 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 	if a.config.AwakeEnabled {
 		rows.awake = true
 		rows.lid = a.lidCapable()
+		if rows.lid && a.lid != nil {
+			rows.watching = a.lid.snapshot().watching
+		}
 		state := a.awake.snapshot()
 		rows.status = state.Active || state.Error != "" || a.menubarPanelErrorKey() != ""
 	}
@@ -167,6 +171,11 @@ func awakeCardHeight(t tokenValues, status bool, lidRow ...bool) float32 {
 	height := 2*t.Space10 + t.SizeNavHeight + t.Space8 + t.SizeSegmentHeight + t.Space8 + t.SizeButtonHeight
 	if len(lidRow) > 0 && lidRow[0] {
 		height += t.Space8 + t.SizeNavHeight
+		// The second line of the lid row must be counted here and in panelLid;
+		// changing only one of them clips the card.
+		if len(lidRow) > 1 && lidRow[1] {
+			height += lidWatchingLineHeight(t)
+		}
 	}
 	if status {
 		height += t.Space8 + t.Space20
@@ -189,7 +198,7 @@ func (a *application) menubarPanelHeight(t tokenValues) int {
 	height := 2 * t.Space12
 	cards := 0
 	if rows.awake {
-		height += awakeCardHeight(t, rows.status, rows.lid)
+		height += awakeCardHeight(t, rows.status, rows.lid, rows.watching)
 		cards++
 	}
 	if rows.json {
