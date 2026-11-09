@@ -329,6 +329,7 @@
   "TranslateCopied": "Copied",
   "TranslateSpeak": "Speak the source",
   "TranslateSpeakFailed": "Could not speak this text",
+  "TranslateSpeakStop": "Stop speaking",
   "TranslateNotConfigured": "No translation endpoint is configured",
   "TranslateOpenSettings": "Open translation settings",
   "TranslateAuthError": "The endpoint rejected the key. Check the API key.",

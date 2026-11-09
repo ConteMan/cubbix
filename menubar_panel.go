@@ -22,13 +22,13 @@ type menubarPanelState struct {
 // menubarPanelRows is what the panel draws. The height calculation and the
 // view read the same answer, so the flyout is exactly as tall as its content.
 type menubarPanelRows struct {
-	awake, json, empty bool
-	lid                bool
-	watching           bool // the lid row's second line
-	status             bool // the awake card's status line
-	documents          []*jsonDocument
-	folded             bool // the JSON windows hide behind one count row
-	listRows           int
+	awake, json, empty, translate bool
+	lid                           bool
+	watching                      bool // the lid row's second line
+	status                        bool // the awake card's status line
+	documents                     []*jsonDocument
+	folded                        bool // the JSON windows hide behind one count row
+	listRows                      int
 }
 
 // toggleMenubarPanel is the tray icon's left click: it opens the card panel,
@@ -124,6 +124,9 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 		state := a.awake.snapshot()
 		rows.status = state.Active || state.Error != "" || a.menubarPanelErrorKey() != ""
 	}
+	if a.config.TranslateEnabled {
+		rows.translate = true
+	}
 	if a.config.JSONEnabled {
 		rows.json = true
 		rows.documents = a.openJSONDocuments()
@@ -138,7 +141,7 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 			rows.listRows = len(rows.documents)
 		}
 	}
-	rows.empty = !rows.awake && !rows.json
+	rows.empty = !rows.awake && !rows.json && !rows.translate
 	return rows
 }
 
@@ -192,6 +195,12 @@ func jsonCardHeight(t tokenValues, listRows int) float32 {
 	return height
 }
 
+// translateCardHeight is the single-row translate card: the title row plus
+// Space8 of vertical padding. It carries no status and no recent translation.
+func translateCardHeight(t tokenValues) float32 {
+	return t.SizeNavHeight + t.Space8
+}
+
 // menubarPanelHeight is the content height of the panel for the current rows.
 // The flyout defaults to 200×200, so every change goes through SetContentSize.
 func (a *application) menubarPanelHeight(t tokenValues) int {
@@ -204,6 +213,10 @@ func (a *application) menubarPanelHeight(t tokenValues) int {
 	}
 	if rows.json {
 		height += jsonCardHeight(t, rows.listRows)
+		cards++
+	}
+	if rows.translate {
+		height += translateCardHeight(t)
 		cards++
 	}
 	if rows.empty {
@@ -306,6 +319,13 @@ func (a *application) panelToggleJSONWindows() {
 	}
 	a.panel.expanded = !a.panel.expanded
 	a.refreshMenubarPanel()
+}
+
+// panelOpenTranslate is the card's only action: close the card panel and
+// open the floating panel with an empty, focused input.
+func (a *application) panelOpenTranslate() {
+	a.hideMenubarPanel()
+	a.openTranslateText("")
 }
 
 // panelNewJSON creates a window from the clipboard. The new window takes the

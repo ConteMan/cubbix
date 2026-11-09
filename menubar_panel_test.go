@@ -284,7 +284,7 @@ func TestMenubarPanelProcessEndedWarning(t *testing.T) {
 		}
 		// The warning sits in its own row, so the card grows by one.
 		token := tokens(false, locale)
-		if got, want := a.menubarPanelHeight(token), int(2*token.Space12+awakeCardHeight(token, true)+token.Space8+jsonCardHeight(token, 0)+token.Space8+token.StrokeHairline+token.SizeNavHeight); got != want {
+		if got, want := a.menubarPanelHeight(token), int(2*token.Space12+awakeCardHeight(token, true)+token.Space8+jsonCardHeight(token, 0)+token.Space8+translateCardHeight(token)+token.Space8+token.StrokeHairline+token.SizeNavHeight); got != want {
 			t.Fatalf("%s: height with warning = %d, want %d", locale, got, want)
 		}
 	}
@@ -390,6 +390,7 @@ func TestMenubarPanelTileToggles(t *testing.T) {
 	a := panelTestApp(t)
 	a.config.AwakeEnabled = false
 	a.config.JSONEnabled = false
+	a.config.TranslateEnabled = false
 	a.toggleMenubarPanel()
 	tt := panelView(a, "en")
 	if !tt.HasText(a.text("en", "PanelEmpty")) {
@@ -428,15 +429,19 @@ func TestContextMenuKeepsOnlySystemActions(t *testing.T) {
 
 func TestMenubarPanelHeight(t *testing.T) {
 	tt := tokens(false, "zh-CN")
+	// The translate card is a third tile by default: one card and the gap
+	// before it. With every other module off it replaces the empty row.
+	extra := int(translateCardHeight(tt) + tt.Space8)
+	emptyWithTranslate := int(2*tt.Space12 + translateCardHeight(tt) + tt.Space8 + tt.StrokeHairline + tt.SizeNavHeight)
 	cases := []struct {
 		name        string
 		awake, json bool
 		want        int
 	}{
-		{"both tiles, no windows", true, true, 249},
-		{"awake only", true, false, 189},
-		{"json only", false, true, 117},
-		{"all tiles off", false, false, 97},
+		{"both tiles, no windows", true, true, 249 + extra},
+		{"awake only", true, false, 189 + extra},
+		{"json only", false, true, 117 + extra},
+		{"all tiles off", false, false, emptyWithTranslate},
 	}
 	for _, c := range cases {
 		a := panelTestApp(t)
@@ -451,8 +456,8 @@ func TestMenubarPanelHeight(t *testing.T) {
 		t.Fatal(err)
 	}
 	withStatus := a.menubarPanelHeight(tt)
-	if withStatus != 277 {
-		t.Fatalf("height with status = %d, want 277", withStatus)
+	if withStatus != 277+extra {
+		t.Fatalf("height with status = %d, want %d", withStatus, 277+extra)
 	}
 	a.awake.stop()
 	withoutStatus := a.menubarPanelHeight(tt)
@@ -460,7 +465,7 @@ func TestMenubarPanelHeight(t *testing.T) {
 		t.Fatalf("status row = %d", withStatus-withoutStatus)
 	}
 	// Each JSON window adds a row and one small gap.
-	three := 249 + 3*int(tt.SizeNavHeight) + 2*int(tt.Space2) + int(tt.Space8)
+	three := 249 + extra + 3*int(tt.SizeNavHeight) + 2*int(tt.Space2) + int(tt.Space8)
 	for index := range 3 {
 		a.addJSONDocument("", fmt.Sprintf("row-%d.json", index), true)
 	}
@@ -471,12 +476,12 @@ func TestMenubarPanelHeight(t *testing.T) {
 	for index := range 4 {
 		a.addJSONDocument("", fmt.Sprintf("more-%d.json", index), true)
 	}
-	folded := 249 + int(tt.SizeNavHeight+tt.Space8)
+	folded := 249 + extra + int(tt.SizeNavHeight+tt.Space8)
 	if got := a.menubarPanelHeight(tt); got != folded {
 		t.Fatalf("folded height = %d, want %d", got, folded)
 	}
 	a.panel = &menubarPanelState{expanded: true}
-	expanded := 249 + 7*int(tt.SizeNavHeight) + 6*int(tt.Space2) + int(tt.Space8) + int(tt.SizeNavHeight+tt.Space2)
+	expanded := 249 + extra + 7*int(tt.SizeNavHeight) + 6*int(tt.Space2) + int(tt.Space8) + int(tt.SizeNavHeight+tt.Space2)
 	if got := a.menubarPanelHeight(tt); got != expanded {
 		t.Fatalf("expanded height = %d, want %d", got, expanded)
 	}
