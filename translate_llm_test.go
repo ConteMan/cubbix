@@ -359,6 +359,18 @@ func TestBuildTranslateMessages(t *testing.T) {
 	if word[0].Content == zh[0].Content {
 		t.Fatal("word and sentence share one instruction")
 	}
+	// A word gets a short Simplified Chinese gloss, not a long dictionary
+	// entry with phonetics, parts of speech, examples or etymology.
+	for _, fragment := range []string{"Simplified Chinese", "brief", "gloss", "Do not add phonetics", "dictionary-style detail"} {
+		if !strings.Contains(word[0].Content, fragment) {
+			t.Fatalf("word instruction misses %q: %q", fragment, word[0].Content)
+		}
+	}
+	wordEnglish := buildTranslateMessages("auto", "en", "hello", true)
+	if !strings.Contains(wordEnglish[0].Content, "brief English gloss") ||
+		strings.Contains(wordEnglish[0].Content, "Simplified Chinese gloss") {
+		t.Fatalf("swapped word instruction = %q", wordEnglish[0].Content)
+	}
 	raw := "line 1\n\"quotes\" and %s"
 	messages := buildTranslateMessages("auto", "zh-Hans", raw, false)
 	if messages[1].Content != raw {

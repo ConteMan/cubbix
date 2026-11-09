@@ -34,7 +34,7 @@ func clampTranslate(value, low, high float32) float32 {
 
 // translateResultHeight is 44 for the empty state; from loading onwards the
 // lower bound is 64 (two rows), and the upper bound is SizeTranslateResultMax.
-// Words with a dictionary block are measured in a later step.
+// The dictionary block below it has its own fixed height.
 func (a *application) translateResultHeight(t tokenValues, s *translateState) float32 {
 	needed := 2*t.Space12 + float32(translateResultLines(s.output))*t.FontSizeBody*t.LineHeightBody
 	switch s.phase {
@@ -46,21 +46,47 @@ func (a *application) translateResultHeight(t tokenValues, s *translateState) fl
 	return clampTranslate(needed, 64, t.SizeTranslateResultMax)
 }
 
+// dictionaryHeaderHeight is the folded row (chevron + label).
+func dictionaryHeaderHeight(t tokenValues) float32 { return t.Space20 + t.Space4 }
+
+// dictionaryBodyHeight is the expanded preview: the first few lines, bounded
+// by SizeTranslateDictionaryMax. Longer definitions scroll inside the block.
+func dictionaryBodyHeight(t tokenValues) float32 {
+	return clampTranslate(t.SizeTranslateDictionaryPreviewLines*t.FontSizeSmall*t.LineHeightBody,
+		0, t.SizeTranslateDictionaryMax)
+}
+
+// dictionaryBlockHeight includes the block's own padding. Collapsed it is
+// only the header row; expanded it adds the preview body.
+func dictionaryBlockHeight(t tokenValues, expanded bool) float32 {
+	height := 2*(t.Space12+t.StrokeHairline) + dictionaryHeaderHeight(t)
+	if expanded {
+		height += dictionaryBodyHeight(t)
+	}
+	return height
+}
+
 // translateHeight is the panel height (without the shadow margin). Its only
 // inputs are tokens and state, so it can be asserted without a window.
+func translateNonResultHeight(t tokenValues, s *translateState) float32 {
+	input := t.SizeTranslateInputBase + float32(translateInputLines(s.input)-1)*t.SizeTranslateInputLine
+	height := t.Space12 + input + t.Space8 + t.SizeTranslateDirectionHeight + t.Space8 + t.Space12 + 2*t.StrokeHairline
+	if s.clipped > 0 {
+		height += t.FontSizeSmall*t.LineHeightBody + t.Space8
+	}
+	// The separator sits between the translation and the dictionary, with a
+	// Space8 gap on each side contributed by the panel column.
+	if strings.TrimSpace(s.dictionary) != "" {
+		height += t.Space8 + t.StrokeHairline + t.Space8 + dictionaryBlockHeight(t, s.dictionaryExpanded)
+	}
+	return height
+}
+
 func (a *application) translateHeight(t tokenValues, s *translateState) float32 {
 	if s == nil {
 		return t.SizeTranslateMinHeight
 	}
-	input := t.SizeTranslateInputBase + float32(translateInputLines(s.input)-1)*t.SizeTranslateInputLine
-	result := float32(44)
-	if s.phase != translateEmpty {
-		result = a.translateResultHeight(t, s)
-	}
-	height := t.Space12 + input + t.Space8 + t.SizeTranslateDirectionHeight + t.Space8 + result + t.Space12
-	if s.clipped > 0 {
-		height += t.FontSizeSmall*t.LineHeightBody + t.Space4
-	}
+	height := translateNonResultHeight(t, s) + a.translateResultHeightForState(t, s)
 	return clampTranslate(height, t.SizeTranslateMinHeight, t.SizeTranslateMaxHeight)
 }
 
@@ -83,12 +109,17 @@ func (a *application) translateView(c *ui.Context) {
 			InsetShadow(0, 0, 0, t.StrokeHairline, ui.Hex(t.ColorPanelStrokeInner)).
 			Shadow(0, t.Space8, t.Space24, 0, ui.Hex(t.ColorPanelShadow)).Children(func() {
 			a.translateInputArea(c, t, locale, s)
-			a.translateDirectionRow(c, t, locale, s)
-			a.translateResultBlock(c, t, locale, s)
 			if s.clipped > 0 {
 				ui.Text(c, fmt.Sprintf(text("TranslateTooLong"), maxTranslateInput)).
 					Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).
 					LineHeight(t.LineHeightBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+			}
+			a.translateDirectionRow(c, t, locale, s)
+			a.translateResultBlock(c, t, locale, s)
+			if strings.TrimSpace(s.dictionary) != "" {
+				ui.Box(c.Key("translate-dictionary-separator")).FillWidth().
+					Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
+				a.translateDictionaryBlock(c, t, locale, s)
 			}
 		})
 	})
@@ -164,7 +195,48 @@ func (a *application) translateResultHeightForState(t tokenValues, s *translateS
 	if s.phase == translateEmpty {
 		return 44
 	}
-	return a.translateResultHeight(t, s)
+	return min(a.translateResultHeight(t, s), t.SizeTranslateMaxHeight-translateNonResultHeight(t, s))
+}
+
+// translateDictionaryBlock draws the local definition below the translation.
+// The header row is the fold button; expanded, the plain text is split into
+// readable lines and scrolls inside a bounded preview area.
+func (a *application) translateDictionaryBlock(c *ui.Context, t tokenValues, locale string, s *translateState) {
+	text := func(key string) string { return a.text(locale, key) }
+	label := text("TranslateDictionary")
+	glyph, tooltip := "chevron-down", text("TranslateDictionaryCollapse")
+	if !s.dictionaryExpanded {
+		glyph, tooltip = "chevron-right", text("TranslateDictionaryExpand")
+	}
+	ui.Column(c.Key("translate-dictionary")).FillWidth().
+		Height(dictionaryBlockHeight(t, s.dictionaryExpanded)).Radius(t.RadiusCard).
+		Background(ui.Hex(t.ColorCard)).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
+		Padding(t.Space12).Children(func() {
+		header := ui.ButtonBase(c.Key("translate-dictionary-toggle")).FillWidth().
+			Height(dictionaryHeaderHeight(t)).Justify(ui.Start).AlignItems(ui.Center).
+			FocusRing(true).Label(label).Tooltip(tooltip).OnClick(a.toggleDictionary)
+		header.Children(func() {
+			ui.Row(c).Gap(t.Space4).AlignItems(ui.Center).Children(func() {
+				ui.Icon(c, icon(glyph)).Size(t.SizeIconSmall, t.SizeIconSmall).
+					TextColor(ui.Hex(t.ColorTextSecondary))
+				ui.Text(c, label).FontSize(t.FontSizeSmall).LineHeight(t.LineHeightBody).
+					TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+			})
+		})
+		if !s.dictionaryExpanded {
+			return
+		}
+		ui.Scroll(c.Key("translate-dictionary-body")).FillWidth().
+			Height(dictionaryBodyHeight(t)).AlignItems(ui.Start).Justify(ui.Start).Children(func() {
+			ui.Column(c).FillWidth().AlignItems(ui.Start).Children(func() {
+				for _, segment := range dictionarySegments(s.dictionary) {
+					ui.Text(c, segment).FillWidth().FontSize(t.FontSizeSmall).
+						LineHeight(t.LineHeightBody).TextColor(ui.Hex(t.ColorTextSecondary)).
+						Selectable().Label(segment)
+				}
+			})
+		})
+	})
 }
 
 func (a *application) translateResultContent(c *ui.Context, t tokenValues, locale string, s *translateState) {

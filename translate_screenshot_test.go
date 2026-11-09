@@ -6,11 +6,17 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/egoist/mygo/ui"
 )
+
+// A synthetic plain-text definition with the shape the local dictionary
+// returns (head, phonetics, parts of speech, senses, origin). No screenshot
+// or assertion depends on the wording of an installed dictionary.
+const dictionaryScreenshotDefinition = "serendipity ser·en·dip·i·ty | ˌserənˈdipədē | noun 1 an unexpected but fortunate discovery: a fortunate stroke of serendipity. • a series of small discoveries made by chance. 2 the faculty of making such discoveries. ORIGIN coined in the eighteenth century, after a tale of three princes."
 
 func renderTranslateSettingsScreenshot(a *application, locale string, dark bool) *ui.Tester {
 	tester := ui.NewTester(a.view, 720, settingsWindowHeight)
@@ -21,6 +27,37 @@ func renderTranslateSettingsScreenshot(a *application, locale string, dark bool)
 	tester.Advance(300 * time.Millisecond)
 	tester.Frame()
 	return tester
+}
+
+// renderTranslatePanelScreenshot advances virtual time past the theme colour
+// transition before the captured frame, so a dark capture is fully dark.
+func renderTranslatePanelScreenshot(a *application, locale string, dark bool) *ui.Tester {
+	tk := tokens(dark, locale)
+	width := int(tk.SizeTranslateWidth) + 2*int(tk.SizePaletteShadowMargin)
+	height := int(a.translateHeight(tk, a.translate)) + 2*int(tk.SizePaletteShadowMargin)
+	tester := ui.NewTester(a.translateView, width, height)
+	tester.SetScale(2)
+	tester.SetLocale(locale)
+	tester.SetDark(dark)
+	tester.Frame()
+	tester.Advance(700 * time.Millisecond)
+	tester.Frame()
+	return tester
+}
+
+func saveTranslateEvidence(t *testing.T, dir, name string, img *image.RGBA) {
+	t.Helper()
+	file, err := os.Create(filepath.Join(dir, name+".png"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := png.Encode(file, img); err != nil {
+		file.Close()
+		t.Fatal(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Fatal(err)
+	}
 }
 
 // TestTranslateScreenshots renders the floating panel and its settings page
@@ -36,20 +73,6 @@ func TestTranslateScreenshots(t *testing.T) {
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		t.Fatal(err)
 	}
-	save := func(name string, img *image.RGBA) {
-		t.Helper()
-		file, err := os.Create(filepath.Join(dir, name+".png"))
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := png.Encode(file, img); err != nil {
-			file.Close()
-			t.Fatal(err)
-		}
-		if err := file.Close(); err != nil {
-			t.Fatal(err)
-		}
-	}
 	for _, locale := range []string{"zh-CN", "en"} {
 		for _, dark := range []bool{false, true} {
 			mode := "light"
@@ -63,7 +86,7 @@ func TestTranslateScreenshots(t *testing.T) {
 			a.translateKeySaved = true
 			a.translateModelList = []string{"group/one", "provider/two"}
 			tt := renderTranslateSettingsScreenshot(a, locale, dark)
-			save(fmt.Sprintf("translate-settings-%s", suffix), tt.Image())
+			saveTranslateEvidence(t, dir, fmt.Sprintf("translate-settings-%s", suffix), tt.Image())
 			// The floating panel in its finished state.
 			b := translateTestApp(t)
 			s := b.ensureTranslateState()
@@ -73,15 +96,70 @@ func TestTranslateScreenshots(t *testing.T) {
 				s.output = "Hello, world — translated"
 			}
 			s.phase = translateDone
-			tk := tokens(dark, locale)
-			width := int(tk.SizeTranslateWidth) + 2*int(tk.SizePaletteShadowMargin)
-			height := int(b.translateHeight(tk, s)) + 2*int(tk.SizePaletteShadowMargin)
-			panel := ui.NewTester(b.translateView, width, height)
-			panel.SetScale(2)
-			panel.SetLocale(locale)
-			panel.SetDark(dark)
-			panel.Frame()
-			save(fmt.Sprintf("translate-panel-%s", suffix), panel.Image())
+			saveTranslateEvidence(t, dir, fmt.Sprintf("translate-panel-%s", suffix),
+				renderTranslatePanelScreenshot(b, locale, dark).Image())
+		}
+	}
+}
+
+// TestTranslateDictionaryScreenshots captures the three word states in both
+// languages and both themes. CUBBIX_TRANSLATE_DICT_EVIDENCE points at a
+// directory outside the repository; without it the test does nothing.
+func TestTranslateDictionaryScreenshots(t *testing.T) {
+	dir := os.Getenv("CUBBIX_TRANSLATE_DICT_EVIDENCE")
+	if dir == "" {
+		t.Skip("dictionary evidence not requested")
+	}
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, dark := range []bool{false, true} {
+			mode := "light"
+			if dark {
+				mode = "dark"
+			}
+			suffix := locale + "-" + mode
+			for _, state := range []struct {
+				name     string
+				failed   bool
+				expanded bool
+			}{
+				{"expanded", false, true},
+				{"collapsed", false, false},
+				{"failed", true, true},
+				{"capped", false, true},
+			} {
+				a := translateTestApp(t)
+				s := a.ensureTranslateState()
+				s.input = "serendipity"
+				s.dictionary = dictionaryScreenshotDefinition
+				s.dictionaryExpanded = state.expanded
+				if state.failed {
+					s.phase, s.errorKey, s.output = translateFailed, "TranslateNetworkError", ""
+				} else {
+					s.phase = translateDone
+					s.output = "机缘巧合；意外发现美好事物的运气"
+					if locale == "en" {
+						s.output = "a fortunate discovery made by chance"
+					}
+				}
+				if state.name == "capped" {
+					s.output = strings.Repeat(s.output+"\n", 100)
+				}
+				name := fmt.Sprintf("translate-word-%s-%s", state.name, suffix)
+				tester := renderTranslatePanelScreenshot(a, locale, dark)
+				saveTranslateEvidence(t, dir, name, tester.Image())
+				if state.name == "capped" {
+					header, ok := tester.Find(a.text(locale, "TranslateDictionary"))
+					if !ok {
+						t.Fatal("dictionary header missing")
+					}
+					tester.Scroll(header.X+header.W/2, header.Y+header.H+8, 0, 10000)
+					tester.Frame()
+					saveTranslateEvidence(t, dir, fmt.Sprintf("translate-word-capped-scrolled-%s", suffix), tester.Image())
+				}
+			}
 		}
 	}
 }

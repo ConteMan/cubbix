@@ -116,6 +116,7 @@ type application struct {
 	translateStreamFn       translateStreamFunc
 	translateModelsFn       translateModelsFunc
 	translateTestFn         translateTestFunc
+	translateDictionaryFn   func(string) string
 	translateCopy           func(string) error
 	createTranslateWindow   func(*translateState)
 	// quiet silences the hint and the lid notification for one command line
@@ -202,6 +203,7 @@ func newApplication(path string) (*application, error) {
 	a.translateSecret = mygo.Secrets
 	a.translateRunOnMain = mygo.RunOnMain
 	a.translateAsync = true
+	a.translateDictionaryFn = dictionaryDefinition
 	a.translateCopy = defaultTranslateCopy
 	a.createJSONWindow = a.buildJSONWindow
 	a.presentJSONWindow = a.focusJSONWindow
