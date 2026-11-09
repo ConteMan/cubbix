@@ -194,7 +194,7 @@ func TestCLISettingsRowStates(t *testing.T) {
 				cliPathsFor = func() (cliPaths, bool) { return translocated, true }
 				restore = func() { cliPathsFor = original }
 			}
-			tt := ui.NewTester(a.view, 720, 388)
+			tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 			tt.SetLocale(locale)
 			if _, found := tt.Find(a.text(locale, "CLIName")); !found {
 				t.Fatalf("%s/%s: missing row: %v", state, locale, tt.Texts())
@@ -281,7 +281,7 @@ func TestCLISettingsRowHiddenWithoutBinary(t *testing.T) {
 func TestCLISettingsInstallClick(t *testing.T) {
 	paths, a := settingsTestPaths(t)
 	a.page = settingsGeneral
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("en")
 	title, ok := tt.Find(a.text("en", "CLIName"))
 	if !ok {

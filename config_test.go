@@ -34,7 +34,7 @@ func TestConfigRoundTrip(t *testing.T) {
 	if err != nil || !reflect.DeepEqual(initial, defaultConfig()) {
 		t.Fatalf("default config = %#v, %v", initial, err)
 	}
-	want := Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "en", OpenAtLogin: true, FeedbackMode: "hint", FeedbackCorner: "top-right", AutomaticUpdates: true, JSONSplit: jsonSplitDefault, PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, WindowPlacement: "cursor"}
+	want := Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "en", OpenAtLogin: true, FeedbackMode: "hint", FeedbackCorner: "top-right", AutomaticUpdates: true, JSONSplit: jsonSplitDefault, PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, WindowPlacement: "cursor", TranslateEnabled: true, TranslateShortcut: defaultTranslateKey, TranslateAutoSpeak: true}
 	if err := saveConfig(path, want); err != nil {
 		t.Fatal(err)
 	}
@@ -135,7 +135,7 @@ func TestWindowSizePersistsAndOldConfigStillLoads(t *testing.T) {
 		t.Fatal(err)
 	}
 	w, h := settingsSize(c.WindowWidth, c.WindowHeight)
-	if w != 720 || h != 388 || c.AutomaticUpdates {
+	if w != 720 || h != settingsWindowHeight || c.AutomaticUpdates {
 		t.Fatalf("old config: %+v", c)
 	}
 	c.WindowWidth, c.WindowHeight = 1000, 600

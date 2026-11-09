@@ -23,6 +23,13 @@ func awakeTestApp(t *testing.T) *application {
 	a.registerShortcut = func(string, func()) error { return nil }
 	a.unregisterShortcut = func(string) {}
 	a.moduleAsync = false
+	// Translation seams: no native window, no real keychain, no real
+	// shortcuts, no network and no main-thread loop in any test.
+	a.createTranslateWindow = nil
+	a.translateAsync = false
+	a.translateRunOnMain = func(fn func()) { fn() }
+	a.translateSecret = newFakeTranslateSecrets()
+	a.translateCopy = func(string) error { return nil }
 	a.awake, _ = fakeAwake(time.Now())
 	a.awake.changed = a.awakeChanged
 	// No test opens a hint window or asks for notification permission.
@@ -132,7 +139,7 @@ func TestShortcutRecorderCommitConflictAndEscape(t *testing.T) {
 		return false
 	}
 	old := a.config.AwakeShortcut
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("en")
 	if err := tt.Click("Record keep awake shortcut"); err != nil {
 		t.Fatal(err)

@@ -73,10 +73,10 @@ func TestPlacementRowsFollowTheDisplayCount(t *testing.T) {
 			t.Fatalf("%s: natural height = %d; want %d", c.name, got, c.natural)
 		}
 		// Every state keeps the window floor: a page never shrinks it.
-		if got := settingsHeight(tk, settingsGeneral, true, l.showPlacement, l.fixedDisplay, true, false); got != 388 {
+		if got := settingsHeight(tk, settingsGeneral, true, l.showPlacement, l.fixedDisplay, true, false); got != settingsWindowHeight {
 			t.Fatalf("%s: window height = %d", c.name, got)
 		}
-		tt := ui.NewTester(a.view, 720, 388)
+		tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 		tt.SetLocale("en")
 		tt.Frame()
 		if has := tt.HasText(a.text("en", "WindowPlacement")); has != c.showPlacement {
@@ -87,7 +87,7 @@ func TestPlacementRowsFollowTheDisplayCount(t *testing.T) {
 		}
 		// The whole page fits the minimum window: nothing is clipped.
 		if c.fixed {
-			if rect, ok := tt.Find("Studio Display"); !ok || rect.Y+rect.H > 388-24 {
+			if rect, ok := tt.Find("Studio Display"); !ok || rect.Y+rect.H > settingsWindowHeight-24 {
 				t.Fatalf("%s: the display row is clipped: %+v %v", c.name, rect, ok)
 			}
 		}
@@ -97,7 +97,7 @@ func TestPlacementRowsFollowTheDisplayCount(t *testing.T) {
 	if got := pageHeight(tk, settingsGeneral, true, true, true, false, false); got != 291 {
 		t.Fatalf("no CLI: content = %v; want 291", got)
 	}
-	if got := settingsHeight(tk, settingsGeneral, true, false, false, false, false); got != 388 {
+	if got := settingsHeight(tk, settingsGeneral, true, false, false, false, false); got != settingsWindowHeight {
 		t.Fatalf("no CLI, one display: window height = %d", got)
 	}
 }
@@ -147,7 +147,7 @@ func TestDisplayChoiceCommitsTheFallback(t *testing.T) {
 	a.config.WindowDisplayID = 99
 	a.config.WindowDisplay = "Gone"
 	a.config.WindowDisplaySize = "1280x720"
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("en")
 	if !tt.HasText(a.text("en", "WindowDisplayMissing")) {
 		t.Fatalf("missing the fallback alert: %v", tt.Texts())
@@ -194,7 +194,7 @@ func TestDisplayMenuKeyboardAndScrolling(t *testing.T) {
 	a.config.WindowDisplayID = 1
 	a.config.WindowDisplay = "Built-in"
 	a.config.WindowDisplaySize = "1440x900"
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("en")
 	// Opening the menu lays the options out in a bounded, scrolling list.
 	if err := tt.Click("Built-in"); err != nil {
@@ -265,7 +265,7 @@ func TestPlacementInfoIsAccessible(t *testing.T) {
 	a.config.WindowPlacement = "display"
 	a.config.WindowDisplayID = 99
 	a.config.WindowDisplay = "Gone"
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("zh-CN")
 	tt.Frame()
 	info := a.text("zh-CN", "WindowPlacementInfo")
@@ -360,13 +360,13 @@ func TestWindowPlacementConfigCompatibility(t *testing.T) {
 		t.Fatalf("round trip = %+v", loaded)
 	}
 	// An old height is raised to the 008 floor; a larger one is kept.
-	if width, height := settingsSize(720, 368); width != 720 || height != 388 {
+	if width, height := settingsSize(720, 368); width != 720 || height != settingsWindowHeight {
 		t.Fatalf("settingsSize(720, 368) = %dx%d", width, height)
 	}
 	if width, height := settingsSize(900, 520); width != 900 || height != 520 {
 		t.Fatalf("settingsSize(900, 520) = %dx%d", width, height)
 	}
-	if width, height := settingsSize(600, 200); width != 720 || height != 388 {
+	if width, height := settingsSize(600, 200); width != 720 || height != settingsWindowHeight {
 		t.Fatalf("settingsSize(600, 200) = %dx%d", width, height)
 	}
 }

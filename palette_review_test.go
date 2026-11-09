@@ -197,7 +197,7 @@ func TestAwakeMinutesRejectOverflowAndSplitDigits(t *testing.T) {
 	}
 }
 
-func TestShortcutRecordingOwnsAllFourSlots(t *testing.T) {
+func TestShortcutRecordingOwnsAllFiveSlots(t *testing.T) {
 	a := awakeTestApp(t)
 	registered := map[string]func(){}
 	a.registerShortcut = func(acc string, fn func()) error {
@@ -225,12 +225,12 @@ func TestShortcutRecordingOwnsAllFourSlots(t *testing.T) {
 		t.Fatal("conflicting shortcut committed")
 	}
 	a.recordShortcut(ui.Alt, ui.KeyComma)
-	if a.shortcutRecording || a.config.PaletteShortcut != "Alt+," || len(registered) != 4 {
+	if a.shortcutRecording || a.config.PaletteShortcut != "Alt+," || len(registered) != 5 {
 		t.Fatal("new shortcut not immediately restored")
 	}
 	a.beginTileShortcutRecording("palette")
 	a.cancelShortcutRecording()
-	if len(registered) != 4 {
+	if len(registered) != 5 {
 		t.Fatal("cancel did not restore all slots")
 	}
 	config, err := loadConfig(a.path)

@@ -854,6 +854,8 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 			page = settingsAwake
 		case "json":
 			page = settingsJSON
+		case "translate":
+			page = settingsTranslate
 		case "shortcuts":
 			page = settingsShortcuts
 		case "about":

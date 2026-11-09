@@ -22,7 +22,7 @@ Commands:
   status               Print keep awake, JSON windows and version
   json new [options]   Open a JSON window  (--text STR | --file PATH | --blank)
   palette              Open the command palette
-  settings [--page P]  Open Settings  (general|awake|json|shortcuts|about)
+  settings [--page P]  Open Settings  (general|awake|json|translate|shortcuts|about)
   version              Print the version of this tool and its app bundle
   help [command]       Show this help
 
@@ -40,7 +40,7 @@ Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
 `
 
 // tiles stays accepted: scripts in the wild still name the old page.
-var settingsPages = map[string]bool{"general": true, "awake": true, "tiles": true, "json": true, "shortcuts": true, "about": true}
+var settingsPages = map[string]bool{"general": true, "awake": true, "tiles": true, "json": true, "translate": true, "shortcuts": true, "about": true}
 
 // parse reads the command line. Every mistake is a usage error.
 func parse(argv []string) (inv invocation, err error) {

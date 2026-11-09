@@ -92,13 +92,13 @@ func hasAccessibleText(tt *ui.Tester, s string) bool {
 func TestSettingsPagesRenderEveryState(t *testing.T) {
 	a := awakeTestApp(t)
 	_ = evidencePaths(t)
-	for _, page := range []int{settingsGeneral, settingsAwake, settingsJSON, settingsShortcuts, settingsAbout} {
+	for _, page := range []int{settingsGeneral, settingsAwake, settingsJSON, settingsTranslate, settingsShortcuts, settingsAbout} {
 		for _, awakeOn := range []bool{false, true} {
 			a.page = page
 			a.config.AwakeEnabled = awakeOn
 			a.config.JSONEnabled = awakeOn
 			height := settingsHeight(tokens(false, "en"), page, awakeOn, false, false, true, true)
-			if height != 388 {
+			if height != settingsWindowHeight {
 				t.Fatalf("page %d: window height %d", page, height)
 			}
 			tt := ui.NewTester(a.view, 720, height)
@@ -791,7 +791,7 @@ func TestCLIRowHiddenWhenPathsCannotBeProbed(t *testing.T) {
 	cliPathsFor = func() (cliPaths, bool) { return cliPaths{}, false }
 	t.Cleanup(func() { cliPathsFor = original })
 	a.page = settingsGeneral
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("en")
 	if _, found := tt.Find(a.text("en", "CLIName")); found {
 		t.Fatal("the command line row was drawn without paths")

@@ -209,6 +209,8 @@ func (a *application) setSlotError(target, key string) {
 		a.paletteShortcutError = key
 	case "panel":
 		a.panelShortcutError = key
+	case "translate":
+		a.translateShortcutError = key
 	}
 }
 

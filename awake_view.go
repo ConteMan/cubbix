@@ -350,10 +350,10 @@ func sameShortcut(first, second string) bool {
 	return identity(first) == identity(second)
 }
 
-// shortcutSlot describes one global shortcut and what it runs. The four
+// shortcutSlot describes one global shortcut and what it runs. The five
 // slots are mutually exclusive: the same combination never registers twice.
 type shortcutSlot struct {
-	Target   string // "awake" / "json" / "palette" / "panel"
+	Target   string // "awake" / "json" / "palette" / "panel" / "translate"
 	Acc      string
 	Enabled  bool
 	Callback func()
@@ -365,6 +365,7 @@ func (a *application) shortcutSlots() []shortcutSlot {
 		{Target: "json", Acc: a.config.JSONShortcut, Enabled: a.config.JSONEnabled, Callback: a.newJSONWindow},
 		{Target: "palette", Acc: a.config.PaletteShortcut, Enabled: true, Callback: a.togglePalette},
 		{Target: "panel", Acc: a.config.PanelShortcut, Enabled: true, Callback: a.toggleMenubarPanel},
+		{Target: "translate", Acc: a.config.TranslateShortcut, Enabled: a.config.TranslateEnabled, Callback: a.toggleTranslate},
 	}
 }
 
@@ -457,8 +458,12 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 		a.config.PaletteShortcut = acc
 	case "panel":
 		a.config.PanelShortcut = acc
-	default:
+	case "awake":
 		a.config.AwakeShortcut = acc
+	case "translate":
+		a.config.TranslateShortcut = acc
+		// An unknown target is never written: a stray recorder must not change
+		// the keep-awake shortcut or any other slot.
 	}
 	// Every slot let go when the recording started, so the commit re-registers
 	// all of them; a combination that no longer registers keeps its diagnostic.
@@ -551,7 +556,8 @@ func (a *application) beginShortcutRecording() { a.beginTileShortcutRecording("a
 // beginTileShortcutRecording takes every registered combination away so the
 // recorder can hear any key. A closed module has nothing to record: its slot is
 // released, so opening the recorder is refused instead of writing a value that
-// could never register.
+// could never register. shortcutSlots carries the fifth (translate) target, so
+// this suspension and the restore below both cover it.
 func (a *application) beginTileShortcutRecording(target string) {
 	if a.moduleClosing || !a.shortcutSlotEnabled(target) {
 		return
@@ -606,9 +612,10 @@ func (a *application) cancelShortcutRecording() {
 	a.refreshMenuAfterShortcut()
 }
 
-// restoreShortcuts re-registers every slot that should own one now. A slot
-// that no longer holds its combination (because another slot took it over)
-// keeps its diagnostic and never steals the registration back.
+// restoreShortcuts re-registers every slot that should own one now, including
+// the translate target. A slot that no longer holds its combination (because
+// another slot took it over) keeps its diagnostic and never steals the
+// registration back.
 func (a *application) restoreShortcuts() {
 	suspended := a.suspendedShortcut
 	a.suspendedShortcut = nil
@@ -652,6 +659,8 @@ func (a *application) shortcutSlotEnabled(target string) bool {
 		return a.config.AwakeEnabled
 	case "json":
 		return a.config.JSONEnabled
+	case "translate":
+		return a.config.TranslateEnabled
 	}
 	return true
 }
@@ -691,6 +700,8 @@ func (a *application) slotError(target string) string {
 		return a.paletteShortcutError
 	case "panel":
 		return a.panelShortcutError
+	case "translate":
+		return a.translateShortcutError
 	}
 	return ""
 }
@@ -705,6 +716,8 @@ func (a *application) clearSlotError(target string) {
 		a.paletteShortcutError = ""
 	case "panel":
 		a.panelShortcutError = ""
+	case "translate":
+		a.translateShortcutError = ""
 	}
 }
 
@@ -725,6 +738,10 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 	if target == "panel" {
 		label, recordKey = "PanelShortcutLabel", "PanelRecordShortcut"
 		acc = a.config.PanelShortcut
+	}
+	if target == "translate" {
+		label, recordKey, moduleKey = "TranslateShortcutLabel", "TranslateRecordShortcut", "Translate"
+		acc = a.config.TranslateShortcut
 	}
 	enabled := a.shortcutSlotEnabled(target)
 	recordable := enabled && !a.moduleClosing

@@ -13,7 +13,7 @@ import (
 func TestDisplayPopupClosesWhenTopologyChanges(t *testing.T) {
 	a := settingsPlacementApp(t, placementScreens())
 	a.config.WindowPlacement, a.config.WindowDisplayID = "display", 1
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("en")
 	if err := tt.Click("Built-in"); err != nil {
 		t.Fatal(err)
@@ -58,7 +58,7 @@ func TestFallbackDisplayExplicitSelection(t *testing.T) {
 			a := settingsPlacementApp(t, placementScreens())
 			a.config.WindowPlacement = "display"
 			a.config.WindowDisplayID, a.config.WindowDisplay = 99, "Gone"
-			tt := ui.NewTester(a.view, 720, 388)
+			tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 			tt.SetLocale("en")
 			if err := tt.Click("Built-in"); err != nil {
 				t.Fatal(err)
@@ -122,7 +122,7 @@ func TestPlacementKeyboardReachesFullDescriptions(t *testing.T) {
 		a := settingsPlacementApp(t, placementScreens())
 		a.knownDisplays[1].Label = strings.Repeat("External Display ", 8)
 		a.config.WindowPlacement, a.config.WindowDisplayID = "display", 2
-		tt := ui.NewTester(a.view, 720, 388)
+		tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 		tt.SetLocale(locale)
 		info := a.text(locale, "WindowPlacementInfo")
 		fullChoice := a.text(locale, "WindowDisplay") + ": " + strings.TrimSpace(a.knownDisplays[1].Label)

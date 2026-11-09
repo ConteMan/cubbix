@@ -796,8 +796,8 @@ func TestSettingsHeightGeneralPage(t *testing.T) {
 		t.Fatalf("general page height = %d, want %d", got, want)
 	}
 	// The window itself never drops below the shared floor.
-	if got := settingsHeight(token, settingsGeneral, true, false, false, true, false); got != 388 {
-		t.Fatalf("general window height = %d, want 388", got)
+	if got := settingsHeight(token, settingsGeneral, true, false, false, true, false); got != settingsWindowHeight {
+		t.Fatalf("general window height = %d, want %d", got, settingsWindowHeight)
 	}
 }
 

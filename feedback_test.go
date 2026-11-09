@@ -105,7 +105,7 @@ func TestFeedbackShortcutsPageHeight(t *testing.T) {
 	// The window keeps its own minimum size, so switching to a shorter page
 	// never resizes it, and the shortcuts page fits inside that minimum.
 	width, minimum := settingsMinimumSize()
-	if width != 720 || minimum < shortcuts || minimum != 388 {
+	if width != 720 || minimum < shortcuts || minimum != settingsWindowHeight {
 		t.Fatalf("minimum window = %dx%d; shortcuts need %d", width, minimum, shortcuts)
 	}
 }
