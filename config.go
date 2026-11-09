@@ -151,7 +151,11 @@ func loadConfig(path string) (Config, error) {
 	if config.PanelShortcut == "" {
 		config.PanelShortcut = defaultPanelKey
 	}
-	if config.AwakeLidBatteryMin != 10 && config.AwakeLidBatteryMin != 20 && config.AwakeLidBatteryMin != 30 {
+	switch config.AwakeLidBatteryMin {
+	case 5, 10, 20, 30:
+	default:
+		// Older configs (and any unsupported value) keep the 20% default; no
+		// migration is needed for the existing 10/20/30 choices.
 		config.AwakeLidBatteryMin = 20
 	}
 	config.UpdateLastCheck = normalizeCheckedAt(config.UpdateLastCheck, time.Now())

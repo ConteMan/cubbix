@@ -14,11 +14,12 @@ func TestLidNativeReadOnly(t *testing.T) {
 	if !(lid.SystemPower{}).HasInternalBattery() {
 		t.Fatal("internal battery not detected")
 	}
-	kind, p, err := (lid.SystemPower{}).Source()
+	sample, err := (lid.SystemPower{}).Sample()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if (kind != "ac" && kind != "battery") || p < 0 || p > 100 {
+	if (sample.Kind != "ac" && sample.Kind != "battery") || sample.Percent < 0 || sample.Percent > 100 {
 		t.Fatal("invalid native power reading")
 	}
+	_ = (lid.SystemPower{}).Adapter()
 }

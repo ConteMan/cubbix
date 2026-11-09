@@ -225,6 +225,8 @@ type LidState struct {
 	State                  string `json:"state"`
 	Reason                 string `json:"reason"`
 	BatteryMin             int    `json:"batteryMin"`
+	Adapter                string `json:"adapter,omitempty"`
+	Rewrites               int    `json:"rewrites,omitempty"`
 	LastCode               string `json:"lastCode,omitempty"`
 	HelperVersion          string `json:"helperVersion,omitempty"`
 	Hello                  string `json:"hello,omitempty"`

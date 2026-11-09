@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- When another tool has already disabled sleep on lid close, the lid switch still works: Cubbix remembers the request, and the helper takes over once the other tool lets go. It never overwrites the other tool's setting and never asks for authorization to do it.
+- After taking over, or when the helper's own setting is turned back off, the helper writes it back as soon as the lease allows, with a bounded number of retries. Two tools repeatedly fighting over the setting now stop and show a hint.
+- Low battery no longer ends a lid session while plugged in. A new 5% limit is available for tools that calibrate by discharging.
+- The helper revision is now 5; the next time you deliberately turn the lid switch on after updating, you will be asked for one administrator authorization.
+
 ## 0.6.1 — 2026-11-06
 
 - With more than one display, choose in General where the Settings window opens: follow the pointer, or always on a display you pick. Each display remembers where the window was last time.

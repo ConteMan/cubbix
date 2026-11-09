@@ -15,13 +15,14 @@ import (
 
 type fakeSleep struct {
 	v               int
+	reads           int
 	writes          []int
 	setErr, zeroErr bool
 	badOne, badZero bool
 	before          func(int)
 }
 
-func (s *fakeSleep) Read() (int, error) { return s.v, nil }
+func (s *fakeSleep) Read() (int, error) { s.reads++; return s.v, nil }
 func (s *fakeSleep) Set(v int) error {
 	if s.before != nil {
 		s.before(v)
@@ -38,12 +39,15 @@ func (s *fakeSleep) Set(v int) error {
 }
 
 type fakePower struct {
-	kind string
-	p    int
-	err  error
+	kind    string
+	p       int
+	adapter AdapterState
+	err     error
 }
 
-func (p *fakePower) Source() (string, int, error) { return p.kind, p.p, p.err }
+func (p *fakePower) Sample() (PowerSample, error) {
+	return PowerSample{Kind: p.kind, Percent: p.p, Adapter: p.adapter}, p.err
+}
 func fixture(t *testing.T) (*Engine, *fakeSleep, *fakePower, *time.Time) {
 	t.Helper()
 	s := &fakeSleep{}
@@ -321,11 +325,24 @@ func TestProtocolValidation(t *testing.T) {
 		cases = append(cases, r)
 	}
 	r := request("enable")
-	r.MinPercent = 9
+	r.MinPercent = 4
 	cases = append(cases, r)
 	for _, r := range cases {
 		if r.Validate(now) == "" {
 			t.Fatal(r)
+		}
+	}
+	valid := request("enable")
+	valid.MinPercent = 5
+	valid.AdoptForeign = true
+	if valid.Validate(now) != "" {
+		t.Fatal("5% threshold and adoptForeign must be accepted")
+	}
+	for _, op := range []string{"hello", "status", "ping", "disable"} {
+		bad := request(op)
+		bad.AdoptForeign = true
+		if bad.Validate(now) == "" {
+			t.Fatal("adoptForeign only belongs to enable", op)
 		}
 	}
 }

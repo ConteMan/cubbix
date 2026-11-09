@@ -30,10 +30,13 @@ func (s *lidTestSleep) Set(v int) error {
 type lidTestPower struct {
 	kind    string
 	percent int
+	adapter lid.AdapterState
 	err     error
 }
 
-func (p *lidTestPower) Source() (string, int, error) { return p.kind, p.percent, p.err }
+func (p *lidTestPower) Sample() (lid.PowerSample, error) {
+	return lid.PowerSample{Kind: p.kind, Percent: p.percent, Adapter: p.adapter}, p.err
+}
 
 type lidTestService struct {
 	onRegister                    func()
@@ -60,12 +63,14 @@ type lidTestConnection struct {
 	engine       *lid.Engine
 	gone         bool
 	helloVersion string
+	requests     []lid.Request
 }
 
 func (c *lidTestConnection) Call(r lid.Request) (lid.Response, error) {
 	if c.gone {
 		return lid.Response{}, errors.New("gone")
 	}
+	c.requests = append(c.requests, r)
 	r.V = lid.Protocol
 	r.ID = "test-client"
 	out := c.engine.Handle(1, r)
@@ -129,12 +134,12 @@ func TestLidEnableMemoryAndMarker(t *testing.T) {
 	}
 }
 func TestLidEnableFailuresNeverRemember(t *testing.T) {
-	for _, kind := range []string{"foreign", "battery", "approval", "denied", "gone"} {
+	// A foreign 1 is no longer a failure: the helper registers a watching
+	// lease instead (covered by the coexist tests).
+	for _, kind := range []string{"battery", "approval", "denied", "gone"} {
 		t.Run(kind, func(t *testing.T) {
-			a, s, p, svc, conn := lidTestApp(t)
+			a, _, p, svc, conn := lidTestApp(t)
 			switch kind {
-			case "foreign":
-				s.value = 1
 			case "battery":
 				p.kind = "battery"
 				p.percent = 20
@@ -390,7 +395,7 @@ func TestLidCombinedLifecycle(t *testing.T) {
 	}
 }
 func TestLidConfigNormalization(t *testing.T) {
-	for _, n := range []int{-1, 0, 10, 20, 30, 50, 999} {
+	for _, n := range []int{-1, 0, 5, 10, 20, 30, 50, 999} {
 		a := awakeTestApp(t)
 		a.config.AwakeLidBatteryMin = n
 		if err := saveConfig(a.path, a.config); err != nil {
@@ -401,7 +406,7 @@ func TestLidConfigNormalization(t *testing.T) {
 			t.Fatal(err)
 		}
 		want := n
-		if n != 10 && n != 20 && n != 30 {
+		if n != 5 && n != 10 && n != 20 && n != 30 {
 			want = 20
 		}
 		if got.AwakeLidBatteryMin != want {

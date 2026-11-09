@@ -421,6 +421,11 @@ func (a *application) awakeStatus(locale string, now time.Time) string {
 	mode := a.awakeMode(locale, s.Session)
 	if s.Session.Lid {
 		mode += " · " + text("R05Lid")
+		// While watching, the 1 belongs to another tool. Keep the status line
+		// honest without adding a third tray icon.
+		if a.lid != nil && a.lid.snapshot().watching {
+			mode += text("R05LidHeld")
+		}
 	}
 	return mode + " · " + a.awakeSuffix(locale, s.Session, now)
 }
