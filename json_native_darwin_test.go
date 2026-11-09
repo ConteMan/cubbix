@@ -883,7 +883,7 @@ func TestJSONSettingsAndMenuScreenshots(t *testing.T) {
 				if kind == "shortcuts" {
 					// The shortcuts page is six rows and needs the window's
 					// minimum height, which it now sets.
-					a.page, h = 3, 388
+					a.page, h = 3, settingsWindowHeight
 				}
 				tt := ui.NewTester(view, w, h)
 				tt.SetScale(2)

@@ -20,6 +20,9 @@ const (
 	settingsAwake     = 2
 	settingsShortcuts = 3
 	settingsJSON      = 4
+	// settingsTranslate is the sixth page. Pages 0-4 keep their numbers: a
+	// saved window, a URL or the command line may name one.
+	settingsTranslate = 5
 )
 
 // settingsNav is the sidebar order: module pages first, global pages after.
@@ -30,6 +33,7 @@ var settingsNav = []struct {
 	{settingsGeneral, "settings-2", "General"},
 	{settingsAwake, "sun", "Awake"},
 	{settingsJSON, "braces", "JSON"},
+	{settingsTranslate, "text-quote", "Translate"},
 	{settingsShortcuts, "keyboard", "R05Shortcuts"},
 	{settingsAbout, "info", "About"},
 }
@@ -44,6 +48,8 @@ func settingsPageName(page int) string {
 		return "shortcuts"
 	case settingsJSON:
 		return "json"
+	case settingsTranslate:
+		return "translate"
 	}
 	return "general"
 }
@@ -53,6 +59,7 @@ func settingsPageName(page int) string {
 type settingsLayout struct {
 	page                   int
 	awakeOn, jsonOn, ready bool
+	translateOn            bool
 	showPlacement          bool
 	fixedDisplay           bool
 	hasCLI                 bool
@@ -72,11 +79,12 @@ type settingsLayout struct {
 func newSettingsLayout(a *application, page int) settingsLayout {
 	displays := a.displaySnapshot()
 	l := settingsLayout{
-		page:     page,
-		awakeOn:  a.config.AwakeEnabled,
-		jsonOn:   a.config.JSONEnabled,
-		ready:    a.updates.snapshot().Phase == updateReady,
-		displays: displays,
+		page:        page,
+		awakeOn:     a.config.AwakeEnabled,
+		jsonOn:      a.config.JSONEnabled,
+		translateOn: a.config.TranslateEnabled,
+		ready:       a.updates.snapshot().Phase == updateReady,
+		displays:    displays,
 		// A single display needs no choice, so the whole group stays hidden
 		// and the stored choice is kept for when a second one returns.
 		showPlacement: len(displays) >= 2,
@@ -156,6 +164,8 @@ func pageHeight(t tokenValues, page int, awakeOn, showPlacement, fixedDisplay, h
 			cardHeight(t, rowHeight(t, 3), rowHeight(t, 3)))
 	case settingsJSON:
 		return sectionHeight(t, cardHeight(t, rowHeight(t, 3)))
+	case settingsTranslate:
+		return translatePageHeight(t, true)
 	}
 	return 0
 }
@@ -176,6 +186,7 @@ func settingsMinimumHeight(t tokenValues) float32 {
 		pageHeight(t, settingsAwake, true, false, false, false, false),
 		pageHeight(t, settingsShortcuts, true, false, false, false, false),
 		pageHeight(t, settingsJSON, true, false, false, false, false),
+		pageHeight(t, settingsTranslate, true, false, false, false, false),
 	)
 	height := max(t.SizeWindowMinHeight, sidebarNaturalHeight(t), content+2*t.Space24)
 	return ceilingTo(t, height)
@@ -208,6 +219,9 @@ func settingsHeight(t tokenValues, page int, awakeOn, showPlacement, fixedDispla
 }
 
 func (l settingsLayout) height(t tokenValues) float32 {
+	if l.page == settingsTranslate {
+		return translatePageHeight(t, l.translateOn)
+	}
 	return pageHeight(t, l.page, l.awakeOn, l.showPlacement, l.fixedDisplay, l.hasCLI, l.ready)
 }
 
@@ -469,6 +483,8 @@ func (a *application) settingsContent(c *ui.Context, t tokenValues, locale strin
 		a.awakeModulePage(c, t, locale, l, alert)
 	case settingsJSON:
 		a.jsonModulePage(c, t, locale, l, alert)
+	case settingsTranslate:
+		a.translateModulePage(c, t, locale, l, alert)
 	default:
 		a.shortcutsPage(c, t, locale, l, alert)
 	}

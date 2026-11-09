@@ -204,3 +204,20 @@ ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代�
 
 设置页按「模块」重组见 [规格 007](../docs/specs/007-设置按模块组织.md) 与 [R16 交付](rounds/R16-2026-11-05-模块分组/README.md)。头部卡片 56 高：28 图标方块 + 名称 13/600 与页面说明 12 上下排（19.5 + 2 + 18 = 39.5，加 `2 × Space8`），向上留足 56。分组标题 24 高、12/500 次要色。导航项 40 高（图标方块 28 + `2 × Space6` 的上下留白），不复用 32 高的 `SizeNavHeight`（历史设计仍引用旧值）。三个 Token 已同步 `design/cubbix.pen` 变量、`design/tokens.json` 与 `tokens.go`；R16 第 2 版画板按组合几何绘制，不重绘。
 >
+## R17 追加
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `SizeTranslateWidth` | number | `480` |
+| `SizeTranslateMinHeight` | number | `148` |
+| `SizeTranslateMaxHeight` | number | `520` |
+| `SizeTranslateInputBase` | number | `28` |
+| `SizeTranslateInputLine` | number | `20` |
+| `SizeTranslateInputMaxLines` | number | `4` |
+| `SizeTranslateResultMax` | number | `320` |
+| `SizeTranslateDictionaryPreviewLines` | number | `3` |
+| `SizeTranslateDictionaryMax` | number | `96` |
+| `SizeTranslateTopOffset` | number | `96` |
+| `SizeTranslateDirectionHeight` | number | `20` |
+
+浮窗的尺寸见 [规格 010](../docs/specs/010-翻译.md) §3.1：面板宽 480，高度夹在 148 与 520 之间；输入区单行 28，每多一行加 20，最多四行；译文块最高 320，词典正文最高 96、默认展开三行；距工作区顶部 96，方向行 20。十一个 Token 已写入 `design/tokens.json` 与 `tokens.go`；本步没有新增画板轮次，`design/cubbix.pen` 的画板变量留给后续界面轮次同步。

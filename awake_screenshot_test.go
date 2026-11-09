@@ -76,14 +76,14 @@ func TestAwakeScreenshots(t *testing.T) {
 				if page == 3 {
 					name = "shortcuts"
 				}
-				capture(name+suffix, locale, dark, a.view, 720, 388)
+				capture(name+suffix, locale, dark, a.view, 720, settingsWindowHeight)
 			}
 			a.page = 3
 			a.shortcutRecording = true
-			capture("recording"+suffix, locale, dark, a.view, 720, 388)
+			capture("recording"+suffix, locale, dark, a.view, 720, settingsWindowHeight)
 			a.shortcutDraft = "Cmd+,"
 			a.shortcutError = "R05Conflict"
-			capture("conflict"+suffix, locale, dark, a.view, 720, 388)
+			capture("conflict"+suffix, locale, dark, a.view, 720, settingsWindowHeight)
 			a.shortcutRecording = false
 			a.shortcutDraft = ""
 			a.shortcutError = ""

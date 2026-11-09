@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- New Translate module: a global shortcut opens a small floating panel; type text, press Return, and read the streamed translation. You can copy it, swap the direction, and configure the endpoint, the API key (kept in the system keychain) and the model in Settings. Models can be fetched from the endpoint or typed by hand, and the connection can be tested. A word auto-speak preference is stored but does not speak yet.
+- Translate has its own global shortcut and module switch. Turning the module off releases the shortcut while its settings row stays visible, disabled.
+- A saved translation key shows only Saved, Replace, and Clear; choose Replace to enter a new one. Keychain operations keep the interface responsive. Multiline streams, timeout and truncation hints, and stale request updates are fixed; switching panels cancels the translation.
 - When another tool has already disabled sleep on lid close, the lid switch still works: Cubbix remembers the request, and the helper takes over once the other tool lets go. It never overwrites the other tool's setting and never asks for authorization to do it.
 - After taking over, or when the helper's own setting is turned back off, the helper writes it back as soon as the lease allows, with a bounded number of retries. Two tools repeatedly fighting over the setting now stop and show a hint.
 - Low battery no longer ends a lid session while plugged in. A new 5% limit is available for tools that calibrate by discharging.

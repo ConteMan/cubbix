@@ -299,7 +299,7 @@ func TestCheckTimePersistenceRetriesAfterSaveFailure(t *testing.T) {
 func TestClosingRecorderShowsBusyReason(t *testing.T) {
 	a := awakeTestApp(t)
 	a.page, a.moduleClosing = settingsAwake, true
-	tt := ui.NewTester(a.view, 720, 388)
+	tt := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tt.SetLocale("en")
 	tt.Frame()
 	if !hasAccessibleText(tt, a.text("en", "ModuleBusy")) {
@@ -322,7 +322,7 @@ func TestModuleClosePreservesUserFocus(t *testing.T) {
 		}
 		a.awakeModulePage(c, tk, "en", newSettingsLayout(a, settingsAwake), "")
 		kept = other.FocusWithin()
-	}, 720, 388)
+	}, 720, settingsWindowHeight)
 	tt.Frame()
 	initial = false
 	a.config.AwakeEnabled = false

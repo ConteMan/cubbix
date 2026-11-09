@@ -89,6 +89,34 @@ type application struct {
 
 	// cli is the command line socket server, nil until ready.
 	cli *cliServer
+	// translate is the floating window state. The remaining fields are seams:
+	// headless tests replace the window factory, the keychain, the main-thread
+	// hop, the clipboard and the HTTP functions, so no case touches a real
+	// window, keychain, shortcut or network.
+	translate               *translateState
+	translateShortcutError  string
+	translateRowError       string
+	translateKeyDraft       string
+	translateKeySaved       bool
+	translateKeyEditing     bool
+	translateKeyFocus       bool
+	translateKeyWriting     bool
+	translateKeyGeneration  uint64
+	translateKeyError       string
+	translateModelList      []string
+	translateModelListError string
+	translateModelFetching  bool
+	translateTestRunning    bool
+	translateTestKey        string
+	translateTestUntil      time.Time
+	translateSecret         translateSecretStore
+	translateRunOnMain      func(func())
+	translateAsync          bool
+	translateStreamFn       translateStreamFunc
+	translateModelsFn       translateModelsFunc
+	translateTestFn         translateTestFunc
+	translateCopy           func(string) error
+	createTranslateWindow   func(*translateState)
 	// quiet silences the hint and the lid notification for one command line
 	// request; it is set and reset on the main thread only.
 	quiet                  bool
@@ -169,6 +197,11 @@ func newApplication(path string) (*application, error) {
 		a.palette.window.SetPosition(p.X, p.Y)
 	}
 	a.createMenubarPanel = a.buildMenubarPanel
+	a.createTranslateWindow = a.buildTranslateWindow
+	a.translateSecret = mygo.Secrets
+	a.translateRunOnMain = mygo.RunOnMain
+	a.translateAsync = true
+	a.translateCopy = defaultTranslateCopy
 	a.createJSONWindow = a.buildJSONWindow
 	a.presentJSONWindow = a.focusJSONWindow
 	a.feedbackMode = feedbackIndex(feedbackModes, config.FeedbackMode)
@@ -482,6 +515,8 @@ func (a *application) ready() {
 	a.registerJSONShortcut()
 	a.registerPaletteShortcut()
 	a.registerPanelShortcut()
+	a.registerTranslateShortcut()
+	a.refreshTranslateKey()
 	a.feedback.watch()
 	a.startCLIServer()
 	if err := a.registerURLScheme("cubbix"); err != nil {
@@ -522,6 +557,7 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	// JSON seat of each display. Windows are still alive here.
 	a.saveWindowPlacesOnQuit()
 	a.cli.stop()
+	a.cancelTranslate()
 	a.hidePalette()
 	a.hidePaletteGuides()
 	a.hideMenubarPanel()

@@ -284,7 +284,7 @@ func TestSettingsHeightShortcutsPageIsTwoGroups(t *testing.T) {
 	}
 	// The tallest page state (five general rows or the update ready card) sets
 	// the shared minimum, so no alert can be cut off on any page.
-	if _, minHeight := settingsMinimumSize(); minHeight != 388 {
+	if _, minHeight := settingsMinimumSize(); minHeight != settingsWindowHeight {
 		t.Fatalf("minimum height = %d", minHeight)
 	}
 }

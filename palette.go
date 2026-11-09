@@ -113,6 +113,7 @@ func (a *application) paletteVisible() bool {
 }
 
 func (a *application) showPalette() {
+	a.closeTranslate()
 	a.hideMenubarPanel()
 	if a.palette == nil {
 		a.palette = &paletteState{}
@@ -854,6 +855,8 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 			page = settingsAwake
 		case "json":
 			page = settingsJSON
+		case "translate":
+			page = settingsTranslate
 		case "shortcuts":
 			page = settingsShortcuts
 		case "about":

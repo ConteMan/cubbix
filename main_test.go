@@ -169,7 +169,7 @@ func TestLanguageAndPreferencesPersist(t *testing.T) {
 	}
 	var selectedLocale string
 	app.setLocale = func(locale string) { selectedLocale = locale }
-	tester := ui.NewTester(app.view, 720, 388)
+	tester := ui.NewTester(app.view, 720, settingsWindowHeight)
 	tester.SetLocale("zh-CN")
 	if err := tester.Click("English"); err != nil {
 		t.Fatal(err)
@@ -222,13 +222,13 @@ func TestSettingsHeight(t *testing.T) {
 		}
 		// The window itself never drops below the shared floor, whatever the
 		// page on screen needs.
-		if got := settingsHeight(tokens, c.page, c.awakeOn, c.showPlacement, c.fixed, c.hasCLI, c.ready); got != 388 {
-			t.Fatalf("%s: window height = %d, want 388", c.name, got)
+		if got := settingsHeight(tokens, c.page, c.awakeOn, c.showPlacement, c.fixed, c.hasCLI, c.ready); got != settingsWindowHeight {
+			t.Fatalf("%s: window height = %d, want %d", c.name, got, settingsWindowHeight)
 		}
 	}
-	// The sidebar fits the same window: brand, separator and five 40-high items.
-	if got := sidebarNaturalHeight(tokens); got != 321 {
-		t.Fatalf("sidebar height = %v, want 321", got)
+	// The sidebar fits the same window: brand, separator and six 40-high items.
+	if got := sidebarNaturalHeight(tokens); got != 365 {
+		t.Fatalf("sidebar height = %v, want 365", got)
 	}
 }
 
@@ -316,7 +316,7 @@ func TestNotesStayInSettingsAndReturn(t *testing.T) {
 
 func TestSettingsMinimumAndWideContent(t *testing.T) {
 	minW, minH := settingsMinimumSize()
-	if minW != 720 || minH != 388 {
+	if minW != 720 || minH != settingsWindowHeight {
 		t.Fatalf("minimum=%dx%d", minW, minH)
 	}
 	for _, size := range [][2]int{{0, 0}, {-1, -1}, {719, 387}, {1000, 600}} {

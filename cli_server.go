@@ -574,6 +574,8 @@ func settingsPageIndex(page string, a *application) (int, bool) {
 		return settingsAwake, true
 	case "json":
 		return settingsJSON, true
+	case "translate":
+		return settingsTranslate, true
 	case "shortcuts":
 		return settingsShortcuts, true
 	}

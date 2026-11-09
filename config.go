@@ -12,10 +12,12 @@ import (
 )
 
 const (
-	configVersion      = 1
-	paletteRecentLimit = 5
-	defaultPaletteKey  = "Alt+."
-	defaultPanelKey    = "Ctrl+Alt+Cmd+P"
+	configVersion       = 1
+	paletteRecentLimit  = 5
+	defaultPaletteKey   = "Alt+."
+	defaultPanelKey     = "Ctrl+Alt+Cmd+P"
+	defaultTranslateKey = "Ctrl+Alt+Cmd+T"
+	maxTranslateAddress = 512
 )
 
 // normalizeCommandIDs drops blanks and duplicates while keeping the order.
@@ -88,10 +90,17 @@ type Config struct {
 	// UpdateLastCheck is the UTC RFC3339Nano time of the last finished update
 	// check. It is optional: an older config simply has none.
 	UpdateLastCheck string `toml:"update_last_check,omitempty"`
+	// Translate is the sixth module. The API key is never part of Config: it
+	// lives in mygo.Secrets. No default address or model is stored here.
+	TranslateEnabled   bool   `toml:"translate_enabled"`
+	TranslateShortcut  string `toml:"translate_shortcut"`
+	TranslateBaseURL   string `toml:"translate_base_url,omitempty"`
+	TranslateModel     string `toml:"translate_model,omitempty"`
+	TranslateAutoSpeak bool   `toml:"translate_auto_speak"`
 }
 
 func defaultConfig() Config {
-	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right", WindowPlacement: "cursor"}
+	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right", WindowPlacement: "cursor", TranslateEnabled: true, TranslateShortcut: defaultTranslateKey, TranslateAutoSpeak: true}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -150,6 +159,21 @@ func loadConfig(path string) (Config, error) {
 	}
 	if config.PanelShortcut == "" {
 		config.PanelShortcut = defaultPanelKey
+	}
+	if config.TranslateShortcut == "" {
+		config.TranslateShortcut = defaultTranslateKey
+	}
+	// The address and model are optional strings. Trim and drop a trailing
+	// slash here; the full address rule is applied when an endpoint is used.
+	// An overlong value is discarded rather than blocking the launch. The
+	// model name is never format-checked, so a name containing / survives.
+	config.TranslateBaseURL = strings.TrimRight(strings.TrimSpace(config.TranslateBaseURL), "/")
+	config.TranslateModel = strings.TrimSpace(config.TranslateModel)
+	if len(config.TranslateBaseURL) > maxTranslateAddress {
+		config.TranslateBaseURL = ""
+	}
+	if len(config.TranslateModel) > maxTranslateAddress {
+		config.TranslateModel = ""
 	}
 	switch config.AwakeLidBatteryMin {
 	case 5, 10, 20, 30:
