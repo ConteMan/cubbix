@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -26,6 +27,7 @@ func awakeTestApp(t *testing.T) *application {
 	// Translation seams: no native window, no real keychain, no real
 	// shortcuts, no network and no main-thread loop in any test.
 	a.createTranslateWindow = nil
+	a.setActivationPolicy = func(mygo.ActivationPolicy) {}
 	a.translateAsync = false
 	a.translateRunOnMain = func(fn func()) { fn() }
 	a.translateSecret = newFakeTranslateSecrets()

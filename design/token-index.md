@@ -209,15 +209,15 @@ ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代�
 | Token / Go 字段 | 类型 | 值 |
 | --- | --- | --- |
 | `SizeTranslateWidth` | number | `480` |
-| `SizeTranslateMinHeight` | number | `148` |
+| `SizeTranslateMinHeight` | number | `260` |
+| `SizeTranslateWindowHeight` | number | `360` |
 | `SizeTranslateMaxHeight` | number | `520` |
-| `SizeTranslateInputBase` | number | `28` |
+| `SizeTranslateInputBase` | number | `36` |
 | `SizeTranslateInputLine` | number | `20` |
 | `SizeTranslateInputMaxLines` | number | `4` |
 | `SizeTranslateResultMax` | number | `320` |
 | `SizeTranslateDictionaryPreviewLines` | number | `3` |
 | `SizeTranslateDictionaryMax` | number | `96` |
-| `SizeTranslateTopOffset` | number | `96` |
 | `SizeTranslateDirectionHeight` | number | `20` |
 
 浮窗的尺寸见 [规格 010](../docs/specs/010-翻译.md) §3.1：面板宽 480，高度夹在 148 与 520 之间；输入区单行 28，每多一行加 20，最多四行；译文块最高 320，词典正文最高 96、默认展开三行；距工作区顶部 96，方向行 20。十一个 Token 已写入 `design/tokens.json` 与 `tokens.go`；本步没有新增画板轮次，`design/cubbix.pen` 的画板变量留给后续界面轮次同步。

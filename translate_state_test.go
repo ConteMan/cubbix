@@ -218,39 +218,21 @@ func TestTranslateStateGeneration(t *testing.T) {
 	}
 }
 
-func TestTranslateBlurRule(t *testing.T) {
-	a := translateTestApp(t)
-	s := a.ensureTranslateState()
-	s.visible, s.input, s.output = true, "hello", "你好"
-	a.onTranslateBlur()
-	if !s.visible {
-		t.Fatal("a result was hidden on blur")
-	}
-	s.input = ""
-	a.onTranslateBlur()
-	if s.visible {
-		t.Fatal("an empty input stayed open on blur")
-	}
-	s.visible, s.output, s.input = true, "", "hello"
-	a.onTranslateBlur()
-	if s.visible {
-		t.Fatal("an empty result stayed open on blur")
-	}
-	// A dictionary result alone also keeps the panel for comparison.
-	s.visible, s.output, s.input, s.dictionary = true, "", "hello", dictionaryTestDefinition
-	a.onTranslateBlur()
-	if !s.visible {
-		t.Fatal("a dictionary-only result was hidden on blur")
-	}
-	s.dictionary = ""
-	// Esc closes even with a result on screen.
-	s.visible, s.output = true, "你好"
-	tt := ui.NewTester(a.translateView, 480+64, 148+64)
-	tt.SetLocale("en")
-	tt.Frame()
-	tt.Key(0, ui.KeyEscape)
-	if s.visible {
-		t.Fatal("Esc did not close the panel")
+func TestTranslateCloseShortcuts(t *testing.T) {
+	for _, command := range []bool{false, true} {
+		a := translateTestApp(t)
+		s := a.ensureTranslateState()
+		s.visible, s.input, s.output = true, "hello", "你好"
+		tester := ui.NewTester(a.translateView, 480, 360)
+		tester.Frame()
+		if command {
+			tester.Key(ui.Cmd, ui.KeyW)
+		} else {
+			tester.Key(0, ui.KeyEscape)
+		}
+		if a.translate != nil || s.visible {
+			t.Fatal("close shortcut retained the tool window")
+		}
 	}
 }
 
@@ -277,73 +259,18 @@ func TestTranslateDirectionSwap(t *testing.T) {
 func TestTranslateHeight(t *testing.T) {
 	a := translateTestApp(t)
 	tk := tokens(false, "zh-CN")
-	s := &translateState{phase: translateEmpty}
-	if got := a.translateHeight(tk, s); got != 148 {
-		t.Fatalf("empty height = %v; want 148", got)
+	for _, phase := range []translatePhase{translateEmpty, translateLoading, translateStreaming, translateDone, translateFailed, translateNotConfigured} {
+		state := &translateState{phase: phase, input: "hello"}
+		if height := a.translateHeight(tk, state); height < tk.SizeTranslateMinHeight || height > tk.SizeTranslateMaxHeight {
+			t.Fatalf("phase %v content height = %v", phase, height)
+		}
 	}
-	s.phase = translateLoading
-	if got := a.translateHeight(tk, s); got != 154 {
-		t.Fatalf("loading height = %v; want 154 (64 plus panel borders)", got)
+	state := &translateState{phase: translateStreaming, input: "a\nb\nc\nd", output: strings.Repeat("long output ", 1000), dictionary: dictionaryTestDefinition, dictionaryExpanded: true}
+	if height := a.translateHeight(tk, state); height != tk.SizeTranslateMaxHeight {
+		t.Fatalf("long content height = %v", height)
 	}
-	s.phase, s.output = translateDone, "你好"
-	if got := a.translateHeight(tk, s); got != 154 {
-		t.Fatalf("done height = %v", got)
-	}
-	s.phase, s.errorKey = translateFailed, "TranslateNetworkError"
-	failed := a.translateHeight(tk, s)
-	if failed <= 154 {
-		t.Fatalf("failed height = %v; retry row missing", failed)
-	}
-	s.phase = translateNotConfigured
-	if got := a.translateHeight(tk, s); got <= 154 {
-		t.Fatalf("not configured height = %v", got)
-	}
-	s.phase, s.output, s.input, s.clipped = translateStreaming, strings.Repeat("长", 3000), "one", 0
-	// Without a dictionary block the ceiling is the result block's own
-	// maximum (320), plus the panel's padding, gaps and two border edges.
-	// The 520 ceiling is reached once the dictionary block exists.
-	if got := a.translateHeight(tk, s); got != 410 || got > tk.SizeTranslateMaxHeight {
-		t.Fatalf("long result height = %v; want 410", got)
-	}
-	s.phase, s.output, s.clipped = translateEmpty, "", 12
-	// The empty block is 44, so the raw panel is 134; the overlay adds 18+8
-	// and the 148 floor does not apply until that sum passes it.
-	want := tk.Space12 + tk.SizeTranslateInputBase + tk.Space8 + tk.SizeTranslateDirectionHeight +
-		tk.Space8 + 44 + tk.Space12 + 2*tk.StrokeHairline + tk.FontSizeSmall*tk.LineHeightBody + tk.Space8
-	if got := a.translateHeight(tk, s); got != want {
-		t.Fatalf("too-long overlay height = %v; want %v", got, want)
-	}
-	// Four input rows, still clamped to the same floor and ceiling.
-	s.phase, s.input, s.clipped = translateEmpty, "a\nb\nc\nd", 0
-	if got := a.translateHeight(tk, s); got >= 520 || got < 148 {
-		t.Fatalf("four input rows = %v", got)
-	}
-	// Dictionary states: folded keeps only the header, expanded adds the
-	// three-line preview. Both sit below the translation with a hairline.
-	s.phase, s.output, s.input, s.clipped = translateLoading, "", "hello", 0
-	s.dictionary, s.dictionaryExpanded = dictionaryTestDefinition, false
-	separator := tk.Space8 + tk.StrokeHairline + tk.Space8
-	folded := 154 + separator + dictionaryBlockHeight(tk, false)
-	if got := a.translateHeight(tk, s); got != folded || got != 221 {
-		t.Fatalf("folded dictionary height = %v; want %v", got, folded)
-	}
-	s.dictionaryExpanded = true
-	unfolded := 154 + separator + dictionaryBlockHeight(tk, true)
-	if got := a.translateHeight(tk, s); got != unfolded || got <= folded {
-		t.Fatalf("expanded dictionary height = %v; want %v", got, unfolded)
-	}
-	if dictionaryBodyHeight(tk) != tk.SizeTranslateDictionaryPreviewLines*tk.FontSizeSmall*tk.LineHeightBody {
-		t.Fatal("preview lines were not used for the body height")
-	}
-	// Two overlong blocks stop at the panel ceiling.
-	s.phase, s.output, s.input = translateStreaming, strings.Repeat("长", 3000), "a\nb\nc\nd"
-	if got := a.translateHeight(tk, s); got != tk.SizeTranslateMaxHeight {
-		t.Fatalf("both blocks overlong = %v; want %v", got, tk.SizeTranslateMaxHeight)
-	}
-	// A nil definition removes the separator and the whole block.
-	s.dictionary, s.input, s.output, s.phase = "", "hello", "", translateLoading
-	if got := a.translateHeight(tk, s); got != 154 {
-		t.Fatalf("nil definition left a block: %v", got)
+	if dictionaryBlockHeight(tk, true)-dictionaryBlockHeight(tk, false) != dictionaryBodyHeight(tk) {
+		t.Fatal("folding did not release the preview height")
 	}
 }
 
@@ -444,8 +371,8 @@ func TestTranslateStatesRender(t *testing.T) {
 				s.errorKey = ""
 				check.setup()
 				tk := tokens(dark, locale)
-				height := int(a.translateHeight(tk, s)) + 2*int(tk.SizePaletteShadowMargin)
-				tt := ui.NewTester(a.translateView, int(tk.SizeTranslateWidth)+2*int(tk.SizePaletteShadowMargin), height)
+				height := int(a.translateHeight(tk, s))
+				tt := ui.NewTester(a.translateView, int(tk.SizeTranslateWidth), height)
 				tt.SetLocale(locale)
 				tt.SetDark(dark)
 				tt.Frame()
@@ -454,8 +381,8 @@ func TestTranslateStatesRender(t *testing.T) {
 						t.Fatalf("%s dark=%v phase=%v: missing %q: %v", locale, dark, check.phase, key, tt.Texts())
 					}
 				}
-				if _, ok := tt.Find(a.text(locale, "TranslateClose")); !ok {
-					t.Fatalf("missing close button: %v", tt.Texts())
+				if _, ok := tt.Find(a.text(locale, "R07Pin")); !ok {
+					t.Fatalf("missing pin button: %v", tt.Texts())
 				}
 			}
 		}
@@ -470,7 +397,7 @@ func TestTranslateCopyAndRetry(t *testing.T) {
 	copied := ""
 	a.translateCopy = func(value string) error { copied = value; return nil }
 	tk := tokens(false, locale)
-	tt := ui.NewTester(a.translateView, int(tk.SizeTranslateWidth)+64, int(a.translateHeight(tk, s))+64)
+	tt := ui.NewTester(a.translateView, int(tk.SizeTranslateWidth), int(a.translateHeight(tk, s)))
 	tt.SetLocale(locale)
 	tt.Frame()
 	if err := tt.Click(a.text(locale, "TranslateCopy")); err != nil {

@@ -231,9 +231,8 @@ func TestTranslateSelectionHintRendered(t *testing.T) {
 		t.Fatal("hint state missing")
 	}
 	tk := tokens(false, "zh-CN")
-	margin := int(tk.SizePaletteShadowMargin)
-	width := int(tk.SizeTranslateWidth) + 2*margin
-	height := int(a.translateHeight(tk, s)) + 2*margin
+	width := int(tk.SizeTranslateWidth)
+	height := int(a.translateHeight(tk, s))
 	tt := ui.NewTester(a.translateView, width, height)
 	tt.SetLocale("zh-CN")
 	tt.Frame()

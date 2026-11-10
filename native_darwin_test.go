@@ -115,6 +115,9 @@ func nativeWindowChecks(a *application, dir string) error {
 		if err := nativePalettePositionChecks(a, nsapp); err != nil {
 			return err
 		}
+		if err := nativeTranslateWindowChecks(a, nsapp); err != nil {
+			return err
+		}
 		// MyGo's regular-policy wrapper activates the application. Inspect
 		// native policy values directly without making a foreground request.
 		nsapp.Send(objc.RegisterName("setActivationPolicy:"), 0)

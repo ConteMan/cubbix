@@ -33,8 +33,8 @@ func renderTranslateSettingsScreenshot(a *application, locale string, dark bool)
 // transition before the captured frame, so a dark capture is fully dark.
 func renderTranslatePanelScreenshot(a *application, locale string, dark bool) *ui.Tester {
 	tk := tokens(dark, locale)
-	width := int(tk.SizeTranslateWidth) + 2*int(tk.SizePaletteShadowMargin)
-	height := int(a.translateHeight(tk, a.translate)) + 2*int(tk.SizePaletteShadowMargin)
+	width := int(tk.SizeTranslateWidth)
+	height := int(a.translateHeight(tk, a.translate))
 	tester := ui.NewTester(a.translateView, width, height)
 	tester.SetScale(2)
 	tester.SetLocale(locale)
@@ -57,6 +57,47 @@ func saveTranslateEvidence(t *testing.T, dir, name string, img *image.RGBA) {
 	}
 	if err := file.Close(); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestTranslateToolScreenshots(t *testing.T) {
+	dir := os.Getenv("CUBBIX_TRANSLATE_TOOL_EVIDENCE")
+	if dir == "" {
+		t.Skip("tool window evidence not requested")
+	}
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	for _, locale := range []string{"zh-CN", "en"} {
+		for _, dark := range []bool{false, true} {
+			mode := "light"
+			if dark {
+				mode = "dark"
+			}
+			for _, state := range []string{"empty", "sentence", "word", "failed", "pinned"} {
+				a := translateTestApp(t)
+				s := a.ensureTranslateState()
+				s.input, s.output, s.phase = "Good tools make everyday work simpler.", "好工具让日常工作更简单。", translateDone
+				switch state {
+				case "empty":
+					s.input, s.output, s.phase = "", "", translateEmpty
+				case "word":
+					s.input, s.output, s.dictionary = "serendipity", "机缘巧合；意外发现美好事物的运气", dictionaryScreenshotDefinition
+				case "failed":
+					s.output, s.phase, s.errorKey = "", translateFailed, "TranslateNetworkError"
+				case "pinned":
+					s.pinned = true
+				}
+				tester := ui.NewTester(a.translateView, 480, 360)
+				tester.SetScale(2)
+				tester.SetLocale(locale)
+				tester.SetDark(dark)
+				tester.Frame()
+				tester.Advance(700 * time.Millisecond)
+				tester.Frame()
+				saveTranslateEvidence(t, dir, "translate-tool-"+state+"-"+locale+"-"+mode, tester.Image())
+			}
+		}
 	}
 }
 
