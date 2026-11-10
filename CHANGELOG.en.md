@@ -2,6 +2,7 @@
 
 ## 0.7.1 — 2026-11-10
 
+- Translate is now a small tool window like JSON: drag it, close it with the window buttons or Esc, pin it on top, and it remembers its place and size. Clicking elsewhere no longer closes it, so you can compare with the original.
 - A pasted API key, or an edited endpoint or model, is now saved when you click elsewhere or close the window, without pressing Return. A rejected endpoint stays in the field with its reason. Before this, a key left without Return stayed a draft, and Translate kept saying no endpoint was configured.
 - The connection test is now a worded button instead of a lone refresh icon on the model row.
 
