@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.0 — 2026-11-10
 
 - New QR code module: press ⌃⌥⌘R and the selected text, or a link on the clipboard, becomes a QR code you can copy, save as a PNG, or drag into another app. It updates as you type, and turning the module off releases its shortcut and hides its entries.
 - Make one from the command palette with "QR code <text>", from the card panel, or from `cubbix qr`. The QR, Translate and JSON windows can now stay open together, and opening the command palette or the card panel no longer closes them.
