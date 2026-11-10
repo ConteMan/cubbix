@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- New QR code module: press ⌃⌥⌘R and the selected text, or a link on the clipboard, becomes a QR code you can copy, save as a PNG, or drag into another app. It updates as you type, and turning the module off releases its shortcut and hides its entries.
+- Make one from the command palette with "QR code <text>", from the card panel, or from `cubbix qr`. The QR, Translate and JSON windows can now stay open together, and opening the command palette or the card panel no longer closes them.
+
 ## 0.7.1 — 2026-11-10
 
 - Translate is now a small tool window like JSON: drag it, close it with the window buttons or Esc, pin it on top, and it remembers its place and size. Clicking elsewhere no longer closes it, so you can compare with the original.

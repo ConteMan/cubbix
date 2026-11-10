@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"syscall"
@@ -18,6 +19,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/ConteMan/cubbix/internal/cli"
+	qrlib "github.com/ConteMan/cubbix/internal/qr"
 )
 
 // cliServer is the app's end of the command line protocol: a Unix socket only
@@ -279,9 +281,11 @@ func (s *cliServer) handle(conn *net.UnixConn) {
 	if invalidFrame.Load() {
 		result, responseBody = cli.Failure(cli.CodeBadRequest), nil
 	}
+	// Every module field of the result has to be copied here: a field left out
+	// never reaches the tool, whatever Response.Result() does.
 	response := cli.Response{V: cli.Protocol, ID: req.ID, OK: result.OK, Code: result.Code,
 		Message: result.Message, Lines: result.Lines, State: result.State,
-		Bytes: result.Bytes, Translate: result.Translate}
+		Bytes: result.Bytes, Translate: result.Translate, QR: result.QR}
 	if !ran {
 		response = cli.Response{V: cli.Protocol, ID: req.ID, OK: false, Code: cli.CodeQuitting}
 	}
@@ -482,6 +486,10 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 		if !a.config.JSONEnabled {
 			return cli.Failure(cli.CodeDisabled)
 		}
+	case cli.ActionQR:
+		if !a.config.QREnabled {
+			return cli.Failure(cli.CodeDisabled)
+		}
 	}
 	var err error
 	switch req.Action {
@@ -508,6 +516,17 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 	case cli.ActionSettings:
 		page, _ := settingsPageIndex(req.Page, a)
 		err = a.runURL(paletteURLRequest{Kind: "settings", Page: page, CLI: true})
+	case cli.ActionQR:
+		if len(body) > cli.MaxPayload {
+			return cli.Failure(cli.CodeBadRequest)
+		}
+		text := string(body)
+		if strings.TrimSpace(text) == "" || !cli.ValidTranslateInput(body) {
+			return cli.Failure(cli.CodeBadRequest)
+		}
+		result := a.runCLIQR(text)
+		result.State = a.cliState()
+		return result
 	default:
 		return cli.Failure(cli.CodeBadRequest)
 	}
@@ -532,6 +551,30 @@ func (a *application) runCLIToggle() error {
 	a.lidURL = true
 	defer func() { a.lidURL = previous }()
 	return a.toggleAwakeResult()
+}
+
+// runCLIQR encodes the text and answers with metadata only: the tool draws the
+// symbol itself, so no pixels and no text travel over the socket. A payload that
+// does not fit is QRTooLong, never a truncated symbol; the capacity rule lives
+// in internal/qr alone.
+func (a *application) runCLIQR(text string) cli.Result {
+	code, err := a.qrEncodeFunction()(text)
+	if err != nil {
+		result := cli.Failure(cli.CodeBadRequest)
+		if errors.Is(err, qrlib.ErrTooLong) {
+			result.Code = "QRTooLong"
+			result.Message = a.text(uiLocale(), "QRTooLong")
+			return result
+		}
+		// Any other failure is this build's own problem, never the caller's
+		// text: say so without echoing the library error.
+		result.Code = cli.CodeInternal
+		result.Message = a.text(uiLocale(), "QRFailed")
+		return result
+	}
+	result := cli.Result{V: cli.Protocol, OK: true, Message: ""}
+	result.QR = &cli.QRResult{Version: code.Version(), ECC: code.ECC(), Modules: code.Modules(), Bytes: code.Bytes}
+	return result
 }
 
 // cliErrorKey names the failure the tool reports. ProcessEnded keeps its own
@@ -675,6 +718,8 @@ func settingsPageIndex(page string, a *application) (int, bool) {
 		return settingsJSON, true
 	case "translate":
 		return settingsTranslate, true
+	case "qr":
+		return settingsQR, true
 	case "shortcuts":
 		return settingsShortcuts, true
 	}

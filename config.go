@@ -17,6 +17,7 @@ const (
 	defaultPaletteKey   = "Alt+."
 	defaultPanelKey     = "Ctrl+Alt+Cmd+P"
 	defaultTranslateKey = "Ctrl+Alt+Cmd+T"
+	defaultQRKey        = "Ctrl+Alt+Cmd+R"
 	maxTranslateAddress = 512
 )
 
@@ -98,10 +99,15 @@ type Config struct {
 	TranslateModel     string                       `toml:"translate_model,omitempty"`
 	TranslateAutoSpeak bool                         `toml:"translate_auto_speak"`
 	TranslateWindows   map[string]translateGeometry `toml:"translate_windows,omitempty"`
+	// QR is the seventh module. It stores no content: the window is a tool and
+	// keeps nothing between launches.
+	QREnabled  bool                  `toml:"qr_enabled"`
+	QRShortcut string                `toml:"qr_shortcut"`
+	QRWindows  map[string]qrGeometry `toml:"qr_windows,omitempty"`
 }
 
 func defaultConfig() Config {
-	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right", WindowPlacement: "cursor", TranslateEnabled: true, TranslateShortcut: defaultTranslateKey, TranslateAutoSpeak: true}
+	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right", WindowPlacement: "cursor", TranslateEnabled: true, TranslateShortcut: defaultTranslateKey, TranslateAutoSpeak: true, QREnabled: true, QRShortcut: defaultQRKey}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -163,6 +169,9 @@ func loadConfig(path string) (Config, error) {
 	}
 	if config.TranslateShortcut == "" {
 		config.TranslateShortcut = defaultTranslateKey
+	}
+	if config.QRShortcut == "" {
+		config.QRShortcut = defaultQRKey
 	}
 	// The address and model are optional strings. Trim and drop a trailing
 	// slash here; the full address rule is applied when an endpoint is used.

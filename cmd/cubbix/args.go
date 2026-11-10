@@ -23,10 +23,13 @@ Commands:
   status               Print keep awake, JSON windows and version
   json new [options]   Open a JSON window  (--text STR | --file PATH | --blank)
   palette              Open the command palette
-  settings [--page P]  Open Settings  (general|awake|json|translate|shortcuts|about)
+  settings [--page P]  Open Settings  (general|awake|json|translate|qr|shortcuts|about)
   translate [TEXT]     Translate text from an argument, file, standard input,
                        or the current selection when no text is given
                        [--to auto|zh|en] [--text STR | --file PATH | -]
+  qr [TEXT]            Make a QR code of text or a link and print it as block
+                       characters  [--text STR | --file PATH | -]
+                       [--png PATH]
   version              Print the version of this tool and its app bundle
   help [command]       Show this help
 
@@ -71,8 +74,34 @@ Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
              4 rejected, 5 timeout
 `
 
+// qrHelpText is the topic help for `cubbix help qr`. The tool's own strings
+// stay in English; the app's messages carry the interface language.
+const qrHelpText = `Usage: cubbix qr [TEXT] [options]
+
+Make a QR code of a link or a short text. TEXT may be omitted when piping
+standard input; "-" reads standard input explicitly. The default output is a
+block-character drawing with a quiet zone of four modules: two module rows per
+line, so a long payload can be wider than a narrow terminal and wrap, which
+makes it unscannable. Use --png for those, or for anything you want to keep.
+With --png the image is written to the file and nothing is drawn.
+Only one symbol is made: text that does not fit is rejected (exit 4) rather
+than cut, because a shortened link is a wrong QR code.
+
+Options:
+  --text STR           Make a code of STR
+  --file PATH          Read the text from PATH, or standard input for -
+  --png PATH           Write a PNG (16 pixels per module) instead of drawing
+  --json               Print one JSON object with stable fields
+  --no-launch          Do not start Cubbix when it is not running
+  --timeout DURATION   Wait at most this long (default 15s, max 60s)
+  --socket PATH        Talk to the app at PATH instead of the default socket
+
+Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
+             4 rejected, 5 timeout
+`
+
 // tiles stays accepted: scripts in the wild still name the old page.
-var settingsPages = map[string]bool{"general": true, "awake": true, "tiles": true, "json": true, "translate": true, "shortcuts": true, "about": true}
+var settingsPages = map[string]bool{"general": true, "awake": true, "tiles": true, "json": true, "translate": true, "qr": true, "shortcuts": true, "about": true}
 
 // parse reads the command line. Every mistake is a usage error.
 func parse(argv []string) (inv invocation, err error) {
@@ -186,6 +215,16 @@ func parse(argv []string) (inv invocation, err error) {
 			}
 			seen = append(seen, name)
 			inv.flags.socket = raw
+		case "--png":
+			raw, err := value(&i, name, inline, hasInline)
+			if err != nil {
+				return inv, err
+			}
+			seen = append(seen, name)
+			if raw == "" {
+				return inv, usagef("Invalid value for --png: %q", raw)
+			}
+			inv.png, inv.hasPNG = raw, true
 		case "--text":
 			raw, err := value(&i, name, inline, hasInline)
 			if err != nil {
@@ -240,6 +279,9 @@ func parse(argv []string) (inv invocation, err error) {
 	// before the app could answer. An explicit --timeout still wins.
 	if inv.command == "translate" && !seenContains(seen, "--timeout") {
 		inv.flags.timeout = 30 * time.Second
+	}
+	if inv.command == "qr" && !seenContains(seen, "--timeout") {
+		inv.flags.timeout = 15 * time.Second
 	}
 	if inv.command == "awake.on" {
 		chosen := 0
@@ -344,6 +386,15 @@ func resolve(inv *invocation, positional []string) error {
 			inv.textArg = rest[0]
 			inv.hasTextArg = true
 		}
+	case "qr":
+		if len(rest) > 1 {
+			return usagef("qr accepts one TEXT argument. See \"cubbix help qr\".")
+		}
+		inv.command = "qr"
+		if len(rest) == 1 {
+			inv.textArg = rest[0]
+			inv.hasTextArg = true
+		}
 	case "help":
 		if len(rest) > 1 {
 			return usagef("Unknown command %q. See \"cubbix help\".", strings.Join(positional, " "))
@@ -365,6 +416,7 @@ func checkOptions(command string, seen []string) error {
 	awakeOnly := map[string]bool{"--minutes": true, "--until": true, "--follow": true, "--mode": true, "--lid": true, "--no-lid": true}
 	bodyOnly := map[string]bool{"--text": true, "--file": true, "--blank": true}
 	translateOnly := map[string]bool{"--to": true, "--text": true, "--file": true}
+	qrOnly := map[string]bool{"--text": true, "--file": true, "--png": true}
 	allowed := map[string]bool{}
 	for name := range global {
 		allowed[name] = true
@@ -383,11 +435,13 @@ func checkOptions(command string, seen []string) error {
 		// A translation never shows a hint and never opens a window, so
 		// --notify would be a no-op at best. --blank belongs to json.new only.
 		allow(translateOnly)
+	case "qr":
+		allow(qrOnly)
 	case "settings":
 		allowed["--page"] = true
 	}
 	// A read-only command never carries --notify: nothing would show.
-	if strings.HasPrefix(command, "awake.status") || command == "status" || command == "version" || command == "help" || command == "translate" {
+	if strings.HasPrefix(command, "awake.status") || command == "status" || command == "version" || command == "help" || command == "translate" || command == "qr" {
 		delete(allowed, "--notify")
 	}
 	if command == "help" || command == "version" {

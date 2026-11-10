@@ -49,6 +49,7 @@ const (
 	ActionPalette     = "palette"
 	ActionSettings    = "settings"
 	ActionTranslate   = "translate"
+	ActionQR          = "qr"
 )
 
 // Accepted --to values for the translate action. Empty means auto.
@@ -82,7 +83,8 @@ const (
 var idPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,64}$`)
 
 // Request is one line of the protocol. Fields the selected op does not use are
-// ignored, except that a body is only allowed for json.new.
+// ignored. A body frame is allowed for the three actions that carry text:
+// json.new, translate and qr.
 type Request struct {
 	V      int    `json:"v"`
 	ID     string `json:"id"`
@@ -174,6 +176,16 @@ func (r Request) Validate(maxPayload int) string {
 		default:
 			return CodeBadRequest
 		}
+	case ActionQR:
+		// The text travels in a body frame, as it does for translate. A QR
+		// code never shows a hint either, so --notify is a usage error.
+		if r.Arg != "" || r.Mode != "" || r.Follow != 0 || r.Lid != nil ||
+			r.Blank || r.Page != "" || r.Notify || r.To != "" {
+			return CodeBadRequest
+		}
+		if r.Bytes < 0 || r.Bytes > maxPayload {
+			return CodeBadRequest
+		}
 	default:
 		return CodeBadRequest
 	}
@@ -191,6 +203,19 @@ type TranslateResult struct {
 	Text    string `json:"text,omitempty"`
 }
 
+// QRResult is the small metadata of one symbol. It carries no text and no
+// pixels: the tool draws the symbol itself, so the JSON line stays far below
+// MaxLine.
+type QRResult struct {
+	Version int    `json:"version"`
+	ECC     string `json:"ecc"`
+	Modules int    `json:"modules"`
+	Bytes   int    `json:"bytes"`
+	// PNG is the path the image was written to. It is set only when --png
+	// asked for a file; the image itself never travels in the answer.
+	PNG string `json:"png,omitempty"`
+}
+
 // Result is what the command line tool prints: the stable --json object.
 type Result struct {
 	V         int              `json:"v"`
@@ -201,6 +226,7 @@ type Result struct {
 	State     *State           `json:"state"`
 	Bytes     int              `json:"bytes,omitempty"`
 	Translate *TranslateResult `json:"translate,omitempty"`
+	QR        *QRResult        `json:"qr,omitempty"`
 }
 
 // Response is a Result with the request id the wire response carries.
@@ -214,13 +240,14 @@ type Response struct {
 	State     *State           `json:"state"`
 	Bytes     int              `json:"bytes,omitempty"`
 	Translate *TranslateResult `json:"translate,omitempty"`
+	QR        *QRResult        `json:"qr,omitempty"`
 }
 
-// Result drops the id for printing. Both translate fields travel through it:
-// a field added only to Response would be lost before the tool sees it.
+// Result drops the id for printing. Every module field travels through it: a
+// field added only to Response would be lost before the tool sees it.
 func (r Response) Result() Result {
 	return Result{V: r.V, OK: r.OK, Code: r.Code, Message: r.Message, Lines: r.Lines,
-		State: r.State, Bytes: r.Bytes, Translate: r.Translate}
+		State: r.State, Bytes: r.Bytes, Translate: r.Translate, QR: r.QR}
 }
 
 // NewResult is a successful result with a state.

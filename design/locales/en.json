@@ -372,5 +372,22 @@
   "TranslateSelectionLabel": "Selected text",
   "TranslateSelectionAuthorized": "Allowed",
   "TranslateSelectionUnauthorized": "Not allowed",
-  "TranslateSelectionInfo": "Accessibility permission is needed to read selected text from other applications. Once allowed, the shortcut translates it directly. Cubbix only reads the selection; it never copies or changes the clipboard."
+  "TranslateSelectionInfo": "Accessibility permission is needed to read selected text from other applications. Once allowed, the shortcut translates it directly. Cubbix only reads the selection; it never copies or changes the clipboard.",
+  "QR": "QR code",
+  "QRPageDesc": "Turns text or a link into a QR code you can copy, save or drag out",
+  "QRShortcutLabel": "QR code",
+  "QRRecordShortcut": "Record QR code shortcut",
+  "QRInputPlaceholder": "Type text or a link",
+  "QREmpty": "Type something to make a QR code",
+  "QRTooLong": "Too much content for one QR code",
+  "QRTooLongHint": "Use a shorter link or text",
+  "QRFailed": "Could not make a QR code",
+  "QRSelectionDenied": "Turn on Accessibility access to use the selected text",
+  "QRGrantAccess": "Open Settings",
+  "QRCopy": "Copy QR code image",
+  "QRCopied": "Copied",
+  "QRSave": "Save as PNG",
+  "QRSaveFailed": "Could not write the file",
+  "QRCardAction": "QR code…",
+  "QRDragHint": "Drag to another app"
 }

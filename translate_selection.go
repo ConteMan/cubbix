@@ -51,7 +51,11 @@ type selectionAnswer struct {
 	status       selectionStatus
 	trusted      bool
 	trustedKnown bool // false for a timeout: keep the last known permission
-	reason       string
+	// busy reports a read this call could not start because another one owns
+	// the single flight. It is neither "no selection" nor "no permission", so
+	// a caller may not fall back to the clipboard on it.
+	busy   bool
+	reason string
 }
 
 // systemSelectionReader is defined per platform: the darwin one uses AX, the
@@ -77,8 +81,11 @@ func (a *application) captureSelectionContext(parent context.Context) selectionA
 	}
 	ctx, cancel := context.WithTimeout(parent, a.selectionTimeoutDuration())
 	defer cancel()
-	if ctx.Err() != nil || !a.selectionReading.CompareAndSwap(false, true) {
-		return selectionAnswer{status: selectionNone, reason: "selection unavailable"}
+	if ctx.Err() != nil {
+		return selectionAnswer{status: selectionNone, reason: "selection timeout"}
+	}
+	if !a.selectionReading.CompareAndSwap(false, true) {
+		return selectionAnswer{status: selectionNone, busy: true, reason: "selection unavailable"}
 	}
 	done := make(chan selectionAnswer, 1)
 	go func() {
@@ -206,6 +213,9 @@ func (a *application) grantAccessibility() {
 	if s := a.translate; s != nil {
 		s.denied = false
 	}
+	if s := a.qr; s != nil {
+		s.denied = false
+	}
 	if !a.accessibilitySettingsOpened {
 		a.accessibilitySettingsOpened = true
 		if a.openAccessibilitySettings != nil {
@@ -213,6 +223,12 @@ func (a *application) grantAccessibility() {
 		}
 	}
 	a.refreshTranslate()
+	if a.qr != nil {
+		// The hint row changes the room the symbol has, so the bitmap is built
+		// again for the new box.
+		a.refreshQRScale()
+		a.refreshQR()
+	}
 	a.invalidateWindow()
 }
 

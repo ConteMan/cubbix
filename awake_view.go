@@ -350,8 +350,8 @@ func sameShortcut(first, second string) bool {
 	return identity(first) == identity(second)
 }
 
-// shortcutSlot describes one global shortcut and what it runs. The five
-// slots are mutually exclusive: the same combination never registers twice.
+// shortcutSlot describes one global shortcut and what it runs. The six slots
+// are mutually exclusive: the same combination never registers twice.
 type shortcutSlot struct {
 	Target   string // "awake" / "json" / "palette" / "panel" / "translate"
 	Acc      string
@@ -366,6 +366,7 @@ func (a *application) shortcutSlots() []shortcutSlot {
 		{Target: "palette", Acc: a.config.PaletteShortcut, Enabled: true, Callback: a.togglePalette},
 		{Target: "panel", Acc: a.config.PanelShortcut, Enabled: true, Callback: a.toggleMenubarPanel},
 		{Target: "translate", Acc: a.config.TranslateShortcut, Enabled: a.config.TranslateEnabled, Callback: a.toggleTranslate},
+		{Target: "qr", Acc: a.config.QRShortcut, Enabled: a.config.QREnabled, Callback: a.toggleQR},
 	}
 }
 
@@ -462,6 +463,8 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 		a.config.AwakeShortcut = acc
 	case "translate":
 		a.config.TranslateShortcut = acc
+	case "qr":
+		a.config.QRShortcut = acc
 		// An unknown target is never written: a stray recorder must not change
 		// the keep-awake shortcut or any other slot.
 	}
@@ -661,6 +664,8 @@ func (a *application) shortcutSlotEnabled(target string) bool {
 		return a.config.JSONEnabled
 	case "translate":
 		return a.config.TranslateEnabled
+	case "qr":
+		return a.config.QREnabled
 	}
 	return true
 }
@@ -702,6 +707,8 @@ func (a *application) slotError(target string) string {
 		return a.panelShortcutError
 	case "translate":
 		return a.translateShortcutError
+	case "qr":
+		return a.qrShortcutError
 	}
 	return ""
 }
@@ -718,6 +725,8 @@ func (a *application) clearSlotError(target string) {
 		a.panelShortcutError = ""
 	case "translate":
 		a.translateShortcutError = ""
+	case "qr":
+		a.qrShortcutError = ""
 	}
 }
 
@@ -742,6 +751,10 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 	if target == "translate" {
 		label, recordKey, moduleKey = "TranslateShortcutLabel", "TranslateRecordShortcut", "Translate"
 		acc = a.config.TranslateShortcut
+	}
+	if target == "qr" {
+		label, recordKey, moduleKey = "QRShortcutLabel", "QRRecordShortcut", "QR"
+		acc = a.config.QRShortcut
 	}
 	enabled := a.shortcutSlotEnabled(target)
 	recordable := enabled && !a.moduleClosing

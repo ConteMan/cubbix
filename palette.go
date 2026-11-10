@@ -112,8 +112,10 @@ func (a *application) paletteVisible() bool {
 	return a.palette != nil && a.palette.visible
 }
 
+// showPalette opens the command palette. It closes the card panel, which is
+// another overlay, and leaves the tool windows alone: Translate and QR stay
+// open, so a command can be chosen while they are visible.
 func (a *application) showPalette() {
-	a.closeTranslate()
 	a.hideMenubarPanel()
 	if a.palette == nil {
 		a.palette = &paletteState{}
@@ -862,6 +864,8 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 			page = settingsJSON
 		case "translate":
 			page = settingsTranslate
+		case "qr":
+			page = settingsQR
 		case "shortcuts":
 			page = settingsShortcuts
 		case "about":

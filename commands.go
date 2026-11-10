@@ -75,6 +75,8 @@ func commandCategory(cmd *command) string {
 		return "PaletteShortcutLabel"
 	case "translate":
 		return "Translate"
+	case "qr":
+		return "QR"
 	}
 	return "R05App"
 }
@@ -87,6 +89,7 @@ func (a *application) commands() []*command {
 	all = append(all, a.jsonCommands()...)
 	all = append(all, a.systemCommands()...)
 	all = append(all, a.translateCommands()...)
+	all = append(all, a.qrCommands()...)
 	commands := make([]*command, 0, len(all))
 	for _, command := range all {
 		if command.Available == nil || command.Available(a) {
@@ -111,6 +114,26 @@ func (a *application) translateCommands() []*command {
 			Available: func(a *application) bool { return a.config.TranslateEnabled },
 			Run: func(a *application, req request) error {
 				a.openTranslateText(req.Arg)
+				return nil
+			},
+		},
+	}
+}
+
+// qrCommands is the command palette entry. The text argument keeps its original
+// case, as the translate command does: a URL path is case sensitive.
+func (a *application) qrCommands() []*command {
+	return []*command{
+		{
+			ID:        "qr.open",
+			Title:     localizedTitle("QR"),
+			Keywords:  []string{"二维码", "qr", "erweima", "ewm", "qrcode", "code"},
+			Tile:      "qr",
+			Icon:      "qr-code",
+			Param:     paramText,
+			Available: func(a *application) bool { return a.config.QREnabled },
+			Run: func(a *application, req request) error {
+				a.openQRText(req.Arg)
 				return nil
 			},
 		},

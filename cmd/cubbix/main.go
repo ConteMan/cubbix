@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/ConteMan/cubbix/internal/cli"
+	qrlib "github.com/ConteMan/cubbix/internal/qr"
 )
 
 // Exit statuses, documented in `cubbix help`.
@@ -89,8 +90,10 @@ type invocation struct {
 	body       bodyOptions
 	page       string
 	to         string // translate target override
-	textArg    string // the positional TEXT of translate
+	textArg    string // the positional TEXT of translate or qr
 	hasTextArg bool
+	png        string // the --png path of qr
+	hasPNG     bool
 	helpTopic  string // `cubbix help translate`
 }
 
@@ -136,9 +139,12 @@ func run(args []string, e *env) int {
 	}
 	switch inv.command {
 	case "help":
-		if inv.helpTopic == "translate" {
+		switch inv.helpTopic {
+		case "translate":
 			fmt.Fprint(e.stdout, translateHelpText)
-		} else {
+		case "qr":
+			fmt.Fprint(e.stdout, qrHelpText)
+		default:
 			fmt.Fprint(e.stdout, helpText)
 		}
 		return exitOK
@@ -161,7 +167,63 @@ func run(args []string, e *env) int {
 	if inv.command == "awake.status" && len(result.Lines) > 1 {
 		result.Lines = result.Lines[:1]
 	}
+	if inv.command == "qr" {
+		return reportQR(e, inv, result, payload)
+	}
 	return report(e, inv, inv.flags.json, result)
+}
+
+// qrTerminalQuietZone is the quiet zone of the terminal drawing: four modules,
+// the same margin the exported image uses. A smaller margin scans on a clean
+// screen but not on a phone camera over a busy background.
+const qrTerminalQuietZone = qrlib.QuietZone
+
+// reportQR prints a QR code answer. The app only says whether the text fits and
+// what the symbol measures; the drawing and the file are made here, after the
+// app has answered, so a disabled module or an over-long text never prints a
+// symbol the app would have refused.
+func reportQR(e *env, inv invocation, result cli.Result, payload []byte) int {
+	if !result.OK {
+		return report(e, inv, inv.flags.json, result)
+	}
+	code, err := qrlib.Encode(string(payload))
+	if err != nil {
+		// The app accepted the text, so this is this tool's own failure: report
+		// it without claiming the app refused anything.
+		failed := cli.Failure(cli.CodeInternal)
+		failed.Message = "cubbix: could not build the QR code"
+		return report(e, inv, inv.flags.json, failed)
+	}
+	if inv.hasPNG {
+		png, err := code.PNG(qrlib.ExportModule)
+		if err == nil {
+			err = os.WriteFile(inv.png, png, 0o644)
+		}
+		if err != nil {
+			failed := cli.Failure(cli.CodeInternal)
+			failed.Message = fmt.Sprintf("cubbix: could not write %s: %v", inv.png, err)
+			return report(e, inv, inv.flags.json, failed)
+		}
+		if result.QR != nil {
+			result.QR.PNG = inv.png
+		}
+	}
+	if inv.flags.json {
+		// One metadata line, never the drawing and never the pixels.
+		data, err := json.Marshal(result)
+		if err != nil {
+			fmt.Fprintln(e.stderr, "cubbix: could not encode the answer")
+			return exitInternal
+		}
+		fmt.Fprintln(e.stdout, string(data))
+		return exitOK
+	}
+	if inv.hasPNG {
+		// The image went to the file; nothing goes to the terminal.
+		return exitOK
+	}
+	fmt.Fprint(e.stdout, code.Matrix(qrTerminalQuietZone))
+	return exitOK
 }
 
 // wantsJSON reports whether --json appeared, even when parsing failed after it:
@@ -264,6 +326,8 @@ func fallbackMessage(code, command string) string {
 			return "The JSON module is disabled."
 		case command == "translate":
 			return "The translate module is disabled."
+		case command == "qr":
+			return "The QR code module is disabled."
 		}
 		return "The keep-awake module is disabled."
 	case cli.CodeBusy:
@@ -277,6 +341,14 @@ func buildRequest(inv invocation, e *env) (cli.Request, []byte, error) {
 	request := cli.Request{V: cli.Protocol, ID: newID(), Notify: inv.flags.notify}
 	var payload []byte
 	switch inv.command {
+	case "qr":
+		body, err := readQRBody(inv, e)
+		if err != nil {
+			return request, nil, err
+		}
+		payload = body
+		request.Op, request.Action = cli.OpRun, cli.ActionQR
+		request.Bytes = len(body)
 	case "status", "awake.status":
 		request.Op = cli.OpStatus
 	case "awake.on":
@@ -356,6 +428,52 @@ func readTranslateBody(inv invocation, e *env) ([]byte, error) {
 	}
 	if len(bytes.TrimSpace(data)) == 0 {
 		return nil, usagef("translate needs text. See \"cubbix help translate\".")
+	}
+	return data, nil
+}
+
+// readQRBody reads the text of `cubbix qr`: an argument, --text, a file, or
+// standard input when it is a pipe. An explicitly empty text is a usage error:
+// an empty QR code is never useful.
+func readQRBody(inv invocation, e *env) ([]byte, error) {
+	sources := 0
+	for _, present := range []bool{inv.body.hasText, inv.body.hasFile, inv.hasTextArg} {
+		if present {
+			sources++
+		}
+	}
+	if sources > 1 {
+		return nil, usagef("--text, --file and TEXT are mutually exclusive.")
+	}
+	var data []byte
+	var err error
+	switch {
+	case inv.body.hasText:
+		data = []byte(inv.body.text)
+	case inv.body.hasFile:
+		data, err = readBody(bodyOptions{file: inv.body.file, hasFile: true}, e)
+	case inv.textArg == "-":
+		data, err = readStdin(e)
+	case inv.hasTextArg:
+		data = []byte(inv.textArg)
+	default:
+		reader, terminal := e.stdin()
+		if terminal {
+			return nil, usagef("qr needs text. See \"cubbix help qr\".")
+		}
+		data, err = io.ReadAll(io.LimitReader(reader, cli.MaxPayload+1))
+	}
+	if err != nil {
+		return nil, usagef("Could not read the text to encode.")
+	}
+	if len(data) > cli.MaxPayload {
+		return nil, usagef("The text exceeds the 64 MiB limit.")
+	}
+	if !cli.ValidTranslateInput(data) {
+		return nil, usagef("QR input must be UTF-8 text without binary control characters.")
+	}
+	if len(bytes.TrimSpace(data)) == 0 {
+		return nil, usagef("qr needs text. See \"cubbix help qr\".")
 	}
 	return data, nil
 }

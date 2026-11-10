@@ -20,9 +20,10 @@ const (
 	settingsAwake     = 2
 	settingsShortcuts = 3
 	settingsJSON      = 4
-	// settingsTranslate is the sixth page. Pages 0-4 keep their numbers: a
-	// saved window, a URL or the command line may name one.
+	// settingsTranslate is the sixth page and settingsQR the seventh. Pages 0-5
+	// keep their numbers: a saved window, a URL or the command line may name one.
 	settingsTranslate = 5
+	settingsQR        = 6
 )
 
 // settingsNav is the sidebar order: module pages first, global pages after.
@@ -34,6 +35,7 @@ var settingsNav = []struct {
 	{settingsAwake, "sun", "Awake"},
 	{settingsJSON, "braces", "JSON"},
 	{settingsTranslate, "languages", "Translate"},
+	{settingsQR, "qr-code", "QR"},
 	{settingsShortcuts, "keyboard", "R05Shortcuts"},
 	{settingsAbout, "info", "About"},
 }
@@ -50,6 +52,8 @@ func settingsPageName(page int) string {
 		return "json"
 	case settingsTranslate:
 		return "translate"
+	case settingsQR:
+		return "qr"
 	}
 	return "general"
 }
@@ -60,6 +64,7 @@ type settingsLayout struct {
 	page                   int
 	awakeOn, jsonOn, ready bool
 	translateOn            bool
+	qrOn                   bool
 	showPlacement          bool
 	fixedDisplay           bool
 	hasCLI                 bool
@@ -83,6 +88,7 @@ func newSettingsLayout(a *application, page int) settingsLayout {
 		awakeOn:     a.config.AwakeEnabled,
 		jsonOn:      a.config.JSONEnabled,
 		translateOn: a.config.TranslateEnabled,
+		qrOn:        a.config.QREnabled,
 		ready:       a.updates.snapshot().Phase == updateReady,
 		displays:    displays,
 		// A single display needs no choice, so the whole group stays hidden
@@ -166,12 +172,14 @@ func pageHeight(t tokenValues, page int, awakeOn, showPlacement, fixedDisplay, h
 		return sectionHeight(t, cardHeight(t, rowHeight(t, 3)))
 	case settingsTranslate:
 		return translatePageHeight(t, true)
+	case settingsQR:
+		return qrPageHeight(t)
 	}
 	return 0
 }
 
 // sidebarNaturalHeight is the tallest the sidebar can be: padding, the
-// traffic light slot, the brand row, the separator and five navigation items.
+// traffic light slot, the brand row, the separator and one row per page.
 func sidebarNaturalHeight(t tokenValues) float32 {
 	nav := float32(len(settingsNav))*t.SizeNavItem + float32(len(settingsNav)-1)*t.Space4
 	return 2*t.Space12 + t.Space12 + 3*t.Space16 + t.Space20 + t.StrokeHairline + nav
@@ -186,6 +194,7 @@ func settingsMinimumHeight(t tokenValues) float32 {
 		pageHeight(t, settingsAwake, true, false, false, false, false),
 		pageHeight(t, settingsShortcuts, true, false, false, false, false),
 		pageHeight(t, settingsJSON, true, false, false, false, false),
+		pageHeight(t, settingsQR, true, false, false, false, false),
 		translatePageHeight(t, true)-rowHeight(t, 3)-t.StrokeHairline,
 	)
 	height := max(t.SizeWindowMinHeight, sidebarNaturalHeight(t), content+2*t.Space24)
@@ -224,6 +233,9 @@ func settingsHeight(t tokenValues, page int, awakeOn, showPlacement, fixedDispla
 func (l settingsLayout) height(t tokenValues) float32 {
 	if l.page == settingsTranslate {
 		return translatePageHeight(t, l.translateOn)
+	}
+	if l.page == settingsQR {
+		return qrPageHeight(t)
 	}
 	return pageHeight(t, l.page, l.awakeOn, l.showPlacement, l.fixedDisplay, l.hasCLI, l.ready)
 }
@@ -488,6 +500,8 @@ func (a *application) settingsContent(c *ui.Context, t tokenValues, locale strin
 		a.jsonModulePage(c, t, locale, l, alert)
 	case settingsTranslate:
 		a.translateModulePage(c, t, locale, l, alert)
+	case settingsQR:
+		a.qrModulePage(c, t, locale, l, alert)
 	default:
 		a.shortcutsPage(c, t, locale, l, alert)
 	}
@@ -873,6 +887,26 @@ func (a *application) selectSettingsPage(page int) {
 		a.refreshSelectionTrust()
 	}
 	a.invalidateWindow()
+}
+
+// qrPageHeight is the natural height of the seventh settings page. It has no
+// settings group: the symbol's parameters are fixed, so only the header card
+// and the shortcut card exist, and the page is the same height either way.
+func qrPageHeight(t tokenValues) float32 {
+	return sectionHeight(t, cardHeight(t, rowHeight(t, 3)))
+}
+
+func (a *application) qrModulePage(c *ui.Context, t tokenValues, locale string, l settingsLayout, alert string) {
+	text := func(key string) string { return a.text(locale, key) }
+	on := l.qrOn
+	a.pageHeader(c, t, locale, "qr-code", "QR", "QRPageDesc", alert, func() {
+		a.switchControl(c, t, "qr-enabled", text("QR"), &on, func() {
+			a.changeQREnabled(!a.config.QREnabled)
+		}, "", false)
+	})
+	a.settingsSection(c, t, text("GroupShortcuts"), func() {
+		a.shortcutSettingsRow(c, t, locale, "qr")
+	})
 }
 
 // settingsView is the settings column for the page on screen.
