@@ -274,7 +274,9 @@ func (a *application) scheduleQR() {
 	if s == nil {
 		return
 	}
+	a.cancelQREncode()
 	s.due = time.Now().Add(qrDebounce)
+	a.refreshQRBitmap()
 	a.refreshQR()
 }
 
@@ -292,7 +294,7 @@ func (a *application) encodeQR(text string) {
 	a.runQRWorker(func() {
 		code, err := encode(text)
 		a.qrOnMainThread(func() {
-			if generation != s.generation || s.closing || a.quitting {
+			if a.qr != s || generation != s.generation || s.input != text || s.closing || a.quitting {
 				return
 			}
 			if err != nil {
@@ -334,6 +336,7 @@ func (a *application) refreshQRScale() {
 	}
 	s.scale = scale
 	a.refreshQRBitmap()
+	a.refreshQR()
 }
 
 // refreshQRBitmap rebuilds the bitmap from the symbol already encoded, at whole
@@ -486,7 +489,7 @@ func (a *application) showQRSelectionHintOnce() {
 // zone, whatever the window shows.
 func (a *application) qrPNG() ([]byte, error) {
 	s := a.qr
-	if s == nil || s.code == nil {
+	if s == nil || s.code == nil || s.encoded != s.input {
 		return nil, errors.New("qr: nothing encoded")
 	}
 	return s.code.PNG(qrlib.ExportModule)
@@ -512,27 +515,32 @@ func (a *application) copyQRImage() {
 // dialog writes nothing and reports nothing.
 func (a *application) saveQRImage() {
 	s := a.qr
-	if s == nil || s.code == nil || a.qrChooseSave == nil {
+	if s == nil || s.code == nil || s.encoded != s.input || a.qrChooseSave == nil {
 		return
 	}
 	window := s.window
 	code := s.code
 	s.saveFailed = false
+	a.refreshQRBitmap()
 	a.refreshQR()
 	go func() {
 		path, err := a.qrChooseSave(window)
-		if err != nil || path == "" {
+		if err == nil && path == "" {
 			return
 		}
-		png, err := code.PNG(qrlib.ExportModule)
 		if err == nil {
-			err = a.qrWriteFile(path, png)
+			var png []byte
+			png, err = code.PNG(qrlib.ExportModule)
+			if err == nil {
+				err = a.qrWriteFile(path, png)
+			}
 		}
 		a.qrOnMainThread(func() {
 			if a.qr != s || s.closing {
 				return
 			}
 			s.saveFailed = err != nil
+			a.refreshQRBitmap()
 			a.refreshQR()
 		})
 	}()

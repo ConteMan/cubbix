@@ -190,8 +190,9 @@ func reportQR(e *env, inv invocation, result cli.Result, payload []byte) int {
 	if err != nil {
 		// The app accepted the text, so this is this tool's own failure: report
 		// it without claiming the app refused anything.
-		fmt.Fprintln(e.stderr, "cubbix: could not build the QR code")
-		return exitInternal
+		failed := cli.Failure(cli.CodeInternal)
+		failed.Message = "cubbix: could not build the QR code"
+		return report(e, inv, inv.flags.json, failed)
 	}
 	if inv.hasPNG {
 		png, err := code.PNG(qrlib.ExportModule)
@@ -199,8 +200,9 @@ func reportQR(e *env, inv invocation, result cli.Result, payload []byte) int {
 			err = os.WriteFile(inv.png, png, 0o644)
 		}
 		if err != nil {
-			fmt.Fprintf(e.stderr, "cubbix: could not write %s: %v\n", inv.png, err)
-			return exitInternal
+			failed := cli.Failure(cli.CodeInternal)
+			failed.Message = fmt.Sprintf("cubbix: could not write %s: %v", inv.png, err)
+			return report(e, inv, inv.flags.json, failed)
 		}
 		if result.QR != nil {
 			result.QR.PNG = inv.png

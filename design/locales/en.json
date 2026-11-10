@@ -380,7 +380,7 @@
   "QRInputPlaceholder": "Type text or a link",
   "QREmpty": "Type something to make a QR code",
   "QRTooLong": "Too much content for one QR code",
-  "QRTooLongHint": "Use a shorter link or text: about 2331 bytes",
+  "QRTooLongHint": "Use a shorter link or text",
   "QRFailed": "Could not make a QR code",
   "QRSelectionDenied": "Turn on Accessibility access to use the selected text",
   "QRGrantAccess": "Open Settings",

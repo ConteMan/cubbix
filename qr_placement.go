@@ -60,6 +60,7 @@ func (a *application) placeQR() {
 func (a *application) reconcileQRDisplay() {
 	if s := a.qr; s != nil && s.frame() != nil {
 		a.reconcilePlacementIfNeeded(&s.place, s.frame(), a.displaysNow(), a.jsonReselect, a.qrSeats())
+		a.refreshQRScale()
 	}
 }
 

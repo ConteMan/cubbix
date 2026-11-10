@@ -380,7 +380,7 @@
   "QRInputPlaceholder": "输入文字或网址",
   "QREmpty": "输入内容后生成二维码",
   "QRTooLong": "内容太长，二维码放不下",
-  "QRTooLongHint": "换短一些的链接或文字，最多约 2331 字节",
+  "QRTooLongHint": "换短一些的链接或文字",
   "QRFailed": "无法生成二维码",
   "QRSelectionDenied": "开启辅助功能权限后可直接用选中的文字",
   "QRGrantAccess": "去设置",

@@ -21,6 +21,9 @@ func (a *application) qrView(c *ui.Context) {
 	if a.qrCopyExpired(c.Now()) {
 		s.copiedUntil = time.Time{}
 	}
+	if s.copiedUntil.After(c.Now()) {
+		c.After(s.copiedUntil.Sub(c.Now()))
+	}
 	c.OnShortcut(0, ui.KeyEscape, a.closeQR)
 	c.OnShortcut(ui.Cmd, ui.KeyW, a.closeQR)
 	c.OnShortcut(ui.Cmd|ui.Alt, ui.KeyP, func() { a.setQRPinned(!s.pinned) })
@@ -67,7 +70,7 @@ func (a *application) qrToolbar(c *ui.Context, t tokenValues, locale string, s *
 			pin.Background(ui.Hex(t.ColorAccentSoft))
 		}
 		pin.OnClick(func() { a.setQRPinned(!s.pinned) })
-		usable := s.code != nil
+		usable := s.code != nil && s.encoded == s.input
 		a.qrActionButton(c, t, "qr-copy", "copy", text("QRCopy"), usable, s.copiedUntil.After(c.Now()),
 			text("QRCopied"), a.copyQRImage)
 		a.qrActionButton(c, t, "qr-save", "download", text("QRSave"), usable, false, "", a.saveQRImage)
@@ -155,7 +158,7 @@ func (a *application) qrSymbolArea(c *ui.Context, t tokenValues, locale string, 
 		label := text("QRSaveFailed")
 		ui.Row(c.Key("qr-save-failed")).FillWidth().Gap(t.Space6).AlignItems(ui.Center).Children(func() {
 			ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).
-				TextColor(ui.Hex(t.ColorDanger)).Tooltip(label)
+				TextColor(ui.Hex(t.ColorTextSecondary)).Tooltip(label)
 			ui.Text(c, label).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
 		})
 	}
@@ -201,8 +204,6 @@ func (a *application) qrSymbolContent(c *ui.Context, t tokenValues, locale strin
 			ui.Text(c, text(key)).FontSize(t.FontSizeBody).LineHeight(t.LineHeightBody).
 				TextColor(ui.Hex(t.ColorText)).SingleLine().Label(text(key))
 			if s.phase == qrTooLong {
-				// The hint states what one symbol holds without claiming it is
-				// a limit of every payload: digits and upper case hold more.
 				ui.Text(c, text("QRTooLongHint")).FontSize(t.FontSizeSmall).
 					LineHeight(t.LineHeightBody).TextColor(ui.Hex(t.ColorTextSecondary)).
 					SingleLine().Tooltip(text("QRTooLongHint"))

@@ -42,8 +42,8 @@ type Code struct {
 }
 
 // Encode builds the symbol with the fixed parameters: ECC M, no boost, a
-// single byte-mode segment and an explicit UTF-8 ECI. A payload that does not
-// fit is reported as ErrTooLong and never truncated.
+// single numeric, alphanumeric or byte segment and UTF-8 ECI for non-ASCII text.
+// A payload that does not fit is reported as ErrTooLong and never truncated.
 func Encode(text string) (*Code, error) {
 	code, err := codeqr.Encode(text,
 		codeqr.WithECC(codeqr.ECCMedium),
@@ -52,7 +52,7 @@ func Encode(text string) (*Code, error) {
 		codeqr.WithUTF8ECI())
 	if err != nil {
 		if errors.Is(err, codeqr.ErrDataTooLong) {
-			return nil, fmt.Errorf("%w: %d bytes", ErrTooLong, len(text))
+			return nil, fmt.Errorf("%w: %w", ErrTooLong, err)
 		}
 		return nil, err
 	}
@@ -122,14 +122,4 @@ func (c *Code) PNG(modulePixels int) ([]byte, error) {
 // SidePixels is the side of an exported image in pixels, quiet zone included.
 func (c *Code) SidePixels(modulePixels int) int {
 	return (c.Modules() + 2*QuietZone) * modulePixels
-}
-
-// Decode reads a symbol back. It exists for the round-trip tests only: the app
-// never decodes, and the wrapper deliberately exposes no other decoder.
-func Decode(img image.Image) (string, error) {
-	result, err := codeqr.Decode(img)
-	if err != nil {
-		return "", err
-	}
-	return result.Text, nil
 }

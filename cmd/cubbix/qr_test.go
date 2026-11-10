@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"image"
 	"io"
 	"os"
 	"path/filepath"
@@ -53,7 +54,7 @@ func TestCLIQRValidate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if inv.command != "qr" || inv.textArg != "https://example.com/a" || inv.hasPNG {
+	if inv.command != "qr" || inv.textArg != "https://example.com/a" || inv.hasPNG || inv.flags.timeout != 15*time.Second {
 		t.Fatalf("qr = %+v", inv)
 	}
 	inv, err = parse([]string{"qr", "--png", "out.png", "--text", "hello", "--json"})
@@ -139,6 +140,14 @@ func TestCLIQROutput(t *testing.T) {
 	if len(data) == 0 || !bytes.HasPrefix(data, []byte("\x89PNG")) {
 		t.Fatalf("not a PNG: %d bytes", len(data))
 	}
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected, err := code.PNG(qrlib.ExportModule)
+	if err != nil || !bytes.Equal(data, expected) || img.Bounds().Dx() != code.SidePixels(qrlib.ExportModule) {
+		t.Fatalf("CLI PNG differs from the round-trip-tested encoder: %v", err)
+	}
 	// --json prints one metadata line, and png is only the path.
 	e, stdout, _, _ = qrEnv(t, qrOKResult(text), "", true)
 	if exit := run([]string{"qr", text, "--png", path, "--json"}, e); exit != exitOK {
@@ -166,6 +175,46 @@ func TestCLIQROutput(t *testing.T) {
 	}
 	if _, err := os.Stat(refusedPath); !os.IsNotExist(err) {
 		t.Fatal("a refused answer wrote a file")
+	}
+}
+
+func TestCLIQRFailureAndJSONContract(t *testing.T) {
+	text := "hello"
+	for _, args := range [][]string{{"qr", text, "--json"}, {"qr", text, "--json", "--png", filepath.Join(t.TempDir(), "missing", "out.png")}} {
+		e, stdout, stderr, _ := qrEnv(t, qrOKResult(text), "", true)
+		want := exitOK
+		if len(args) > 4 {
+			want = exitInternal
+		}
+		if got := run(args, e); got != want {
+			t.Fatalf("%v: exit %d want %d", args, got, want)
+		}
+		var result cli.Result
+		if err := json.Unmarshal(stdout.Bytes(), &result); err != nil || result.OK != (want == exitOK) || result.Bytes != 0 || stderr.Len() != 0 || bytes.Count(stdout.Bytes(), []byte("\n")) != 1 {
+			t.Fatalf("JSON contract: %q stderr %q: %v", stdout.String(), stderr.String(), err)
+		}
+		if want == exitOK && result.QR == nil {
+			t.Fatal("JSON response lost metadata")
+		}
+	}
+	e, stdout, _, stub := qrEnv(t, qrOKResult(text), "", true)
+	stub.err = &cli.Error{Code: cli.CodeTimeout}
+	if got := run([]string{"qr", text}, e); got != exitTimeout || stdout.Len() != 0 {
+		t.Fatalf("timeout exit %d output %q", got, stdout.String())
+	}
+	e, _, _, launched := testEnv(t, func(string, time.Duration) (conn, error) { return nil, &cli.Error{Code: cli.CodeNotRunning} })
+	if got := run([]string{"qr", text, "--no-launch"}, e); got != exitUnavail || len(*launched) != 0 {
+		t.Fatalf("no-launch exit %d launched %v", got, *launched)
+	}
+	for _, args := range [][]string{{"qr", "--text", ""}, {"qr", text, "--text", text}, {"qr", "\xff"}, {"qr", "hello\x00"}} {
+		e, _, _, stub := qrEnv(t, qrOKResult(text), "", true)
+		if got := run(args, e); got != exitUsage || stub.req.Action != "" {
+			t.Fatalf("%q: exit %d reached app %v", args, got, stub.req.Action)
+		}
+	}
+	inv, err := parse([]string{"qr", text, "--timeout", "9s"})
+	if err != nil || inv.flags.timeout != 9*time.Second {
+		t.Fatalf("explicit timeout = %+v %v", inv, err)
 	}
 }
 

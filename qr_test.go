@@ -12,6 +12,7 @@ import (
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
+	codeqr "github.com/piglig/go-qr/v2"
 
 	"github.com/ConteMan/cubbix/internal/cli"
 	qrlib "github.com/ConteMan/cubbix/internal/qr"
@@ -57,12 +58,12 @@ func TestQRRoundTrip(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		got, err := qrlib.Decode(img)
+		got, err := codeqr.Decode(img)
 		if err != nil {
 			t.Fatalf("decode %d bytes: %v", len(text), err)
 		}
-		if got != text {
-			t.Fatalf("round trip differs: %q", got)
+		if got.Text != text {
+			t.Fatalf("round trip differs: %q", got.Text)
 		}
 	}
 }
@@ -84,9 +85,9 @@ func TestQRPNGDecodes(t *testing.T) {
 	if got := file.Bounds().Dx(); got != (code.Modules()+2*qrlib.QuietZone)*qrlib.ExportModule {
 		t.Fatalf("png side = %d", got)
 	}
-	decoded, err := qrlib.Decode(file)
-	if err != nil || decoded != text {
-		t.Fatalf("png decode = %q, %v", decoded, err)
+	decoded, err := codeqr.Decode(file)
+	if err != nil || decoded.Text != text {
+		t.Fatalf("png decode = %+v, %v", decoded, err)
 	}
 }
 
@@ -95,18 +96,21 @@ func TestQRQuietZone(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows := strings.Split(strings.TrimSuffix(code.Matrix(2), "\n"), "\n")
-	if want := (code.Modules() + 4 + 1) / 2; len(rows) != want {
+	rows := strings.Split(strings.TrimSuffix(code.Matrix(4), "\n"), "\n")
+	if want := (code.Modules() + 8 + 1) / 2; len(rows) != want {
 		t.Fatalf("rows = %d, want %d", len(rows), want)
 	}
-	for _, row := range rows {
-		if got, want := len([]rune(row)), code.Modules()+4; got != want {
+	for index, row := range rows {
+		if got, want := len([]rune(row)), code.Modules()+8; got != want {
 			t.Fatalf("columns = %d, want %d", got, want)
 		}
 		for _, glyph := range row {
 			if !strings.ContainsRune("█▀▄ ", glyph) {
 				t.Fatalf("unexpected glyph %q", glyph)
 			}
+		}
+		if !strings.HasPrefix(row, "    ") || !strings.HasSuffix(row, "    ") || ((index < 2 || index >= len(rows)-2) && strings.TrimSpace(row) != "") {
+			t.Fatal("terminal quiet zone contains a dark module")
 		}
 	}
 }
@@ -272,7 +276,10 @@ func TestQRSelectionDeniedOnce(t *testing.T) {
 func TestQRSelectionBusyReadOpensEmpty(t *testing.T) {
 	a := qrTestApp(t)
 	a.selection = &fakeSelectionReader{trusted: true, pid: otherSelectionPID(), text: "https://selected.example"}
-	a.qrReadClipboard = func() string { return "https://clipboard.example" }
+	a.qrReadClipboard = func() string {
+		t.Fatal("busy read accessed clipboard")
+		return ""
+	}
 	a.selectionReading.Store(true)
 	defer a.selectionReading.Store(false)
 	a.toggleQR()
@@ -374,22 +381,23 @@ func TestQRStaleEncodeDropped(t *testing.T) {
 	var queued []func()
 	a.qrRunOnMain = func(fn func()) { queued = append(queued, fn) }
 	a.openQRText("new")
-	a.qr.input = "newer"
 	a.encodeQR("new")
+	a.qr.input = "newer"
+	a.syncQRInput()
 	if a.qr.encoded != "" {
 		t.Fatal("an open reset the encoded text")
 	}
 	for _, fn := range queued {
 		fn()
 	}
-	if a.qr.encoded != "new" {
+	if a.qr.encoded != "" {
 		t.Fatalf("stale result replaced the symbol: %q", a.qr.encoded)
 	}
 	a.cancelQREncode()
 	for _, fn := range queued {
 		fn()
 	}
-	if a.qr.encoded != "new" {
+	if a.qr.encoded != "" {
 		t.Fatal("a cancelled encode still applied")
 	}
 }
@@ -731,6 +739,9 @@ func TestQRToolWindowsDoNotCloseEachOther(t *testing.T) {
 func TestQRPanelCardAndCommand(t *testing.T) {
 	a := qrTestApp(t)
 	a.config.QREnabled = true
+	a.config.AwakeEnabled = false
+	a.config.JSONEnabled = false
+	a.config.TranslateEnabled = false
 	rows := a.menubarPanelRows()
 	if !rows.qr || rows.empty {
 		t.Fatalf("rows = %+v", rows)
@@ -755,5 +766,8 @@ func TestQRPanelCardAndCommand(t *testing.T) {
 	}
 	if a.menubarPanelRows().qr {
 		t.Fatal("a closed module still draws the card")
+	}
+	if !a.menubarPanelRows().empty {
+		t.Fatal("all modules disabled without empty state")
 	}
 }

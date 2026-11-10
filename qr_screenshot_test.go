@@ -39,6 +39,9 @@ func saveQREvidence(t *testing.T, dir, name string, img *image.RGBA) {
 // fully dark before it is saved.
 func renderQRWindow(a *application, locale string, dark bool) *ui.Tester {
 	tk := tokens(dark, locale)
+	screens := paletteTestScreens(a)
+	screens.displays[0].ScaleFactor = 2
+	a.refreshQRScale()
 	tester := ui.NewTester(a.qrView, int(tk.SizeQRWidth), int(tk.SizeQRWindowHeight))
 	tester.SetScale(2)
 	tester.SetLocale(locale)
@@ -49,7 +52,7 @@ func renderQRWindow(a *application, locale string, dark bool) *ui.Tester {
 	return tester
 }
 
-// TestQRToolScreenshots captures the QR window in its five states, the card
+// TestQRToolScreenshots captures the QR window states, the card
 // panel with the QR row, the settings page, and one picture of the three tool
 // windows side by side. Everything is rendered in memory: no window is
 // created, no screen is read and nothing is activated.
@@ -67,7 +70,7 @@ func TestQRToolScreenshots(t *testing.T) {
 			if dark {
 				mode = "dark"
 			}
-			for _, state := range []string{"empty", "url", "chinese", "toolong", "pinned"} {
+			for _, state := range []string{"empty", "url", "chinese", "toolong", "pinned", "save-failed"} {
 				a := qrTestApp(t)
 				a.openQRText("")
 				switch state {
@@ -84,6 +87,10 @@ func TestQRToolScreenshots(t *testing.T) {
 					a.openQRText("https://example.com/orders/2026?utm=mail")
 					a.qr.due = time.Now().Add(-time.Second)
 					a.qr.pinned = true
+				case "save-failed":
+					a.openQRText("https://example.com/orders/2026?utm=mail")
+					a.qr.due = time.Now().Add(-time.Second)
+					a.qr.saveFailed = true
 				}
 				tester := renderQRWindow(a, locale, dark)
 				saveQREvidence(t, dir, "qr-window-"+state+"-"+locale+"-"+mode, tester.Image())

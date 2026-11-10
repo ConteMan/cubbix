@@ -93,7 +93,7 @@ Options:
   --png PATH           Write a PNG (16 pixels per module) instead of drawing
   --json               Print one JSON object with stable fields
   --no-launch          Do not start Cubbix when it is not running
-  --timeout DURATION   Wait at most this long (default 5s, max 60s)
+  --timeout DURATION   Wait at most this long (default 15s, max 60s)
   --socket PATH        Talk to the app at PATH instead of the default socket
 
 Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
@@ -279,6 +279,9 @@ func parse(argv []string) (inv invocation, err error) {
 	// before the app could answer. An explicit --timeout still wins.
 	if inv.command == "translate" && !seenContains(seen, "--timeout") {
 		inv.flags.timeout = 30 * time.Second
+	}
+	if inv.command == "qr" && !seenContains(seen, "--timeout") {
+		inv.flags.timeout = 15 * time.Second
 	}
 	if inv.command == "awake.on" {
 		chosen := 0
