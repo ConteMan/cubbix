@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -24,7 +25,7 @@ var assets embed.FS
 //go:embed frontend/dist/*
 var jsonAssets embed.FS
 
-const appVersion = "0.7.0"
+const appVersion = "0.7.1"
 
 type application struct {
 	lidCompletion func(error)
@@ -93,16 +94,31 @@ type application struct {
 	// headless tests replace the window factory, the keychain, the main-thread
 	// hop, the clipboard and the HTTP functions, so no case touches a real
 	// window, keychain, shortcut or network.
-	translate               *translateState
-	translateShortcutError  string
-	translateRowError       string
-	translateKeyDraft       string
-	translateKeySaved       bool
-	translateKeyEditing     bool
-	translateKeyFocus       bool
-	translateKeyWriting     bool
-	translateKeyGeneration  uint64
-	translateKeyError       string
+	translate              *translateState
+	translateShortcutError string
+	translateRowError      string
+	translateKeyDraft      string
+	translateKeySaved      bool
+	translateKeyEditing    bool
+	translateKeyFocus      bool
+	translateKeyWriting    bool
+	translateKeyGeneration uint64
+	translateKeyError      string
+	// translateKeyCommitted is the last key written to the keychain this run,
+	// in memory only: a draft equal to it needs no second write.
+	translateKeyCommitted string
+	// translateBaseURLDraft and translateModelDraft are the inputs' own text,
+	// not the saved values. A rejected address therefore stays on screen and
+	// never reaches the file through an unrelated save. The dirty flags say
+	// whether the user typed in a field; an untouched field follows the saved
+	// value, so a write from elsewhere still shows up in it.
+	translateBaseURLDraft string
+	translateModelDraft   string
+	translateBaseURLDirty bool
+	translateModelDirty   bool
+	// translateFieldFocused records which settings input had the keyboard
+	// last frame. MyGo has no blur callback, so losing it is read here.
+	translateFieldFocused   map[string]bool
 	translateModelList      []string
 	translateModelListError string
 	translateModelFetching  bool
@@ -111,13 +127,19 @@ type application struct {
 	translateTestUntil      time.Time
 	translateCLIDispatch    func(func())
 	translateSecret         translateSecretStore
-	translateRunOnMain      func(func())
-	translateAsync          bool
-	translateStreamFn       translateStreamFunc
-	translateModelsFn       translateModelsFunc
-	translateTestFn         translateTestFunc
-	translateDictionaryFn   func(string) string
-	translateCopy           func(string) error
+	// translateSecretMu guards the keychain and translateKeyPending. A write
+	// and the read that follows it (the panel opening right after a paste)
+	// run on different workers, so a reader waits for the write to settle
+	// instead of seeing the old, empty keychain.
+	translateSecretMu     sync.Mutex
+	translateKeyPending   chan struct{}
+	translateRunOnMain    func(func())
+	translateAsync        bool
+	translateStreamFn     translateStreamFunc
+	translateModelsFn     translateModelsFunc
+	translateTestFn       translateTestFunc
+	translateDictionaryFn func(string) string
+	translateCopy         func(string) error
 	// speech is the pronunciation seam. ready() installs the real engine;
 	// headless tests keep it nil or inject a fake, so no test makes a sound.
 	speech                speechEngine
@@ -216,6 +238,9 @@ func newApplication(path string) (*application, error) {
 	}
 	a.createMenubarPanel = a.buildMenubarPanel
 	a.createTranslateWindow = a.buildTranslateWindow
+	// The two text fields edit drafts seeded from the file, so the input never
+	// writes a half-typed value into the config an unrelated save would store.
+	a.translateBaseURLDraft, a.translateModelDraft = config.TranslateBaseURL, config.TranslateModel
 	a.translateSecret = mygo.Secrets
 	a.translateRunOnMain = mygo.RunOnMain
 	a.translateAsync = true
@@ -338,6 +363,10 @@ func (a *application) visibility(visible bool) {
 
 func (a *application) hide() {
 	a.cancelShortcutRecording()
+	// A hidden window can draw no further frame, so an uncommitted draft is
+	// committed here rather than on the blur the window never reports.
+	a.commitTranslateDrafts()
+	a.resetTranslateFieldFocus()
 	w := a.settingsPlacementWindow()
 	if w == nil {
 		return
@@ -457,13 +486,21 @@ func (a *application) createSettingsWindow() {
 	// Close, minimize and zoom keep their system symbols; full screen stays off.
 	a.window = mygo.NewWindow(mygo.WindowOptions{Title: "Cubbix", Width: width, Height: height, MinWidth: minWidth, MinHeight: minHeight, Hidden: true, TitleBarStyle: mygo.TitleBarHidden, TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space12)}, DisableFullScreen: true, Content: ui.View(a.view)})
 	a.window.OnShow(func() { a.visibility(true) })
-	a.window.OnHide(func() { a.cancelShortcutRecording(); a.visibility(false) })
+	a.window.OnHide(func() {
+		a.cancelShortcutRecording()
+		a.commitTranslateDrafts()
+		a.resetTranslateFieldFocus()
+		a.visibility(false)
+	})
 	a.window.OnClosed(func() { a.visibility(false) })
 	a.window.OnResize(a.rememberWindowSize)
 	a.window.OnMove(a.observeSettingsMove)
 	a.window.OnRestore(a.reconcileSettingsDisplayIfNeeded)
 	a.window.OnFocus(a.onSettingsFocus)
 
+	// Losing the keyboard focus commits the translation drafts too: the user
+	// may have typed a key and clicked another application, without Return.
+	a.window.OnBlur(func() { a.commitTranslateDrafts(); a.resetTranslateFieldFocus() })
 	a.window.OnClose(func(event *mygo.CloseEvent) {
 		if !a.quitting {
 			event.PreventDefault()

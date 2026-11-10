@@ -445,7 +445,8 @@ func TestTranslateSettingsRowsRender(t *testing.T) {
 func TestTranslateEndpointHTTPRejectedInline(t *testing.T) {
 	a := translateTestApp(t)
 	a.page = settingsTranslate
-	a.config.TranslateBaseURL = "http://example.com/v1"
+	// The field edits a draft, so a case that types an address sets the draft.
+	a.translateBaseURLDraft, a.translateBaseURLDirty = "http://example.com/v1", true
 	a.commitTranslateBaseURL()
 	if a.translateRowError != "TranslateEndpointHTTPRejected" {
 		t.Fatalf("save did not report the rejection: %q", a.translateRowError)
@@ -457,7 +458,7 @@ func TestTranslateEndpointHTTPRejectedInline(t *testing.T) {
 		t.Fatalf("no inline error: %v", tt.Texts())
 	}
 	// A valid address clears it.
-	a.config.TranslateBaseURL = "https://h/v1"
+	a.translateBaseURLDraft, a.translateBaseURLDirty = "https://h/v1", true
 	a.commitTranslateBaseURL()
 	if a.translateRowError != "" {
 		t.Fatalf("valid address kept the error: %q", a.translateRowError)
@@ -548,7 +549,7 @@ func TestTranslateModelListDropdown(t *testing.T) {
 		t.Fatalf("selected model = %q", a.config.TranslateModel)
 	}
 	// Manual typing stays available.
-	a.config.TranslateModel = "hand/typed"
+	a.translateModelDraft, a.translateModelDirty = "hand/typed", true
 	a.commitTranslateModel()
 	if a.config.TranslateModel != "hand/typed" {
 		t.Fatal("manual model was rewritten")

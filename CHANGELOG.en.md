@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.1 — 2026-11-10
+
+- A pasted API key, or an edited endpoint or model, is now saved when you click elsewhere or close the window, without pressing Return. A rejected endpoint stays in the field with its reason. Before this, a key left without Return stayed a draft, and Translate kept saying no endpoint was configured.
+- The connection test is now a worded button instead of a lone refresh icon on the model row.
+
 ## 0.7.0 — 2026-11-10
 
 - New Translate module: open a small floating panel from the shortcut, the card panel or the command palette; selected text or what you type is translated, with copy, direction swap, a dictionary for single English words, and `cubbix translate` for scripts.

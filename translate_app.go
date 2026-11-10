@@ -169,6 +169,11 @@ func (a *application) openTranslateText(text string) {
 	a.cancelTranslateSelection()
 	a.hideMenubarPanel()
 	a.hidePalette()
+	// The panel reads the saved key and address. A draft left in Settings
+	// must be committed first, or the panel would say "not configured"
+	// about a key the user already pasted.
+	a.commitTranslateDrafts()
+	a.resetTranslateFieldFocus()
 	s := a.ensureTranslateState()
 	if (s.visible || s.frame() != nil) && strings.TrimSpace(text) == "" {
 		s.focus = true
