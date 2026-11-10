@@ -88,6 +88,7 @@ func TestMenubarPanelScreenshots(t *testing.T) {
 			a.config.AwakeEnabled = false
 			a.config.JSONEnabled = false
 			a.config.TranslateEnabled = false
+			a.config.QREnabled = false
 		}},
 	}
 	for _, locale := range []string{"zh-CN", "en"} {

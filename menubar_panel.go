@@ -22,13 +22,13 @@ type menubarPanelState struct {
 // menubarPanelRows is what the panel draws. The height calculation and the
 // view read the same answer, so the flyout is exactly as tall as its content.
 type menubarPanelRows struct {
-	awake, json, empty, translate bool
-	lid                           bool
-	watching                      bool // the lid row's second line
-	status                        bool // the awake card's status line
-	documents                     []*jsonDocument
-	folded                        bool // the JSON windows hide behind one count row
-	listRows                      int
+	awake, json, empty, translate, qr bool
+	lid                               bool
+	watching                          bool // the lid row's second line
+	status                            bool // the awake card's status line
+	documents                         []*jsonDocument
+	folded                            bool // the JSON windows hide behind one count row
+	listRows                          int
 }
 
 // toggleMenubarPanel is the tray icon's left click: it opens the card panel,
@@ -45,12 +45,12 @@ func (a *application) toggleMenubarPanel() {
 }
 
 // showMenubarPanel opens the panel under the icon. The palette closes first:
-// the two panels never stack.
+// the two panels never stack. A tool window stays where it is: Translate and QR
+// are tools the user compares the panel with, not popovers that replace it.
 func (a *application) showMenubarPanel() {
 	if a.shortcutRecording {
 		return
 	}
-	a.closeTranslate()
 	a.hidePalette()
 	a.pollLid()
 	if a.panel == nil {
@@ -127,6 +127,9 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 	if a.config.TranslateEnabled {
 		rows.translate = true
 	}
+	if a.config.QREnabled {
+		rows.qr = true
+	}
 	if a.config.JSONEnabled {
 		rows.json = true
 		rows.documents = a.openJSONDocuments()
@@ -141,7 +144,9 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 			rows.listRows = len(rows.documents)
 		}
 	}
-	rows.empty = !rows.awake && !rows.json && !rows.translate
+	// The empty state belongs to all four modules: a lone QR card must not be
+	// drawn above "no modules enabled".
+	rows.empty = !rows.awake && !rows.json && !rows.translate && !rows.qr
 	return rows
 }
 
@@ -216,6 +221,10 @@ func (a *application) menubarPanelHeight(t tokenValues) int {
 		cards++
 	}
 	if rows.translate {
+		height += translateCardHeight(t)
+		cards++
+	}
+	if rows.qr {
 		height += translateCardHeight(t)
 		cards++
 	}
@@ -339,6 +348,13 @@ func (a *application) panelNewJSON() {
 func (a *application) panelShowJSON(d *jsonDocument) {
 	a.hideMenubarPanel()
 	a.showJSON(d)
+}
+
+// panelOpenQR closes the card panel and opens the QR window empty and focused.
+// It never reads the clipboard: only the shortcut does.
+func (a *application) panelOpenQR() {
+	a.hideMenubarPanel()
+	a.openQRText("")
 }
 
 // menubarPanelStatusLine is the awake card's running status, or "" when the

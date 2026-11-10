@@ -372,5 +372,22 @@
   "TranslateSelectionLabel": "划词",
   "TranslateSelectionAuthorized": "已授权",
   "TranslateSelectionUnauthorized": "未授权",
-  "TranslateSelectionInfo": "需要辅助功能权限才能读取其他应用的选中文字；授权后按快捷键可直接翻译。Cubbix 只读取选中文字，不复制、不改动剪贴板。"
+  "TranslateSelectionInfo": "需要辅助功能权限才能读取其他应用的选中文字；授权后按快捷键可直接翻译。Cubbix 只读取选中文字，不复制、不改动剪贴板。",
+  "QR": "二维码",
+  "QRPageDesc": "把一段文字或网址变成二维码，可复制、保存或直接拖出",
+  "QRShortcutLabel": "二维码",
+  "QRRecordShortcut": "录制二维码快捷键",
+  "QRInputPlaceholder": "输入文字或网址",
+  "QREmpty": "输入内容后生成二维码",
+  "QRTooLong": "内容太长，二维码放不下",
+  "QRTooLongHint": "换短一些的链接或文字，最多约 2331 字节",
+  "QRFailed": "无法生成二维码",
+  "QRSelectionDenied": "开启辅助功能权限后可直接用选中的文字",
+  "QRGrantAccess": "去设置",
+  "QRCopy": "复制二维码图片",
+  "QRCopied": "已复制",
+  "QRSave": "存为 PNG",
+  "QRSaveFailed": "无法写入文件",
+  "QRCardAction": "二维码…",
+  "QRDragHint": "拖到别的应用"
 }

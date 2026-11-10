@@ -225,12 +225,12 @@ func TestShortcutRecordingOwnsAllFiveSlots(t *testing.T) {
 		t.Fatal("conflicting shortcut committed")
 	}
 	a.recordShortcut(ui.Alt, ui.KeyComma)
-	if a.shortcutRecording || a.config.PaletteShortcut != "Alt+," || len(registered) != 5 {
+	if a.shortcutRecording || a.config.PaletteShortcut != "Alt+," || len(registered) != len(a.shortcutSlots()) {
 		t.Fatal("new shortcut not immediately restored")
 	}
 	a.beginTileShortcutRecording("palette")
 	a.cancelShortcutRecording()
-	if len(registered) != 5 {
+	if len(registered) != len(a.shortcutSlots()) {
 		t.Fatal("cancel did not restore all slots")
 	}
 	config, err := loadConfig(a.path)

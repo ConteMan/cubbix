@@ -221,3 +221,15 @@ ColorSyntax 组是「界面只用黑白灰」的唯一例外，只作用于代�
 | `SizeTranslateDirectionHeight` | number | `20` |
 
 浮窗的尺寸见 [规格 010](../docs/specs/010-翻译.md) §3.1：面板宽 480，高度夹在 148 与 520 之间；输入区单行 28，每多一行加 20，最多四行；译文块最高 320，词典正文最高 96、默认展开三行；距工作区顶部 96，方向行 20。十一个 Token 已写入 `design/tokens.json` 与 `tokens.go`；本步没有新增画板轮次，`design/cubbix.pen` 的画板变量留给后续界面轮次同步。
+
+## R18 追加
+
+| Token / Go 字段 | 类型 | 值 |
+| --- | --- | --- |
+| `SizeQRWidth` | number | `480` |
+| `SizeQRWindowHeight` | number | `520` |
+| `SizeQRMinHeight` | number | `440` |
+| `SizeQRInputHeight` | number | `72` |
+| `SizeQRCodeMax` | number | `320` |
+
+二维码工具窗口的尺寸见 [规格 011](../docs/specs/011-二维码.md) §4.1：窗口 480 × 520、最小 480 × 440；输入框固定 72 高（约三行，超出内部滚动）；二维码外层白底最长边 320，位图按整数设备像素生成、居中显示。五个 Token 已写入 `design/tokens.json` 与 `tokens.go`；本步同样没有新增画板轮次。

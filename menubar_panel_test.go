@@ -284,7 +284,7 @@ func TestMenubarPanelProcessEndedWarning(t *testing.T) {
 		}
 		// The warning sits in its own row, so the card grows by one.
 		token := tokens(false, locale)
-		if got, want := a.menubarPanelHeight(token), int(2*token.Space12+awakeCardHeight(token, true)+token.Space8+jsonCardHeight(token, 0)+token.Space8+translateCardHeight(token)+token.Space8+token.StrokeHairline+token.SizeNavHeight); got != want {
+		if got, want := a.menubarPanelHeight(token), int(2*token.Space12+awakeCardHeight(token, true)+token.Space8+jsonCardHeight(token, 0)+token.Space8+translateCardHeight(token)+token.Space8+translateCardHeight(token)+token.Space8+token.StrokeHairline+token.SizeNavHeight); got != want {
 			t.Fatalf("%s: height with warning = %d, want %d", locale, got, want)
 		}
 	}
@@ -391,6 +391,7 @@ func TestMenubarPanelTileToggles(t *testing.T) {
 	a.config.AwakeEnabled = false
 	a.config.JSONEnabled = false
 	a.config.TranslateEnabled = false
+	a.config.QREnabled = false
 	a.toggleMenubarPanel()
 	tt := panelView(a, "en")
 	if !tt.HasText(a.text("en", "PanelEmpty")) {
@@ -408,6 +409,13 @@ func TestMenubarPanelTileToggles(t *testing.T) {
 	tt.Frame()
 	if !tt.HasText(a.text("en", "JSONShortcutLabel")) {
 		t.Fatalf("the JSON tile did not come back: %v", tt.Texts())
+	}
+	// The QR card is a fourth module: a panel with only it is not empty.
+	a.config.JSONEnabled = false
+	a.changeQREnabled(true)
+	tt.Frame()
+	if !tt.HasText(a.text("en", "QRCardAction")) || tt.HasText(a.text("en", "PanelEmpty")) {
+		t.Fatalf("the QR card alone left the panel empty: %v", tt.Texts())
 	}
 }
 
@@ -429,10 +437,11 @@ func TestContextMenuKeepsOnlySystemActions(t *testing.T) {
 
 func TestMenubarPanelHeight(t *testing.T) {
 	tt := tokens(false, "zh-CN")
-	// The translate card is a third tile by default: one card and the gap
-	// before it. With every other module off it replaces the empty row.
-	extra := int(translateCardHeight(tt) + tt.Space8)
-	emptyWithTranslate := int(2*tt.Space12 + translateCardHeight(tt) + tt.Space8 + tt.StrokeHairline + tt.SizeNavHeight)
+	// The translate and QR cards are a third and a fourth tile by default: two
+	// cards and the gap before each. With every other module off they replace
+	// the empty row.
+	extra := int(2 * (translateCardHeight(tt) + tt.Space8))
+	emptyWithTranslate := int(2*tt.Space12 + 2*(translateCardHeight(tt)+tt.Space8) + tt.StrokeHairline + tt.SizeNavHeight)
 	cases := []struct {
 		name        string
 		awake, json bool

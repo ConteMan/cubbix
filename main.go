@@ -17,6 +17,8 @@ import (
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
+
+	qrlib "github.com/ConteMan/cubbix/internal/qr"
 )
 
 //go:embed design/locales/*.json assets/*.tiff brand/dist/mark.svg design/assets/lucide-0.468.0/*.svg
@@ -157,6 +159,21 @@ type application struct {
 	accessibilitySettingsOpened  bool
 	translateSelectionPending    bool
 	translateSelectionGeneration uint64
+	// qr is the seventh module. Its seams keep every test headless: no native
+	// window, no clipboard, no save dialog and no worker unless asked.
+	qr                    *qrState
+	qrShortcutError       string
+	qrRunOnMain           func(func())
+	qrAsync               bool
+	qrEncodeFn            func(string) (*qrlib.Code, error)
+	qrReadClipboard       func() string
+	qrCopyPNG             func([]byte) error
+	qrChooseSave          func(*mygo.Window) (string, error)
+	qrWriteFile           func(string, []byte) error
+	createQRWindow        func(*qrState)
+	qrSelectionPending    bool
+	qrSelectionGeneration uint64
+	qrSelectionHintShown  bool
 	// quiet silences the hint and the lid notification for one command line
 	// request; it is set and reset on the main thread only.
 	quiet                  bool
@@ -238,6 +255,15 @@ func newApplication(path string) (*application, error) {
 	}
 	a.createMenubarPanel = a.buildMenubarPanel
 	a.createTranslateWindow = a.buildTranslateWindow
+	a.createQRWindow = a.buildQRWindow
+	a.qrRunOnMain = mygo.RunOnMain
+	a.qrAsync = true
+	a.qrReadClipboard = mygo.Clipboard.ReadText
+	a.qrCopyPNG = copyQRImageData
+	a.qrWriteFile = writeQRFile
+	a.qrChooseSave = func(w *mygo.Window) (string, error) {
+		return mygo.Dialog.Save(mygo.SaveDialogOptions{Parent: w, Title: a.text(mygo.App.Locale(), "QRSave"), DefaultPath: "qrcode.png", Filters: []mygo.FileFilter{{Name: "PNG", Extensions: []string{"png"}}}})
+	}
 	// The two text fields edit drafts seeded from the file, so the input never
 	// writes a half-typed value into the config an unrelated save would store.
 	a.translateBaseURLDraft, a.translateModelDraft = config.TranslateBaseURL, config.TranslateModel
@@ -342,6 +368,9 @@ func (a *application) visibility(visible bool) {
 				visible = true
 				break
 			}
+		}
+		if a.qrVisible() {
+			visible = true
 		}
 	}
 	if visible {
@@ -590,6 +619,7 @@ func (a *application) ready() {
 	a.registerPaletteShortcut()
 	a.registerPanelShortcut()
 	a.registerTranslateShortcut()
+	a.registerQRShortcut()
 	a.refreshTranslateKey()
 	a.feedback.watch()
 	a.startCLIServer()
@@ -632,6 +662,7 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	a.saveWindowPlacesOnQuit()
 	a.cli.stop()
 	a.closeTranslate()
+	a.closeQR()
 	a.hidePalette()
 	a.hidePaletteGuides()
 	a.hideMenubarPanel()

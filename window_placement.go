@@ -528,6 +528,13 @@ func (a *application) repairWindowPlaces(displays []mygo.Display) {
 	if s := a.translate; s != nil && s.frame() != nil && a.topologyChanged(&s.place, displays) {
 		a.repairOrDeferPlacement(&s.place, s.frame(), displays, a.jsonReselect, a.translateSeats())
 	}
+	if s := a.qr; s != nil && s.frame() != nil && a.topologyChanged(&s.place, displays) {
+		a.repairOrDeferPlacement(&s.place, s.frame(), displays, a.jsonReselect, a.qrSeats())
+		// A new display may bring another scale factor, and the bitmap is
+		// built from whole device pixels of it.
+		a.refreshQRScale()
+		a.refreshQR()
+	}
 	if w := a.settingsPlacementWindow(); w != nil && a.topologyChanged(&a.settingsPlace, displays) {
 		a.repairOrDeferPlacement(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
 	}

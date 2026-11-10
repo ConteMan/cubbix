@@ -162,12 +162,12 @@ func TestJSONToggleAndShortcutRecorder(t *testing.T) {
 		t.Fatal("cross-tile conflict replaced shortcut")
 	}
 	tt.Key(0, ui.KeyEscape)
-	if len(registry) != 5 {
+	if len(registry) != len(a.shortcutSlots()) {
 		t.Fatal("escape did not restore shortcuts")
 	}
 	_ = tt.Click("Record JSON shortcut")
 	tt.Key(ui.Ctrl|ui.Alt|ui.Cmd, ui.KeyM)
-	if a.shortcutRecording || a.config.JSONShortcut != "Ctrl+Alt+Cmd+M" || len(registry) != 5 {
+	if a.shortcutRecording || a.config.JSONShortcut != "Ctrl+Alt+Cmd+M" || len(registry) != len(a.shortcutSlots()) {
 		t.Fatal("JSON shortcut did not commit")
 	}
 	if strings.Join(shortcutSymbols(a.config.JSONShortcut), "") != "⌃⌥⌘M" {

@@ -10,7 +10,10 @@ import (
 )
 
 func TestTranslateSelectionQueuedResultInvalidated(t *testing.T) {
-	for _, scenario := range []string{"close", "disable", "palette", "manual", "quit", "second-press"} {
+	// The palette and the card panel are overlays, not owners of a tool
+	// window: they no longer invalidate a pending read, which the next test
+	// covers.
+	for _, scenario := range []string{"close", "disable", "manual", "quit", "second-press"} {
 		t.Run(scenario, func(t *testing.T) {
 			a, texts := configuredSelectionApp(t, &fakeSelectionReader{trusted: true, pid: otherSelectionPID(), text: "old text"})
 			a.createPaletteWindow = func(*paletteState) {}
@@ -25,8 +28,6 @@ func TestTranslateSelectionQueuedResultInvalidated(t *testing.T) {
 				a.closeTranslate()
 			case "disable":
 				a.changeTranslateEnabled(false)
-			case "palette":
-				a.showPalette()
 			case "manual":
 				a.openTranslateText("")
 				a.closeTranslate()
@@ -42,11 +43,28 @@ func TestTranslateSelectionQueuedResultInvalidated(t *testing.T) {
 			if a.translateVisible() || len(*texts) != 0 {
 				t.Fatal("stale selection reopened the panel or submitted text")
 			}
-			if scenario == "palette" && !a.paletteVisible() {
-				t.Fatal("stale selection hid the palette")
-			}
 		})
 	}
+}
+
+// TestTranslateToolWindowSurvivesOverlays pins the tool-window rule: the
+// command palette and the card panel close each other, never a floating tool.
+func TestTranslateToolWindowSurvivesOverlays(t *testing.T) {
+	a, windows := translateWindowTestApp(t)
+	a.createPaletteWindow = func(*paletteState) {}
+	a.openTranslateText("hello")
+	if len(*windows) != 1 || !a.translateVisible() {
+		t.Fatal("translate window did not open")
+	}
+	a.showPalette()
+	if !a.translateVisible() || a.translate == nil || a.translate.closing {
+		t.Fatal("the palette closed the translate window")
+	}
+	a.showMenubarPanel()
+	if !a.translateVisible() || a.translate == nil || a.translate.closing {
+		t.Fatal("the card panel closed the translate window")
+	}
+	a.hideMenubarPanel()
 }
 
 type delayedSelectionReader struct {

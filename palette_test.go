@@ -245,7 +245,7 @@ func TestShortcutSlotsAreMutuallyExclusive(t *testing.T) {
 		t.Fatalf("disabled slots still conflict: %q", reason)
 	}
 	slots := a.shortcutSlots()
-	if len(slots) != 5 || slots[0].Target != "awake" || slots[1].Target != "json" || slots[2].Target != "palette" || slots[3].Target != "panel" || slots[4].Target != "translate" {
+	if len(slots) != 6 || slots[0].Target != "awake" || slots[1].Target != "json" || slots[2].Target != "palette" || slots[3].Target != "panel" || slots[4].Target != "translate" || slots[5].Target != "qr" {
 		t.Fatalf("slots = %+v", slots)
 	}
 }

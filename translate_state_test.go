@@ -289,10 +289,11 @@ func TestSettingsTranslatePageHeight(t *testing.T) {
 	if w, h := settingsMinimumSize(); w != 720 || h != settingsWindowHeight {
 		t.Fatalf("minimum window = %dx%d; want 720x%d", w, h, settingsWindowHeight)
 	}
-	if got := sidebarNaturalHeight(tk); got != 365 {
-		t.Fatalf("sidebar = %v; want 365", got)
+	if got := sidebarNaturalHeight(tk); got != 409 {
+		t.Fatalf("sidebar = %v; want 409", got)
 	}
-	if settingsNav[2].page != settingsJSON || settingsNav[3].page != settingsTranslate || settingsNav[4].page != settingsShortcuts {
+	if settingsNav[2].page != settingsJSON || settingsNav[3].page != settingsTranslate ||
+		settingsNav[4].page != settingsQR || settingsNav[5].page != settingsShortcuts {
 		t.Fatalf("nav order = %+v", settingsNav)
 	}
 	if settingsGeneral != 0 || settingsAbout != 1 || settingsAwake != 2 || settingsShortcuts != 3 || settingsJSON != 4 {

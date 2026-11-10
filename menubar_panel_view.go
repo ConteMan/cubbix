@@ -43,6 +43,9 @@ func (a *application) menubarPanelView(c *ui.Context) {
 		if rows.translate {
 			a.panelTranslateCard(c, t, locale)
 		}
+		if rows.qr {
+			a.panelQRCard(c, t, locale)
+		}
 		if rows.empty {
 			ui.Box(c).FillWidth().Height(t.SizeNavHeight).AlignItems(ui.Center).Justify(ui.Center).Children(func() {
 				ui.Text(c, a.text(locale, "PanelEmpty")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextDisabled))
@@ -257,6 +260,32 @@ func (a *application) panelTranslateCard(c *ui.Context, t tokenValues, locale st
 				FontWeight(fontWeight(t.FontWeightSemibold)).TextColor(ui.Hex(t.ColorText)).Grow(1)
 			button := ui.ButtonBase(c.Key("panel-translate-open")).Size(t.SizeIconButton, t.SizeIconButton).
 				Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label).OnClick(a.panelOpenTranslate)
+			if button.Hovered() {
+				button.Background(ui.Hex(t.ColorControlHover))
+			}
+			button.Children(func() {
+				ui.Icon(c, icon("chevron-right")).Size(t.SizeIcon, t.SizeIcon).
+					TextColor(ui.Hex(t.ColorTextSecondary))
+			})
+		})
+	})
+}
+
+// panelQRCard is the QR module's single row: a title and the button that opens
+// the tool window empty. The card carries no state, so it is exactly as tall as
+// the translate card.
+func (a *application) panelQRCard(c *ui.Context, t tokenValues, locale string) {
+	text := func(key string) string { return a.text(locale, key) }
+	label := text("QRCardAction")
+	ui.Column(c.Key("panel-qr-card")).FillWidth().Height(translateCardHeight(t)).
+		Padding(t.Space4, t.Space10).Radius(t.RadiusCard).
+		Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).Background(ui.Hex(t.ColorCard)).Children(func() {
+		ui.Row(c).FillWidth().Height(t.SizeNavHeight).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+			ui.Icon(c, icon("qr-code")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorText))
+			ui.Text(c, text("QR")).FontSize(t.FontSizeBody).
+				FontWeight(fontWeight(t.FontWeightSemibold)).TextColor(ui.Hex(t.ColorText)).Grow(1)
+			button := ui.ButtonBase(c.Key("panel-qr-open")).Size(t.SizeIconButton, t.SizeIconButton).
+				Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label).OnClick(a.panelOpenQR)
 			if button.Hovered() {
 				button.Background(ui.Hex(t.ColorControlHover))
 			}

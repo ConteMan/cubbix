@@ -211,6 +211,8 @@ func (a *application) setSlotError(target, key string) {
 		a.panelShortcutError = key
 	case "translate":
 		a.translateShortcutError = key
+	case "qr":
+		a.qrShortcutError = key
 	}
 }
 

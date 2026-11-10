@@ -72,7 +72,7 @@ func TestSettingsNavigationAndLocale(t *testing.T) {
 	}
 	defer app.updates.close()
 	app.updates.check = func(ctx context.Context) (*updateCandidate, error) { <-ctx.Done(); return nil, ctx.Err() }
-	tester := ui.NewTester(app.view, 720, 340)
+	tester := ui.NewTester(app.view, 720, settingsWindowHeight)
 	tester.SetLocale("zh-CN")
 	if !tester.HasText("语言") {
 		t.Fatalf("missing general page: %v", tester.Texts())
@@ -226,9 +226,10 @@ func TestSettingsHeight(t *testing.T) {
 			t.Fatalf("%s: window height = %d, want %d", c.name, got, settingsWindowHeight)
 		}
 	}
-	// The sidebar fits the same window: brand, separator and six 40-high items.
-	if got := sidebarNaturalHeight(tokens); got != 365 {
-		t.Fatalf("sidebar height = %v, want 365", got)
+	// The sidebar fits the same window: brand, separator and one 40-high item
+	// per settings page, now seven.
+	if got := sidebarNaturalHeight(tokens); got != 409 {
+		t.Fatalf("sidebar height = %v, want 409", got)
 	}
 }
 
@@ -241,7 +242,7 @@ func TestPreview(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tester := ui.NewTester(app.view, 720, 340)
+	tester := ui.NewTester(app.view, 720, settingsWindowHeight)
 	tester.SetLocale("zh-CN")
 	file, err := os.Create(path)
 	if err != nil {
