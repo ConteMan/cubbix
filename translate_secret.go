@@ -19,9 +19,26 @@ type translateSecretStore interface {
 const translateSecretKey = "translate-api-key"
 
 // translateAPIKey reads the key for a worker. A missing secret is not an
-// error: it means the module is not configured yet.
+// error: it means the module is not configured yet. A read waits for a write
+// still in flight, so opening the panel right after a paste sees the new key
+// rather than the old one.
 func (a *application) translateAPIKey() (string, error) {
+	a.waitTranslateKeyWrite()
 	return readTranslateAPIKey(a.translateSecret)
+}
+
+// waitTranslateKeyWrite blocks until the keychain write in flight settles. It
+// is only ever called from a worker; the main thread never waits here.
+func (a *application) waitTranslateKeyWrite() {
+	for {
+		a.translateSecretMu.Lock()
+		pending := a.translateKeyPending
+		a.translateSecretMu.Unlock()
+		if pending == nil {
+			return
+		}
+		<-pending
+	}
 }
 
 func readTranslateAPIKey(store translateSecretStore) (string, error) {
@@ -52,6 +69,10 @@ func (a *application) setTranslateAPIKey(value string) {
 	a.translateKeyGeneration++
 	a.translateKeyWriting = true
 	a.translateKeyError = ""
+	done := make(chan struct{})
+	a.translateSecretMu.Lock()
+	a.translateKeyPending = done
+	a.translateSecretMu.Unlock()
 	a.invalidateWindow()
 	a.runTranslateWorker(func() {
 		var err error
@@ -63,14 +84,24 @@ func (a *application) setTranslateAPIKey(value string) {
 		} else {
 			err = a.translateSecret.Set(translateSecretKey, []byte(value))
 		}
+		a.translateSecretMu.Lock()
+		if a.translateKeyPending == done {
+			a.translateKeyPending = nil
+		}
+		a.translateSecretMu.Unlock()
+		close(done)
 		a.translateOnMain(func() {
 			a.translateKeyWriting = false
 			if err != nil {
 				a.translateKeyError = "TranslateKeyError"
+				// The keychain may still hold the old key: forget what was
+				// committed so a retry writes again.
+				a.translateKeyCommitted = ""
 			} else {
 				a.translateKeySaved = value != ""
 				a.translateKeyEditing = false
 				a.translateKeyError = ""
+				a.translateKeyCommitted = value
 			}
 			a.invalidateWindow()
 		})
@@ -94,6 +125,7 @@ func (a *application) refreshTranslateKey() {
 			} else {
 				a.translateKeyError = ""
 				a.translateKeySaved = key != ""
+				a.translateKeyCommitted = key
 			}
 			a.invalidateWindow()
 		})

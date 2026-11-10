@@ -863,6 +863,10 @@ func (a *application) sidebar(c *ui.Context, t tokenValues, locale string) {
 // first.
 func (a *application) selectSettingsPage(page int) {
 	a.cancelShortcutRecording()
+	// Leaving the page drops the fields that were focused: their drafts are
+	// committed first, so switching pages never loses what was typed.
+	a.commitTranslateDrafts()
+	a.resetTranslateFieldFocus()
 	a.focusModuleSwitch = false
 	a.page, a.notesPage = page, false
 	if page == settingsTranslate {

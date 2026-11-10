@@ -18,13 +18,15 @@ import (
 // or assertion depends on the wording of an installed dictionary.
 const dictionaryScreenshotDefinition = "serendipity ser·en·dip·i·ty | ˌserənˈdipədē | noun 1 an unexpected but fortunate discovery: a fortunate stroke of serendipity. • a series of small discoveries made by chance. 2 the faculty of making such discoveries. ORIGIN coined in the eighteenth century, after a tale of three princes."
 
+// renderTranslateSettingsScreenshot advances past the theme transition, so a
+// dark capture is fully dark before it is saved.
 func renderTranslateSettingsScreenshot(a *application, locale string, dark bool) *ui.Tester {
 	tester := ui.NewTester(a.view, 720, settingsWindowHeight)
 	tester.SetScale(2)
 	tester.SetLocale(locale)
 	tester.SetDark(dark)
 	tester.Frame()
-	tester.Advance(300 * time.Millisecond)
+	tester.Advance(700 * time.Millisecond)
 	tester.Frame()
 	return tester
 }
@@ -186,6 +188,17 @@ func TestTranslateScreenshots(t *testing.T) {
 			a.translateModelList = []string{"group/one", "provider/two"}
 			tt := renderTranslateSettingsScreenshot(a, locale, dark)
 			saveTranslateEvidence(t, dir, fmt.Sprintf("translate-settings-%s", suffix), tt.Image())
+			// The connection test is a worded button, with its result beside
+			// it. Captured separately so the result is visible too.
+			c := translateTestApp(t)
+			c.page = settingsTranslate
+			c.translateKeySaved = true
+			c.config.TranslateBaseURL, c.config.TranslateModel = "https://example.test/v1", "group/one"
+			c.translateBaseURLDraft, c.translateModelDraft = "https://example.test/v1", "group/one"
+			c.translateTestKey = "TranslateTestOK"
+			c.translateTestUntil = time.Now().Add(time.Minute)
+			tested := renderTranslateSettingsScreenshot(c, locale, dark)
+			saveTranslateEvidence(t, dir, fmt.Sprintf("translate-settings-tested-%s", suffix), tested.Image())
 			// The floating panel in its finished state.
 			b := translateTestApp(t)
 			s := b.ensureTranslateState()

@@ -356,7 +356,7 @@
   "TranslateKeyError": "无法读写钥匙串",
   "TranslateKeyPlaceholder": "粘贴 API Key",
   "TranslateModel": "模型",
-  "TranslateModelInfo": "可手填，也可从接口拉取模型列表；模型名允许带 /，不做格式限制；点刷新图标测试连接",
+  "TranslateModelInfo": "可手填，也可从接口拉取模型列表；模型名允许带 /，不做格式限制；点「测试连接」用一次最小请求同时验证地址、密钥和模型",
   "TranslateModelFetch": "从接口获取模型列表",
   "TranslateModelFetchFailed": "获取模型列表失败，仍可手填",
   "TranslateModelListEmpty": "接口没有返回模型",
