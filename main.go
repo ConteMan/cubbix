@@ -90,7 +90,6 @@ type application struct {
 
 	// cli is the command line socket server, nil until ready.
 	cli *cliServer
-	// translate is the floating window state. The remaining fields are seams:
 	// headless tests replace the window factory, the keychain, the main-thread
 	// hop, the clipboard and the HTTP functions, so no case touches a real
 	// window, keychain, shortcut or network.
@@ -123,6 +122,7 @@ type application struct {
 	// headless tests keep it nil or inject a fake, so no test makes a sound.
 	speech                speechEngine
 	createTranslateWindow func(*translateState)
+	setActivationPolicy   func(mygo.ActivationPolicy)
 	// selection is the AX seam. It stays nil in every headless test; ready()
 	// installs the real reader, so tests can neither read the frontmost
 	// application nor cause a permission prompt.
@@ -306,6 +306,9 @@ func (a *application) rememberWindowSize() {
 func (a *application) visibility(visible bool) {
 	policy := mygo.ActivationPolicyAccessory
 	if !visible {
+		if a.translateVisible() {
+			visible = true
+		}
 		if a.window != nil && a.window.IsVisible() {
 			visible = true
 		}
@@ -326,7 +329,11 @@ func (a *application) visibility(visible bool) {
 		return
 	}
 	a.policy = policy
-	mygo.App.SetActivationPolicy(policy)
+	if a.setActivationPolicy != nil {
+		a.setActivationPolicy(policy)
+	} else {
+		mygo.App.SetActivationPolicy(policy)
+	}
 }
 
 func (a *application) hide() {

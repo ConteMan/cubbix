@@ -64,8 +64,8 @@ func TestTranslateSpeechSeamIsHeadless(t *testing.T) {
 
 func speechPanelTester(a *application, locale string, s *translateState) *ui.Tester {
 	tk := tokens(false, locale)
-	width := int(tk.SizeTranslateWidth) + 2*int(tk.SizePaletteShadowMargin)
-	height := int(a.translateHeight(tk, s)) + 2*int(tk.SizePaletteShadowMargin)
+	width := int(tk.SizeTranslateWidth)
+	height := int(a.translateHeight(tk, s))
 	tt := ui.NewTester(a.translateView, width, height)
 	tt.SetLocale(locale)
 	tt.Frame()
@@ -247,10 +247,12 @@ func TestTranslateSpeechStopsOnNewWork(t *testing.T) {
 	}
 	a.speakTranslateSource()
 	stops = primary.stops
-	a.hideTranslate()
+	a.closeTranslate()
 	if s.speaking || primary.stops <= stops {
-		t.Fatal("hiding the panel did not stop speech")
+		t.Fatal("closing the window did not stop speech")
 	}
+	s = a.ensureTranslateState()
+	s.visible, s.input, s.output, s.phase = true, "hello", "你好", translateDone
 	a.config.TranslateAutoSpeak = true
 	a.speakTranslateSource()
 	stops = primary.stops

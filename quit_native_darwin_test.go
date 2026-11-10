@@ -101,10 +101,11 @@ func quitNativeMain() int {
 	mygo.App.OnBeforeQuit(a.beforeQuit)
 	speech := &fakeSpeechBackend{}
 	a.speech = speech
-	a.translate = &translateState{speaking: true}
+	translation := &translateState{speaking: true}
+	a.translate = translation
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnQuit(func() {
-		if speech.stops == 0 || a.translate.speaking {
+		if speech.stops == 0 || translation.speaking || a.translate != nil {
 			write("quit did not stop speech")
 			return
 		}

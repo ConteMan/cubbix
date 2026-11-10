@@ -13,8 +13,8 @@ const dictionaryTestDefinition = "hello hel·lo | həˈlō | noun 1 a greeting. 
 
 func renderTranslatePanel(a *application, locale string, dark bool, s *translateState) *ui.Tester {
 	tk := tokens(dark, locale)
-	width := int(tk.SizeTranslateWidth) + 2*int(tk.SizePaletteShadowMargin)
-	height := int(a.translateHeight(tk, s)) + 2*int(tk.SizePaletteShadowMargin)
+	width := int(tk.SizeTranslateWidth)
+	height := int(a.translateHeight(tk, s))
 	tt := ui.NewTester(a.translateView, width, height)
 	tt.SetLocale(locale)
 	tt.SetDark(dark)
@@ -52,7 +52,7 @@ func TestTranslateDictionaryStatesRender(t *testing.T) {
 					tk := tokens(dark, locale)
 					header := a.text(locale, "TranslateDictionary")
 					bounds, ok := tt.Find(header)
-					if !ok || bounds.X < 0 || bounds.X+bounds.W > tk.SizeTranslateWidth+2*tk.SizePaletteShadowMargin {
+					if !ok || bounds.X < 0 || bounds.X+bounds.W > tk.SizeTranslateWidth {
 						t.Fatalf("dictionary header clipped: %+v; %v", bounds, tt.Texts())
 					}
 					if state.expanded {
@@ -88,7 +88,7 @@ func TestTranslateDictionaryToggle(t *testing.T) {
 	if err := tt.Click(a.text("en", "TranslateDictionary")); err != nil {
 		t.Fatalf("fold button: %v", err)
 	}
-	if s.dictionaryExpanded || a.translateHeight(tk, s) >= expanded {
+	if s.dictionaryExpanded || a.translateHeight(tk, s) > expanded {
 		t.Fatalf("fold did not shrink the panel: %v -> %v", expanded, a.translateHeight(tk, s))
 	}
 	tt.Frame()
@@ -169,12 +169,7 @@ func TestTranslateModelFailureKeepsDictionary(t *testing.T) {
 		!tt.HasText(a.text("en", "TranslateDictionary")) || !tt.HasText("noun 1 a greeting.") {
 		t.Fatalf("failure layout is incomplete: %v", tt.Texts())
 	}
-	// A dictionary result alone keeps the panel on blur (§3.8).
-	s.visible, s.output = true, ""
-	a.onTranslateBlur()
-	if !s.visible {
-		t.Fatal("dictionary-only result was hidden on blur")
-	}
+
 }
 
 func TestTranslateDictionaryLookupUsesWorker(t *testing.T) {
@@ -293,8 +288,8 @@ func TestTranslateDictionaryHeightBudgetAndScroll(t *testing.T) {
 			if !ok {
 				t.Fatal("dictionary header missing")
 			}
-			bottom := tk.SizePaletteShadowMargin + a.translateHeight(tk, s) - tk.Space12
-			wantHeaderBottom := bottom - tk.Space12
+			bottom := a.translateHeight(tk, s) - tk.Space12
+			wantHeaderBottom := bottom
 			if expanded {
 				wantHeaderBottom -= dictionaryBodyHeight(tk)
 			}
@@ -305,7 +300,7 @@ func TestTranslateDictionaryHeightBudgetAndScroll(t *testing.T) {
 				tester.Scroll(header.X+header.W/2, header.Y+header.H+tk.Space8, 0, 10000)
 				tester.Frame()
 				last, found := tester.Find("ORIGIN last visible marker")
-				if !found || last.Y < header.Y+header.H || last.Y+last.H > bottom-tk.Space12+1 {
+				if !found || last.Y < header.Y+header.H || last.Y+last.H > bottom+1 {
 					t.Fatalf("last definition line is not reachable inside the block: %+v, header=%+v, bottom=%v", last, header, bottom)
 				}
 			}

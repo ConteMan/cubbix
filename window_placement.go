@@ -460,7 +460,7 @@ func (a *application) saveWindowPlacesOnQuit() {
 	if len(displays) == 0 {
 		return
 	}
-	changed := false
+	changed := a.rememberTranslatePlace()
 	if w := a.settingsPlacementWindow(); w != nil {
 		a.observeMove(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
 		if id, value, _, ok := takePending(&a.settingsPlace); ok {
@@ -524,6 +524,9 @@ func (a *application) displaysChanged() {
 func (a *application) repairWindowPlaces(displays []mygo.Display) {
 	if len(displays) == 0 {
 		return
+	}
+	if s := a.translate; s != nil && s.frame() != nil && a.topologyChanged(&s.place, displays) {
+		a.repairOrDeferPlacement(&s.place, s.frame(), displays, a.jsonReselect, a.translateSeats())
 	}
 	if w := a.settingsPlacementWindow(); w != nil && a.topologyChanged(&a.settingsPlace, displays) {
 		a.repairOrDeferPlacement(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})

@@ -138,6 +138,7 @@ type tokenValues struct {
 	SizeNavItem                         float32
 	SizeTranslateWidth                  float32
 	SizeTranslateMinHeight              float32
+	SizeTranslateWindowHeight           float32
 	SizeTranslateMaxHeight              float32
 	SizeTranslateInputBase              float32
 	SizeTranslateInputLine              float32
@@ -145,7 +146,6 @@ type tokenValues struct {
 	SizeTranslateResultMax              float32
 	SizeTranslateDictionaryPreviewLines float32
 	SizeTranslateDictionaryMax          float32
-	SizeTranslateTopOffset              float32
 	SizeTranslateDirectionHeight        float32
 }
 
@@ -282,15 +282,15 @@ func tokens(dark bool, language string) tokenValues {
 		SizeGroupHeader:                     24,
 		SizeNavItem:                         40,
 		SizeTranslateWidth:                  480,
-		SizeTranslateMinHeight:              148,
+		SizeTranslateMinHeight:              260,
+		SizeTranslateWindowHeight:           360,
 		SizeTranslateMaxHeight:              520,
-		SizeTranslateInputBase:              28,
+		SizeTranslateInputBase:              36,
 		SizeTranslateInputLine:              20,
 		SizeTranslateInputMaxLines:          4,
 		SizeTranslateResultMax:              320,
 		SizeTranslateDictionaryPreviewLines: 3,
 		SizeTranslateDictionaryMax:          96,
-		SizeTranslateTopOffset:              96,
 		SizeTranslateDirectionHeight:        20,
 	}
 	if dark {

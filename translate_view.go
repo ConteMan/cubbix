@@ -9,9 +9,6 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// translateResultLines estimates how many rows the译文 needs. The result
-// block scrolls internally once it reaches SizeTranslateResultMax, so the
-// window never grows past SizeTranslateMaxHeight.
 func translateResultLines(value string) int {
 	const columns = 56
 	lines := 0
@@ -32,9 +29,6 @@ func clampTranslate(value, low, high float32) float32 {
 	return float32(math.Max(float64(low), math.Min(float64(high), float64(value))))
 }
 
-// translateResultHeight is 44 for the empty state; from loading onwards the
-// lower bound is 64 (two rows), and the upper bound is SizeTranslateResultMax.
-// The dictionary block below it has its own fixed height.
 func (a *application) translateResultHeight(t tokenValues, s *translateState) float32 {
 	needed := 2*t.Space12 + float32(translateResultLines(s.output))*t.FontSizeBody*t.LineHeightBody
 	switch s.phase {
@@ -56,31 +50,23 @@ func dictionaryBodyHeight(t tokenValues) float32 {
 		0, t.SizeTranslateDictionaryMax)
 }
 
-// dictionaryBlockHeight includes the block's own padding. Collapsed it is
-// only the header row; expanded it adds the preview body.
 func dictionaryBlockHeight(t tokenValues, expanded bool) float32 {
-	height := 2*(t.Space12+t.StrokeHairline) + dictionaryHeaderHeight(t)
+	height := dictionaryHeaderHeight(t)
 	if expanded {
 		height += dictionaryBodyHeight(t)
 	}
 	return height
 }
 
-// translateHeight is the panel height (without the shadow margin). Its only
-// inputs are tokens and state, so it can be asserted without a window.
 func translateNonResultHeight(t tokenValues, s *translateState) float32 {
 	input := t.SizeTranslateInputBase + float32(translateInputLines(s.input)-1)*t.SizeTranslateInputLine
-	height := t.Space12 + input + t.Space8 + t.SizeTranslateDirectionHeight + t.Space8 + t.Space12 + 2*t.StrokeHairline
+	height := t.SizeJSONToolbarHeight + t.StrokeHairline + 2*t.Space12 + input + 2*t.Space8 + t.SizeTranslateDirectionHeight
 	if s.clipped > 0 {
 		height += t.FontSizeSmall*t.LineHeightBody + t.Space8
 	}
-	// The accessibility hint owns its own row plus the column gap above it;
-	// without it the measured window would clip the hint.
 	if s.denied {
 		height += t.SizeSegmentHeight + t.Space8
 	}
-	// The separator sits between the translation and the dictionary, with a
-	// Space8 gap on each side contributed by the panel column.
 	if strings.TrimSpace(s.dictionary) != "" {
 		height += t.Space8 + t.StrokeHairline + t.Space8 + dictionaryBlockHeight(t, s.dictionaryExpanded)
 	}
@@ -106,65 +92,85 @@ func (a *application) translateView(c *ui.Context) {
 		s.copiedUntil = time.Time{}
 	}
 	c.OnShortcut(0, ui.KeyEscape, a.closeTranslate)
-	c.Root().Background(ui.Transparent)
-	ui.Box(c.Key("translate-root")).Fill().Padding(t.SizePaletteShadowMargin).Children(func() {
-		ui.Column(c.Key("translate-panel")).Fill().Padding(t.Space12).Gap(t.Space8).Radius(t.RadiusWindow).
-			Background(ui.Hex(t.ColorMenuSurface)).
-			Border(t.StrokeHairline, ui.Hex(t.ColorPanelStrokeOuter)).
-			InsetShadow(0, 0, 0, t.StrokeHairline, ui.Hex(t.ColorPanelStrokeInner)).
-			Shadow(0, t.Space8, t.Space24, 0, ui.Hex(t.ColorPanelShadow)).Children(func() {
-			a.translateInputArea(c, t, locale, s)
-			if s.denied {
-				a.translateSelectionHint(c, t, locale)
-			}
-			if s.clipped > 0 {
-				ui.Text(c, fmt.Sprintf(text("TranslateTooLong"), maxTranslateInput)).
-					Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).
-					LineHeight(t.LineHeightBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
-			}
-			a.translateDirectionRow(c, t, locale, s)
-			a.translateResultBlock(c, t, locale, s)
-			if strings.TrimSpace(s.dictionary) != "" {
-				ui.Box(c.Key("translate-dictionary-separator")).FillWidth().
-					Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
-				a.translateDictionaryBlock(c, t, locale, s)
-			}
+	c.OnShortcut(ui.Cmd, ui.KeyW, a.closeTranslate)
+	c.OnShortcut(ui.Cmd|ui.Alt, ui.KeyP, func() { a.setTranslatePinned(!s.pinned) })
+	c.Root().Background(ui.Hex(t.ColorCard))
+	ui.Column(c.Key("translate-root")).Fill().Children(func() {
+		a.translateToolbar(c, t, locale, s)
+		ui.Box(c).FillWidth().Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
+		ui.Scroll(c.Key("translate-content")).FillWidth().Grow(1).MinHeight(0).Children(func() {
+			ui.Column(c.Key("translate-panel")).FillWidth().Padding(t.Space12).Gap(t.Space8).Children(func() {
+				a.translateInputArea(c, t, locale, s)
+				if s.denied {
+					a.translateSelectionHint(c, t, locale)
+				}
+				if s.clipped > 0 {
+					ui.Text(c, fmt.Sprintf(text("TranslateTooLong"), maxTranslateInput)).
+						Height(t.FontSizeSmall * t.LineHeightBody).FontSize(t.FontSizeSmall).
+						LineHeight(t.LineHeightBody).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+				}
+				a.translateDirectionRow(c, t, locale, s)
+				a.translateResultBlock(c, t, locale, s)
+				if strings.TrimSpace(s.dictionary) != "" {
+					ui.Box(c.Key("translate-dictionary-separator")).FillWidth().
+						Height(t.StrokeHairline).Background(ui.Hex(t.ColorSeparator))
+					a.translateDictionaryBlock(c, t, locale, s)
+				}
+			})
 		})
+	})
+}
+
+func (a *application) translateToolbar(c *ui.Context, t tokenValues, locale string, s *translateState) {
+	ui.Row(c.Key("translate-toolbar")).FillWidth().Height(t.SizeJSONToolbarHeight).Shrink(0).
+		Padding(t.Space8, t.Space12, t.Space8, t.SizeJSONTitleInset).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+		ui.Row(c.Key("translate-title-drag")).Grow(1).FillHeight().DragWindow().AlignItems(ui.Center).Children(func() {
+			ui.Text(c, a.text(locale, "Translate")).FontSize(t.FontSizeSmall).TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+		})
+		glyph, label := "pin", a.text(locale, "R07Pin")
+		if s.pinned {
+			label = a.text(locale, "R07Unpin")
+		}
+		button := ui.ButtonBase(c.Key("translate-pin")).Size(t.SizeIconButton, t.SizeIconButton).
+			Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label).
+			OnClick(func() { a.setTranslatePinned(!s.pinned) })
+		if s.pinned {
+			button.Background(ui.Hex(t.ColorAccentSoft))
+		} else if button.Hovered() {
+			button.Background(ui.Hex(t.ColorControlHover))
+		}
+		button.Children(func() {
+			ui.Row(c).Fill().AlignItems(ui.Center).Justify(ui.Center).Children(func() {
+				ui.Icon(c, icon(glyph)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
+			})
+		})
+		a.translateCopyButton(c, t, locale, s)
+		a.translateSpeakButton(c, t, locale, s)
 	})
 }
 
 func (a *application) translateInputArea(c *ui.Context, t tokenValues, locale string, s *translateState) {
 	text := func(key string) string { return a.text(locale, key) }
 	height := t.SizeTranslateInputBase + float32(translateInputLines(s.input)-1)*t.SizeTranslateInputLine
-	ui.Row(c).FillWidth().Height(height).Gap(t.Space8).Children(func() {
-		ui.Box(c).Grow(1).FillHeight().MinWidth(0).Children(func() {
-			input := ui.TextArea(c.Key("translate-source"), &s.input).Fill().Padding(0).
-				Border(0, ui.Hex(t.ColorTransparent)).Background(ui.Hex(t.ColorTransparent)).
-				FontSize(t.FontSizeBody).LineHeight(t.LineHeightBody).
-				Placeholder(text("TranslateInputPlaceholder")).Label(text("TranslateInputPlaceholder")).FocusRing(true)
-			input.OnTextKey(func(k ui.TextKey) bool {
-				if k.Key != ui.KeyEnter || k.Mods != 0 {
-					return false // Shift+Enter breaks the line.
-				}
-				s.input = k.Text()
-				a.submitTranslate()
-				k.SetText(s.input)
-				return true
-			})
-			input.OnChange(a.syncTranslateInput)
-			if s.focus {
-				s.focus = false
-				input.Focus()
+	ui.Box(c).FillWidth().Height(height).Children(func() {
+		input := ui.TextArea(c.Key("translate-source"), &s.input).Fill().MinHeight(0).Padding(t.Space4, t.Space12).
+			Border(0, ui.Hex(t.ColorTransparent)).Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).
+			FontSize(t.FontSizeBody).LineHeight(t.LineHeightBody).
+			Placeholder(text("TranslateInputPlaceholder")).Label(text("TranslateInputPlaceholder")).FocusRing(true)
+		input.OnTextKey(func(k ui.TextKey) bool {
+			if k.Key != ui.KeyEnter || k.Mods != 0 {
+				return false // Shift+Enter breaks the line.
 			}
+			s.input = k.Text()
+			a.submitTranslate()
+			k.SetText(s.input)
+			return true
 		})
-		close := ui.ButtonBase(c.Key("translate-close")).Size(t.SizeIconButton, t.SizeIconButton).
-			Radius(t.RadiusControl).FocusRing(true).Label(text("TranslateClose")).
-			Tooltip(text("TranslateClose")).OnClick(a.closeTranslate)
-		close.Children(func() {
-			ui.Row(c).Fill().AlignItems(ui.Center).Justify(ui.Center).Children(func() {
-				ui.Icon(c, icon("x")).Size(t.SizeIconSmall, t.SizeIconSmall).TextColor(ui.Hex(t.ColorTextSecondary))
-			})
-		})
+		input.OnChange(a.syncTranslateInput)
+		if s.focus {
+			s.focus = false
+			input.Focus()
+		}
 	})
 }
 
@@ -201,23 +207,12 @@ func (a *application) translateDirectionRow(c *ui.Context, t tokenValues, locale
 }
 
 func (a *application) translateResultBlock(c *ui.Context, t tokenValues, locale string, s *translateState) {
-	ui.Row(c).FillWidth().Height(a.translateResultHeightForState(t, s)).Radius(t.RadiusCard).
-		Background(ui.Hex(t.ColorCard)).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
-		Padding(t.Space12).Gap(t.Space8).AlignItems(ui.Start).Children(func() {
+	ui.Row(c).FillWidth().Height(a.translateResultHeightForState(t, s)).AlignItems(ui.Start).Children(func() {
 		ui.Scroll(c).Grow(1).FillHeight().MinWidth(0).AlignItems(ui.Start).Justify(ui.Start).Children(func() {
 			ui.Column(c).FillWidth().AlignItems(ui.Start).Justify(ui.Start).Children(func() {
 				a.translateResultContent(c, t, locale, s)
 			})
 		})
-		// The two icon buttons share one top-trailing row and keep the
-		// Space4 gap from the spec; the result text scrolls beside them.
-		// The 44 pt empty block is too short for a 28 pt button.
-		if s.phase != translateEmpty {
-			ui.Row(c).Shrink(0).Gap(t.Space4).AlignItems(ui.Start).Children(func() {
-				a.translateCopyButton(c, t, locale, s)
-				a.translateSpeakButton(c, t, locale, s)
-			})
-		}
 	})
 }
 
@@ -239,9 +234,7 @@ func (a *application) translateDictionaryBlock(c *ui.Context, t tokenValues, loc
 		glyph, tooltip = "chevron-right", text("TranslateDictionaryExpand")
 	}
 	ui.Column(c.Key("translate-dictionary")).FillWidth().
-		Height(dictionaryBlockHeight(t, s.dictionaryExpanded)).Radius(t.RadiusCard).
-		Background(ui.Hex(t.ColorCard)).Border(t.StrokeHairline, ui.Hex(t.ColorSeparator)).
-		Padding(t.Space12).Children(func() {
+		Height(dictionaryBlockHeight(t, s.dictionaryExpanded)).Children(func() {
 		header := ui.ButtonBase(c.Key("translate-dictionary-toggle")).FillWidth().
 			Height(dictionaryHeaderHeight(t)).Justify(ui.Start).AlignItems(ui.Center).
 			FocusRing(true).Label(label).Tooltip(tooltip).OnClick(a.toggleDictionary)
@@ -297,7 +290,7 @@ func (a *application) translateResultContent(c *ui.Context, t tokenValues, local
 		}
 		ui.Column(c).FillWidth().Gap(t.Space8).Children(func() {
 			ui.Row(c).FillWidth().Gap(t.Space8).AlignItems(ui.Center).Children(func() {
-				ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorDanger))
+				ui.Icon(c, icon("triangle-alert")).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 				ui.Text(c, text(key)).FontSize(t.FontSizeBody).TextColor(ui.Hex(t.ColorText)).SingleLine()
 			})
 			a.translateTextButton(c, t, "translate-retry", text("TranslateRetry"), a.submitTranslate)
@@ -335,12 +328,15 @@ func (a *application) translateCopyButton(c *ui.Context, t tokenValues, locale s
 		Shrink(0).Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label)
 	if usable {
 		button = button.OnClick(a.copyTranslateResult)
+		if button.Hovered() {
+			button.Background(ui.Hex(t.ColorControlHover))
+		}
 	} else {
 		button = button.Disabled(true).Opacity(t.OpacityDisabled)
 	}
 	button.Children(func() {
 		ui.Row(c).Fill().AlignItems(ui.Center).Justify(ui.Center).Children(func() {
-			ui.Icon(c, icon(glyph)).Size(t.SizeIconSmall, t.SizeIconSmall).TextColor(ui.Hex(t.ColorTextSecondary))
+			ui.Icon(c, icon(glyph)).Size(t.SizeIcon, t.SizeIcon).TextColor(ui.Hex(t.ColorTextSecondary))
 		})
 	})
 }
@@ -362,12 +358,15 @@ func (a *application) translateSpeakButton(c *ui.Context, t tokenValues, locale 
 		Shrink(0).Radius(t.RadiusControl).FocusRing(true).Label(label).Tooltip(label)
 	if usable || s.speaking {
 		button = button.OnClick(a.speakTranslateSource)
+		if button.Hovered() {
+			button.Background(ui.Hex(t.ColorControlHover))
+		}
 	} else {
 		button = button.Disabled(true).Opacity(t.OpacityDisabled)
 	}
 	button.Children(func() {
 		ui.Row(c).Fill().AlignItems(ui.Center).Justify(ui.Center).Children(func() {
-			ui.Icon(c, icon(glyph)).Size(t.SizeIconSmall, t.SizeIconSmall).
+			ui.Icon(c, icon(glyph)).Size(t.SizeIcon, t.SizeIcon).
 				TextColor(ui.Hex(t.ColorTextSecondary))
 		})
 	})

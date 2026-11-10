@@ -21,12 +21,13 @@ const (
 	translateNotConfigured
 )
 
-// translateState is the floating window's own state. It lives on the main
-// thread, like paletteState and menubarPanelState. The dictionary text is the
-// cropped plain-text definition from the local macOS dictionaries; speech and
-// selection belong to later steps.
 type translateState struct {
 	window             *mygo.Window
+	testFrame          translateWindow
+	place              windowPlaceState
+	initialSize        screenSize
+	pinned             bool
+	closing            bool
 	visible            bool
 	input              string
 	directionInput     string
@@ -120,8 +121,6 @@ func (a *application) registerTranslateShortcut() {
 	a.registerSlot("translate", a.config.TranslateShortcut, a.config.TranslateEnabled, a.toggleTranslate)
 }
 
-// changeTranslateEnabled is the module switch. Turning it off releases only
-// the combination this slot actually registered and closes the panel.
 func (a *application) changeTranslateEnabled(target bool) {
 	a.cancelShortcutRecording()
 	if target == a.config.TranslateEnabled {
@@ -161,23 +160,22 @@ func (a *application) toggleTranslate() {
 	if a.shortcutRecording || !a.config.TranslateEnabled {
 		return
 	}
-	if a.translateVisible() {
-		a.closeTranslate()
-		return
-	}
 	// The AX read runs on a worker with a 200 ms deadline, so a stuck
 	// application can never hold the shortcut callback.
 	a.beginTranslateSelection()
 }
 
-// openTranslateText is the one panel entry point. The shortcut, the command
-// palette and the card panel all land here with either selected text or an
-// empty input.
 func (a *application) openTranslateText(text string) {
 	a.cancelTranslateSelection()
 	a.hideMenubarPanel()
 	a.hidePalette()
 	s := a.ensureTranslateState()
+	if (s.visible || s.frame() != nil) && strings.TrimSpace(text) == "" {
+		s.focus = true
+		a.showTranslate()
+		a.refreshTranslate()
+		return
+	}
 	a.stopTranslateSpeech()
 	a.cancelTranslate()
 	s.input = text
@@ -194,8 +192,9 @@ func (a *application) openTranslateText(text string) {
 	s.speakFailed = false
 	s.denied = false
 	s.focus = true
-	if s.window == nil && a.createTranslateWindow != nil {
+	if s.frame() == nil && a.createTranslateWindow != nil {
 		a.createTranslateWindow(s)
+		a.placeTranslate()
 	}
 	a.showTranslate()
 	if strings.TrimSpace(text) != "" {
@@ -205,71 +204,47 @@ func (a *application) openTranslateText(text string) {
 	}
 }
 
-// showTranslate places and shows the nonactivating panel. It deliberately
-// does not call visibility: that would switch the activation policy and pull
-// the user out of the application they were reading.
 func (a *application) showTranslate() {
 	s := a.translate
 	if s == nil {
 		return
 	}
-	a.placeTranslate()
+	if window := s.frame(); window != nil {
+		if window.IsMinimized() {
+			window.Restore()
+		}
+		a.reconcileTranslateDisplay()
+		a.visibility(true)
+		s.visible = true
+		window.Show()
+		window.Focus()
+	}
 	s.visible = true
 	if s.window != nil {
-		s.window.Show()
 		s.window.Invalidate()
-	}
-}
-
-func (a *application) placeTranslate() {
-	s := a.translate
-	if s == nil || s.window == nil {
-		return
-	}
-	t := tokens(false, "zh-CN")
-	margin := int(t.SizePaletteShadowMargin)
-	width := int(t.SizeTranslateWidth) + 2*margin
-	height := int(a.translateHeight(t, s)) + 2*margin
-	displays := a.paletteDisplaysNow()
-	if len(displays) == 0 {
-		return
-	}
-	display := displayNearest(displays, a.paletteCursorPoint())
-	x, y := palettePosition(display, width, height, t.SizeTranslateTopOffset)
-	s.window.SetPosition(x, y)
-}
-
-func (a *application) hideTranslate() {
-	s := a.translate
-	if s == nil {
-		return
-	}
-	a.stopTranslateSpeech()
-	s.visible = false
-	if s.window != nil {
-		s.window.Hide()
 	}
 }
 
 func (a *application) closeTranslate() {
 	a.cancelTranslateSelection()
-	a.cancelTranslate()
-	a.hideTranslate()
-}
-
-// onTranslateBlur keeps a result on screen for comparing with the source;
-// an empty input closes as soon as the panel loses focus.
-func (a *application) onTranslateBlur() {
 	s := a.translate
-	if s == nil {
+	if s == nil || s.closing {
 		return
 	}
-	hasResult := strings.TrimSpace(s.output) != "" || strings.TrimSpace(s.dictionary) != ""
-	if hasResult && strings.TrimSpace(s.input) != "" {
-		return
+	s.closing = true
+	if a.rememberTranslatePlace() {
+		a.save()
 	}
 	a.cancelTranslate()
-	a.hideTranslate()
+	a.stopTranslateSpeech()
+	s.visible = false
+	if window := s.frame(); window != nil {
+		window.Destroy()
+	}
+	if a.translate == s {
+		a.translate = nil
+	}
+	a.visibility(false)
 }
 
 func (a *application) cancelTranslate() {
@@ -481,39 +456,56 @@ func (a *application) refreshTranslate() {
 	if s == nil || s.window == nil {
 		return
 	}
-	t := tokens(false, "zh-CN")
-	margin := int(t.SizePaletteShadowMargin)
-	s.window.SetContentSize(int(t.SizeTranslateWidth)+2*margin, int(a.translateHeight(t, s))+2*margin)
 	s.window.Invalidate()
 }
 
-// buildTranslateWindow creates the hidden nonactivating panel. It is created
-// on first use, never at launch, and never shown by a test.
+func (a *application) translateWindowOptions(t tokenValues, locale string) mygo.WindowOptions {
+	return mygo.WindowOptions{
+		Title:                a.text(locale, "Translate"),
+		Width:                int(t.SizeTranslateWidth),
+		Height:               int(t.SizeTranslateWindowHeight),
+		MinWidth:             int(t.SizeTranslateWidth),
+		MinHeight:            int(t.SizeTranslateMinHeight),
+		Hidden:               true,
+		TitleBarStyle:        mygo.TitleBarHidden,
+		TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space16)},
+		DisableFullScreen:    true,
+		BackgroundColor:      t.ColorCard,
+		Page:                 mygo.PageOptions{DevTools: mygo.DevToolsDisabled},
+		Content:              ui.View(a.translateView),
+	}
+}
+
 func (a *application) buildTranslateWindow(s *translateState) {
-	t := tokens(false, "zh-CN")
-	margin := int(t.SizePaletteShadowMargin)
-	window := mygo.NewWindow(mygo.WindowOptions{
-		Title:             "Cubbix",
-		Width:             int(t.SizeTranslateWidth) + 2*margin,
-		Height:            int(t.SizeTranslateMinHeight) + 2*margin,
-		Hidden:            true,
-		Frameless:         true,
-		Transparent:       true,
-		DisableShadow:     true,
-		DisableResize:     true,
-		DisableMove:       true,
-		DisableMinimize:   true,
-		DisableMaximize:   true,
-		DisableFullScreen: true,
-		Panel:             true,
-		Content:           ui.View(a.translateView),
-	})
-	window.OnClose(func(event *mygo.CloseEvent) {
-		if !a.quitting {
-			event.PreventDefault()
-			a.closeTranslate()
-		}
-	})
-	window.OnBlur(a.onTranslateBlur)
+	t := tokens(mygo.Theme.IsDark(), mygo.App.Locale())
+	window := mygo.NewWindow(a.translateWindowOptions(t, mygo.App.Locale()))
 	s.window = window
+	window.OnClose(func(*mygo.CloseEvent) {
+		if a.rememberTranslatePlace() {
+			a.save()
+		}
+		a.cancelTranslateSelection()
+		a.cancelTranslate()
+		a.stopTranslateSpeech()
+		s.visible = false
+	})
+	window.OnClosed(func() {
+		if a.translate == s {
+			a.translate = nil
+		}
+		a.visibility(false)
+	})
+	window.OnHide(func() { s.visible = false; a.visibility(false) })
+	window.OnMove(a.observeTranslateMove)
+	window.OnRestore(a.reconcileTranslateDisplay)
+}
+
+func (a *application) setTranslatePinned(pinned bool) {
+	if s := a.translate; s != nil {
+		s.pinned = pinned
+		if window := s.frame(); window != nil {
+			window.SetAlwaysOnTop(pinned)
+		}
+		a.refreshTranslate()
+	}
 }

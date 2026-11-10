@@ -151,9 +151,6 @@ func (a *application) beginTranslateSelection() {
 			if answer.trustedKnown {
 				a.translateSelectionTrusted = answer.trusted
 			}
-			if a.translateVisible() {
-				return
-			}
 			switch answer.status {
 			case selectionFound:
 				a.openTranslateText(answer.text)

@@ -87,8 +87,7 @@ func (a *application) changeJSONEnabled(target bool) {
 	a.refreshModuleSurfaces()
 }
 
-func (a *application) buildJSONWindow(d *jsonDocument) {
-	t := tokens(mygo.Theme.IsDark(), mygo.App.Locale())
+func (a *application) jsonWindowOptions(d *jsonDocument, t tokenValues, locale string) mygo.WindowOptions {
 	width, height := int(t.SizeJSONWindowWidth), int(t.SizeJSONWindowHeight)
 	if a.config.JSONWidth >= int(t.SizeJSONEmptyWidth) {
 		width = a.config.JSONWidth
@@ -96,7 +95,12 @@ func (a *application) buildJSONWindow(d *jsonDocument) {
 	if a.config.JSONHeight >= int(t.SizeJSONEmptyHeight) {
 		height = a.config.JSONHeight
 	}
-	d.window = mygo.NewWindow(mygo.WindowOptions{Title: d.name(a, mygo.App.Locale()), Width: width, Height: height, MinWidth: int(t.SizeJSONEmptyWidth), MinHeight: int(t.SizeJSONEmptyHeight), Hidden: true, TitleBarStyle: mygo.TitleBarHidden, TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space16)}, DisableFullScreen: true, Page: mygo.PageOptions{DevTools: mygo.DevToolsDisabled}, BackgroundColor: t.ColorCard})
+	return mygo.WindowOptions{Title: d.name(a, locale), Width: width, Height: height, MinWidth: int(t.SizeJSONEmptyWidth), MinHeight: int(t.SizeJSONEmptyHeight), Hidden: true, TitleBarStyle: mygo.TitleBarHidden, TrafficLightPosition: &mygo.Point{X: int(t.Space12), Y: int(t.Space16)}, DisableFullScreen: true, Page: mygo.PageOptions{DevTools: mygo.DevToolsDisabled}, BackgroundColor: t.ColorCard}
+}
+
+func (a *application) buildJSONWindow(d *jsonDocument) {
+	t := tokens(mygo.Theme.IsDark(), mygo.App.Locale())
+	d.window = mygo.NewWindow(a.jsonWindowOptions(d, t, mygo.App.Locale()))
 	d.window.Page().SetWindowOpenHandler(func(mygo.WindowOpenRequest) *mygo.WindowOptions { return nil })
 	d.window.Page().OnWillNavigate(func(e *mygo.NavigateEvent) {
 		if d.ready || e.URL != "mygo://localhost/" {

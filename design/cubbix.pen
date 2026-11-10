@@ -153746,6 +153746,938 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "fk4fE",
+      "x": 0,
+      "y": 23930,
+      "name": "R17 zh-CN light",
+      "theme": {
+        "mode": "light",
+        "language": "zh-CN"
+      },
+      "clip": true,
+      "width": 480,
+      "height": 360,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "atrAe",
+          "name": "Native title area and toolbar",
+          "width": "fill_container",
+          "height": 44,
+          "gap": "$Space8",
+          "padding": [
+            "$Space8",
+            "$Space12",
+            "$Space8",
+            "$SizeJSONTitleInset"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "JndhF",
+              "name": "翻译",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "翻译",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "kJjqZ",
+              "name": "Toolbar / pin",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "h4cTZ0",
+                  "type": "ref",
+                  "ref": "vnA76",
+                  "name": "Lucide / pin",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "yO3Fa",
+              "name": "Toolbar / copy",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "RGSMI",
+                  "type": "ref",
+                  "ref": "YHZ39",
+                  "name": "Lucide / copy",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "eM1fx",
+              "name": "Toolbar / volume-2",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "path",
+                  "id": "rPQyO",
+                  "name": "Lucide / volume-2",
+                  "geometry": "M11 4.702a0.705 0.705 0 0 0-1.203-0.498l-3.384 3.383a1.4 1.4 0 0 1-0.997 0.413h-2.416a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 0.997 0.413l3.383 3.384a0.705 0.705 0 0 0 1.204-0.499z m5 4.298a5 5 0 0 1 0 6m3.364 3.364a9 9 0 0 0 0-12.728",
+                  "viewBox": [
+                    0,
+                    0,
+                    24,
+                    24
+                  ],
+                  "fill": "$ColorTransparent",
+                  "width": 16,
+                  "height": 16,
+                  "stroke": "$ColorTextSecondary",
+                  "strokeWidth": "$StrokeIcon",
+                  "strokeLinejoin": "round",
+                  "strokeLinecap": "round"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "F9niX4",
+          "name": "Toolbar separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical"
+        },
+        {
+          "type": "frame",
+          "id": "nKOVr",
+          "name": "Content",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space12",
+          "children": [
+            {
+              "type": "frame",
+              "id": "X23zA7",
+              "name": "Source input",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "padding": [
+                "$Space4",
+                "$Space12"
+              ],
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "n4xCv",
+                  "name": "serendipity",
+                  "fill": "$ColorText",
+                  "content": "serendipity",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "F8BZXz",
+              "name": "英 → 中",
+              "fill": "$ColorTextSecondary",
+              "content": "英 → 中",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "o33Hf",
+              "name": "Translation",
+              "width": "fill_container",
+              "height": 80,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "m5D5D",
+                  "name": "意外发现美好事物的幸运。",
+                  "fill": "$ColorText",
+                  "content": "意外发现美好事物的幸运。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Uxwa4",
+              "name": "Dictionary separator",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator",
+              "layout": "vertical"
+            },
+            {
+              "type": "text",
+              "id": "kkAOd",
+              "name": "词典",
+              "fill": "$ColorTextSecondary",
+              "content": "词典",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "sjfUZ",
+              "name": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "fill": "$ColorTextSecondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "DOq5Y",
+      "x": 608,
+      "y": 23930,
+      "name": "R17 zh-CN dark",
+      "theme": {
+        "mode": "dark",
+        "language": "zh-CN"
+      },
+      "clip": true,
+      "width": 480,
+      "height": 360,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "WLmRy",
+          "name": "Native title area and toolbar",
+          "width": "fill_container",
+          "height": 44,
+          "gap": "$Space8",
+          "padding": [
+            "$Space8",
+            "$Space12",
+            "$Space8",
+            "$SizeJSONTitleInset"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "i6LGA",
+              "name": "翻译",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "翻译",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "kQPO7",
+              "name": "Toolbar / pin",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "ZrJcq",
+                  "type": "ref",
+                  "ref": "vnA76",
+                  "name": "Lucide / pin",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bv5E1",
+              "name": "Toolbar / copy",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "tFmPb",
+                  "type": "ref",
+                  "ref": "YHZ39",
+                  "name": "Lucide / copy",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "P1KLj8",
+              "name": "Toolbar / volume-2",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "path",
+                  "id": "kFPaI",
+                  "name": "Lucide / volume-2",
+                  "geometry": "M11 4.702a0.705 0.705 0 0 0-1.203-0.498l-3.384 3.383a1.4 1.4 0 0 1-0.997 0.413h-2.416a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 0.997 0.413l3.383 3.384a0.705 0.705 0 0 0 1.204-0.499z m5 4.298a5 5 0 0 1 0 6m3.364 3.364a9 9 0 0 0 0-12.728",
+                  "viewBox": [
+                    0,
+                    0,
+                    24,
+                    24
+                  ],
+                  "fill": "$ColorTransparent",
+                  "width": 16,
+                  "height": 16,
+                  "stroke": "$ColorTextSecondary",
+                  "strokeWidth": "$StrokeIcon",
+                  "strokeLinejoin": "round",
+                  "strokeLinecap": "round"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "LY3xX",
+          "name": "Toolbar separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical"
+        },
+        {
+          "type": "frame",
+          "id": "C5Vvmz",
+          "name": "Content",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space12",
+          "children": [
+            {
+              "type": "frame",
+              "id": "YorFG",
+              "name": "Source input",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "padding": [
+                "$Space4",
+                "$Space12"
+              ],
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "xM3ot",
+                  "name": "serendipity",
+                  "fill": "$ColorText",
+                  "content": "serendipity",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "KfXd5",
+              "name": "英 → 中",
+              "fill": "$ColorTextSecondary",
+              "content": "英 → 中",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "H40j8",
+              "name": "Translation",
+              "width": "fill_container",
+              "height": 80,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "M0CqP",
+                  "name": "意外发现美好事物的幸运。",
+                  "fill": "$ColorText",
+                  "content": "意外发现美好事物的幸运。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ehOdu",
+              "name": "Dictionary separator",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator",
+              "layout": "vertical"
+            },
+            {
+              "type": "text",
+              "id": "Nivzp",
+              "name": "词典",
+              "fill": "$ColorTextSecondary",
+              "content": "词典",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "sMgDN",
+              "name": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "fill": "$ColorTextSecondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "kBBrl",
+      "x": 1216,
+      "y": 23930,
+      "name": "R17 en light",
+      "theme": {
+        "mode": "light",
+        "language": "en"
+      },
+      "clip": true,
+      "width": 480,
+      "height": 360,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "xGUXJ",
+          "name": "Native title area and toolbar",
+          "width": "fill_container",
+          "height": 44,
+          "gap": "$Space8",
+          "padding": [
+            "$Space8",
+            "$Space12",
+            "$Space8",
+            "$SizeJSONTitleInset"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "UJMVA",
+              "name": "Translate",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Translate",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "Ei3Nu",
+              "name": "Toolbar / pin",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "NHHg8",
+                  "type": "ref",
+                  "ref": "vnA76",
+                  "name": "Lucide / pin",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pMX0p",
+              "name": "Toolbar / copy",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "yaIkg",
+                  "type": "ref",
+                  "ref": "YHZ39",
+                  "name": "Lucide / copy",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "L2jvO",
+              "name": "Toolbar / volume-2",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "path",
+                  "id": "H3gy05",
+                  "name": "Lucide / volume-2",
+                  "geometry": "M11 4.702a0.705 0.705 0 0 0-1.203-0.498l-3.384 3.383a1.4 1.4 0 0 1-0.997 0.413h-2.416a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 0.997 0.413l3.383 3.384a0.705 0.705 0 0 0 1.204-0.499z m5 4.298a5 5 0 0 1 0 6m3.364 3.364a9 9 0 0 0 0-12.728",
+                  "viewBox": [
+                    0,
+                    0,
+                    24,
+                    24
+                  ],
+                  "fill": "$ColorTransparent",
+                  "width": 16,
+                  "height": 16,
+                  "stroke": "$ColorTextSecondary",
+                  "strokeWidth": "$StrokeIcon",
+                  "strokeLinejoin": "round",
+                  "strokeLinecap": "round"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "x00wOn",
+          "name": "Toolbar separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical"
+        },
+        {
+          "type": "frame",
+          "id": "XWm7d",
+          "name": "Content",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space12",
+          "children": [
+            {
+              "type": "frame",
+              "id": "vemtf",
+              "name": "Source input",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "padding": [
+                "$Space4",
+                "$Space12"
+              ],
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "DAWwY",
+                  "name": "serendipity",
+                  "fill": "$ColorText",
+                  "content": "serendipity",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "NIh9h",
+              "name": "EN → ZH",
+              "fill": "$ColorTextSecondary",
+              "content": "EN → ZH",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "vhtAi",
+              "name": "Translation",
+              "width": "fill_container",
+              "height": 80,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ZHdAf",
+                  "name": "意外发现美好事物的幸运。",
+                  "fill": "$ColorText",
+                  "content": "意外发现美好事物的幸运。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "zStb7",
+              "name": "Dictionary separator",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator",
+              "layout": "vertical"
+            },
+            {
+              "type": "text",
+              "id": "Y5hqdz",
+              "name": "Dictionary",
+              "fill": "$ColorTextSecondary",
+              "content": "Dictionary",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "FBk3b",
+              "name": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "fill": "$ColorTextSecondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "SdFQG",
+      "x": 1824,
+      "y": 23930,
+      "name": "R17 en dark",
+      "theme": {
+        "mode": "dark",
+        "language": "en"
+      },
+      "clip": true,
+      "width": 480,
+      "height": 360,
+      "fill": "$ColorCard",
+      "cornerRadius": "$RadiusWindow",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "bfO7G",
+          "name": "Native title area and toolbar",
+          "width": "fill_container",
+          "height": 44,
+          "gap": "$Space8",
+          "padding": [
+            "$Space8",
+            "$Space12",
+            "$Space8",
+            "$SizeJSONTitleInset"
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "o1vTi",
+              "name": "Translate",
+              "fill": "$ColorText",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Translate",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeBody",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "SV48P",
+              "name": "Toolbar / pin",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "L68Ro",
+                  "type": "ref",
+                  "ref": "vnA76",
+                  "name": "Lucide / pin",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "A9vzzg",
+              "name": "Toolbar / copy",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "jyR0g",
+                  "type": "ref",
+                  "ref": "YHZ39",
+                  "name": "Lucide / copy",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "OQa4G",
+              "name": "Toolbar / volume-2",
+              "width": 28,
+              "height": 28,
+              "cornerRadius": "$RadiusControl",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "path",
+                  "id": "Dk89w",
+                  "name": "Lucide / volume-2",
+                  "geometry": "M11 4.702a0.705 0.705 0 0 0-1.203-0.498l-3.384 3.383a1.4 1.4 0 0 1-0.997 0.413h-2.416a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 0.997 0.413l3.383 3.384a0.705 0.705 0 0 0 1.204-0.499z m5 4.298a5 5 0 0 1 0 6m3.364 3.364a9 9 0 0 0 0-12.728",
+                  "viewBox": [
+                    0,
+                    0,
+                    24,
+                    24
+                  ],
+                  "fill": "$ColorTransparent",
+                  "width": 16,
+                  "height": 16,
+                  "stroke": "$ColorTextSecondary",
+                  "strokeWidth": "$StrokeIcon",
+                  "strokeLinejoin": "round",
+                  "strokeLinecap": "round"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gzpWo",
+          "name": "Toolbar separator",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$ColorSeparator",
+          "layout": "vertical"
+        },
+        {
+          "type": "frame",
+          "id": "C5ywJr",
+          "name": "Content",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": "$Space8",
+          "padding": "$Space12",
+          "children": [
+            {
+              "type": "frame",
+              "id": "DZZFQ",
+              "name": "Source input",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$ColorControl",
+              "cornerRadius": "$RadiusControl",
+              "layout": "vertical",
+              "padding": [
+                "$Space4",
+                "$Space12"
+              ],
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "T2wDqf",
+                  "name": "serendipity",
+                  "fill": "$ColorText",
+                  "content": "serendipity",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "x9pqyA",
+              "name": "EN → ZH",
+              "fill": "$ColorTextSecondary",
+              "content": "EN → ZH",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "JSngF",
+              "name": "Translation",
+              "width": "fill_container",
+              "height": 80,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pF7UF",
+                  "name": "意外发现美好事物的幸运。",
+                  "fill": "$ColorText",
+                  "content": "意外发现美好事物的幸运。",
+                  "lineHeight": "$LineHeightBody",
+                  "fontFamily": "$FontFamily",
+                  "fontSize": "$FontSizeBody",
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Qo1p8",
+              "name": "Dictionary separator",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$ColorSeparator",
+              "layout": "vertical"
+            },
+            {
+              "type": "text",
+              "id": "O1wnSE",
+              "name": "Dictionary",
+              "fill": "$ColorTextSecondary",
+              "content": "Dictionary",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "fJ87p",
+              "name": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "fill": "$ColorTextSecondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "serendipity | ˌserənˈdipədē | noun\nAn unexpected but fortunate discovery.",
+              "lineHeight": "$LineHeightBody",
+              "fontFamily": "$FontFamily",
+              "fontSize": "$FontSizeSmall",
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
     }
   ],
   "themes": {
@@ -159785,6 +160717,50 @@
           }
         }
       ]
+    },
+    "SizeTranslateWidth": {
+      "type": "number",
+      "value": 480
+    },
+    "SizeTranslateMinHeight": {
+      "type": "number",
+      "value": 260
+    },
+    "SizeTranslateWindowHeight": {
+      "type": "number",
+      "value": 360
+    },
+    "SizeTranslateMaxHeight": {
+      "type": "number",
+      "value": 520
+    },
+    "SizeTranslateInputBase": {
+      "type": "number",
+      "value": 36
+    },
+    "SizeTranslateInputLine": {
+      "type": "number",
+      "value": 20
+    },
+    "SizeTranslateInputMaxLines": {
+      "type": "number",
+      "value": 4
+    },
+    "SizeTranslateResultMax": {
+      "type": "number",
+      "value": 320
+    },
+    "SizeTranslateDictionaryPreviewLines": {
+      "type": "number",
+      "value": 3
+    },
+    "SizeTranslateDictionaryMax": {
+      "type": "number",
+      "value": 96
+    },
+    "SizeTranslateDirectionHeight": {
+      "type": "number",
+      "value": 20
     }
   },
   "fileToken": "d54ef04c-78c9-405f-bd8d-0848edd09a7a"

@@ -92,11 +92,12 @@ type Config struct {
 	UpdateLastCheck string `toml:"update_last_check,omitempty"`
 	// Translate is the sixth module. The API key is never part of Config: it
 	// lives in mygo.Secrets. No default address or model is stored here.
-	TranslateEnabled   bool   `toml:"translate_enabled"`
-	TranslateShortcut  string `toml:"translate_shortcut"`
-	TranslateBaseURL   string `toml:"translate_base_url,omitempty"`
-	TranslateModel     string `toml:"translate_model,omitempty"`
-	TranslateAutoSpeak bool   `toml:"translate_auto_speak"`
+	TranslateEnabled   bool                         `toml:"translate_enabled"`
+	TranslateShortcut  string                       `toml:"translate_shortcut"`
+	TranslateBaseURL   string                       `toml:"translate_base_url,omitempty"`
+	TranslateModel     string                       `toml:"translate_model,omitempty"`
+	TranslateAutoSpeak bool                         `toml:"translate_auto_speak"`
+	TranslateWindows   map[string]translateGeometry `toml:"translate_windows,omitempty"`
 }
 
 func defaultConfig() Config {
