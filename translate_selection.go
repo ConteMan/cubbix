@@ -216,6 +216,9 @@ func (a *application) grantAccessibility() {
 	if s := a.qr; s != nil {
 		s.denied = false
 	}
+	if s := a.devtools; s != nil {
+		s.denied = false
+	}
 	if !a.accessibilitySettingsOpened {
 		a.accessibilitySettingsOpened = true
 		if a.openAccessibilitySettings != nil {
@@ -228,6 +231,9 @@ func (a *application) grantAccessibility() {
 		// again for the new box.
 		a.refreshQRScale()
 		a.refreshQR()
+	}
+	if a.devtools != nil {
+		a.refreshDevtools()
 	}
 	a.invalidateWindow()
 }

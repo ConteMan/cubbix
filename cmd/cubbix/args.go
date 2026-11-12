@@ -23,13 +23,17 @@ Commands:
   status               Print keep awake, JSON windows and version
   json new [options]   Open a JSON window  (--text STR | --file PATH | --blank)
   palette              Open the command palette
-  settings [--page P]  Open Settings  (general|awake|json|translate|qr|shortcuts|about)
+  settings [--page P]  Open Settings  (general|awake|json|translate|qr|devtools|shortcuts|about)
   translate [TEXT]     Translate text from an argument, file, standard input,
                        or the current selection when no text is given
                        [--to auto|zh|en] [--text STR | --file PATH | -]
   qr [TEXT]            Make a QR code of text or a link and print it as block
                        characters  [--text STR | --file PATH | -]
                        [--png PATH]
+  ts [TEXT|now]        Convert a Unix timestamp or a date, or print the current
+                       time  (TEXT may come from standard input)
+  uuid [N]             Generate UUIDs, one per line  [--v4|--v7]
+                       [--upper] [--plain] [-n N]
   version              Print the version of this tool and its app bundle
   help [command]       Show this help
 
@@ -100,6 +104,52 @@ Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
              4 rejected, 5 timeout
 `
 
+// tsHelpText is the topic help for `cubbix help ts`.
+const tsHelpText = `Usage: cubbix ts [TEXT|now] [options]
+
+Convert one Unix timestamp or one date. TEXT may be omitted when piping
+standard input; "-" reads standard input explicitly. With no TEXT and no pipe,
+the current time is printed. The text uses the same rules as the palette's
+"ts" prefix, except that the prefix itself is not written: 1-10 digits are
+seconds, and 13, 16 and 19 digits are milliseconds, microseconds and
+nanoseconds. A 12-digit millisecond value needs an "ms" suffix
+(for example "946684800000ms"), and a 9-digit second value is accepted here
+because the command is already explicit. Output is one result per line; the
+first line is the default result. Empty text and text over 128 bytes are usage
+errors. --notify is not accepted.
+
+Options:
+  --json               Print one JSON object with stable fields
+  --no-launch          Do not start Cubbix when it is not running
+  --timeout DURATION   Wait at most this long (default 5s, max 60s)
+  --socket PATH        Talk to the app at PATH instead of the default socket
+
+Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
+             4 rejected, 5 timeout
+`
+
+// uuidHelpText is the topic help for `cubbix help uuid`.
+const uuidHelpText = `Usage: cubbix uuid [N] [options]
+
+Generate N UUIDs, one per line. Defaults: version 4, one value, lowercase and
+hyphenated. N is 1-100. --v4 and --v7 are mutually exclusive. --upper and
+--plain only change how a value is written: a hyphenless UUID is the same
+value. --notify is not accepted.
+
+Options:
+  -n N                 Generate N values (1-100, same as the positional N)
+  --v4, --v7           Pick the UUID version (default v4)
+  --upper              Write the values in uppercase
+  --plain              Write the values without hyphens
+  --json               Print one JSON object with stable fields
+  --no-launch          Do not start Cubbix when it is not running
+  --timeout DURATION   Wait at most this long (default 5s, max 60s)
+  --socket PATH        Talk to the app at PATH instead of the default socket
+
+Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
+             4 rejected, 5 timeout
+`
+
 // tiles stays accepted: scripts in the wild still name the old page.
 var settingsPages = map[string]bool{"general": true, "awake": true, "tiles": true, "json": true, "translate": true, "qr": true, "devtools": true, "shortcuts": true, "about": true}
 
@@ -125,7 +175,9 @@ func parse(argv []string) (inv invocation, err error) {
 			positional = append(positional, argv[i+1:]...)
 			break
 		}
-		if !strings.HasPrefix(arg, "-") || arg == "-" {
+		if !strings.HasPrefix(arg, "-") || arg == "-" || negativeNumber(arg) {
+			// A negative number is the text of ts, not an option: no option of
+			// this tool takes one.
 			positional = append(positional, arg)
 			continue
 		}
@@ -215,6 +267,32 @@ func parse(argv []string) (inv invocation, err error) {
 			}
 			seen = append(seen, name)
 			inv.flags.socket = raw
+		case "--v4", "--v7", "--upper", "--plain":
+			if hasInline {
+				return inv, usagef("Option %s takes no value.", name)
+			}
+			seen = append(seen, name)
+			switch name {
+			case "--v4":
+				inv.uuidVersion = 4
+			case "--v7":
+				inv.uuidVersion = 7
+			case "--upper":
+				inv.upper = true
+			case "--plain":
+				inv.plain = true
+			}
+		case "-n", "--count":
+			raw, err := value(&i, name, inline, hasInline)
+			if err != nil {
+				return inv, err
+			}
+			seen = append(seen, "-n")
+			count, err := strconv.Atoi(raw)
+			if err != nil || count < 1 || count > 100 {
+				return inv, usagef("Invalid value for %s: %q", name, raw)
+			}
+			inv.count, inv.hasCount = count, true
 		case "--png":
 			raw, err := value(&i, name, inline, hasInline)
 			if err != nil {
@@ -283,6 +361,14 @@ func parse(argv []string) (inv invocation, err error) {
 	if inv.command == "qr" && !seenContains(seen, "--timeout") {
 		inv.flags.timeout = 15 * time.Second
 	}
+	if inv.command == "uuid" {
+		if inv.countArgument && seenContains(seen, "-n") {
+			return inv, usagef("N and -n are mutually exclusive.")
+		}
+		if seenContains(seen, "--v4") && seenContains(seen, "--v7") {
+			return inv, usagef("--v4 and --v7 are mutually exclusive.")
+		}
+	}
 	if inv.command == "awake.on" {
 		chosen := 0
 		for _, used := range []bool{inv.awake.hasMin, inv.awake.until != "", inv.awake.follow > 0} {
@@ -299,6 +385,19 @@ func parse(argv []string) (inv invocation, err error) {
 		inv.awake.arg = normalizeAwake(inv.awake)
 	}
 	return inv, nil
+}
+
+// negativeNumber reports a bare negative integer such as -1.
+func negativeNumber(arg string) bool {
+	if len(arg) < 2 || arg[0] != '-' {
+		return false
+	}
+	for index := 1; index < len(arg); index++ {
+		if arg[index] < '0' || arg[index] > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func seenContains(seen []string, name string) bool {
@@ -395,6 +494,27 @@ func resolve(inv *invocation, positional []string) error {
 			inv.textArg = rest[0]
 			inv.hasTextArg = true
 		}
+	case "ts":
+		if len(rest) > 1 {
+			return usagef("ts accepts one TEXT argument. See \"cubbix help ts\".")
+		}
+		inv.command = "ts"
+		if len(rest) == 1 {
+			inv.textArg = rest[0]
+			inv.hasTextArg = true
+		}
+	case "uuid":
+		if len(rest) > 1 {
+			return usagef("uuid takes at most one count. See \"cubbix help uuid\".")
+		}
+		inv.command = "uuid"
+		if len(rest) == 1 {
+			count, err := strconv.Atoi(rest[0])
+			if err != nil || count < 1 || count > 100 {
+				return usagef("Invalid count %q: uuid generates 1-100 values.", rest[0])
+			}
+			inv.count, inv.hasCount, inv.countArgument = count, true, true
+		}
 	case "help":
 		if len(rest) > 1 {
 			return usagef("Unknown command %q. See \"cubbix help\".", strings.Join(positional, " "))
@@ -417,6 +537,7 @@ func checkOptions(command string, seen []string) error {
 	bodyOnly := map[string]bool{"--text": true, "--file": true, "--blank": true}
 	translateOnly := map[string]bool{"--to": true, "--text": true, "--file": true}
 	qrOnly := map[string]bool{"--text": true, "--file": true, "--png": true}
+	uuidOnly := map[string]bool{"-n": true, "--v4": true, "--v7": true, "--upper": true, "--plain": true}
 	allowed := map[string]bool{}
 	for name := range global {
 		allowed[name] = true
@@ -437,11 +558,13 @@ func checkOptions(command string, seen []string) error {
 		allow(translateOnly)
 	case "qr":
 		allow(qrOnly)
+	case "uuid":
+		allow(uuidOnly)
 	case "settings":
 		allowed["--page"] = true
 	}
 	// A read-only command never carries --notify: nothing would show.
-	if strings.HasPrefix(command, "awake.status") || command == "status" || command == "version" || command == "help" || command == "translate" || command == "qr" {
+	if strings.HasPrefix(command, "awake.status") || command == "status" || command == "version" || command == "help" || command == "translate" || command == "qr" || command == "ts" || command == "uuid" {
 		delete(allowed, "--notify")
 	}
 	if command == "help" || command == "version" {

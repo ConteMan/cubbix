@@ -22,13 +22,13 @@ type menubarPanelState struct {
 // menubarPanelRows is what the panel draws. The height calculation and the
 // view read the same answer, so the flyout is exactly as tall as its content.
 type menubarPanelRows struct {
-	awake, json, empty, translate, qr bool
-	lid                               bool
-	watching                          bool // the lid row's second line
-	status                            bool // the awake card's status line
-	documents                         []*jsonDocument
-	folded                            bool // the JSON windows hide behind one count row
-	listRows                          int
+	awake, json, empty, translate, qr, devtools bool
+	lid                                         bool
+	watching                                    bool // the lid row's second line
+	status                                      bool // the awake card's status line
+	documents                                   []*jsonDocument
+	folded                                      bool // the JSON windows hide behind one count row
+	listRows                                    int
 }
 
 // toggleMenubarPanel is the tray icon's left click: it opens the card panel,
@@ -130,6 +130,9 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 	if a.config.QREnabled {
 		rows.qr = true
 	}
+	if a.config.DevtoolsEnabled {
+		rows.devtools = true
+	}
 	if a.config.JSONEnabled {
 		rows.json = true
 		rows.documents = a.openJSONDocuments()
@@ -144,9 +147,9 @@ func (a *application) menubarPanelRows() menubarPanelRows {
 			rows.listRows = len(rows.documents)
 		}
 	}
-	// The empty state belongs to all four modules: a lone QR card must not be
-	// drawn above "no modules enabled".
-	rows.empty = !rows.awake && !rows.json && !rows.translate && !rows.qr
+	// The empty state belongs to all five modules: a lone devtools card must
+	// not be drawn above "no modules enabled".
+	rows.empty = !rows.awake && !rows.json && !rows.translate && !rows.qr && !rows.devtools
 	return rows
 }
 
@@ -225,6 +228,10 @@ func (a *application) menubarPanelHeight(t tokenValues) int {
 		cards++
 	}
 	if rows.qr {
+		height += translateCardHeight(t)
+		cards++
+	}
+	if rows.devtools {
 		height += translateCardHeight(t)
 		cards++
 	}
@@ -355,6 +362,13 @@ func (a *application) panelShowJSON(d *jsonDocument) {
 func (a *application) panelOpenQR() {
 	a.hideMenubarPanel()
 	a.openQRText("")
+}
+
+// panelOpenDevtools closes the card panel and opens the devtools window empty
+// and focused. Only the shortcut reads the selection or the clipboard.
+func (a *application) panelOpenDevtools() {
+	a.hideMenubarPanel()
+	a.openDevtools(devtoolsRequest{})
 }
 
 // menubarPanelStatusLine is the awake card's running status, or "" when the

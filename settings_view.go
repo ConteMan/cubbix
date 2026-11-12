@@ -919,11 +919,11 @@ func (a *application) qrModulePage(c *ui.Context, t tokenValues, locale string, 
 	})
 }
 
-// devtoolsPageHeight is the natural height of the eighth settings page. This
-// step has only the header switch: the shortcut row, and the 144 height it
-// adds, arrive with the shortcut in the next step.
+// devtoolsPageHeight is the natural height of the eighth settings page: the
+// header card and one shortcut card, as the QR page has. The two presentation
+// switches stay in the window, so the page never grows a settings group.
 func devtoolsPageHeight(t tokenValues) float32 {
-	return t.SizePageHeader
+	return sectionHeight(t, cardHeight(t, rowHeight(t, 3)))
 }
 
 func (a *application) devtoolsModulePage(c *ui.Context, t tokenValues, locale string, l settingsLayout, alert string) {
@@ -933,6 +933,9 @@ func (a *application) devtoolsModulePage(c *ui.Context, t tokenValues, locale st
 		a.switchControl(c, t, "devtools-enabled", text("Devtools"), &on, func() {
 			a.changeDevtoolsEnabled(!a.config.DevtoolsEnabled)
 		}, "", false)
+	})
+	a.settingsSection(c, t, text("GroupShortcuts"), func() {
+		a.shortcutSettingsRow(c, t, locale, "devtools")
 	})
 }
 

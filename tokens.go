@@ -152,6 +152,9 @@ type tokenValues struct {
 	SizeQRMinHeight                     float32
 	SizeQRInputHeight                   float32
 	SizeQRCodeMax                       float32
+	SizeDevtoolsWidth                   float32
+	SizeDevtoolsWindowHeight            float32
+	SizeDevtoolsMinHeight               float32
 }
 
 func tokens(dark bool, language string) tokenValues {
@@ -302,6 +305,9 @@ func tokens(dark bool, language string) tokenValues {
 		SizeQRMinHeight:                     440,
 		SizeQRInputHeight:                   72,
 		SizeQRCodeMax:                       320,
+		SizeDevtoolsWidth:                   480,
+		SizeDevtoolsWindowHeight:            440,
+		SizeDevtoolsMinHeight:               360,
 	}
 	if dark {
 		t.ColorWindow = "#202020"

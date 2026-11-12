@@ -761,6 +761,7 @@ func TestQRPanelCardAndCommand(t *testing.T) {
 		t.Fatalf("command text = %q", a.qr.input)
 	}
 	a.config.QREnabled = false
+	a.config.DevtoolsEnabled = false
 	if findCommand(a.commands(), "qr.open") != nil {
 		t.Fatal("a closed module still offers the command")
 	}

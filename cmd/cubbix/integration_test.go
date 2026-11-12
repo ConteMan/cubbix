@@ -336,3 +336,118 @@ func (zeroReader) Read(p []byte) (int, error) {
 	}
 	return len(p), nil
 }
+
+// TestIntegrationDevtoolsTS checks both the request the tool builds and what it
+// prints: one result per line, the default line first.
+func TestIntegrationDevtoolsTS(t *testing.T) {
+	path := tempSocket(t)
+	requests := make(chan cli.Request, 1)
+	stub(t, path, func(req cli.Request, body []byte) *cli.Response {
+		if len(body) != 0 {
+			t.Errorf("ts sent a body frame: %q", body)
+		}
+		requests <- req
+		return &cli.Response{OK: true, Lines: []string{"2026-11-12 00:00:00", "1700000000000"}, Message: "2026-11-12 00:00:00"}
+	})
+	stdout, stderr, code := runCLI(t, "ts", "2026-11-12", "--socket", path)
+	if code != 0 {
+		t.Fatalf("exit = %d (%q)", code, stderr)
+	}
+	if stdout != "2026-11-12 00:00:00\n1700000000000\n" {
+		t.Fatalf("stdout = %q", stdout)
+	}
+	select {
+	case req := <-requests:
+		if req.Op != cli.OpRun || req.Action != cli.ActionTS || req.Arg != "2026-11-12" || req.Bytes != 0 {
+			t.Fatalf("request = %+v", req)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("no request")
+	}
+}
+
+func TestIntegrationDevtoolsUUID(t *testing.T) {
+	path := tempSocket(t)
+	requests := make(chan cli.Request, 1)
+	stub(t, path, func(req cli.Request, body []byte) *cli.Response {
+		requests <- req
+		return &cli.Response{OK: true, Lines: []string{"AAA", "BBB", "CCC"}, Message: "AAA\nBBB\nCCC"}
+	})
+	stdout, stderr, code := runCLI(t, "uuid", "3", "--v7", "--upper", "--plain", "--socket", path)
+	if code != 0 {
+		t.Fatalf("exit = %d (%q)", code, stderr)
+	}
+	if stdout != "AAA\nBBB\nCCC\n" {
+		t.Fatalf("stdout = %q", stdout)
+	}
+	select {
+	case req := <-requests:
+		if req.Action != cli.ActionUUID || req.Count != 3 || req.UUIDVersion != 7 || !req.Upper || !req.Plain || req.Arg != "" || req.Bytes != 0 {
+			t.Fatalf("request = %+v", req)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("no request")
+	}
+}
+
+// TestIntegrationDevtoolsJSON keeps --json to one object and never truncates a
+// value: the lines and the message both travel.
+func TestIntegrationDevtoolsJSON(t *testing.T) {
+	path := tempSocket(t)
+	stub(t, path, func(cli.Request, []byte) *cli.Response {
+		return &cli.Response{OK: true, Lines: []string{"AAA", "BBB"}, Message: "AAA\nBBB"}
+	})
+	stdout, stderr, code := runCLI(t, "uuid", "2", "--json", "--socket", path)
+	if code != 0 {
+		t.Fatalf("exit = %d (%q)", code, stderr)
+	}
+	if strings.Count(strings.TrimSpace(stdout), "\n") != 0 {
+		t.Fatalf("more than one line: %q", stdout)
+	}
+	var result cli.Result
+	if err := json.Unmarshal([]byte(stdout), &result); err != nil {
+		t.Fatalf("%q: %v", stdout, err)
+	}
+	if !result.OK || len(result.Lines) != 2 || result.Message != "AAA\nBBB" {
+		t.Fatalf("result = %+v", result)
+	}
+}
+
+// TestIntegrationDevtoolsPipe feeds ts from standard input, and refuses to mix
+// a pipe with a positional text.
+func TestIntegrationDevtoolsPipe(t *testing.T) {
+	path := tempSocket(t)
+	requests := make(chan cli.Request, 1)
+	stub(t, path, func(req cli.Request, body []byte) *cli.Response {
+		requests <- req
+		return &cli.Response{OK: true, Lines: []string{"line"}, Message: "line"}
+	})
+	command := exec.Command(binPath, "ts", "--socket", path)
+	command.Stdin = strings.NewReader("1700000000\n")
+	var stdout, stderr bytes.Buffer
+	command.Stdout, command.Stderr = &stdout, &stderr
+	if err := command.Run(); err != nil {
+		t.Fatalf("run: %v (%q)", err, stderr.String())
+	}
+	if stdout.String() != "line\n" {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+	select {
+	case req := <-requests:
+		if req.Arg != "1700000000" {
+			t.Fatalf("piped arg = %q", req.Arg)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("no request")
+	}
+	// Both at once is a usage error before any connection.
+	command = exec.Command(binPath, "ts", "1700000000", "--socket", path)
+	command.Stdin = strings.NewReader("more\n")
+	stderr.Reset()
+	command.Stderr = &stderr
+	err := command.Run()
+	exit, ok := err.(*exec.ExitError)
+	if !ok || exit.ExitCode() != 2 {
+		t.Fatalf("mixing a pipe and TEXT exited %v (%q)", err, stderr.String())
+	}
+}

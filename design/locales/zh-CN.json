@@ -408,6 +408,7 @@
   "DevtoolsPaste": "粘贴到前台应用",
   "DevtoolsCopy": "复制",
   "DevtoolsCount": "共 %d 个",
+  "DevtoolsCountLabel": "个数",
   "DevtoolsVersion": "版本 %d · 变体 %s",
   "DevtoolsNil": "Nil · 变体 %s",
   "DevtoolsMax": "Max · 变体 %s",
@@ -421,5 +422,7 @@
   "DevtoolsLeapSecond": "暂不支持闰秒",
   "DevtoolsInput": "时间戳、日期或 UUID",
   "PaletteResults": "结果",
-  "PaletteActionTooltip": "操作 (⌘K)"
+  "PaletteActionTooltip": "操作 (⌘K)",
+  "DevtoolsCardAction": "开发工具…",
+  "DevtoolsSelectionDenied": "开启辅助功能权限后，快捷键可带入选中的文字"
 }

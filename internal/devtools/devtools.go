@@ -162,3 +162,56 @@ func parseCount(digits string) (int, bool) {
 	}
 	return value, true
 }
+
+// Generation is a complete UUID generation request, as one query expresses it.
+// Version 0 with count 0 is the bare pair (a v4 row and a v7 row); otherwise
+// count is 1-100. The two switches are presentation only: they never change a
+// value, they only change how it is written.
+type Generation struct {
+	Version int
+	Count   int
+	Upper   bool
+	Plain   bool
+}
+
+// Pair reports the bare command, which shows one v4 and one v7.
+func (g Generation) Pair() bool { return g.Version == 0 }
+
+// ParseGeneration reads a generation query in the same grammar Query uses, so
+// "uuid7 21" opened in a window still makes 21 v7 values. ok is false for any
+// other text, a non-numeric argument, or a count outside 1-100.
+func ParseGeneration(text string) (Generation, bool) {
+	token, arg := splitToken(strings.TrimSpace(text))
+	lower := strings.ToLower(token)
+	version, count, state := uuidRequest(lower, arg)
+	if state != uuidGenerate {
+		return Generation{}, false
+	}
+	switch {
+	case count > 0:
+		return Generation{Version: version, Count: count}, true
+	case version == 7:
+		return Generation{Version: 7, Count: 1}, true
+	}
+	return Generation{Version: 0, Count: 0}, true
+}
+
+// FormatBatch applies the two presentation switches to one value or to a batch
+// payload that joins its values with newlines. It never changes a value: the
+// same text is only written in another case or without hyphens.
+func FormatBatch(payload string, upper, plain bool) string {
+	if !upper && !plain {
+		return payload
+	}
+	lines := strings.Split(payload, "\n")
+	for index, line := range lines {
+		if upper {
+			line = strings.ToUpper(line)
+		}
+		if plain {
+			line = strings.ReplaceAll(line, "-", "")
+		}
+		lines[index] = line
+	}
+	return strings.Join(lines, "\n")
+}

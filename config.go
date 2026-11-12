@@ -18,6 +18,7 @@ const (
 	defaultPanelKey     = "Ctrl+Alt+Cmd+P"
 	defaultTranslateKey = "Ctrl+Alt+Cmd+T"
 	defaultQRKey        = "Ctrl+Alt+Cmd+R"
+	defaultDevtoolsKey  = "Ctrl+Alt+Cmd+D"
 	maxTranslateAddress = 512
 )
 
@@ -104,13 +105,18 @@ type Config struct {
 	QREnabled  bool                  `toml:"qr_enabled"`
 	QRShortcut string                `toml:"qr_shortcut"`
 	QRWindows  map[string]qrGeometry `toml:"qr_windows,omitempty"`
-	// Devtools is the eighth module. This step has only the palette results
-	// and the switch; its shortcut and window arrive in the next step.
-	DevtoolsEnabled bool `toml:"devtools_enabled"`
+	// Devtools is the eighth module. It stores no result: the window keeps
+	// nothing between launches, and its two presentation switches are the only
+	// values it remembers.
+	DevtoolsEnabled   bool                        `toml:"devtools_enabled"`
+	DevtoolsShortcut  string                      `toml:"devtools_shortcut"`
+	DevtoolsUUIDUpper bool                        `toml:"devtools_uuid_upper"`
+	DevtoolsUUIDPlain bool                        `toml:"devtools_uuid_plain"`
+	DevtoolsWindows   map[string]devtoolsGeometry `toml:"devtools_windows,omitempty"`
 }
 
 func defaultConfig() Config {
-	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right", WindowPlacement: "cursor", TranslateEnabled: true, TranslateShortcut: defaultTranslateKey, TranslateAutoSpeak: true, QREnabled: true, QRShortcut: defaultQRKey, DevtoolsEnabled: true}
+	return Config{AwakeLidBatteryMin: 20, Version: configVersion, Language: "zh-CN", AutomaticUpdates: true, AwakeEnabled: true, JSONEnabled: true, JSONSplit: jsonSplitDefault, JSONShortcut: "Ctrl+Alt+Cmd+J", AwakeMode: "screen", AwakeMinutes: 60, AwakeAgents: "codex,claude,gemini,aider", AwakeShortcut: "Ctrl+Alt+Cmd+K", PaletteShortcut: defaultPaletteKey, PanelShortcut: defaultPanelKey, FeedbackMode: "hint", FeedbackCorner: "top-right", WindowPlacement: "cursor", TranslateEnabled: true, TranslateShortcut: defaultTranslateKey, TranslateAutoSpeak: true, QREnabled: true, QRShortcut: defaultQRKey, DevtoolsEnabled: true, DevtoolsShortcut: defaultDevtoolsKey}
 }
 
 func loadConfig(path string) (Config, error) {
@@ -175,6 +181,9 @@ func loadConfig(path string) (Config, error) {
 	}
 	if config.QRShortcut == "" {
 		config.QRShortcut = defaultQRKey
+	}
+	if config.DevtoolsShortcut == "" {
+		config.DevtoolsShortcut = defaultDevtoolsKey
 	}
 	// The address and model are optional strings. Trim and drop a trailing
 	// slash here; the full address rule is applied when an endpoint is used.

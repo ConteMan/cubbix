@@ -295,3 +295,76 @@ func TestBodyExplicitEmptyAndBlank(t *testing.T) {
 		}
 	}
 }
+
+func TestParseDevtoolsCommands(t *testing.T) {
+	inv, err := parse([]string{"ts"})
+	if err != nil || inv.command != "ts" || inv.hasTextArg {
+		t.Fatalf("ts = %+v %v", inv, err)
+	}
+	// A negative number is ts's text, not an unknown option.
+	inv, err = parse([]string{"ts", "-1"})
+	if err != nil || !inv.hasTextArg || inv.textArg != "-1" {
+		t.Fatalf("ts -1 = %+v %v", inv, err)
+	}
+	inv, err = parse([]string{"uuid"})
+	if err != nil || inv.command != "uuid" || inv.uuidVersion != 0 || inv.hasCount || inv.upper || inv.plain {
+		t.Fatalf("uuid = %+v %v", inv, err)
+	}
+	inv, err = parse([]string{"uuid", "3", "--v7", "--upper", "--plain"})
+	if err != nil || inv.count != 3 || !inv.hasCount || inv.uuidVersion != 7 || !inv.upper || !inv.plain {
+		t.Fatalf("uuid options = %+v %v", inv, err)
+	}
+	inv, err = parse([]string{"uuid", "-n", "100", "--v4"})
+	if err != nil || inv.count != 100 || inv.uuidVersion != 4 {
+		t.Fatalf("uuid -n = %+v %v", inv, err)
+	}
+	for _, args := range [][]string{
+		{"uuid", "--v4", "--v7"},
+		{"uuid", "0"},
+		{"uuid", "101"},
+		{"uuid", "3", "-n", "2"},
+		{"uuid", "-n", "0"},
+		{"uuid", "abc"},
+		{"uuid", "--text", "x"},
+		{"uuid", "--page", "qr"},
+		{"ts", "--notify"},
+		{"ts", "--text", "x"},
+		{"ts", "a", "b"},
+	} {
+		if _, err := parse(args); err == nil {
+			t.Fatalf("%v was accepted", args)
+		} else if _, ok := err.(*usageError); !ok {
+			t.Fatalf("%v: not a usage error: %v", args, err)
+		}
+	}
+}
+
+// TestTSLongTextIsUsage bounds the ts argument before any connection: the app's
+// MaxArg is 128 bytes, and an over-long text fails here rather than remotely.
+func TestTSEmptyArgumentIsUsage(t *testing.T) {
+	for _, text := range []string{"", " \t\n"} {
+		e, stdout, stderr, _ := testEnv(t, func(string, time.Duration) (conn, error) {
+			t.Fatal("an empty ts argument connected")
+			return nil, nil
+		})
+		if code := run([]string{"ts", text}, e); code != exitUsage {
+			t.Fatalf("ts %q exit = %d", text, code)
+		}
+		if stdout.Len() != 0 || !strings.Contains(stderr.String(), "non-empty") {
+			t.Fatalf("ts %q stdout %q stderr %q", text, stdout.String(), stderr.String())
+		}
+	}
+}
+
+func TestTSLongTextIsUsage(t *testing.T) {
+	e, stdout, stderr, _ := testEnv(t, func(string, time.Duration) (conn, error) {
+		t.Fatal("an over-long ts text connected")
+		return nil, nil
+	})
+	if code := run([]string{"ts", strings.Repeat("1", cli.MaxArg+1)}, e); code != exitUsage {
+		t.Fatalf("exit = %d", code)
+	}
+	if stdout.Len() != 0 || !strings.Contains(stderr.String(), "128") {
+		t.Fatalf("stdout %q stderr %q", stdout.String(), stderr.String())
+	}
+}

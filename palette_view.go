@@ -78,6 +78,9 @@ func (a *application) paletteView(c *ui.Context) {
 						p.runError = ""
 					})
 					input.OnSubmit(a.runPalette)
+					// ⌘回车 pastes the selected result. The field reads it before
+					// its own Enter submit, so the two paths never both run.
+					input.OnShortcut(ui.Cmd, ui.KeyEnter, a.pastePaletteResult)
 					input.OnShortcut(0, ui.KeyDown, func() { a.movePaletteSelection(1) })
 					input.OnShortcut(0, ui.KeyUp, func() { a.movePaletteSelection(-1) })
 					if p.query == "" && !input.Composing() {
@@ -134,6 +137,10 @@ func (a *application) paletteView(c *ui.Context) {
 		element := ui.Box(c.Key("palette-keys")).Size(0, 0).PassThrough()
 		if element.OverlayShortcut(0, ui.KeyEnter) {
 			a.runPalette()
+		}
+		// The list, not the field, may have the keyboard; ⌘回车 reaches it here.
+		if element.OverlayShortcut(ui.Cmd, ui.KeyEnter) {
+			a.pastePaletteResult()
 		}
 	})
 }
