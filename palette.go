@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ConteMan/cubbix/internal/awake"
+	"github.com/ConteMan/cubbix/internal/devtools"
 	"log"
 	"net/url"
 	"slices"
@@ -32,6 +33,7 @@ const (
 	paletteRowAction
 	paletteRowActionTitle
 	paletteRowSeparator
+	paletteRowResult
 )
 
 // paletteRow is one line of the panel. Headers and separators are not chosen.
@@ -47,6 +49,9 @@ type paletteRow struct {
 	Checked  bool
 	Command  *command
 	Action   *paletteAction
+	// Result is a devtools row. Its Payload is what Enter copies; the title
+	// may only be a readable clock face.
+	Result devtools.Row
 }
 
 // paletteState is the panel's own state. It lives on the main thread, like
@@ -81,6 +86,40 @@ type paletteState struct {
 	// them, not to the drag.
 	searchBounds ui.Rect
 	listBounds   ui.Rect
+	// resultCache keeps one devtools result per query. The palette redraws
+	// every frame, and regenerating a UUID there would copy a value the user
+	// never saw. The cache is dropped when the panel reopens or a module
+	// changes.
+	resultCache map[string]devtoolsCacheEntry
+	// suggestion is the empty-query clipboard group. It is read once when the
+	// panel opens, never while it stays open.
+	suggestion []devtools.Row
+	// actionsResult is the ⌘K page of a result row, which has no command.
+	actionsResult      bool
+	actionsResultQuery string
+	actionsResultUUID  bool
+	actionsPayload     string
+	actionsTitle       string
+	actionsIcon        string
+	// done stops a second Enter from executing the same result twice, and
+	// resets on a query change or the next open.
+	done bool
+	// devSession changes when the panel opens or a module changes. Result rows
+	// remember the session they were built in, so a row that outlives its
+	// session cannot copy or open anything.
+	devSession uint64
+	// resultSession is the session the current result rows belong to.
+	resultSession uint64
+	// actionsResultSession is the session the open result action page
+	// belongs to.
+	actionsResultSession uint64
+}
+
+// devtoolsCacheEntry remembers both the result and whether this query was a
+// devtools request at all, so an ordinary search is cached too.
+type devtoolsCacheEntry struct {
+	output     devtools.Output
+	recognized bool
 }
 
 // togglePalette is the ⌥. entry and the card panel's palette button target.
@@ -130,7 +169,17 @@ func (a *application) showPalette() {
 	a.palette.runError = ""
 	a.palette.selectionKey = ""
 	a.palette.actionsCommand = nil
+	a.palette.actionsResult = false
 	a.palette.actionSelection = ""
+	a.palette.resultCache = nil
+	a.palette.suggestion = nil
+	a.palette.done = false
+	a.palette.devSession++
+	a.palette.resultSession = 0
+	a.palette.actionsResultSession = 0
+	if a.config.DevtoolsEnabled && a.devtoolsReadClipboard != nil {
+		a.palette.suggestion = devtoolsSuggestion(a.devtoolsReadClipboard())
+	}
 	a.palette.list.ScrollTo(0, ui.Start)
 	a.presentPalette()
 }
@@ -179,6 +228,23 @@ func (a *application) invalidatePaletteAfterModuleChange() {
 		}
 	}
 	p.selectionKey = ""
+	// A module change invalidates every cached devtools result and the
+	// clipboard suggestion; a result page loses its command, and the next
+	// frame rebuilds the rows.
+	p.resultCache = nil
+	p.suggestion = nil
+	p.done = false
+	p.devSession++
+	p.resultSession = 0
+	p.actionsResultSession = 0
+	if p.mode == paletteActionMode && p.actionsResult {
+		p.mode = paletteCommandMode
+		p.actionsResult = false
+		p.actionsResultQuery = ""
+		p.actionsCommand = nil
+		p.actionSelection = ""
+		p.scrollSelection = true
+	}
 	a.invalidatePalette()
 }
 
@@ -279,6 +345,8 @@ func (a *application) paletteEscape() {
 	if p.mode == paletteActionMode {
 		p.mode = paletteCommandMode
 		p.actionsCommand = nil
+		p.actionsResult = false
+		p.actionsResultQuery = ""
 		p.actionSelection = ""
 		p.scrollSelection = true
 		a.invalidatePalette()
@@ -295,8 +363,29 @@ func (a *application) togglePaletteActions() {
 	if p.mode == paletteActionMode {
 		p.mode = paletteCommandMode
 		p.actionsCommand = nil
+		p.actionsResult = false
+		p.actionsResultQuery = ""
 		p.actionSelection = ""
 		p.scrollSelection = true
+		a.invalidatePalette()
+		return
+	}
+	if row, ok := p.selectedRow(); ok && row.Kind == paletteRowResult {
+		if !a.config.DevtoolsEnabled || p.resultSession != p.devSession || row.ErrorKey != "" {
+			// A stale or error row has nothing to copy; ⌘K must not open an empty page.
+			return
+		}
+		p.mode = paletteActionMode
+		p.actionsCommand = nil
+		p.actionsResult = true
+		p.actionsResultQuery = p.lastQuery
+		p.actionsResultSession = p.devSession
+		p.actionsResultUUID = row.Result.Kind == devtools.KindUUID
+		p.actionsPayload = row.Result.Payload
+		p.actionsTitle = row.Title
+		p.actionsIcon = row.Icon
+		p.actionSelection = ""
+		p.list.ScrollTo(0, ui.Start)
 		a.invalidatePalette()
 		return
 	}
@@ -326,6 +415,13 @@ func (p *paletteState) selectedAction() *paletteAction {
 	return p.rows[p.selected].Action
 }
 
+func (p *paletteState) selectedRow() (paletteRow, bool) {
+	if p.selected < 0 || p.selected >= len(p.rows) {
+		return paletteRow{}, false
+	}
+	return p.rows[p.selected], true
+}
+
 func (a *application) movePaletteSelection(delta int) {
 	p := a.palette
 	if p == nil {
@@ -333,7 +429,7 @@ func (a *application) movePaletteSelection(delta int) {
 	}
 	for index := p.selected + delta; index >= 0 && index < len(p.rows); index += delta {
 		row := p.rows[index]
-		if row.Kind != paletteRowCommand && row.Kind != paletteRowAction {
+		if row.Kind != paletteRowCommand && row.Kind != paletteRowAction && row.Kind != paletteRowResult {
 			continue
 		}
 		if row.Action != nil && row.Action.Available != nil && !row.Action.Available(a) {
@@ -359,8 +455,20 @@ func (a *application) runPalette() {
 	if p == nil {
 		return
 	}
+	if p.done {
+		// A second handler for the same Return must not run the result again.
+		return
+	}
 	p.runError = ""
 	if p.mode == paletteActionMode {
+		if p.actionsResult {
+			if !a.config.DevtoolsEnabled || p.actionsResultSession != p.devSession {
+				a.invalidatePaletteAfterModuleChange()
+				return
+			}
+			a.runPaletteResultAction(p)
+			return
+		}
 		if p.actionsCommand != nil && findCommand(a.commands(), p.actionsCommand.ID) == nil {
 			a.invalidatePaletteAfterModuleChange()
 			return
@@ -395,6 +503,30 @@ func (a *application) runPalette() {
 		if p.actionsCommand != nil {
 			a.recordRecent(p.actionsCommand.ID)
 		}
+		p.done = true
+		a.hidePalette()
+		return
+	}
+	if row, ok := p.selectedRow(); ok && row.Kind == paletteRowResult {
+		if !a.config.DevtoolsEnabled || p.resultSession != p.devSession {
+			// The module closed, or the panel session changed, after the row
+			// was built.
+			p.resultCache = nil
+			p.selectionKey = ""
+			a.invalidatePaletteAfterModuleChange()
+			return
+		}
+		if row.ErrorKey != "" {
+			p.errorKey = row.ErrorKey
+			a.invalidatePalette()
+			return
+		}
+		if err := a.copyDevtoolsPayload(row.Result.Payload); err != nil {
+			p.runError, p.errorKey = "DevtoolsCopyFailed", "DevtoolsCopyFailed"
+			a.invalidatePalette()
+			return
+		}
+		p.done = true
 		a.hidePalette()
 		return
 	}
@@ -432,6 +564,7 @@ func (a *application) runPalette() {
 		return
 	}
 	a.recordRecent(cmd.ID)
+	p.done = true
 	a.hidePalette()
 }
 
@@ -507,6 +640,12 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		p.lastQuery = query
 		p.selectionKey = ""
 		p.runError = ""
+		p.done = false
+		if query != "" {
+			// Typing ends the clipboard group for this panel session; only a
+			// fresh open reads the clipboard again.
+			p.suggestion = nil
+		}
 	}
 	prefix, matchedPrefix := splitCommandQuery(a, locale, query, commands)
 	forced := matchedPrefix && prefix.Command.Param != paramNone && prefix.Arg != ""
@@ -548,7 +687,26 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 	}
 	forced = forced && usable(prefix.Command)
 
+	var resultRows []paletteRow
+	p.resultSession = 0
+	if a.config.DevtoolsEnabled && query != "" {
+		if entry := a.devtoolsCache(p, query, now); entry.recognized {
+			resultRows = a.devtoolsResultRows(locale, entry.output)
+			p.resultSession = p.devSession
+		}
+	}
+
 	var rows []paletteRow
+	if query == "" && len(p.suggestion) > 0 {
+		rows = append(rows, paletteRow{Kind: paletteRowHeader, Group: "DevtoolsClipboardGroup"})
+		rows = append(rows, a.devtoolsRows(locale, p.suggestion, "devtools.clipboard")...)
+	}
+	if len(resultRows) > 0 {
+		// A certain result sits on top, but the matching commands stay below:
+		// a JSON window named "now" must remain reachable.
+		rows = append(rows, paletteRow{Kind: paletteRowHeader, Group: "PaletteResults"})
+		rows = append(rows, resultRows...)
+	}
 	if forced {
 		rows = append(rows, paletteRow{Kind: paletteRowHeader, Group: "PaletteAll"})
 		rows = append(rows, commandRow(prefix.Command))
@@ -602,7 +760,17 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 	selected := -1
 	if p.selectionKey != "" {
 		for index, row := range rows {
-			if row.Kind == paletteRowCommand && row.Key == p.selectionKey {
+			if (row.Kind == paletteRowCommand || row.Kind == paletteRowResult) && row.Key == p.selectionKey {
+				selected = index
+				break
+			}
+		}
+	}
+	if selected < 0 && len(resultRows) > 0 {
+		// The recognized query defaults to its first result, never to a
+		// same-named command further down.
+		for index, row := range rows {
+			if row.Kind == paletteRowResult {
 				selected = index
 				break
 			}
@@ -636,7 +804,14 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 	p.request = request{}
 	p.errorKey = p.runError
 	if selected >= 0 && selected < len(rows) {
-		cmd := rows[selected].Command
+		row := rows[selected]
+		if row.Kind == paletteRowResult {
+			p.selectionKey = row.Key
+			if row.ErrorKey != "" {
+				p.errorKey = row.ErrorKey
+			}
+		}
+		cmd := row.Command
 		if cmd != nil {
 			p.selectionKey = cmd.ID
 			arg := awake.Arg{}
@@ -664,6 +839,67 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 	}
 }
 
+// devtoolsCache returns the cached result for one query, computing it only
+// once. A UUID generated here is therefore the value the user sees and copies.
+func (a *application) devtoolsCache(p *paletteState, query string, now time.Time) devtoolsCacheEntry {
+	if p.resultCache == nil {
+		p.resultCache = map[string]devtoolsCacheEntry{}
+	}
+	if entry, ok := p.resultCache[query]; ok {
+		return entry
+	}
+	output, recognized := devtools.Query(query, now, time.Local)
+	entry := devtoolsCacheEntry{output: output, recognized: recognized}
+	p.resultCache[query] = entry
+	return entry
+}
+
+// devtoolsResultRows turns one output into palette rows. The hint resource
+// keys are formatted here, so the package stays free of interface text.
+func (a *application) devtoolsResultRows(locale string, output devtools.Output) []paletteRow {
+	if output.ErrorKey != "" {
+		label := a.text(locale, output.ErrorKey)
+		return []paletteRow{{
+			Kind:     paletteRowResult,
+			Key:      "devtools.error",
+			Title:    label,
+			ErrorKey: output.ErrorKey,
+			Result:   devtools.Row{},
+		}}
+	}
+	return a.devtoolsRows(locale, output.Rows, "devtools.result")
+}
+
+func (a *application) devtoolsRows(locale string, results []devtools.Row, keyPrefix string) []paletteRow {
+	rows := make([]paletteRow, 0, len(results))
+	for index, result := range results {
+		icon := "clock-3"
+		if result.Kind == devtools.KindUUID {
+			icon = "blocks"
+		}
+		rows = append(rows, paletteRow{
+			Kind:   paletteRowResult,
+			Key:    fmt.Sprintf("%s.%d", keyPrefix, index),
+			Title:  result.Title,
+			Hint:   a.devtoolsHint(locale, result),
+			Icon:   icon,
+			Result: result,
+		})
+	}
+	return rows
+}
+
+func (a *application) devtoolsHint(locale string, result devtools.Row) string {
+	if result.HintKey == "" {
+		return ""
+	}
+	message := a.text(locale, result.HintKey)
+	if len(result.HintArgs) == 0 {
+		return message
+	}
+	return fmt.Sprintf(message, result.HintArgs...)
+}
+
 func findCommand(commands []*command, id string) *command {
 	for _, cmd := range commands {
 		if cmd.ID == id {
@@ -676,6 +912,10 @@ func findCommand(commands []*command, id string) *command {
 // refreshPaletteActions lists the actions of the command chosen before ⌘K.
 func (a *application) refreshPaletteActions(p *paletteState, locale string) {
 	p.errorKey = p.runError
+	if p.actionsResult {
+		a.refreshResultActions(p, locale)
+		return
+	}
 	cmd := p.actionsCommand
 	if cmd == nil {
 		p.mode = paletteCommandMode
@@ -742,6 +982,167 @@ func (a *application) refreshPaletteActions(p *paletteState, locale string) {
 	if selected >= 0 {
 		p.actionSelection = rows[selected].Key
 	}
+}
+
+// refreshResultActions lists what a result row can do: copy, and for a UUID
+// row the two presentation changes. Uppercase and no hyphens transform the
+// cached batch, so the copy is the same values the user saw.
+func (a *application) refreshResultActions(p *paletteState, locale string) {
+	payload := p.actionsPayload
+	actions := []paletteAction{{
+		ID:    "devtools.copy",
+		Title: localizedTitle("DevtoolsCopy"),
+		Icon:  "copy",
+		Run: func(a *application) error {
+			if err := a.copyDevtoolsPayload(payload); err != nil {
+				return err
+			}
+			p.done = true
+			a.hidePalette()
+			return nil
+		},
+	}}
+	if p.actionsResultUUID {
+		actions = append(actions,
+			paletteAction{
+				ID:    "devtools.upper",
+				Title: localizedTitle("DevtoolsUpper"),
+				Run: func(a *application) error {
+					a.transformDevtoolsResult(p.actionsResultQuery, true, false)
+					return nil
+				},
+			},
+			paletteAction{
+				ID:    "devtools.plain",
+				Title: localizedTitle("DevtoolsPlain"),
+				Run: func(a *application) error {
+					a.transformDevtoolsResult(p.actionsResultQuery, false, true)
+					return nil
+				},
+			},
+		)
+	}
+	rows := []paletteRow{{Kind: paletteRowActionTitle, Key: "palette-action-title", Title: p.actionsTitle, Icon: p.actionsIcon}}
+	rows = append(rows, paletteRow{Kind: paletteRowSeparator})
+	for index := range actions {
+		action := &actions[index]
+		title := ""
+		if action.Title != nil {
+			title = action.Title(a, locale)
+		}
+		rows = append(rows, paletteRow{Kind: paletteRowAction, Key: action.ID, Title: title, Icon: action.Icon, Action: action})
+	}
+	p.rows = rows
+	p.list.Header = nil
+	selected := 0
+	if p.actionSelection != "" {
+		for index, row := range rows {
+			if row.Kind == paletteRowAction && row.Key == p.actionSelection {
+				selected = index
+				break
+			}
+		}
+	}
+	if selected < len(rows) && rows[selected].Kind != paletteRowAction {
+		for index, row := range rows {
+			if row.Kind == paletteRowAction {
+				selected = index
+				break
+			}
+		}
+	}
+	if selected < 0 || selected >= len(rows) {
+		p.selected = -1
+		return
+	}
+	p.selected = selected
+	p.actionSelection = ""
+	p.actionSelection = rows[selected].Key
+}
+
+// runPaletteResultAction applies one action of a result row. Copy closes the
+// panel; the two presentation changes return to the same row.
+func (a *application) runPaletteResultAction(p *paletteState) {
+	if !a.config.DevtoolsEnabled || p.actionsResultSession != p.devSession {
+		a.invalidatePaletteAfterModuleChange()
+		return
+	}
+	action := p.selectedAction()
+	if action == nil || action.Run == nil {
+		return
+	}
+	if err := action.Run(a); err != nil {
+		p.runError, p.errorKey = "DevtoolsCopyFailed", "DevtoolsCopyFailed"
+		a.invalidatePalette()
+		return
+	}
+	if action.ID == "devtools.copy" {
+		return
+	}
+	p.mode = paletteCommandMode
+	p.actionsResult = false
+	p.actionsResultQuery = ""
+	p.actionsCommand = nil
+	p.actionSelection = ""
+	p.scrollSelection = true
+	a.invalidatePalette()
+}
+
+// transformDevtoolsResult changes the cached UUID rows of one query. It never
+// generates a new value: the batch stays the one the user was looking at.
+func (a *application) transformDevtoolsResult(query string, upper, plain bool) {
+	if a.palette == nil || a.palette.resultCache == nil {
+		return
+	}
+	entry, ok := a.palette.resultCache[query]
+	if !ok {
+		return
+	}
+	for index := range entry.output.Rows {
+		row := &entry.output.Rows[index]
+		if row.Kind != devtools.KindUUID {
+			continue
+		}
+		text := row.Payload
+		if upper {
+			text = strings.ToUpper(text)
+		}
+		if plain {
+			text = strings.ReplaceAll(text, "-", "")
+		}
+		row.Payload = text
+		row.Title = strings.Split(text, "\n")[0]
+	}
+	if len(entry.output.Rows) > 0 {
+		entry.output.Payload = entry.output.Rows[0].Payload
+	}
+	a.palette.resultCache[query] = entry
+}
+
+// paletteHasActions reports whether the selected row has an action page. A
+// result error has none, and an empty selection shows no keycaps either.
+func (a *application) paletteHasActions(p *paletteState) bool {
+	if p.mode == paletteActionMode {
+		return true
+	}
+	row, ok := p.selectedRow()
+	if !ok {
+		return false
+	}
+	switch row.Kind {
+	case paletteRowCommand:
+		return row.Command != nil && row.Command.Actions != nil
+	case paletteRowResult:
+		return row.ErrorKey == ""
+	}
+	return false
+}
+
+func (a *application) copyDevtoolsPayload(payload string) error {
+	if a.devtoolsCopy == nil {
+		return nil
+	}
+	return a.devtoolsCopy(payload)
 }
 
 // --- cubbix:// URLs ---
@@ -866,6 +1267,8 @@ func parsePaletteURL(raw string, awakeEnabled, jsonEnabled bool, jsonLimit int) 
 			page = settingsTranslate
 		case "qr":
 			page = settingsQR
+		case "devtools":
+			page = settingsDevtools
 		case "shortcuts":
 			page = settingsShortcuts
 		case "about":

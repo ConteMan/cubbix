@@ -227,9 +227,9 @@ func TestSettingsHeight(t *testing.T) {
 		}
 	}
 	// The sidebar fits the same window: brand, separator and one 40-high item
-	// per settings page, now seven.
-	if got := sidebarNaturalHeight(tokens); got != 409 {
-		t.Fatalf("sidebar height = %v, want 409", got)
+	// per settings page, now eight.
+	if got := sidebarNaturalHeight(tokens); got != 453 {
+		t.Fatalf("sidebar height = %v, want 453", got)
 	}
 }
 

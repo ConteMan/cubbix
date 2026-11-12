@@ -101,7 +101,7 @@ Exit status: 0 ok, 1 internal error, 2 usage, 3 Cubbix unavailable,
 `
 
 // tiles stays accepted: scripts in the wild still name the old page.
-var settingsPages = map[string]bool{"general": true, "awake": true, "tiles": true, "json": true, "translate": true, "qr": true, "shortcuts": true, "about": true}
+var settingsPages = map[string]bool{"general": true, "awake": true, "tiles": true, "json": true, "translate": true, "qr": true, "devtools": true, "shortcuts": true, "about": true}
 
 // parse reads the command line. Every mistake is a usage error.
 func parse(argv []string) (inv invocation, err error) {

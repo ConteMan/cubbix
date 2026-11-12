@@ -24,6 +24,16 @@ func keycaps(c *ui.Context, t tokenValues, keys []string) {
 	})
 }
 
+// paletteActionButton makes the ⌘K keycaps a real target: the pointer can
+// open the same action list the keyboard does, and the tooltip names it.
+func (a *application) paletteActionButton(c *ui.Context, t tokenValues, label string) {
+	button := ui.ButtonBase(c.Key("palette-action-button")).Height(t.SizeKeycapHeight).Radius(t.RadiusControl).
+		FocusRing(true).Label(label).Tooltip(label).OnClick(a.togglePaletteActions)
+	button.Children(func() {
+		keycaps(c, t, paletteActionKeys)
+	})
+}
+
 // shortcutTooltip uses the same keycaps as the palette and recorder. The
 // description stays plain text so assistive technology hears the shortcut.
 func shortcutTooltip(c *ui.Context, t tokenValues, anchor ui.Element, label, accelerator string) {

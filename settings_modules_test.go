@@ -92,7 +92,7 @@ func hasAccessibleText(tt *ui.Tester, s string) bool {
 func TestSettingsPagesRenderEveryState(t *testing.T) {
 	a := awakeTestApp(t)
 	_ = evidencePaths(t)
-	for _, page := range []int{settingsGeneral, settingsAwake, settingsJSON, settingsTranslate, settingsShortcuts, settingsAbout} {
+	for _, page := range []int{settingsGeneral, settingsAwake, settingsJSON, settingsTranslate, settingsQR, settingsDevtools, settingsShortcuts, settingsAbout} {
 		for _, awakeOn := range []bool{false, true} {
 			a.page = page
 			a.config.AwakeEnabled = awakeOn

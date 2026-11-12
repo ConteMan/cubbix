@@ -33,6 +33,9 @@ func awakeTestApp(t *testing.T) *application {
 	a.translateSecret = newFakeTranslateSecrets()
 	a.translateDictionaryFn = func(string) string { return "" }
 	a.translateCopy = func(string) error { return nil }
+	// Developer tools seams: no test reads or writes the real clipboard.
+	a.devtoolsReadClipboard = func() string { return "" }
+	a.devtoolsCopy = func(string) error { return nil }
 	a.awake, _ = fakeAwake(time.Now())
 	a.awake.changed = a.awakeChanged
 	// No test opens a hint window or asks for notification permission.

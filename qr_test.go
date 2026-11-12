@@ -496,10 +496,10 @@ func TestSettingsQRPage(t *testing.T) {
 	if got := pageHeight(tk, settingsQR, true, false, false, false, false); got != 144 {
 		t.Fatalf("pageHeight = %v", got)
 	}
-	if len(settingsNav) != 7 {
+	if len(settingsNav) != 8 {
 		t.Fatalf("nav has %d entries", len(settingsNav))
 	}
-	want := []int{settingsGeneral, settingsAwake, settingsJSON, settingsTranslate, settingsQR, settingsShortcuts, settingsAbout}
+	want := []int{settingsGeneral, settingsAwake, settingsJSON, settingsTranslate, settingsQR, settingsDevtools, settingsShortcuts, settingsAbout}
 	for i, page := range want {
 		if settingsNav[i].page != page {
 			t.Fatalf("nav %d = %d, want %d", i, settingsNav[i].page, page)
