@@ -174,6 +174,10 @@ type application struct {
 	qrSelectionPending    bool
 	qrSelectionGeneration uint64
 	qrSelectionHintShown  bool
+	// devtools seams: the clipboard read is for the empty-query suggestion,
+	// the write is the result copy. Both stay nil-safe for headless tests.
+	devtoolsReadClipboard func() string
+	devtoolsCopy          func(string) error
 	// quiet silences the hint and the lid notification for one command line
 	// request; it is set and reset on the main thread only.
 	quiet                  bool
@@ -260,6 +264,8 @@ func newApplication(path string) (*application, error) {
 	a.qrAsync = true
 	a.qrReadClipboard = mygo.Clipboard.ReadText
 	a.qrCopyPNG = copyQRImageData
+	a.devtoolsReadClipboard = mygo.Clipboard.ReadText
+	a.devtoolsCopy = defaultDevtoolsCopy
 	a.qrWriteFile = writeQRFile
 	a.qrChooseSave = func(w *mygo.Window) (string, error) {
 		return mygo.Dialog.Save(mygo.SaveDialogOptions{Parent: w, Title: a.text(mygo.App.Locale(), "QRSave"), DefaultPath: "qrcode.png", Filters: []mygo.FileFilter{{Name: "PNG", Extensions: []string{"png"}}}})

@@ -720,6 +720,8 @@ func settingsPageIndex(page string, a *application) (int, bool) {
 		return settingsTranslate, true
 	case "qr":
 		return settingsQR, true
+	case "devtools":
+		return settingsDevtools, true
 	case "shortcuts":
 		return settingsShortcuts, true
 	}

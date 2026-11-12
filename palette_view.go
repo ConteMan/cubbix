@@ -71,6 +71,8 @@ func (a *application) paletteView(c *ui.Context) {
 						// Editing leaves the action list and clears the last error.
 						p.mode = paletteCommandMode
 						p.actionsCommand = nil
+						p.actionsResult = false
+						p.actionsResultQuery = ""
 						p.actionSelection = ""
 						p.errorKey = ""
 						p.runError = ""
@@ -94,7 +96,9 @@ func (a *application) paletteView(c *ui.Context) {
 						})
 					})
 				}
-				keycaps(c, t, paletteActionKeys)
+				if a.paletteHasActions(p) {
+					a.paletteActionButton(c, t, text("PaletteActionTooltip"))
+				}
 			})
 			if empty {
 				// Nothing to pick: the whole body drags.

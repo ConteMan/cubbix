@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- New Devtools module, on by default. Type a timestamp, a date, `now`, `uuid` or `uuid7 8` in the command palette and a copyable result appears at the top; press Return to copy it and close the panel. Same-named ordinary commands stay below.
+- An empty palette shows a clipboard suggestion for a timestamp or UUID but never selects it. Uppercase and no-hyphens live under ⌘K as result actions. The Devtools settings page only has the switch so far; the tool window and shortcut come next.
+
 ## 0.8.0 — 2026-11-10
 
 - New QR code module: press ⌃⌥⌘R and the selected text, or a link on the clipboard, becomes a QR code you can copy, save as a PNG, or drag into another app. It updates as you type, and turning the module off releases its shortcut and hides its entries.

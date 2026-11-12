@@ -24,6 +24,8 @@ const (
 	// keep their numbers: a saved window, a URL or the command line may name one.
 	settingsTranslate = 5
 	settingsQR        = 6
+	// settingsDevtools is the eighth page. Pages 0-6 keep their numbers.
+	settingsDevtools = 7
 )
 
 // settingsNav is the sidebar order: module pages first, global pages after.
@@ -36,6 +38,7 @@ var settingsNav = []struct {
 	{settingsJSON, "braces", "JSON"},
 	{settingsTranslate, "languages", "Translate"},
 	{settingsQR, "qr-code", "QR"},
+	{settingsDevtools, "blocks", "Devtools"},
 	{settingsShortcuts, "keyboard", "R05Shortcuts"},
 	{settingsAbout, "info", "About"},
 }
@@ -54,6 +57,8 @@ func settingsPageName(page int) string {
 		return "translate"
 	case settingsQR:
 		return "qr"
+	case settingsDevtools:
+		return "devtools"
 	}
 	return "general"
 }
@@ -174,6 +179,8 @@ func pageHeight(t tokenValues, page int, awakeOn, showPlacement, fixedDisplay, h
 		return translatePageHeight(t, true)
 	case settingsQR:
 		return qrPageHeight(t)
+	case settingsDevtools:
+		return devtoolsPageHeight(t)
 	}
 	return 0
 }
@@ -195,6 +202,7 @@ func settingsMinimumHeight(t tokenValues) float32 {
 		pageHeight(t, settingsShortcuts, true, false, false, false, false),
 		pageHeight(t, settingsJSON, true, false, false, false, false),
 		pageHeight(t, settingsQR, true, false, false, false, false),
+		pageHeight(t, settingsDevtools, true, false, false, false, false),
 		translatePageHeight(t, true)-rowHeight(t, 3)-t.StrokeHairline,
 	)
 	height := max(t.SizeWindowMinHeight, sidebarNaturalHeight(t), content+2*t.Space24)
@@ -502,6 +510,8 @@ func (a *application) settingsContent(c *ui.Context, t tokenValues, locale strin
 		a.translateModulePage(c, t, locale, l, alert)
 	case settingsQR:
 		a.qrModulePage(c, t, locale, l, alert)
+	case settingsDevtools:
+		a.devtoolsModulePage(c, t, locale, l, alert)
 	default:
 		a.shortcutsPage(c, t, locale, l, alert)
 	}
@@ -906,6 +916,23 @@ func (a *application) qrModulePage(c *ui.Context, t tokenValues, locale string, 
 	})
 	a.settingsSection(c, t, text("GroupShortcuts"), func() {
 		a.shortcutSettingsRow(c, t, locale, "qr")
+	})
+}
+
+// devtoolsPageHeight is the natural height of the eighth settings page. This
+// step has only the header switch: the shortcut row, and the 144 height it
+// adds, arrive with the shortcut in the next step.
+func devtoolsPageHeight(t tokenValues) float32 {
+	return t.SizePageHeader
+}
+
+func (a *application) devtoolsModulePage(c *ui.Context, t tokenValues, locale string, l settingsLayout, alert string) {
+	text := func(key string) string { return a.text(locale, key) }
+	on := a.config.DevtoolsEnabled
+	a.pageHeader(c, t, locale, "blocks", "Devtools", "DevtoolsPageDesc", alert, func() {
+		a.switchControl(c, t, "devtools-enabled", text("Devtools"), &on, func() {
+			a.changeDevtoolsEnabled(!a.config.DevtoolsEnabled)
+		}, "", false)
 	})
 }
 
