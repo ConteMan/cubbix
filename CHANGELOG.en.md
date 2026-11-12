@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.0 — 2026-11-12
 
 - New Devtools module, on by default. Type a timestamp, a date, `now`, `uuid` or `uuid7 8` in the command palette and a copyable result appears at the top; press Return to copy it and close the panel. Same-named ordinary commands stay below.
 - An empty palette shows a clipboard suggestion for a timestamp or UUID but never selects it. Uppercase and no-hyphens live under ⌘K as result actions, which can also open the batch in a tool window.
