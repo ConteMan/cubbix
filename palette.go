@@ -104,6 +104,15 @@ type paletteState struct {
 	// done stops a second Enter from executing the same result twice, and
 	// resets on a query change or the next open.
 	done bool
+	// devSession changes when the panel opens or a module changes. Result rows
+	// remember the session they were built in, so a row that outlives its
+	// session cannot copy or open anything.
+	devSession uint64
+	// resultSession is the session the current result rows belong to.
+	resultSession uint64
+	// actionsResultSession is the session the open result action page
+	// belongs to.
+	actionsResultSession uint64
 }
 
 // devtoolsCacheEntry remembers both the result and whether this query was a
@@ -165,6 +174,9 @@ func (a *application) showPalette() {
 	a.palette.resultCache = nil
 	a.palette.suggestion = nil
 	a.palette.done = false
+	a.palette.devSession++
+	a.palette.resultSession = 0
+	a.palette.actionsResultSession = 0
 	if a.config.DevtoolsEnabled && a.devtoolsReadClipboard != nil {
 		a.palette.suggestion = devtoolsSuggestion(a.devtoolsReadClipboard())
 	}
@@ -222,6 +234,9 @@ func (a *application) invalidatePaletteAfterModuleChange() {
 	p.resultCache = nil
 	p.suggestion = nil
 	p.done = false
+	p.devSession++
+	p.resultSession = 0
+	p.actionsResultSession = 0
 	if p.mode == paletteActionMode && p.actionsResult {
 		p.mode = paletteCommandMode
 		p.actionsResult = false
@@ -356,14 +371,15 @@ func (a *application) togglePaletteActions() {
 		return
 	}
 	if row, ok := p.selectedRow(); ok && row.Kind == paletteRowResult {
-		if row.ErrorKey != "" {
-			// An error row has nothing to copy; ⌘K must not open an empty page.
+		if !a.config.DevtoolsEnabled || p.resultSession != p.devSession || row.ErrorKey != "" {
+			// A stale or error row has nothing to copy; ⌘K must not open an empty page.
 			return
 		}
 		p.mode = paletteActionMode
 		p.actionsCommand = nil
 		p.actionsResult = true
 		p.actionsResultQuery = p.lastQuery
+		p.actionsResultSession = p.devSession
 		p.actionsResultUUID = row.Result.Kind == devtools.KindUUID
 		p.actionsPayload = row.Result.Payload
 		p.actionsTitle = row.Title
@@ -446,6 +462,10 @@ func (a *application) runPalette() {
 	p.runError = ""
 	if p.mode == paletteActionMode {
 		if p.actionsResult {
+			if !a.config.DevtoolsEnabled || p.actionsResultSession != p.devSession {
+				a.invalidatePaletteAfterModuleChange()
+				return
+			}
 			a.runPaletteResultAction(p)
 			return
 		}
@@ -488,8 +508,9 @@ func (a *application) runPalette() {
 		return
 	}
 	if row, ok := p.selectedRow(); ok && row.Kind == paletteRowResult {
-		if !a.config.DevtoolsEnabled {
-			// The module closed after the row was built.
+		if !a.config.DevtoolsEnabled || p.resultSession != p.devSession {
+			// The module closed, or the panel session changed, after the row
+			// was built.
 			p.resultCache = nil
 			p.selectionKey = ""
 			a.invalidatePaletteAfterModuleChange()
@@ -667,9 +688,11 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 	forced = forced && usable(prefix.Command)
 
 	var resultRows []paletteRow
+	p.resultSession = 0
 	if a.config.DevtoolsEnabled && query != "" {
 		if entry := a.devtoolsCache(p, query, now); entry.recognized {
 			resultRows = a.devtoolsResultRows(locale, entry.output)
+			p.resultSession = p.devSession
 		}
 	}
 
@@ -1040,6 +1063,10 @@ func (a *application) refreshResultActions(p *paletteState, locale string) {
 // runPaletteResultAction applies one action of a result row. Copy closes the
 // panel; the two presentation changes return to the same row.
 func (a *application) runPaletteResultAction(p *paletteState) {
+	if !a.config.DevtoolsEnabled || p.actionsResultSession != p.devSession {
+		a.invalidatePaletteAfterModuleChange()
+		return
+	}
 	action := p.selectedAction()
 	if action == nil || action.Run == nil {
 		return

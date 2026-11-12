@@ -196,6 +196,63 @@ func TestPaletteDevtoolsRejectsAClosedModule(t *testing.T) {
 	}
 }
 
+func TestPaletteDevtoolsSessionChangeBlocksAResult(t *testing.T) {
+	a, p := devtoolsPalette(t)
+	copied := 0
+	a.devtoolsCopy = func(string) error { copied++; return nil }
+	refreshWithQuery(a, p, "uuid7 2")
+	before := p.devSession
+	a.changeDevtoolsEnabled(false)
+	if p.devSession == before {
+		t.Fatal("a module change did not advance the session")
+	}
+	// No frame has rebuilt the rows yet: the old result must not copy.
+	a.runPalette()
+	if copied != 0 {
+		t.Fatal("a result from an older panel session copied")
+	}
+
+	// Reopening the panel advances the session and invalidates an old action page.
+	a.changeDevtoolsEnabled(true)
+	refreshWithQuery(a, p, "uuid7 2")
+	a.togglePaletteActions()
+	a.refreshPalette(p, "en")
+	if p.mode != paletteActionMode || !p.actionsResult {
+		t.Fatalf("action page not open: %v %v", p.mode, p.actionsResult)
+	}
+	a.showPalette()
+	if p.actionsResultSession != 0 || p.resultSession != 0 {
+		t.Fatalf("sessions not reset on reopen: %d %d", p.actionsResultSession, p.resultSession)
+	}
+}
+
+func TestPaletteDevtoolsMatchingCommandStaysReachable(t *testing.T) {
+	a, p := devtoolsPalette(t)
+	doc := &jsonDocument{number: 42, custom: "now"}
+	a.jsonDocuments = append(a.jsonDocuments, doc)
+	refreshWithQuery(a, p, "now")
+
+	resultIdx := -1
+	cmdIdx := -1
+	for idx, row := range p.rows {
+		if row.Kind == paletteRowResult && resultIdx < 0 {
+			resultIdx = idx
+		}
+		if row.Kind == paletteRowCommand && row.Command != nil && strings.Contains(row.Title, "now") {
+			cmdIdx = idx
+		}
+	}
+	if resultIdx < 0 || cmdIdx < 0 {
+		t.Fatalf("expected both result and command in rows: resultIdx=%d cmdIdx=%d rows=%+v", resultIdx, cmdIdx, p.rows)
+	}
+	if p.selected != resultIdx {
+		t.Fatalf("selected = %d, want result index %d", p.selected, resultIdx)
+	}
+	if cmdIdx <= resultIdx {
+		t.Fatalf("command index %d is not below result index %d", cmdIdx, resultIdx)
+	}
+}
+
 func TestPaletteDevtoolsErrorRowNeverCloses(t *testing.T) {
 	a, p := devtoolsPalette(t)
 	copied := 0
@@ -240,6 +297,9 @@ func TestPaletteDevtoolsPresentationKeepsTheBatch(t *testing.T) {
 		t.Fatalf("the action page did not return: %v", p.mode)
 	}
 	a.refreshPalette(p, "en")
+	if p.selected != resultRowIndex(p) {
+		t.Fatalf("selection did not return to the result row: %d", p.selected)
+	}
 	after := strings.Split(p.rows[resultRowIndex(p)].Result.Payload, "\n")
 	if len(after) != 3 {
 		t.Fatalf("batch size changed: %d", len(after))
@@ -248,6 +308,18 @@ func TestPaletteDevtoolsPresentationKeepsTheBatch(t *testing.T) {
 		if after[index] != strings.ToUpper(before[index]) {
 			t.Fatalf("value %d changed instead of case: %q -> %q", index, before[index], after[index])
 		}
+	}
+
+	// ⌘K opens actions, pressing ⌘K again toggles back and restores the original row.
+	a.togglePaletteActions()
+	a.refreshPalette(p, "en")
+	if p.mode != paletteActionMode {
+		t.Fatal("⌘K did not enter actions mode")
+	}
+	a.togglePaletteActions()
+	a.refreshPalette(p, "en")
+	if p.mode != paletteCommandMode || p.selected != resultRowIndex(p) {
+		t.Fatalf("toggling ⌘K did not restore command mode and selection: %v %d", p.mode, p.selected)
 	}
 
 	// No hyphens acts on the same cached values.
@@ -333,6 +405,9 @@ func TestPaletteDevtoolsReopenInvalidatesCaches(t *testing.T) {
 	a.showPalette()
 	if p.resultCache != nil || p.suggestion != nil {
 		t.Fatal("reopening kept a cached result or suggestion")
+	}
+	if p.resultSession != 0 || p.actionsResultSession != 0 {
+		t.Fatalf("reopening kept resultSession=%d or actionsResultSession=%d", p.resultSession, p.actionsResultSession)
 	}
 	if p.done {
 		t.Fatal("reopening kept the execution guard")

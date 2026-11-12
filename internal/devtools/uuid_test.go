@@ -85,26 +85,38 @@ func TestUUIDParseShellAndVariants(t *testing.T) {
 		t.Fatalf("v7 time row = %+v", output.Rows)
 	}
 	// Variants other than RFC must never be read as a v7 time.
-	for _, variantByte := range []string{"c000", "e000", "0000"} {
-		text := "00000000-0000-7000-" + variantByte + "-000000000000"
+	for _, tc := range []struct {
+		byteHex string
+		variant string
+	}{
+		{"c000", "Microsoft"},
+		{"e000", "Reserved"},
+		{"0000", "NCS"},
+	} {
+		text := "00000000-0000-7000-" + tc.byteHex + "-000000000000"
 		output, ok := ParseUUID(text)
 		if !ok || len(output.Rows) != 1 {
 			t.Fatalf("%s = %+v %v", text, output, ok)
 		}
-		if output.Rows[0].HintKey != "DevtoolsVersion" || output.Rows[0].HintArgs[0] != 7 {
+		if output.Rows[0].HintKey != "DevtoolsVersion" || output.Rows[0].HintArgs[0] != 7 || output.Rows[0].HintArgs[1] != tc.variant {
 			t.Fatalf("%s hint = %+v", text, output.Rows[0])
 		}
 	}
 }
 
 func TestUUIDNilAndMaxAreMarked(t *testing.T) {
-	for _, test := range []struct{ text, key string }{
-		{"00000000-0000-0000-0000-000000000000", "DevtoolsNil"},
-		{"ffffffff-ffff-ffff-ffff-ffffffffffff", "DevtoolsMax"},
+	for _, test := range []struct {
+		text, key, variant string
+	}{
+		{"00000000-0000-0000-0000-000000000000", "DevtoolsNil", "NCS"},
+		{"ffffffff-ffff-ffff-ffff-ffffffffffff", "DevtoolsMax", "Reserved"},
 	} {
 		output, ok := ParseUUID(test.text)
 		if !ok || output.Rows[0].HintKey != test.key || len(output.Rows) != 1 {
 			t.Fatalf("%s = %+v %v", test.text, output, ok)
+		}
+		if len(output.Rows[0].HintArgs) != 1 || output.Rows[0].HintArgs[0] != test.variant {
+			t.Fatalf("%s variant hint = %+v", test.text, output.Rows[0].HintArgs)
 		}
 	}
 }

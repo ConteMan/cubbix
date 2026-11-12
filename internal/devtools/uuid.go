@@ -135,9 +135,9 @@ func formatUUID(id uuid.UUID, upper, plain bool) string {
 
 // normalizeUUID strips the accepted shell in a fixed order: an optional
 // case-insensitive urn:uuid: prefix first, then at most one brace pair.
-// Therefore urn:uuid:{...}, {urn:uuid:...} is not accepted, and a doubled
-// shell is not accepted either. The core must then be 8-4-4-4-12 or 32 hex
-// digits; Parse runs only after that check.
+// Therefore urn:uuid:{...}, {...}, and urn:uuid:... are accepted; {urn:uuid:...},
+// {{...}}, and doubled prefixes are not accepted. The core must then be
+// 8-4-4-4-12 or 32 hex digits; Parse runs only after that check.
 func normalizeUUID(text string) (string, bool) {
 	text = strings.TrimSpace(text)
 	const prefix = "urn:uuid:"

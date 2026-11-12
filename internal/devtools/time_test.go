@@ -57,6 +57,13 @@ func TestTimestampPrefixAndUnits(t *testing.T) {
 	if key := ConvertTime("946684800S", time.Now(), utc).ErrorKey; key != "" {
 		t.Fatalf("uppercase suffix = %q", key)
 	}
+	if key := ConvertTime("1700000000 s", time.Now(), utc).ErrorKey; key != "" {
+		t.Fatalf("spaced suffix = %q", key)
+	}
+	output = ConvertTime("-1500ms", time.Now(), utc)
+	if output.ErrorKey != "" || !strings.Contains(output.Rows[0].Payload, ".5") {
+		t.Fatalf("ts -1500ms = %+v", output)
+	}
 	if key := ConvertTime("+8", time.Now(), utc).ErrorKey; key != "DevtoolsDateInvalid" {
 		t.Fatalf("positive sign = %q", key)
 	}
@@ -79,6 +86,14 @@ func TestTimestampYearsOverflowAndLeapSecond(t *testing.T) {
 	// 19 nines in nanosecond unit is larger than int64: reject, never wrap.
 	if key := ConvertTime("9999999999999999999", time.Now(), utc).ErrorKey; key != "DevtoolsRange" {
 		t.Fatalf("overflow = %q", key)
+	}
+	// 20 digits is larger than int64: reject as range error, never wrap.
+	if key := ConvertTime("99999999999999999999", time.Now(), utc).ErrorKey; key != "DevtoolsRange" {
+		t.Fatalf("20 digits overflow = %q", key)
+	}
+	// Microseconds outside 1678-2262 must not overflow int64 nanoseconds during unit conversion.
+	if output := ConvertTime("16725225600000000us", time.Now(), utc); output.ErrorKey != "" || output.Rows[0].Title != "2500-01-01 00:00:00" {
+		t.Fatalf("year 2500 microseconds = %+v", output)
 	}
 	if key := ConvertTime("2016-12-31T23:59:60Z", time.Now(), utc).ErrorKey; key != "DevtoolsLeapSecond" {
 		t.Fatalf("leap second = %q", key)
@@ -113,6 +128,32 @@ func TestTimestampKeepsFraction(t *testing.T) {
 	if !found {
 		t.Fatalf("microseconds lost: %+v", output.Rows)
 	}
+	output = ConvertTime("1700000000123456789ns", time.Now(), utc)
+	if output.ErrorKey != "" {
+		t.Fatalf("nanoseconds rejected: %s", output.ErrorKey)
+	}
+	found = false
+	for _, row := range output.Rows {
+		if strings.Contains(row.Payload, ".123456789") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("nanoseconds lost: %+v", output.Rows)
+	}
+	output = ConvertTime("2026-11-12 00:00:00.123456789", time.Now(), utc)
+	if output.ErrorKey != "" {
+		t.Fatalf("date with nanos rejected: %s", output.ErrorKey)
+	}
+	found = false
+	for _, row := range output.Rows {
+		if strings.Contains(row.Payload, ".123456789") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("date nanos lost: %+v", output.Rows)
+	}
 }
 
 func TestSkippedWallClock(t *testing.T) {
@@ -129,7 +170,9 @@ func TestOverlappingWallClocks(t *testing.T) {
 	}{
 		{"America/New_York", "2026-11-01 01:30:00", "-05:00"},
 		{"Europe/London", "2026-10-25 01:30:00", "+00:00"},
+		{"Europe/London", "2026-10-25 01:30", "+00:00"},
 		{"Australia/Lord_Howe", "2026-04-05 01:45:00", "+10:30"},
+		{"Australia/Lord_Howe", "2026-04-05 01:45", "+10:30"},
 	}
 	for _, test := range cases {
 		loc := zone(t, test.zone)
@@ -158,11 +201,30 @@ func mustInt(text string) int64 {
 
 func TestWallClockYearBoundariesReject(t *testing.T) {
 	utc := time.UTC
+	if output, _ := ConvertDate("0000-01-01", utc); output.ErrorKey != "DevtoolsRange" {
+		t.Fatalf("year 0 = %q", output.ErrorKey)
+	}
 	if output, _ := ConvertDate("0001-01-01T00:00:00+14:00", utc); output.ErrorKey != "DevtoolsRange" {
 		t.Fatalf("year 0 UTC = %q", output.ErrorKey)
 	}
 	if output, _ := ConvertDate("9999-12-31T23:59:59-12:00", utc); output.ErrorKey != "DevtoolsRange" {
 		t.Fatalf("year 10000 UTC = %q", output.ErrorKey)
+	}
+	// UTC year in range 1-9999, but local year out of range 1-9999.
+	locMinus := time.FixedZone("TEST-05", -5*3600)
+	if output, _ := ConvertDate("0001-01-01T02:00:00Z", locMinus); output.ErrorKey != "DevtoolsRange" {
+		t.Fatalf("year 0 local = %q", output.ErrorKey)
+	}
+	locPlus := time.FixedZone("TEST+05", 5*3600)
+	if output, _ := ConvertDate("9999-12-31T22:00:00Z", locPlus); output.ErrorKey != "DevtoolsRange" {
+		t.Fatalf("year 10000 local = %q", output.ErrorKey)
+	}
+	// Boundary years 1 and 9999 within range for both UTC and local.
+	if output, ok := ConvertDate("0001-01-01 00:00:00", utc); !ok || output.ErrorKey != "" {
+		t.Fatalf("year 1 valid = %+v %v", output, ok)
+	}
+	if output, ok := ConvertDate("9999-12-31 23:59:59", utc); !ok || output.ErrorKey != "" {
+		t.Fatalf("year 9999 valid = %+v %v", output, ok)
 	}
 }
 

@@ -47,5 +47,6 @@ func (a *application) changeDevtoolsEnabled(target bool) {
 	a.config.DevtoolsEnabled = target
 	a.save()
 	a.invalidateWindow()
+	a.refreshMenubarPanel()
 	a.invalidatePaletteAfterModuleChange()
 }

@@ -147,6 +147,9 @@ func ConvertDate(text string, loc *time.Location) (Output, bool) {
 	rows := dateRows(instant, loc)
 	if len(candidates) > 1 {
 		other := candidates[1]
+		if !withinDisplayYears(other, loc) {
+			return errorOutput("DevtoolsRange"), true
+		}
 		rows = append(rows, Row{
 			Kind:     KindTime,
 			Title:    clockTitle(other.In(loc)),
@@ -263,6 +266,11 @@ func parseTimestamp(text string) (time.Time, Unit, string, bool) {
 		// Not a unit: this is probably a date such as 2026-11-12.
 		return time.Time{}, UnitSecond, "", false
 	}
+	value, err := strconv.ParseInt(digits, 10, 64)
+	if err != nil {
+		// Larger than int64: reject explicitly instead of wrapping.
+		return time.Time{}, UnitSecond, "DevtoolsRange", true
+	}
 	if !explicit {
 		switch len(digits) {
 		case 13:
@@ -277,11 +285,6 @@ func parseTimestamp(text string) (time.Time, Unit, string, bool) {
 			}
 			unit = UnitSecond
 		}
-	}
-	value, err := strconv.ParseInt(digits, 10, 64)
-	if err != nil {
-		// Larger than int64: reject explicitly instead of wrapping.
-		return time.Time{}, UnitSecond, "DevtoolsRange", true
 	}
 	if negative {
 		value = -value
@@ -433,6 +436,11 @@ func daysInMonth(year, month int) int {
 	return 0
 }
 
+type instantKey struct {
+	sec  int64
+	nsec int
+}
+
 // resolveWallClock finds every instant that really shows the given wall clock
 // in zone. Offsets come from the zone's own transitions around that time, not
 // from adding or subtracting a fixed hour, so 30-minute and two-hour shifts
@@ -447,7 +455,7 @@ func resolveWallClock(wall time.Time, zone *time.Location) []time.Time {
 		_, offset := cursor.In(zone).Zone()
 		offsets[offset] = true
 		_, next := cursor.In(zone).ZoneBounds()
-		if next.IsZero() || next.After(end) {
+		if next.IsZero() || !next.After(cursor) || next.After(end) {
 			break
 		}
 		cursor = next
@@ -456,7 +464,7 @@ func resolveWallClock(wall time.Time, zone *time.Location) []time.Time {
 	offsets[endOffset] = true
 
 	var candidates []time.Time
-	seen := map[int64]bool{}
+	seen := map[instantKey]bool{}
 	for offset := range offsets {
 		candidate := time.Unix(wallSeconds-int64(offset), nanos)
 		shown := candidate.In(zone)
@@ -465,7 +473,7 @@ func resolveWallClock(wall time.Time, zone *time.Location) []time.Time {
 			shown.Nanosecond() != wall.Nanosecond() {
 			continue
 		}
-		key := candidate.UnixNano()
+		key := instantKey{sec: candidate.Unix(), nsec: candidate.Nanosecond()}
 		if seen[key] {
 			continue
 		}
