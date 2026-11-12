@@ -84,8 +84,8 @@ const (
 
 var idPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{1,64}$`)
 
-// Request is one line of the protocol. Fields the selected op does not use are
-// ignored. A body frame is allowed for the three actions that carry text:
+// Request is one line of the protocol. Validate applies each action's field
+// rules. A body frame is allowed for the three actions that carry text:
 // json.new, translate and qr.
 type Request struct {
 	V      int    `json:"v"`

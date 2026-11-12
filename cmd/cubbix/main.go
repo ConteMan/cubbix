@@ -511,6 +511,9 @@ func limitedTSArg(text string) (string, error) {
 	if len(text) > cli.MaxArg {
 		return "", usagef("The text exceeds the 128-byte limit.")
 	}
+	if strings.TrimSpace(text) == "" {
+		return "", usagef("ts needs non-empty TEXT when an argument is given.")
+	}
 	return text, nil
 }
 

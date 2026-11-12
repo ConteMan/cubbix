@@ -408,6 +408,7 @@
   "DevtoolsPaste": "粘贴到前台应用",
   "DevtoolsCopy": "复制",
   "DevtoolsCount": "共 %d 个",
+  "DevtoolsCountLabel": "个数",
   "DevtoolsVersion": "版本 %d · 变体 %s",
   "DevtoolsNil": "Nil · 变体 %s",
   "DevtoolsMax": "Max · 变体 %s",

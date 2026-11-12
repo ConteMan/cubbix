@@ -341,6 +341,21 @@ func TestParseDevtoolsCommands(t *testing.T) {
 
 // TestTSLongTextIsUsage bounds the ts argument before any connection: the app's
 // MaxArg is 128 bytes, and an over-long text fails here rather than remotely.
+func TestTSEmptyArgumentIsUsage(t *testing.T) {
+	for _, text := range []string{"", " \t\n"} {
+		e, stdout, stderr, _ := testEnv(t, func(string, time.Duration) (conn, error) {
+			t.Fatal("an empty ts argument connected")
+			return nil, nil
+		})
+		if code := run([]string{"ts", text}, e); code != exitUsage {
+			t.Fatalf("ts %q exit = %d", text, code)
+		}
+		if stdout.Len() != 0 || !strings.Contains(stderr.String(), "non-empty") {
+			t.Fatalf("ts %q stdout %q stderr %q", text, stdout.String(), stderr.String())
+		}
+	}
+}
+
 func TestTSLongTextIsUsage(t *testing.T) {
 	e, stdout, stderr, _ := testEnv(t, func(string, time.Duration) (conn, error) {
 		t.Fatal("an over-long ts text connected")

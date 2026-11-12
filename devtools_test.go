@@ -567,4 +567,11 @@ func TestCLIDevtoolsTwoHopsKeepLinesAndMessage(t *testing.T) {
 	if result.State == nil || result.Bytes != 0 || result.Translate != nil || result.QR != nil {
 		t.Fatalf("the devtools answer carried a needless field: %+v", result)
 	}
+	// A full batch is valid at the action boundary, but its duplicated lines
+	// and message exceed the one-line wire limit. The server must answer with
+	// an explicit internal failure rather than a truncated partial batch.
+	result = do(t, dial(t, path), cli.Request{Op: cli.OpRun, Action: cli.ActionUUID, Count: 100, UUIDVersion: 7}, nil)
+	if result.OK || result.Code != cli.CodeInternal || len(result.Lines) != 0 {
+		t.Fatalf("overlong batch = %+v", result)
+	}
 }

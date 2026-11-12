@@ -63,12 +63,14 @@ type devtoolsState struct {
 	// uuidVersion is 4, 7, or 0 for the bare pair. values are the canonical
 	// lowercase hyphenated texts; the switches only change how they are
 	// written, never the values. uuidLiteral is a parsed UUID opened here.
-	uuidVersion int
-	uuidCount   int
-	uuidLiteral string
-	values      []string
-	upper       bool
-	plain       bool
+	uuidVersion   int
+	uuidCount     int
+	uuidCountText string
+	uuidCountErr  bool
+	uuidLiteral   string
+	values        []string
+	upper         bool
+	plain         bool
 	// selected is the row Enter and ⌘C act on. copiedKey and copyFailedKey
 	// mark one row's short success or its failure.
 	selected      int
@@ -217,7 +219,7 @@ func (a *application) beginDevtoolsSelection() {
 				// empty: the intent was the selection, not the clipboard.
 				text := strings.TrimSpace(answer.text)
 				if hit := devtoolsClipboardHit(text); hit != "" {
-					a.openDevtools(devtoolsRequest{Kind: devtools.KindTime, Text: hit})
+					a.openDevtools(devtoolsRequestForQuery(hit))
 					return
 				}
 				a.openDevtools(devtoolsRequest{})
@@ -229,7 +231,7 @@ func (a *application) beginDevtoolsSelection() {
 				// selected", so the clipboard must not stand in for it.
 				a.openDevtools(devtoolsRequest{})
 			default:
-				a.openDevtools(devtoolsRequest{Kind: devtools.KindTime, Text: a.devtoolsPrefill()})
+				a.openDevtools(devtoolsRequestForQuery(a.devtoolsPrefill()))
 			}
 		})
 	})
@@ -267,10 +269,17 @@ func (a *application) openDevtools(req devtoolsRequest) {
 	s.copiedKey, s.copiedUntil, s.copyFailedKey = "", time.Time{}, ""
 	s.denied = false
 	s.focus = true
-	s.tab = devtoolsTimeTab
-	s.input = ""
+	// An empty entry keeps the segment chosen in this window. A complete
+	// request still selects its own segment below.
+	if req == (devtoolsRequest{}) {
+		s.input = ""
+	} else {
+		s.tab = devtoolsTimeTab
+		s.input = ""
+	}
 	s.uuidLiteral = ""
 	s.uuidVersion, s.uuidCount = 0, 1
+	s.values = nil
 	s.upper, s.plain = a.config.DevtoolsUUIDUpper, a.config.DevtoolsUUIDPlain
 	if req.Upper {
 		s.upper = true
@@ -291,10 +300,14 @@ func (a *application) openDevtools(req devtoolsRequest) {
 			s.uuidVersion, s.uuidCount = req.Version, max(1, req.Count)
 			a.regenerateDevtoolsUUID()
 		}
+	} else if req == (devtoolsRequest{}) && s.tab == devtoolsUUIDTab {
+		a.regenerateDevtoolsUUID()
 	} else {
 		s.input = req.Text
 		a.refreshDevtoolsTime()
 	}
+	s.uuidCountText = strconv.Itoa(s.uuidCount)
+	s.uuidCountErr = false
 	s.selected = 0
 	if s.frame() == nil && a.createDevtoolsWindow != nil {
 		a.createDevtoolsWindow(s)
@@ -406,6 +419,51 @@ func (a *application) selectDevtoolsTab(tab int) {
 
 // regenerateDevtoolsUUID makes a fresh batch with the remembered version and
 // count. The switches do not regenerate: they only rewrite the same values.
+// selectDevtoolsUUIDVersion switches between the bare pair and a single
+// version. Choosing a version is an explicit generation request, so it also
+// replaces a literal opened from the palette.
+func (a *application) selectDevtoolsUUIDVersion(version int) {
+	s := a.devtools
+	if s == nil || version != 0 && version != 4 && version != 7 {
+		return
+	}
+	s.uuidVersion = version
+	a.regenerateDevtoolsUUID()
+}
+
+// syncDevtoolsUUIDCount applies a whole decimal count in the 1-100 range. An
+// unfinished or invalid edit shows the existing count error instead of making
+// a partial batch. Editing the pair's count chooses v4, making the transition
+// from the default pair to a batch explicit in the adjacent segmented control.
+func (a *application) syncDevtoolsUUIDCount() {
+	s := a.devtools
+	if s == nil {
+		return
+	}
+	text := s.uuidCountText
+	valid := text != ""
+	for _, r := range text {
+		valid = valid && r >= '0' && r <= '9'
+	}
+	count, err := strconv.Atoi(text)
+	if !valid || err != nil || count < 1 || count > 100 {
+		s.uuidCountErr = true
+		s.copyFailedKey = ""
+		a.refreshDevtools()
+		return
+	}
+	s.uuidCountErr = false
+	if count == s.uuidCount && s.uuidVersion != 0 && s.uuidLiteral == "" {
+		a.refreshDevtools()
+		return
+	}
+	s.uuidCount = count
+	if s.uuidVersion == 0 {
+		s.uuidVersion = 4
+	}
+	a.regenerateDevtoolsUUID()
+}
+
 func (a *application) regenerateDevtoolsUUID() {
 	s := a.devtools
 	if s == nil {
@@ -424,6 +482,8 @@ func (a *application) regenerateDevtoolsUUID() {
 		s.uuidVersion, s.uuidCount = 0, 1
 		s.values = append(devtoolsValues(4, 1), devtoolsValues(7, 1)...)
 	}
+	s.uuidCountText = strconv.Itoa(s.uuidCount)
+	s.uuidCountErr = false
 	s.selected = 0
 	s.copiedKey = ""
 	s.copyFailedKey = ""
@@ -483,6 +543,9 @@ func (a *application) devtoolsWindowRows(locale string) []devtoolsRow {
 func (a *application) devtoolsUUIDRows(locale string, s *devtoolsState) []devtoolsRow {
 	text := func(key string) string { return a.text(locale, key) }
 	format := func(value string) string { return devtools.FormatBatch(value, s.upper, s.plain) }
+	if s.uuidCountErr {
+		return []devtoolsRow{{Key: "devtools.uuid.count.error", Title: text("DevtoolsCountInvalid"), ErrorKey: "DevtoolsCountInvalid"}}
+	}
 	if len(s.values) == 0 {
 		return nil
 	}
@@ -575,11 +638,12 @@ func (a *application) pasteDevtoolsSelected() bool {
 		a.refreshDevtools()
 		return false
 	}
-	// The window goes first, so the key event reaches the application that was
-	// in front rather than this window.
+	// Record the target while the previous application is still in front. The
+	// window then goes away before preflight and the one synthesized Cmd+V.
+	target := a.devtoolsTargetPID()
 	a.closeDevtools()
 	if a.devtoolsPostAllowed() {
-		a.scheduleDevtoolsPaste(a.devtoolsTargetPID())
+		a.scheduleDevtoolsPaste(target)
 	}
 	return true
 }
@@ -653,10 +717,15 @@ func (a *application) pasteDevtoolsPayload(payload string) error {
 	if err := a.copyDevtoolsPayload(payload); err != nil {
 		return err
 	}
+	// Capture the target before closing the overlays. Unauthorized paste still
+	// closes after the successful copy; permission never decides visibility.
+	target := a.devtoolsTargetPID()
+	a.hidePalette()
+	a.hideMenubarPanel()
 	if !a.devtoolsPostAllowed() {
 		return nil
 	}
-	a.scheduleDevtoolsPaste(a.devtoolsTargetPID())
+	a.scheduleDevtoolsPaste(target)
 	return nil
 }
 
@@ -667,7 +736,7 @@ func (a *application) devtoolsPostAllowed() bool {
 }
 
 // devtoolsTargetPID records the application in front before the panel closes.
-// A zero answer is kept: the paste then has no target to verify.
+// A zero answer fails closed: without a target, the scheduler only copies.
 func (a *application) devtoolsTargetPID() int32 {
 	if a.devtoolsFrontmost == nil {
 		return 0
@@ -684,7 +753,7 @@ func (a *application) scheduleDevtoolsPaste(target int32) {
 	post := a.devtoolsPostKey
 	a.hidePalette()
 	a.hideMenubarPanel()
-	if post == nil {
+	if post == nil || target <= 0 {
 		return
 	}
 	run := func() {

@@ -101,7 +101,10 @@ func postDevtoolsCommandV(target int32) error {
 	if !cgHandles.preflight() {
 		return errors.New("devtools: key events not allowed")
 	}
-	if target > 0 && devtoolsFrontmostPID() != target {
+	if target <= 0 {
+		return errors.New("devtools: no frontmost application")
+	}
+	if devtoolsFrontmostPID() != target {
 		return errors.New("devtools: another application is in front")
 	}
 	down := cgHandles.createKey(0, keyV, true)

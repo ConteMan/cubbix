@@ -117,6 +117,20 @@ func (a *application) devtoolsTimeField(c *ui.Context, t tokenValues, locale str
 		input.OnChange(a.syncDevtoolsInput)
 		input.OnSubmit(func() { a.copyDevtoolsSelected() })
 		input.OnShortcut(ui.Cmd, ui.KeyEnter, func() { a.pasteDevtoolsSelected() })
+		input.OnTextKey(func(key ui.TextKey) bool {
+			switch {
+			case key.Key == ui.KeyC && key.Mods == ui.Cmd:
+				a.copyDevtoolsSelected()
+				return true
+			case key.Key == ui.KeyDown && key.Mods == 0:
+				a.moveDevtoolsSelection(1)
+				return true
+			case key.Key == ui.KeyUp && key.Mods == 0:
+				a.moveDevtoolsSelection(-1)
+				return true
+			}
+			return false
+		})
 		if s.focus {
 			s.focus = false
 			input.Focus()
@@ -128,16 +142,52 @@ func (a *application) devtoolsTimeField(c *ui.Context, t tokenValues, locale str
 // the two presentation switches, which are stored in the config.
 func (a *application) devtoolsUUIDControls(c *ui.Context, t tokenValues, locale string, s *devtoolsState) {
 	text := func(key string) string { return a.text(locale, key) }
-	ui.Row(c.Key("devtools-uuid-controls")).FillWidth().Height(t.SizeSegmentHeight).Shrink(0).Gap(t.Space8).AlignItems(ui.Center).Children(func() {
-		label := text("DevtoolsRegenerate")
-		button := a.qrIconButton(c, t, "devtools-regenerate", "refresh-cw", label)
-		button.OnClick(a.regenerateDevtoolsUUID)
-		ui.Row(c).Grow(1).FillHeight()
-		a.devtoolsSwitch(c, t, "devtools-upper", text("DevtoolsUpper"), s.upper, func() {
-			a.writeDevtoolsSwitches(!s.upper, s.plain)
+	ui.Column(c.Key("devtools-uuid-controls")).FillWidth().Shrink(0).Gap(t.Space8).Children(func() {
+		ui.Row(c.Key("devtools-uuid-generation")).FillWidth().Height(t.SizeSegmentHeight).Shrink(0).
+			Gap(t.Space8).AlignItems(ui.Center).Children(func() {
+			version := 0
+			if s.uuidVersion == 4 {
+				version = 1
+			} else if s.uuidVersion == 7 {
+				version = 2
+			}
+			parts := ui.SegmentedBase(c.Key("devtools-uuid-version"), &version, 3)
+			parts.Track.Size(3*t.SizePillButtonWidth, t.SizeSegmentHeight).Padding(t.Space2).
+				Radius(t.RadiusControl).Background(ui.Hex(t.ColorControl)).Label(text("DevtoolsUUID")).
+				OnChange(func() { a.selectDevtoolsUUIDVersion([]int{0, 4, 7}[version]) }).Children(func() {
+				for index, label := range []string{"v4 + v7", "v4", "v7"} {
+					color, background := t.ColorText, t.ColorTransparent
+					if index == version {
+						color, background = t.ColorOnAccent, t.ColorAccent
+					}
+					parts.Segment(index).Grow(1).FillHeight().Radius(t.RadiusControl).
+						Background(ui.Hex(background)).FocusRing(true).Label("UUID " + label).Children(func() {
+						ui.Text(c, label).FontSize(t.FontSizeSmall).TextColor(ui.Hex(color)).SingleLine()
+					})
+				}
+			})
+			ui.Text(c, text("DevtoolsCountLabel")).FontSize(t.FontSizeSmall).
+				TextColor(ui.Hex(t.ColorTextSecondary)).SingleLine()
+			input := ui.TextInput(c.Key("devtools-uuid-count"), &s.uuidCountText).
+				Width(t.SizePillButtonWidth).Height(t.SizeSegmentHeight).Padding(t.Space2, t.Space8).
+				Border(0, ui.Hex(t.ColorTransparent)).Radius(t.RadiusControl).
+				Background(ui.Hex(t.ColorControl)).FontSize(t.FontSizeSmall).
+				LineHeight(t.LineHeightBody).Label("UUID " + text("DevtoolsCountLabel")).FocusRing(true)
+			input.OnChange(a.syncDevtoolsUUIDCount)
+			input.OnSubmit(a.syncDevtoolsUUIDCount)
+			ui.Row(c).Grow(1).FillHeight()
+			label := text("DevtoolsRegenerate")
+			button := a.qrIconButton(c, t, "devtools-regenerate", "refresh-cw", label)
+			button.OnClick(a.regenerateDevtoolsUUID)
 		})
-		a.devtoolsSwitch(c, t, "devtools-plain", text("DevtoolsPlain"), s.plain, func() {
-			a.writeDevtoolsSwitches(s.upper, !s.plain)
+		ui.Row(c.Key("devtools-uuid-presentation")).FillWidth().Height(t.SizeSegmentHeight).Shrink(0).
+			Gap(t.Space8).Justify(ui.End).AlignItems(ui.Center).Children(func() {
+			a.devtoolsSwitch(c, t, "devtools-upper", text("DevtoolsUpper"), s.upper, func() {
+				a.writeDevtoolsSwitches(!s.upper, s.plain)
+			})
+			a.devtoolsSwitch(c, t, "devtools-plain", text("DevtoolsPlain"), s.plain, func() {
+				a.writeDevtoolsSwitches(s.upper, !s.plain)
+			})
 		})
 	})
 }

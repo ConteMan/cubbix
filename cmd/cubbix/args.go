@@ -23,7 +23,7 @@ Commands:
   status               Print keep awake, JSON windows and version
   json new [options]   Open a JSON window  (--text STR | --file PATH | --blank)
   palette              Open the command palette
-  settings [--page P]  Open Settings  (general|awake|json|translate|qr|shortcuts|about)
+  settings [--page P]  Open Settings  (general|awake|json|translate|qr|devtools|shortcuts|about)
   translate [TEXT]     Translate text from an argument, file, standard input,
                        or the current selection when no text is given
                        [--to auto|zh|en] [--text STR | --file PATH | -]

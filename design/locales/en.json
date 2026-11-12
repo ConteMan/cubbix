@@ -408,6 +408,7 @@
   "DevtoolsPaste": "Paste to Frontmost App",
   "DevtoolsCopy": "Copy",
   "DevtoolsCount": "%d values",
+  "DevtoolsCountLabel": "Count",
   "DevtoolsVersion": "Version %d · variant %s",
   "DevtoolsNil": "Nil · variant %s",
   "DevtoolsMax": "Max · variant %s",

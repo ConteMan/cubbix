@@ -345,6 +345,26 @@ func TestDevtoolsShortcutPrefill(t *testing.T) {
 	}
 }
 
+func TestDevtoolsShortcutUUIDPrefillOpensUUIDTab(t *testing.T) {
+	const literal = "00000000-0000-4000-8000-000000000000"
+	for _, source := range []string{"selection", "clipboard"} {
+		a, _ := devtoolsWindowTestApp(t)
+		a.selection = &fakeSelectionReader{trusted: true, pid: otherSelectionPID(), text: "  "}
+		if source == "selection" {
+			a.selection = &fakeSelectionReader{trusted: true, pid: otherSelectionPID(), text: literal}
+		} else {
+			a.devtoolsReadClipboard = func() string { return literal }
+		}
+		a.toggleDevtools()
+		if a.devtools.tab != devtoolsUUIDTab || a.devtools.uuidLiteral != literal {
+			t.Fatalf("%s UUID prefill = tab %d literal %q", source, a.devtools.tab, a.devtools.uuidLiteral)
+		}
+		if a.devtools.selected != 0 {
+			t.Fatalf("%s UUID prefill selected row %d", source, a.devtools.selected)
+		}
+	}
+}
+
 func TestDevtoolsShortcutDeniedOnce(t *testing.T) {
 	a, _ := devtoolsWindowTestApp(t)
 	opens := 0
@@ -462,12 +482,74 @@ func TestDevtoolsWindowUUIDRows(t *testing.T) {
 	if strings.Join(a.devtools.values, "|") != strings.Join(before, "|") {
 		t.Fatal("a switch generated new values")
 	}
+	// The window itself exposes version and count controls; the palette is not
+	// required to turn the default pair into a v7 batch.
+	a.openDevtools(devtoolsRequest{Kind: devtools.KindUUID})
+	a.selectDevtoolsUUIDVersion(7)
+	if a.devtools.uuidVersion != 7 || len(a.devtools.values) != 1 {
+		t.Fatalf("v7 control = version %d values %d", a.devtools.uuidVersion, len(a.devtools.values))
+	}
+	a.devtools.uuidCountText = "3"
+	a.syncDevtoolsUUIDCount()
+	if a.devtools.uuidCount != 3 || len(a.devtools.values) != 3 || a.devtools.uuidCountErr {
+		t.Fatalf("count control = count %d values %d error %v", a.devtools.uuidCount, len(a.devtools.values), a.devtools.uuidCountErr)
+	}
+	for _, value := range a.devtools.values {
+		if id := uuid.MustParse(value); id[6]>>4 != 7 {
+			t.Fatalf("count control changed version to %d", id[6]>>4)
+		}
+	}
+	a.devtools.uuidCountText = "101"
+	a.syncDevtoolsUUIDCount()
+	if rows := a.devtoolsUUIDRows("en", a.devtools); len(rows) != 1 || rows[0].ErrorKey != "DevtoolsCountInvalid" {
+		t.Fatalf("invalid count rows = %+v", rows)
+	}
+
 	// Generate again makes a fresh batch of the same version and count.
+	a.openDevtools(devtoolsRequest{Kind: devtools.KindUUID, Version: 7, Count: 21})
 	a.writeDevtoolsSwitches(false, false)
 	first := a.devtools.values[0]
 	a.regenerateDevtoolsUUID()
 	if len(a.devtools.values) != 21 || a.devtools.values[0] == first {
 		t.Fatal("generate again did not make a fresh batch")
+	}
+}
+
+func TestDevtoolsUUIDGenerationControlsUI(t *testing.T) {
+	a, _ := devtoolsWindowTestApp(t)
+	a.openDevtools(devtoolsRequest{Kind: devtools.KindUUID})
+	tk := tokens(false, "en")
+	tester := ui.NewTester(a.devtoolsView, int(tk.SizeDevtoolsWidth), int(tk.SizeDevtoolsWindowHeight))
+	tester.SetLocale("en")
+	tester.Frame()
+	if err := tester.Click("UUID v7"); err != nil {
+		t.Fatal(err)
+	}
+	if a.devtools.uuidVersion != 7 {
+		t.Fatalf("clicked version = %d", a.devtools.uuidVersion)
+	}
+	tester.Frame()
+	if err := tester.Click("UUID " + a.text("en", "DevtoolsCountLabel")); err != nil {
+		t.Fatal(err)
+	}
+	tester.Key(ui.Cmd, ui.KeyA)
+	tester.Type("3")
+	if a.devtools.uuidCount != 3 || len(a.devtools.values) != 3 || a.devtools.uuidCountErr {
+		t.Fatalf("edited count = %d values %d error %v", a.devtools.uuidCount, len(a.devtools.values), a.devtools.uuidCountErr)
+	}
+	for _, value := range a.devtools.values {
+		if id := uuid.MustParse(value); id[6]>>4 != 7 {
+			t.Fatalf("UI controls generated version %d", id[6]>>4)
+		}
+	}
+}
+
+func TestDevtoolsEmptyReopenKeepsSegment(t *testing.T) {
+	a, _ := devtoolsWindowTestApp(t)
+	a.openDevtools(devtoolsRequest{Kind: devtools.KindUUID, Version: 7, Count: 3})
+	a.openDevtools(devtoolsRequest{})
+	if a.devtools.tab != devtoolsUUIDTab || a.devtools.uuidVersion != 0 || len(a.devtools.values) != 2 {
+		t.Fatalf("empty reopen = tab %d version %d values %d", a.devtools.tab, a.devtools.uuidVersion, len(a.devtools.values))
 	}
 }
 
@@ -489,7 +571,12 @@ func TestDevtoolsPasteDispatch(t *testing.T) {
 	// Authorized: copy, close, then one Cmd+V aimed at the recorded app.
 	a, _ = devtoolsWindowTestApp(t)
 	a.devtoolsPasteAccess = func() bool { return true }
-	a.devtoolsFrontmost = func() int32 { return 4242 }
+	a.devtoolsFrontmost = func() int32 {
+		if !a.devtoolsVisible() {
+			t.Fatal("the frontmost target was recorded after the window closed")
+		}
+		return 4242
+	}
 	targets := []int32{}
 	paletteOpenAtPost := true
 	a.devtoolsPostKey = func(target int32) error {
@@ -504,6 +591,63 @@ func TestDevtoolsPasteDispatch(t *testing.T) {
 	}
 	if paletteOpenAtPost {
 		t.Fatal("the window was still visible when the key event was posted")
+	}
+}
+
+func TestDevtoolsPasteWithoutTargetOnlyCopies(t *testing.T) {
+	a, _ := devtoolsWindowTestApp(t)
+	a.devtoolsPasteAccess = func() bool { return true }
+	a.devtoolsFrontmost = func() int32 { return 0 }
+	posted := 0
+	a.devtoolsPostKey = func(int32) error { posted++; return nil }
+	copied := 0
+	a.devtoolsCopy = func(string) error { copied++; return nil }
+	a.openDevtools(devtoolsRequest{})
+	if !a.pasteDevtoolsSelected() || copied != 1 || posted != 0 || a.devtoolsVisible() {
+		t.Fatalf("missing target = copied %d posted %d visible %v", copied, posted, a.devtoolsVisible())
+	}
+}
+
+func TestDevtoolsPasteDelayAndCancellationSeams(t *testing.T) {
+	a, _ := devtoolsWindowTestApp(t)
+	a.devtoolsPasteAccess = func() bool { return true }
+	a.devtoolsFrontmost = func() int32 { return 42 }
+	a.devtoolsAsync = true
+	a.devtoolsPasteDelay = time.Millisecond
+	queued := make(chan func(), 1)
+	a.devtoolsOnMainThread = func(fn func()) { queued <- fn }
+	posted := 0
+	a.devtoolsPostKey = func(int32) error { posted++; return nil }
+	a.openDevtools(devtoolsRequest{})
+	if !a.pasteDevtoolsSelected() {
+		t.Fatal("the delayed paste path did not run")
+	}
+	select {
+	case fn := <-queued:
+		if posted != 0 {
+			t.Fatal("the key event ran before the main-thread handoff")
+		}
+		fn()
+		if posted != 1 {
+			t.Fatalf("delayed posts = %d", posted)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("the delayed paste never reached its main-thread seam")
+	}
+
+	a.openDevtools(devtoolsRequest{})
+	if !a.pasteDevtoolsSelected() {
+		t.Fatal("the cancelled paste path did not run")
+	}
+	a.cancelDevtoolsPaste()
+	select {
+	case fn := <-queued:
+		fn()
+		if posted != 1 {
+			t.Fatal("a cancelled generation posted a key")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("the cancelled paste never reached its main-thread seam")
 	}
 }
 
@@ -536,6 +680,28 @@ func TestDevtoolsPalettePasteDispatch(t *testing.T) {
 	a.pastePaletteResult()
 	if len(targets) != 1 {
 		t.Fatal("a second ⌘回车 posted again")
+	}
+}
+
+func TestDevtoolsPalettePasteActionWithoutPermissionCloses(t *testing.T) {
+	a, _ := devtoolsPalette(t)
+	a.devtoolsPasteAccess = func() bool { return false }
+	a.devtoolsFrontmost = func() int32 { return 99 }
+	copied := 0
+	a.devtoolsCopy = func(string) error { copied++; return nil }
+	posted := 0
+	a.devtoolsPostKey = func(int32) error { posted++; return nil }
+	refreshWithQuery(a, a.palette, "1700000000")
+	a.togglePaletteActions()
+	a.refreshPalette(a.palette, "en")
+	for index, row := range a.palette.rows {
+		if row.Kind == paletteRowAction && row.Key == "devtools.paste" {
+			a.palette.selected = index
+		}
+	}
+	a.runPalette()
+	if copied != 1 || posted != 0 || a.paletteVisible() {
+		t.Fatalf("unauthorized action = copied %d posted %d visible %v", copied, posted, a.paletteVisible())
 	}
 }
 
@@ -643,6 +809,11 @@ func TestDevtoolsWindowViewStates(t *testing.T) {
 	if !tester.HasText(a.text("en", "DevtoolsUpper")) || !tester.HasText(a.text("en", "DevtoolsPlain")) {
 		t.Fatalf("the switches are missing: %v", tester.Texts())
 	}
+	for _, label := range []string{"v4 + v7", "v4", "v7", a.text("en", "DevtoolsCountLabel")} {
+		if !tester.HasText(label) {
+			t.Fatalf("UUID generation control %q is missing: %v", label, tester.Texts())
+		}
+	}
 }
 
 // TestDevtoolsWindowKeyboard drives the real view: Enter copies the selected
@@ -664,6 +835,11 @@ func TestDevtoolsWindowKeyboard(t *testing.T) {
 	if len(copied) != 1 || copied[0] != rows[0].Payload {
 		t.Fatalf("Enter copied %v, want %q", copied, rows[0].Payload)
 	}
+	tester.Key(0, ui.KeyDown)
+	tester.Key(ui.Cmd, ui.KeyC)
+	if len(copied) != 2 || copied[1] != rows[1].Payload {
+		t.Fatalf("arrow and Cmd+C copied %v, want %q", copied, rows[1].Payload)
+	}
 	// The UUID tab has no field, so its arrows walk the rows and Enter copies
 	// the selected one.
 	a.openDevtools(devtoolsRequest{Kind: devtools.KindUUID})
@@ -673,7 +849,7 @@ func TestDevtoolsWindowKeyboard(t *testing.T) {
 	tester.Frame()
 	tester.Key(0, ui.KeyDown)
 	tester.Key(0, ui.KeyEnter)
-	if len(copied) != 2 || copied[1] != uuidRows[1].Payload {
+	if len(copied) != 3 || copied[2] != uuidRows[1].Payload {
 		t.Fatalf("arrow and Enter copied %v", copied)
 	}
 
