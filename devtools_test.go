@@ -8,6 +8,7 @@ import (
 	"testing"
 	"uuid"
 
+	"github.com/ConteMan/cubbix/internal/cli"
 	"github.com/ConteMan/cubbix/internal/devtools"
 )
 
@@ -17,6 +18,9 @@ func devtoolsPalette(t *testing.T) (*application, *paletteState) {
 	t.Helper()
 	a := awakeTestApp(t)
 	a.createPaletteWindow = func(*paletteState) {}
+	a.devtoolsAsync = false
+	a.devtoolsOnMainThread = func(fn func()) { fn() }
+	a.devtoolsPasteDelay = 0
 	a.showPalette()
 	if a.palette == nil {
 		t.Fatal("palette did not open")
@@ -417,10 +421,10 @@ func TestPaletteDevtoolsReopenInvalidatesCaches(t *testing.T) {
 func TestDevtoolsSettingsPageAndMappings(t *testing.T) {
 	a := awakeTestApp(t)
 	tk := tokens(false, "zh-CN")
-	if got := devtoolsPageHeight(tk); got != 56 {
-		t.Fatalf("step-1 page height = %v, want 56", got)
+	if got := devtoolsPageHeight(tk); got != 144 {
+		t.Fatalf("page height = %v, want 144", got)
 	}
-	if got := pageHeight(tk, settingsDevtools, true, false, false, false, false); got != 56 {
+	if got := pageHeight(tk, settingsDevtools, true, false, false, false, false); got != 144 {
 		t.Fatalf("pageHeight = %v", got)
 	}
 	if got := settingsPageName(settingsDevtools); got != "devtools" {
@@ -437,5 +441,130 @@ func TestDevtoolsSettingsPageAndMappings(t *testing.T) {
 	}
 	if settingsNav[5].page != settingsDevtools || settingsNav[6].page != settingsShortcuts {
 		t.Fatalf("nav order = %+v", settingsNav)
+	}
+}
+
+// cliDevtoolsRequest is a `cubbix ts` or `cubbix uuid` request.
+func cliDevtoolsRequest(action string) cli.Request {
+	return cli.Request{V: cli.Protocol, ID: "dev1", Op: cli.OpRun, Action: action}
+}
+
+// TestCLIDevtoolsTimeAndUUID covers both actions end to end on the app side:
+// the first line is the default result, a batch is one value per line, and a
+// bad unit keeps its own code instead of becoming a date failure.
+func TestCLIDevtoolsTimeAndUUID(t *testing.T) {
+	a := cliTestApp(t)
+
+	result := a.applyCLI(cliDevtoolsRequest(cli.ActionTS), nil)
+	if !result.OK || len(result.Lines) != 4 || result.Message != result.Lines[0] {
+		t.Fatalf("ts now = %+v", result)
+	}
+	result = a.applyCLI(cli.Request{V: cli.Protocol, ID: "dev2", Op: cli.OpRun, Action: cli.ActionTS, Arg: "2026-11-12"}, nil)
+	if !result.OK || len(result.Lines) != 4 || result.State == nil || result.Bytes != 0 || result.Translate != nil {
+		t.Fatalf("ts date = %+v", result)
+	}
+	result = a.applyCLI(cli.Request{V: cli.Protocol, ID: "dev3", Op: cli.OpRun, Action: cli.ActionTS, Arg: "ts 946684800000"}, nil)
+	if result.OK || result.Code != "DevtoolsUnit" || result.Message == "" {
+		t.Fatalf("ts ambiguous unit = %+v", result)
+	}
+
+	// The default UUID request is one lowercase hyphenated v4.
+	result = a.applyCLI(cliDevtoolsRequest(cli.ActionUUID), nil)
+	if !result.OK || len(result.Lines) != 1 || result.Message != result.Lines[0] {
+		t.Fatalf("uuid default = %+v", result)
+	}
+	id := uuid.MustParse(result.Lines[0])
+	if id[6]>>4 != 4 || result.Lines[0] != strings.ToLower(result.Lines[0]) || !strings.Contains(result.Lines[0], "-") {
+		t.Fatalf("uuid default value = %q", result.Lines[0])
+	}
+	// A batch of v7 values, uppercase and without hyphens, one per line.
+	result = a.applyCLI(cli.Request{V: cli.Protocol, ID: "dev4", Op: cli.OpRun, Action: cli.ActionUUID, Count: 3, UUIDVersion: 7, Upper: true, Plain: true}, nil)
+	if !result.OK || len(result.Lines) != 3 || len(strings.Split(result.Message, "\n")) != 3 {
+		t.Fatalf("uuid batch = %+v", result)
+	}
+	for _, line := range result.Lines {
+		if len(line) != 32 || line != strings.ToUpper(line) {
+			t.Fatalf("uuid batch value = %q", line)
+		}
+	}
+	// A closed module answers disabled, as every other module does.
+	a.config.DevtoolsEnabled = false
+	if result := a.applyCLI(cliDevtoolsRequest(cli.ActionUUID), nil); result.Code != "disabled" {
+		t.Fatalf("disabled answer = %+v", result)
+	}
+}
+
+// TestCLIDevtoolsValidate pins the field whitelist of both actions: a field
+// another action owns is a bad request, never a silent no-op.
+func TestCLIDevtoolsValidate(t *testing.T) {
+	base := func(action string) cli.Request {
+		return cli.Request{V: cli.Protocol, ID: "dev1", Op: cli.OpRun, Action: action}
+	}
+	bad := []cli.Request{}
+	request := base(cli.ActionTS)
+	request.Bytes = 1
+	bad = append(bad, request)
+	request = base(cli.ActionTS)
+	request.Arg = strings.Repeat("1", cli.MaxArg+1)
+	bad = append(bad, request)
+	request = base(cli.ActionTS)
+	request.Notify = true
+	bad = append(bad, request)
+	request = base(cli.ActionTS)
+	request.Count = 2
+	bad = append(bad, request)
+	request = base(cli.ActionUUID)
+	request.Arg = "1700000000"
+	bad = append(bad, request)
+	request = base(cli.ActionUUID)
+	request.Count = 101
+	bad = append(bad, request)
+	request = base(cli.ActionUUID)
+	request.UUIDVersion = 5
+	bad = append(bad, request)
+	request = base(cli.ActionUUID)
+	request.Notify = true
+	bad = append(bad, request)
+	request = base(cli.ActionSettings)
+	request.Upper = true
+	bad = append(bad, request)
+	request = cli.Request{V: cli.Protocol, ID: "dev1", Op: cli.OpStatus, Action: cli.ActionTS}
+	bad = append(bad, request)
+	for _, request := range bad {
+		if code := request.Validate(cli.MaxPayload); code != cli.CodeBadRequest {
+			t.Fatalf("%+v passed validation as %q", request, code)
+		}
+	}
+	good := []cli.Request{base(cli.ActionTS)}
+	request = base(cli.ActionTS)
+	request.Arg = "ts 1700000000"
+	good = append(good, request)
+	request = base(cli.ActionUUID)
+	request.Count, request.UUIDVersion, request.Upper, request.Plain = 100, 7, true, true
+	good = append(good, request)
+	for _, request := range good {
+		if code := request.Validate(cli.MaxPayload); code != "" {
+			t.Fatalf("%+v was rejected as %q", request, code)
+		}
+	}
+}
+
+// TestCLIDevtoolsTwoHopsKeepLinesAndMessage drives the real socket handler: the
+// app builds a Response from the Result and the client turns it back into a
+// Result. Neither hop may drop lines or message.
+func TestCLIDevtoolsTwoHopsKeepLinesAndMessage(t *testing.T) {
+	a := cliTestApp(t)
+	_, path := testServer(t, a)
+	// One request per connection, as the tool always sends.
+	result := do(t, dial(t, path), cli.Request{Op: cli.OpRun, Action: cli.ActionUUID, Count: 4, UUIDVersion: 7}, nil)
+	if !result.OK || len(result.Lines) != 4 || result.Message != strings.Join(result.Lines, "\n") {
+		t.Fatalf("two-hop uuid = %+v", result)
+	}
+	result = do(t, dial(t, path), cli.Request{Op: cli.OpRun, Action: cli.ActionTS, Arg: "1700000000"}, nil)
+	if !result.OK || len(result.Lines) < 3 || result.Message != result.Lines[0] {
+		t.Fatalf("two-hop ts = %+v", result)
+	}
+	if result.State == nil || result.Bytes != 0 || result.Translate != nil || result.QR != nil {
+		t.Fatalf("the devtools answer carried a needless field: %+v", result)
 	}
 }

@@ -367,6 +367,7 @@ func (a *application) shortcutSlots() []shortcutSlot {
 		{Target: "panel", Acc: a.config.PanelShortcut, Enabled: true, Callback: a.toggleMenubarPanel},
 		{Target: "translate", Acc: a.config.TranslateShortcut, Enabled: a.config.TranslateEnabled, Callback: a.toggleTranslate},
 		{Target: "qr", Acc: a.config.QRShortcut, Enabled: a.config.QREnabled, Callback: a.toggleQR},
+		{Target: "devtools", Acc: a.config.DevtoolsShortcut, Enabled: a.config.DevtoolsEnabled, Callback: a.toggleDevtools},
 	}
 }
 
@@ -465,6 +466,8 @@ func (a *application) recordShortcut(mods ui.Modifiers, key ui.Key) {
 		a.config.TranslateShortcut = acc
 	case "qr":
 		a.config.QRShortcut = acc
+	case "devtools":
+		a.config.DevtoolsShortcut = acc
 		// An unknown target is never written: a stray recorder must not change
 		// the keep-awake shortcut or any other slot.
 	}
@@ -666,6 +669,8 @@ func (a *application) shortcutSlotEnabled(target string) bool {
 		return a.config.TranslateEnabled
 	case "qr":
 		return a.config.QREnabled
+	case "devtools":
+		return a.config.DevtoolsEnabled
 	}
 	return true
 }
@@ -709,6 +714,8 @@ func (a *application) slotError(target string) string {
 		return a.translateShortcutError
 	case "qr":
 		return a.qrShortcutError
+	case "devtools":
+		return a.devtoolsShortcutError
 	}
 	return ""
 }
@@ -727,6 +734,8 @@ func (a *application) clearSlotError(target string) {
 		a.translateShortcutError = ""
 	case "qr":
 		a.qrShortcutError = ""
+	case "devtools":
+		a.devtoolsShortcutError = ""
 	}
 }
 
@@ -755,6 +764,10 @@ func (a *application) shortcutSettingsRow(c *ui.Context, t tokenValues, locale, 
 	if target == "qr" {
 		label, recordKey, moduleKey = "QRShortcutLabel", "QRRecordShortcut", "QR"
 		acc = a.config.QRShortcut
+	}
+	if target == "devtools" {
+		label, recordKey, moduleKey = "DevtoolsShortcutLabel", "DevtoolsRecordShortcut", "Devtools"
+		acc = a.config.DevtoolsShortcut
 	}
 	enabled := a.shortcutSlotEnabled(target)
 	recordable := enabled && !a.moduleClosing

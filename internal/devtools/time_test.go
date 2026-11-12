@@ -256,3 +256,21 @@ func TestQueryDoesNotSwallowSimilarTokens(t *testing.T) {
 		t.Fatal("Chinese prefix not recognized")
 	}
 }
+
+// TestConvertTimeAcceptsThePrefix covers the window and the command line: both
+// hand the whole typed text over, so the prefix must not become a date error.
+func TestConvertTimeAcceptsThePrefix(t *testing.T) {
+	now := time.Date(2026, 11, 12, 8, 0, 0, 0, time.UTC)
+	if output := ConvertTime("ts 946684800", now, time.UTC); output.ErrorKey != "" {
+		t.Fatalf("ts 946684800 = %+v", output)
+	}
+	if output := ConvertTime("ts 946684800000", now, time.UTC); output.ErrorKey != "DevtoolsUnit" {
+		t.Fatalf("ts 946684800000 = %+v", output)
+	}
+	if output := ConvertTime("ts now", now, time.UTC); len(output.Rows) != 4 {
+		t.Fatalf("ts now = %+v", output)
+	}
+	if output := ConvertTime("TS 1700000000", now, time.UTC); output.ErrorKey != "" {
+		t.Fatalf("TS 1700000000 = %+v", output)
+	}
+}

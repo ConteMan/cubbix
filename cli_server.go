@@ -19,6 +19,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/ConteMan/cubbix/internal/cli"
+	"github.com/ConteMan/cubbix/internal/devtools"
 	qrlib "github.com/ConteMan/cubbix/internal/qr"
 )
 
@@ -490,6 +491,10 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 		if !a.config.QREnabled {
 			return cli.Failure(cli.CodeDisabled)
 		}
+	case cli.ActionTS, cli.ActionUUID:
+		if !a.config.DevtoolsEnabled {
+			return cli.Failure(cli.CodeDisabled)
+		}
 	}
 	var err error
 	switch req.Action {
@@ -516,6 +521,14 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 	case cli.ActionSettings:
 		page, _ := settingsPageIndex(req.Page, a)
 		err = a.runURL(paletteURLRequest{Kind: "settings", Page: page, CLI: true})
+	case cli.ActionTS:
+		result := a.runCLIDevtoolsTime(req.Arg)
+		result.State = a.cliState()
+		return result
+	case cli.ActionUUID:
+		result := a.runCLIDevtoolsUUID(req)
+		result.State = a.cliState()
+		return result
 	case cli.ActionQR:
 		if len(body) > cli.MaxPayload {
 			return cli.Failure(cli.CodeBadRequest)
@@ -541,6 +554,46 @@ func (a *application) applyCLI(req cli.Request, body []byte) cli.Result {
 		result.Message = a.cliMessage(locale, req.Action)
 	}
 	result.State = a.cliState()
+	return result
+}
+
+// runCLIDevtoolsTime converts one ts argument. An empty argument is the
+// current time, exactly as the palette's bare ts is. A failure keeps its own
+// resource key as the code, so a script can tell a bad unit from a bad date.
+func (a *application) runCLIDevtoolsTime(arg string) cli.Result {
+	return a.cliDevtoolsResult(uiLocale(), devtools.ConvertTime(arg, time.Now(), time.Local))
+}
+
+// runCLIDevtoolsUUID generates the requested batch. The protocol defaults are
+// applied here, after Validate has bounded the range.
+func (a *application) runCLIDevtoolsUUID(req cli.Request) cli.Result {
+	version := req.UUIDVersion
+	if version == 0 {
+		version = 4
+	}
+	count := req.Count
+	if count == 0 {
+		count = 1
+	}
+	return a.cliDevtoolsResult(uiLocale(), devtools.GenerateUUID(version, count, req.Upper, req.Plain))
+}
+
+// cliDevtoolsResult is one devtools answer: every copyable value is a line of
+// its own, and the default row's payload is the message. No body frame is
+// written and no bytes are reported, because the values travel in lines.
+func (a *application) cliDevtoolsResult(locale string, output devtools.Output) cli.Result {
+	if output.ErrorKey != "" {
+		result := cli.Failure(output.ErrorKey)
+		result.Message = a.text(locale, output.ErrorKey)
+		return result
+	}
+	lines := make([]string, 0, len(output.Rows))
+	for _, row := range output.Rows {
+		lines = append(lines, strings.Split(row.Payload, "\n")...)
+	}
+	result := cli.NewResult(nil)
+	result.Lines = lines
+	result.Message = output.Payload
 	return result
 }
 

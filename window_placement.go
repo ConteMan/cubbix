@@ -461,6 +461,9 @@ func (a *application) saveWindowPlacesOnQuit() {
 		return
 	}
 	changed := a.rememberTranslatePlace()
+	if a.rememberDevtoolsPlace() {
+		changed = true
+	}
 	if w := a.settingsPlacementWindow(); w != nil {
 		a.observeMove(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})
 		if id, value, _, ok := takePending(&a.settingsPlace); ok {
@@ -534,6 +537,9 @@ func (a *application) repairWindowPlaces(displays []mygo.Display) {
 		// built from whole device pixels of it.
 		a.refreshQRScale()
 		a.refreshQR()
+	}
+	if s := a.devtools; s != nil && s.frame() != nil && a.topologyChanged(&s.place, displays) {
+		a.repairOrDeferPlacement(&s.place, s.frame(), displays, a.jsonReselect, a.devtoolsSeats())
 	}
 	if w := a.settingsPlacementWindow(); w != nil && a.topologyChanged(&a.settingsPlace, displays) {
 		a.repairOrDeferPlacement(&a.settingsPlace, w, displays, a.settingsReselect, seatTable{seats: &a.config.WindowPositions})

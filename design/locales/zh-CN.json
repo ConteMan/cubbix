@@ -421,5 +421,7 @@
   "DevtoolsLeapSecond": "暂不支持闰秒",
   "DevtoolsInput": "时间戳、日期或 UUID",
   "PaletteResults": "结果",
-  "PaletteActionTooltip": "操作 (⌘K)"
+  "PaletteActionTooltip": "操作 (⌘K)",
+  "DevtoolsCardAction": "开发工具…",
+  "DevtoolsSelectionDenied": "开启辅助功能权限后，快捷键可带入选中的文字"
 }

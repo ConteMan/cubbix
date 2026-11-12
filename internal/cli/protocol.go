@@ -50,6 +50,8 @@ const (
 	ActionSettings    = "settings"
 	ActionTranslate   = "translate"
 	ActionQR          = "qr"
+	ActionTS          = "ts"
+	ActionUUID        = "uuid"
 )
 
 // Accepted --to values for the translate action. Empty means auto.
@@ -107,6 +109,14 @@ type Request struct {
 	Page string `json:"page,omitempty"`
 	// To overrides the detected target language for translate.
 	To string `json:"to,omitempty"`
+	// Count is how many UUIDs a uuid request generates. 0 means the default 1;
+	// the accepted range is 1-100.
+	Count int `json:"count,omitempty"`
+	// UUIDVersion is 4 or 7 for a uuid request. 0 means the default 4.
+	UUIDVersion int `json:"uuidVersion,omitempty"`
+	// Upper and Plain are the two presentation switches of a uuid request.
+	Upper bool `json:"upper,omitempty"`
+	Plain bool `json:"plain,omitempty"`
 }
 
 // Validate reports the protocol code of an invalid request, or "".
@@ -128,6 +138,11 @@ func (r Request) Validate(maxPayload int) string {
 		return ""
 	case OpRun:
 	default:
+		return CodeBadRequest
+	}
+	// The devtools fields belong to the two devtools actions alone; any other
+	// action carrying one is a request this version does not understand.
+	if r.Action != ActionTS && r.Action != ActionUUID && (r.Count != 0 || r.UUIDVersion != 0 || r.Upper || r.Plain) {
 		return CodeBadRequest
 	}
 	switch r.Action {
@@ -173,6 +188,29 @@ func (r Request) Validate(maxPayload int) string {
 		}
 		switch r.To {
 		case "", TranslateToAuto, TranslateToZh, TranslateToEn:
+		default:
+			return CodeBadRequest
+		}
+	case ActionTS:
+		// ts carries its whole input in arg: no body frame, no count, no
+		// presentation switches and nothing a hint or a window would use.
+		if len(r.Arg) > MaxArg || r.Bytes != 0 || r.Mode != "" || r.Follow != 0 || r.Lid != nil ||
+			r.Blank || r.Page != "" || r.Notify || r.To != "" || r.Count != 0 ||
+			r.UUIDVersion != 0 || r.Upper || r.Plain {
+			return CodeBadRequest
+		}
+	case ActionUUID:
+		// uuid accepts count, uuidVersion, upper and plain only: it has no
+		// text, so no body frame, and a hint would be meaningless.
+		if r.Arg != "" || r.Bytes != 0 || r.Mode != "" || r.Follow != 0 || r.Lid != nil ||
+			r.Blank || r.Page != "" || r.Notify || r.To != "" {
+			return CodeBadRequest
+		}
+		if r.Count < 0 || r.Count > 100 {
+			return CodeBadRequest
+		}
+		switch r.UUIDVersion {
+		case 0, 4, 7:
 		default:
 			return CodeBadRequest
 		}

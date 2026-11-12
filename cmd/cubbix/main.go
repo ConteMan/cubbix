@@ -84,17 +84,23 @@ func main() { os.Exit(run(os.Args[1:], live())) }
 
 // invocation is a parsed command line.
 type invocation struct {
-	command    string // awake.on, awake.off, awake.toggle, awake.status, status, json.new, palette, settings, translate, version, help
-	flags      flags
-	awake      awakeOptions
-	body       bodyOptions
-	page       string
-	to         string // translate target override
-	textArg    string // the positional TEXT of translate or qr
-	hasTextArg bool
-	png        string // the --png path of qr
-	hasPNG     bool
-	helpTopic  string // `cubbix help translate`
+	command       string // awake.on, awake.off, awake.toggle, awake.status, status, json.new, palette, settings, translate, version, help
+	flags         flags
+	awake         awakeOptions
+	body          bodyOptions
+	page          string
+	to            string // translate target override
+	textArg       string // the positional TEXT of translate, qr or ts
+	hasTextArg    bool
+	countArgument bool // uuid's positional N, which -n may not repeat
+	count         int
+	hasCount      bool
+	uuidVersion   int
+	upper         bool
+	plain         bool
+	png           string // the --png path of qr
+	hasPNG        bool
+	helpTopic     string // `cubbix help translate`
 }
 
 type flags struct {
@@ -144,6 +150,10 @@ func run(args []string, e *env) int {
 			fmt.Fprint(e.stdout, translateHelpText)
 		case "qr":
 			fmt.Fprint(e.stdout, qrHelpText)
+		case "ts":
+			fmt.Fprint(e.stdout, tsHelpText)
+		case "uuid":
+			fmt.Fprint(e.stdout, uuidHelpText)
 		default:
 			fmt.Fprint(e.stdout, helpText)
 		}
@@ -169,6 +179,9 @@ func run(args []string, e *env) int {
 	}
 	if inv.command == "qr" {
 		return reportQR(e, inv, result, payload)
+	}
+	if inv.command == "ts" || inv.command == "uuid" {
+		return reportDevtools(e, inv, result)
 	}
 	return report(e, inv, inv.flags.json, result)
 }
@@ -223,6 +236,22 @@ func reportQR(e *env, inv invocation, result cli.Result, payload []byte) int {
 		return exitOK
 	}
 	fmt.Fprint(e.stdout, code.Matrix(qrTerminalQuietZone))
+	return exitOK
+}
+
+// reportDevtools prints one converted value per line. The default result is
+// already the first line, so the message is not printed twice; --json still
+// carries it as message.
+func reportDevtools(e *env, inv invocation, result cli.Result) int {
+	if !result.OK {
+		return report(e, inv, inv.flags.json, result)
+	}
+	if inv.flags.json {
+		return report(e, inv, true, result)
+	}
+	for _, line := range result.Lines {
+		fmt.Fprintln(e.stdout, line)
+	}
 	return exitOK
 }
 
@@ -328,6 +357,8 @@ func fallbackMessage(code, command string) string {
 			return "The translate module is disabled."
 		case command == "qr":
 			return "The QR code module is disabled."
+		case command == "ts" || command == "uuid":
+			return "The devtools module is disabled."
 		}
 		return "The keep-awake module is disabled."
 	case cli.CodeBusy:
@@ -341,6 +372,19 @@ func buildRequest(inv invocation, e *env) (cli.Request, []byte, error) {
 	request := cli.Request{V: cli.Protocol, ID: newID(), Notify: inv.flags.notify}
 	var payload []byte
 	switch inv.command {
+	case "ts":
+		text, err := readTSArg(inv, e)
+		if err != nil {
+			return request, nil, err
+		}
+		request.Op, request.Action, request.Arg = cli.OpRun, cli.ActionTS, text
+	case "uuid":
+		request.Op, request.Action = cli.OpRun, cli.ActionUUID
+		version, count := inv.uuidVersion, inv.count
+		if !inv.hasCount {
+			count = 1
+		}
+		request.UUIDVersion, request.Count, request.Upper, request.Plain = version, count, inv.upper, inv.plain
 	case "qr":
 		body, err := readQRBody(inv, e)
 		if err != nil {
@@ -430,6 +474,44 @@ func readTranslateBody(inv invocation, e *env) ([]byte, error) {
 		return nil, usagef("translate needs text. See \"cubbix help translate\".")
 	}
 	return data, nil
+}
+
+// readTSArg reads the text of `cubbix ts`: an argument, or standard input when
+// it is a pipe. Both at once is a usage error, as 006 does for the other text
+// commands; no text at all asks the app for the current time.
+func readTSArg(inv invocation, e *env) (string, error) {
+	reader, terminal := e.stdin()
+	if inv.hasTextArg && inv.textArg != "-" {
+		if !terminal {
+			return "", usagef("TEXT and standard input are mutually exclusive.")
+		}
+		return limitedTSArg(inv.textArg)
+	}
+	if terminal && !inv.hasTextArg {
+		// Interactive and empty: the app answers with the current time.
+		return "", nil
+	}
+	data, err := io.ReadAll(io.LimitReader(reader, cli.MaxArg+1))
+	if err != nil {
+		return "", usagef("Reading standard input: %v", err)
+	}
+	if len(data) > cli.MaxArg {
+		return "", usagef("The text exceeds the 128-byte limit.")
+	}
+	text := strings.TrimSpace(string(data))
+	if text == "" {
+		return "", usagef("ts needs text or standard input. See \"cubbix help ts\".")
+	}
+	return text, nil
+}
+
+// limitedTSArg bounds one positional TEXT: the app's ts argument is at most
+// MaxArg bytes as well, so an over-long text fails here instead of remotely.
+func limitedTSArg(text string) (string, error) {
+	if len(text) > cli.MaxArg {
+		return "", usagef("The text exceeds the 128-byte limit.")
+	}
+	return text, nil
 }
 
 // readQRBody reads the text of `cubbix qr`: an argument, --text, a file, or

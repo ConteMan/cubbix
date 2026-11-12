@@ -3,7 +3,9 @@
 ## Unreleased
 
 - New Devtools module, on by default. Type a timestamp, a date, `now`, `uuid` or `uuid7 8` in the command palette and a copyable result appears at the top; press Return to copy it and close the panel. Same-named ordinary commands stay below.
-- An empty palette shows a clipboard suggestion for a timestamp or UUID but never selects it. Uppercase and no-hyphens live under ⌘K as result actions. The Devtools settings page only has the switch so far; the tool window and shortcut come next.
+- An empty palette shows a clipboard suggestion for a timestamp or UUID but never selects it. Uppercase and no-hyphens live under ⌘K as result actions, which can also open the batch in a tool window.
+- Devtools now has its own window and the ⌃⌥⌘D shortcut: convert repeatedly, generate up to 100 UUIDs at once, and keep its place, size and pin; uppercase and no-hyphens are switches in the window. The command line gains `cubbix ts` and `cubbix uuid` for scripts.
+- ⌘Return on a result row also pastes it into the app that was in front. Without Accessibility permission it only copies and closes the panel: no authorization dialog, and it never claims a paste that did not happen.
 
 ## 0.8.0 — 2026-11-10
 

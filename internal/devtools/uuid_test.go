@@ -144,3 +144,47 @@ func TestUUIDQueryCountRules(t *testing.T) {
 		}
 	}
 }
+
+func TestParseGenerationKeepsTheWholeRequest(t *testing.T) {
+	for _, test := range []struct {
+		text string
+		want Generation
+	}{
+		{"uuid", Generation{Version: 0, Count: 0}},
+		{"uuid4", Generation{Version: 0, Count: 0}},
+		{"uuidv4", Generation{Version: 0, Count: 0}},
+		{"uuid7", Generation{Version: 7, Count: 1}},
+		{"uuidv7", Generation{Version: 7, Count: 1}},
+		{"uuid7 21", Generation{Version: 7, Count: 21}},
+		{" uuid4 08 ", Generation{Version: 4, Count: 8}},
+	} {
+		got, ok := ParseGeneration(test.text)
+		if !ok || got != test.want {
+			t.Fatalf("%q = %+v %v, want %+v", test.text, got, ok, test.want)
+		}
+	}
+	for _, text := range []string{"uuid 0", "uuid 101", "uuid -1", "uuid v4", "ts 1700000000", "devtools"} {
+		if _, ok := ParseGeneration(text); ok {
+			t.Fatalf("%q was read as a generation request", text)
+		}
+	}
+	if got, ok := ParseGeneration("uuid7 21"); !ok || got.Version != 7 || got.Count != 21 {
+		t.Fatal("uuid7 21 lost its version")
+	}
+}
+
+func TestFormatBatchKeepsTheValues(t *testing.T) {
+	batch := "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa\nbbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+	if got := FormatBatch(batch, false, false); got != batch {
+		t.Fatalf("plain passthrough = %q", got)
+	}
+	if got := FormatBatch(batch, true, false); got != strings.ToUpper(batch) {
+		t.Fatalf("upper = %q", got)
+	}
+	if got := FormatBatch(batch, false, true); strings.Contains(got, "-") || strings.Count(got, "\n") != 1 {
+		t.Fatalf("plain = %q", got)
+	}
+	if got := FormatBatch(batch, true, true); got != strings.ToUpper(strings.ReplaceAll(batch, "-", "")) {
+		t.Fatalf("upper and plain = %q", got)
+	}
+}

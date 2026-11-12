@@ -108,6 +108,14 @@ type paletteState struct {
 	// remember the session they were built in, so a row that outlives its
 	// session cannot copy or open anything.
 	devSession uint64
+	// resultRequest is the complete generation request behind the current
+	// result rows, so "open in window" never re-generates with the window's
+	// defaults. actionsDevRequest is that request while the result action page
+	// is open. resultUpper and resultPlain follow the presentation actions.
+	resultRequest     devtoolsRequest
+	actionsDevRequest devtoolsRequest
+	resultUpper       bool
+	resultPlain       bool
 	// resultSession is the session the current result rows belong to.
 	resultSession uint64
 	// actionsResultSession is the session the open result action page
@@ -173,6 +181,9 @@ func (a *application) showPalette() {
 	a.palette.actionSelection = ""
 	a.palette.resultCache = nil
 	a.palette.suggestion = nil
+	a.palette.resultRequest = devtoolsRequest{}
+	a.palette.resultUpper = false
+	a.palette.resultPlain = false
 	a.palette.done = false
 	a.palette.devSession++
 	a.palette.resultSession = 0
@@ -233,6 +244,9 @@ func (a *application) invalidatePaletteAfterModuleChange() {
 	// frame rebuilds the rows.
 	p.resultCache = nil
 	p.suggestion = nil
+	p.resultRequest = devtoolsRequest{}
+	p.resultUpper = false
+	p.resultPlain = false
 	p.done = false
 	p.devSession++
 	p.resultSession = 0
@@ -382,6 +396,11 @@ func (a *application) togglePaletteActions() {
 		p.actionsResultSession = p.devSession
 		p.actionsResultUUID = row.Result.Kind == devtools.KindUUID
 		p.actionsPayload = row.Result.Payload
+		p.actionsDevRequest = p.resultRequest
+		if p.actionsResultUUID {
+			p.actionsDevRequest.Upper = p.resultUpper
+			p.actionsDevRequest.Plain = p.resultPlain
+		}
 		p.actionsTitle = row.Title
 		p.actionsIcon = row.Icon
 		p.actionSelection = ""
@@ -641,6 +660,7 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		p.selectionKey = ""
 		p.runError = ""
 		p.done = false
+		p.resultUpper, p.resultPlain = false, false
 		if query != "" {
 			// Typing ends the clipboard group for this panel session; only a
 			// fresh open reads the clipboard again.
@@ -693,6 +713,7 @@ func (a *application) refreshPalette(p *paletteState, locale string) {
 		if entry := a.devtoolsCache(p, query, now); entry.recognized {
 			resultRows = a.devtoolsResultRows(locale, entry.output)
 			p.resultSession = p.devSession
+			p.resultRequest = devtoolsRequestForQuery(query)
 		}
 	}
 
@@ -1022,6 +1043,31 @@ func (a *application) refreshResultActions(p *paletteState, locale string) {
 			},
 		)
 	}
+	request := p.actionsDevRequest
+	actions = append(actions,
+		paletteAction{
+			ID:    "devtools.paste",
+			Title: localizedTitle("DevtoolsPaste"),
+			Icon:  "external-link",
+			Run: func(a *application) error {
+				if err := a.pasteDevtoolsPayload(payload); err != nil {
+					return err
+				}
+				p.done = true
+				return nil
+			},
+		},
+		paletteAction{
+			ID:    "devtools.open",
+			Title: localizedTitle("DevtoolsOpenWindow"),
+			Icon:  "blocks",
+			Run: func(a *application) error {
+				p.done = true
+				a.openDevtools(request)
+				return nil
+			},
+		},
+	)
 	rows := []paletteRow{{Kind: paletteRowActionTitle, Key: "palette-action-title", Title: p.actionsTitle, Icon: p.actionsIcon}}
 	rows = append(rows, paletteRow{Kind: paletteRowSeparator})
 	for index := range actions {
@@ -1076,7 +1122,9 @@ func (a *application) runPaletteResultAction(p *paletteState) {
 		a.invalidatePalette()
 		return
 	}
-	if action.ID == "devtools.copy" {
+	switch action.ID {
+	case "devtools.copy", "devtools.paste", "devtools.open":
+		// Copy closes the panel, and paste and open close it themselves.
 		return
 	}
 	p.mode = paletteCommandMode
@@ -1117,6 +1165,7 @@ func (a *application) transformDevtoolsResult(query string, upper, plain bool) {
 		entry.output.Payload = entry.output.Rows[0].Payload
 	}
 	a.palette.resultCache[query] = entry
+	a.palette.resultUpper, a.palette.resultPlain = upper, plain
 }
 
 // paletteHasActions reports whether the selected row has an action page. A
@@ -1136,6 +1185,43 @@ func (a *application) paletteHasActions(p *paletteState) bool {
 		return row.ErrorKey == ""
 	}
 	return false
+}
+
+// pastePaletteResult is ⌘回车 on a result row: copy the payload and paste it to
+// the application that was in front. A row that copies nothing pastes nothing.
+func (a *application) pastePaletteResult() {
+	p := a.palette
+	if p == nil || p.done {
+		return
+	}
+	payload := ""
+	switch {
+	case p.mode == paletteActionMode && p.actionsResult:
+		if !a.config.DevtoolsEnabled || p.actionsResultSession != p.devSession {
+			a.invalidatePaletteAfterModuleChange()
+			return
+		}
+		payload = p.actionsPayload
+	case p.mode == paletteCommandMode:
+		row, ok := p.selectedRow()
+		if !ok || row.Kind != paletteRowResult || row.ErrorKey != "" || row.Result.Payload == "" {
+			return
+		}
+		if !a.config.DevtoolsEnabled || p.resultSession != p.devSession {
+			a.invalidatePaletteAfterModuleChange()
+			return
+		}
+		payload = row.Result.Payload
+	default:
+		return
+	}
+	if err := a.pasteDevtoolsPayload(payload); err != nil {
+		p.runError, p.errorKey = "DevtoolsCopyFailed", "DevtoolsCopyFailed"
+		a.invalidatePalette()
+		return
+	}
+	p.done = true
+	a.hidePalette()
 }
 
 func (a *application) copyDevtoolsPayload(payload string) error {

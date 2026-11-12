@@ -174,10 +174,25 @@ type application struct {
 	qrSelectionPending    bool
 	qrSelectionGeneration uint64
 	qrSelectionHintShown  bool
-	// devtools seams: the clipboard read is for the empty-query suggestion,
-	// the write is the result copy. Both stay nil-safe for headless tests.
-	devtoolsReadClipboard func() string
-	devtoolsCopy          func(string) error
+	// devtools is the eighth module. Its seams keep every test headless: no
+	// native window, no clipboard, no key event and no worker.
+	devtools                    *devtoolsState
+	devtoolsShortcutError       string
+	devtoolsReadClipboard       func() string
+	devtoolsCopy                func(string) error
+	createDevtoolsWindow        func(*devtoolsState)
+	devtoolsOnMainThread        func(func())
+	devtoolsAsync               bool
+	devtoolsSelectionPending    bool
+	devtoolsSelectionGeneration uint64
+	devtoolsSelectionHintShown  bool
+	// The paste seams: a preflight that never prompts, the application in
+	// front, and one Cmd+V. They stay nil in every headless test.
+	devtoolsPasteAccess     func() bool
+	devtoolsFrontmost       func() int32
+	devtoolsPostKey         func(int32) error
+	devtoolsPasteDelay      time.Duration
+	devtoolsPasteGeneration uint64
 	// quiet silences the hint and the lid notification for one command line
 	// request; it is set and reset on the main thread only.
 	quiet                  bool
@@ -266,6 +281,9 @@ func newApplication(path string) (*application, error) {
 	a.qrCopyPNG = copyQRImageData
 	a.devtoolsReadClipboard = mygo.Clipboard.ReadText
 	a.devtoolsCopy = defaultDevtoolsCopy
+	a.createDevtoolsWindow = a.buildDevtoolsWindow
+	a.devtoolsOnMainThread = mygo.RunOnMain
+	a.devtoolsAsync = true
 	a.qrWriteFile = writeQRFile
 	a.qrChooseSave = func(w *mygo.Window) (string, error) {
 		return mygo.Dialog.Save(mygo.SaveDialogOptions{Parent: w, Title: a.text(mygo.App.Locale(), "QRSave"), DefaultPath: "qrcode.png", Filters: []mygo.FileFilter{{Name: "PNG", Extensions: []string{"png"}}}})
@@ -376,6 +394,9 @@ func (a *application) visibility(visible bool) {
 			}
 		}
 		if a.qrVisible() {
+			visible = true
+		}
+		if a.devtoolsVisible() {
 			visible = true
 		}
 	}
@@ -626,6 +647,10 @@ func (a *application) ready() {
 	a.registerPanelShortcut()
 	a.registerTranslateShortcut()
 	a.registerQRShortcut()
+	a.registerDevtoolsShortcut()
+	a.devtoolsPasteAccess = devtoolsPostAccess
+	a.devtoolsFrontmost = devtoolsFrontmostPID
+	a.devtoolsPostKey = postDevtoolsCommandV
 	a.refreshTranslateKey()
 	a.feedback.watch()
 	a.startCLIServer()
@@ -669,6 +694,7 @@ func (a *application) beforeQuit(*mygo.QuitEvent) {
 	a.cli.stop()
 	a.closeTranslate()
 	a.closeQR()
+	a.closeDevtools()
 	a.hidePalette()
 	a.hidePaletteGuides()
 	a.hideMenubarPanel()

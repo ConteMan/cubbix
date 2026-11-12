@@ -77,6 +77,8 @@ func commandCategory(cmd *command) string {
 		return "Translate"
 	case "qr":
 		return "QR"
+	case "devtools":
+		return "Devtools"
 	}
 	return "R05App"
 }
@@ -90,6 +92,7 @@ func (a *application) commands() []*command {
 	all = append(all, a.systemCommands()...)
 	all = append(all, a.translateCommands()...)
 	all = append(all, a.qrCommands()...)
+	all = append(all, a.devtoolsCommands()...)
 	commands := make([]*command, 0, len(all))
 	for _, command := range all {
 		if command.Available == nil || command.Available(a) {
@@ -134,6 +137,27 @@ func (a *application) qrCommands() []*command {
 			Available: func(a *application) bool { return a.config.QREnabled },
 			Run: func(a *application, req request) error {
 				a.openQRText(req.Arg)
+				return nil
+			},
+		},
+	}
+}
+
+// devtoolsCommands is the window's entry. It takes no text: the window opens
+// empty and focused, exactly as the card panel opens it. None of its words is
+// a devtools recognition word, so typing "ts" or "uuid" still converts.
+func (a *application) devtoolsCommands() []*command {
+	return []*command{
+		{
+			ID:        "devtools.open",
+			Title:     localizedTitle("Devtools"),
+			Keywords:  []string{"开发工具", "devtools", "devtool", "gongjuxiang"},
+			Tile:      "devtools",
+			Icon:      "blocks",
+			Param:     paramNone,
+			Available: func(a *application) bool { return a.config.DevtoolsEnabled },
+			Run: func(a *application, req request) error {
+				a.openDevtools(devtoolsRequest{})
 				return nil
 			},
 		},

@@ -284,7 +284,7 @@ func TestMenubarPanelProcessEndedWarning(t *testing.T) {
 		}
 		// The warning sits in its own row, so the card grows by one.
 		token := tokens(false, locale)
-		if got, want := a.menubarPanelHeight(token), int(2*token.Space12+awakeCardHeight(token, true)+token.Space8+jsonCardHeight(token, 0)+token.Space8+translateCardHeight(token)+token.Space8+translateCardHeight(token)+token.Space8+token.StrokeHairline+token.SizeNavHeight); got != want {
+		if got, want := a.menubarPanelHeight(token), int(2*token.Space12+awakeCardHeight(token, true)+token.Space8+jsonCardHeight(token, 0)+token.Space8+translateCardHeight(token)+token.Space8+translateCardHeight(token)+token.Space8+translateCardHeight(token)+token.Space8+token.StrokeHairline+token.SizeNavHeight); got != want {
 			t.Fatalf("%s: height with warning = %d, want %d", locale, got, want)
 		}
 	}
@@ -392,6 +392,7 @@ func TestMenubarPanelTileToggles(t *testing.T) {
 	a.config.JSONEnabled = false
 	a.config.TranslateEnabled = false
 	a.config.QREnabled = false
+	a.config.DevtoolsEnabled = false
 	a.toggleMenubarPanel()
 	tt := panelView(a, "en")
 	if !tt.HasText(a.text("en", "PanelEmpty")) {
@@ -417,6 +418,13 @@ func TestMenubarPanelTileToggles(t *testing.T) {
 	if !tt.HasText(a.text("en", "QRCardAction")) || tt.HasText(a.text("en", "PanelEmpty")) {
 		t.Fatalf("the QR card alone left the panel empty: %v", tt.Texts())
 	}
+	// The devtools card is the fifth: only all five off is empty.
+	a.changeQREnabled(false)
+	a.changeDevtoolsEnabled(true)
+	tt.Frame()
+	if !tt.HasText(a.text("en", "DevtoolsCardAction")) || tt.HasText(a.text("en", "PanelEmpty")) {
+		t.Fatalf("the devtools card alone left the panel empty: %v", tt.Texts())
+	}
 }
 
 func TestContextMenuKeepsOnlySystemActions(t *testing.T) {
@@ -437,11 +445,11 @@ func TestContextMenuKeepsOnlySystemActions(t *testing.T) {
 
 func TestMenubarPanelHeight(t *testing.T) {
 	tt := tokens(false, "zh-CN")
-	// The translate and QR cards are a third and a fourth tile by default: two
-	// cards and the gap before each. With every other module off they replace
-	// the empty row.
-	extra := int(2 * (translateCardHeight(tt) + tt.Space8))
-	emptyWithTranslate := int(2*tt.Space12 + 2*(translateCardHeight(tt)+tt.Space8) + tt.StrokeHairline + tt.SizeNavHeight)
+	// The translate, QR and devtools cards are a third, fourth and fifth tile
+	// by default: three cards and the gap before each. With every other module
+	// off they replace the empty row.
+	extra := int(3 * (translateCardHeight(tt) + tt.Space8))
+	emptyWithTranslate := int(2*tt.Space12 + 3*(translateCardHeight(tt)+tt.Space8) + tt.StrokeHairline + tt.SizeNavHeight)
 	cases := []struct {
 		name        string
 		awake, json bool

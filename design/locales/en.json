@@ -421,5 +421,7 @@
   "DevtoolsLeapSecond": "Leap seconds are not supported yet",
   "DevtoolsInput": "A timestamp, a date, or a UUID",
   "PaletteResults": "Results",
-  "PaletteActionTooltip": "Actions (⌘K)"
+  "PaletteActionTooltip": "Actions (⌘K)",
+  "DevtoolsCardAction": "Devtools…",
+  "DevtoolsSelectionDenied": "Turn on Accessibility access to bring the selected text in with the shortcut"
 }

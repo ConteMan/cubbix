@@ -41,6 +41,14 @@ func ConvertTime(text string, now time.Time, loc *time.Location) Output {
 		loc = time.Local
 	}
 	text = strings.TrimSpace(text)
+	// A caller may pass the prefix along: the window's one field and the
+	// command line both accept "ts ..." so a pasted panel query still works.
+	if token, rest := splitToken(text); rest != "" {
+		switch strings.ToLower(token) {
+		case "ts", "timestamp", "时间戳":
+			text = rest
+		}
+	}
 	if text == "" || strings.EqualFold(text, "now") {
 		return CurrentTime(now, loc)
 	}
