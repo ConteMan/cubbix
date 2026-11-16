@@ -32,7 +32,7 @@ var (
 	speechLoadErr  error
 	speechClasses  struct{ synth, utterance, voice objc.ID }
 	speechSelector struct {
-		alloc, init, utf8String, utteranceWithString, setVoice,
+		alloc, init, utf8String, speechUtteranceWithString, setVoice,
 		voiceWithLanguage, speakUtterance, stopSpeaking, isSpeaking,
 		release, newPool, drain objc.SEL
 	}
@@ -59,7 +59,7 @@ func loadSpeechClasses() {
 	speechSelector.alloc = objc.RegisterName("alloc")
 	speechSelector.init = objc.RegisterName("init")
 	speechSelector.utf8String = objc.RegisterName("stringWithUTF8String:")
-	speechSelector.utteranceWithString = objc.RegisterName("utteranceWithString:")
+	speechSelector.speechUtteranceWithString = objc.RegisterName("speechUtteranceWithString:")
 	speechSelector.setVoice = objc.RegisterName("setVoice:")
 	speechSelector.voiceWithLanguage = objc.RegisterName("voiceWithLanguage:")
 	speechSelector.speakUtterance = objc.RegisterName("speakUtterance:")
@@ -68,6 +68,40 @@ func loadSpeechClasses() {
 	speechSelector.release = objc.RegisterName("release")
 	speechSelector.newPool = objc.RegisterName("new")
 	speechSelector.drain = objc.RegisterName("drain")
+	// An unavailable Objective-C method raises an exception that Go cannot
+	// recover. Reject incompatible runtimes before sending any speech message.
+	if !speechMethodsAvailable() {
+		speechLoadErr = errSpeechUnavailable
+	}
+}
+
+func speechMethodsAvailable() bool {
+	responds := objc.RegisterName("respondsToSelector:")
+	instancesRespond := objc.RegisterName("instancesRespondToSelector:")
+	for _, method := range []struct {
+		class    objc.ID
+		selector objc.SEL
+		instance bool
+	}{
+		{speechClasses.synth, speechSelector.alloc, false},
+		{speechClasses.synth, speechSelector.init, true},
+		{speechClasses.synth, speechSelector.speakUtterance, true},
+		{speechClasses.synth, speechSelector.stopSpeaking, true},
+		{speechClasses.synth, speechSelector.isSpeaking, true},
+		{speechClasses.synth, speechSelector.release, true},
+		{speechClasses.utterance, speechSelector.speechUtteranceWithString, false},
+		{speechClasses.utterance, speechSelector.setVoice, true},
+		{speechClasses.voice, speechSelector.voiceWithLanguage, false},
+	} {
+		query := responds
+		if method.instance {
+			query = instancesRespond
+		}
+		if method.class == 0 || !objc.Send[bool](method.class, query, method.selector) {
+			return false
+		}
+	}
+	return true
 }
 
 // speechString bridges a Go string to an autoreleased NSString. purego passes
@@ -126,7 +160,7 @@ func (systemAVSpeech) Start(text string) (objc.ID, error) {
 	if synth == 0 {
 		return 0, errSpeechUnavailable
 	}
-	utterance := speechClasses.utterance.Send(speechSelector.utteranceWithString, speechString(text))
+	utterance := speechClasses.utterance.Send(speechSelector.speechUtteranceWithString, speechString(text))
 	if utterance == 0 {
 		synth.Send(speechSelector.release)
 		return 0, errSpeechUnavailable

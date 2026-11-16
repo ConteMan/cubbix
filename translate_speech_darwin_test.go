@@ -220,3 +220,21 @@ func TestSaySpeechStopReapsChild(t *testing.T) {
 	default:
 	}
 }
+
+// Exercise the real runtime without speaking or creating a visible window.
+// Fake drivers cannot catch a misspelled Objective-C selector.
+func TestSystemSpeechRuntimeMethods(t *testing.T) {
+	speechOnce.Do(loadSpeechClasses)
+	if speechLoadErr != nil {
+		t.Fatalf("system speech methods unavailable: %v", speechLoadErr)
+	}
+	if !speechMethodsAvailable() {
+		t.Fatal("system speech methods unavailable")
+	}
+	original := speechSelector.speechUtteranceWithString
+	t.Cleanup(func() { speechSelector.speechUtteranceWithString = original })
+	speechSelector.speechUtteranceWithString = objc.RegisterName("utteranceWithString:")
+	if speechMethodsAvailable() {
+		t.Fatal("unsupported utterance factory was accepted")
+	}
+}

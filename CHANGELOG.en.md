@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1 — 2026-11-16
+
+- Fixed a possible app crash when Translate spoke automatically or manually; when the system speech API is unavailable, it now uses a fallback speech method.
+
 ## 0.9.0 — 2026-11-12
 
 - New Devtools module, on by default. Type a timestamp, a date, `now`, `uuid` or `uuid7 8` in the command palette and a copyable result appears at the top; press Return to copy it and close the panel. Same-named ordinary commands stay below.
